@@ -2,12 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Debtonate</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/vue@next" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <header>
+      <h1>Debtonate</h1>
+    </header>
+    <section id="assignment">
+      <h2>Input a loan</h2>
+      <!-- 1) Show an alert (any text of your choice) when the button is pressed -->
+      <button v-on:click="createLoan">Create</button>
+      <hr />
+      <!-- 2) Register the user input on "keydown" and output it in the paragraph (hint: event.target.value helps) -->
+      <p>Principal</p>
+      <input v-bind:value="principal" v-on:keyup.enter="setPrincipal" type="text" label="Principal"/>
+      <p>{{ principal }}</p>
+      <hr />
+      <p>Interest</p>
+      <input v-bind:value="interestRate" v-on:keyup.enter="setInterestRate" type="text" label="Interest"/>
+      <p>{{ interestRate }}</p>
+      <hr />
+      <p>Term</p>
+      <input v-bind:value="termInYears" v-on:keyup.enter="setTermInYears" type="text" label="Term Length"/>
+      <p>{{ termInYears }}</p>
+      <hr />
+      <!-- 3) Repeat 2) but only output the entered value if the ENTER key was pressed -->
+    </section>
   </body>
 </html>
