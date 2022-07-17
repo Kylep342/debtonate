@@ -3,33 +3,31 @@
 const app = Vue.createApp({
   data() {
     return {
-      principal: 0,
-      interestRate: 0,
-      termInYears: 0,
+      principal: null,
+      interestRate: null,
+      termInYears: null,
       loans: [],
+      paymentBudgets: [],
     }
   },
+  computed: {
+    paymentSchedules() {
+      return this.loans
+    }
+  },
+  watch: {},
   methods: {
-    setPrincipal(event) {
-      this.principal = event.target.value;
-    },
-    setInterestRate(event) {
-      this.interestRate = event.target.value;
-    },
-    setTermInYears(event) {
-      this.termInYears = event.target.value;
-    },
     createLoan() {
       const newLoan = {
         principal: this.principal,
         interestRate: this.interestRate,
         termInYears: this.termInYears,
       }
-      alert(`New loan: ${newLoan}`);
+      console.log(`New loan: ${JSON.stringify(newLoan)}`);
       this.loans.push(newLoan);
-      this.principal = 0;
-      this.interestRate = 0;
-      this.termInYears = 0;
+      this.principal = null;
+      this.interestRate = null;
+      this.termInYears = null;
     },
   },
 });

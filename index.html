@@ -19,20 +19,34 @@
     <section id="assignment">
       <h2>Input a loan</h2>
       <!-- 1) Show an alert (any text of your choice) when the button is pressed -->
-      <button v-on:click="createLoan">Create</button>
       <hr />
       <!-- 2) Register the user input on "keydown" and output it in the paragraph (hint: event.target.value helps) -->
       <p>Principal</p>
-      <input v-bind:value="principal" v-on:keyup.enter="setPrincipal" type="text" label="Principal"/>
-      <p>{{ principal }}</p>
+      <!-- <input v-bind:value="principal" v-on:keyup.enter="setPrincipal" type="text" label="Principal"/> -->
+      <input v-model="principal" type="text" label="Principal"/>
+      <p>{{ principal || '' }}</p>
       <hr />
       <p>Interest</p>
-      <input v-bind:value="interestRate" v-on:keyup.enter="setInterestRate" type="text" label="Interest"/>
-      <p>{{ interestRate }}</p>
+      <!-- <input v-bind:value="interestRate" v-on:keyup.enter="setInterestRate" type="text" label="Interest"/> -->
+      <input v-model="interestRate" type="text" label="Interest"/>
+      <p>{{ interestRate || '' }}</p>
       <hr />
       <p>Term</p>
-      <input v-bind:value="termInYears" v-on:keyup.enter="setTermInYears" type="text" label="Term Length"/>
-      <p>{{ termInYears }}</p>
+      <!-- <input v-bind:value="termInYears" v-on:keyup.enter="setTermInYears" type="text" label="Term Length"/> -->
+      <input v-model="termInYears" type="text" label="Term Length"/>
+      <p>{{ termInYears || '' }}</p>
+      <hr />
+      <!-- section to house created loans-->
+      <ul>
+        <li v-for="loan in loans">
+          Principal: {{ loan.principal }}, Interest Rate: {{ loan.interestRate }}, Term: {{ loan.termInYears }} Years
+        </li>
+      </ul>
+
+      <button v-on:click="createLoan">Create</button>
+      <ul>
+
+      </ul>
       <hr />
       <!-- 3) Repeat 2) but only output the entered value if the ENTER key was pressed -->
     </section>
