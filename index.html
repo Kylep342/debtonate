@@ -17,22 +17,28 @@
       <h1>Debtonate</h1>
     </header>
     <section id="assignment">
-      <h2>Input a loan</h2>
-      <hr />
-      <p>Principal</p>
-      <input v-model="principal" type="text" label="Principal"/>
-      <p>{{ principal || '' }}</p>
-      <hr />
-      <p>Interest</p>
-      <input v-model="interestRate" type="text" label="Interest"/>
-      <p>{{ interestRate || '' }}</p>
-      <hr />
-      <p>Term</p>
-      <input v-model="termInYears" type="text" label="Term Length"/>
-      <p>{{ termInYears || '' }}</p>
-      <hr />
-      <!-- <button v-on:click="createLoan" :class="{{createActive ? 'active' : ''}}">Create</button> -->
-      <button v-on:click="createLoan" :class="disableCreate ? 'inactive' : ''" :disabled="!createEnabled">Create</button>
+      <div>
+        <button @click="toggleCreate" :class="{active: !createFormActive}" :disabled="createFormActive">Create a Loan</button>
+      </div>
+      <div id="createLoanForm" :hidden="!createFormActive">
+        <h2>Input a loan</h2>
+        <hr />
+        <p>Principal</p>
+        <input v-model="principal" type="text" label="Principal"/>
+        <p>{{ principal || '' }}</p>
+        <hr />
+        <p>Interest</p>
+        <input v-model="interestRate" type="text" label="Interest"/>
+        <p>{{ interestRate || '' }}</p>
+        <hr />
+        <p>Term</p>
+        <input v-model="termInYears" type="text" label="Term Length"/>
+        <p>{{ termInYears || '' }}</p>
+        <hr />
+        <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create</button>
+        <button @click="createLoan(true)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Another</button>
+        <button @click="toggleCreate" :class="{active: createFormActive}" :disabled="!createFormActive">Back</button>
+      </div>
       <hr>
       <h2>Your Loans</h2>
       <hr>

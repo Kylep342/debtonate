@@ -7,6 +7,7 @@ const app = Vue.createApp({
       principal: null,
       interestRate: null,
       termInYears: null,
+      createFormActive: false,
       loans: [],
       paymentBudgets: [],
     };
@@ -22,13 +23,16 @@ const app = Vue.createApp({
         0
       );
     },
-    createEnabled() {
+    createLoanButtonEnabled() {
       return this.principal && this.interestRate && this.termInYears;
     },
   },
   watch: {},
   methods: {
-    createLoan() {
+    toggleCreate() {
+      this.createFormActive = !this.createFormActive;
+    },
+    createLoan(createFormActive = false) {
       const principal = parseFloat(this.principal);
       const interestRate = parseFloat(this.interestRate) / 100;
       const termInYears = parseFloat(this.termInYears);
@@ -45,6 +49,7 @@ const app = Vue.createApp({
       this.principal = null;
       this.interestRate = null;
       this.termInYears = null;
+      this.createFormActive = createFormActive;
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id != id);
