@@ -71,4 +71,11 @@
     border-color: #ec3169;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26);
   }
-  
+
+  #assignment button:disabled {
+    opacity: 0.3;
+  }
+
+  /* .inactive {
+
+  } */
