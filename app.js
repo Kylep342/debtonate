@@ -22,8 +22,8 @@ const app = Vue.createApp({
         0
       );
     },
-    disableCreate() {
-      return !(this.principal && this.interestRate && this.termInYears);
+    createEnabled() {
+      return this.principal && this.interestRate && this.termInYears;
     },
   },
   watch: {},

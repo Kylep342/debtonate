@@ -32,7 +32,7 @@
       <p>{{ termInYears || '' }}</p>
       <hr />
       <!-- <button v-on:click="createLoan" :class="{{createActive ? 'active' : ''}}">Create</button> -->
-      <button v-on:click="createLoan" :class="disableCreate ? 'inactive' : ''" :disabled="disableCreate">Create</button>
+      <button v-on:click="createLoan" :class="disableCreate ? 'inactive' : ''" :disabled="!createEnabled">Create</button>
       <hr>
       <h2>Your Loans</h2>
       <hr>
