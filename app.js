@@ -2,6 +2,30 @@
 import * as moneyfunx from "moneyfunx";
 // import * as Plotly from "plotly.js-dist";
 
+// const graph1 = Vue.component("reactive-chart", {
+//   props: ["litChart"],
+//   template: '<div :ref="litChart.id"></div>',
+//   mounted() {
+//     Plotly.plot(
+//       this.$refs[this.litChart.id],
+//       this.litChart.data,
+//       this.litChart.layout
+//     );
+//   },
+//   watch: {
+//     chart: {
+//       handler: function () {
+//         Plotly.react(
+//           this.$refs[this.chart.id],
+//           this.chart.data,
+//           this.chart.layout
+//         );
+//       },
+//       deep: true,
+//     },
+//   },
+// });
+
 const app = Vue.createApp({
   data() {
     return {
@@ -29,9 +53,19 @@ const app = Vue.createApp({
       );
     },
     monthlyBudgets() {
-      return this.addedBudgets.map((budget) => {
-        return { id: String(Math.floor(Math.random() * Date.now())), relative: budget, absolute: budget + this.globalMinPayment };
+      const budgets = this.addedBudgets.map((budget) => {
+        return {
+          id: String(Math.floor(Math.random() * Date.now())),
+          relative: budget,
+          absolute: budget + this.globalMinPayment,
+        };
       });
+      budgets.push({
+        id: "default",
+        relative: 0,
+        absolute: this.globalMinPayment,
+      });
+      return budgets;
     },
     paymentSchedules() {
       return this.monthlyBudgets.map((budget) => {
@@ -45,15 +79,23 @@ const app = Vue.createApp({
     lifetimeInterestTotals() {
       return this.loans.map((loan) => {
         return {
-          x: [...this.monthlyBudgets, 0].map((budget) => budget.relative),
-          y: [...this.monthlyBudgets, 0].map((budget) => {
-            this.paymentSchedules.filter(
-              (schedule) => schedule.budgetId === budget.budgetId
-            )[0].paymentSchedule[loan.id].lifetimeInterest;
-          }),
+          x: this.monthlyBudgets.map((budget) => budget.relative),
+          y: this.monthlyBudgets.map(
+            (budget) =>
+              this.paymentSchedules.filter(
+                (schedule) => schedule.budgetId === budget.id
+              )[0].paymentSchedule[loan.id].lifetimeInterest
+          ),
           type: "bar",
         };
       });
+    },
+    litChart() {
+      return {
+        id: "litChart",
+        data: this.lifetimeInterestTotals,
+        layout: { barmode: "group" },
+      };
     },
   },
   watch: {},
@@ -120,6 +162,24 @@ const app = Vue.createApp({
       this.addedBudgets = this.addedBudgets.filter(
         (addedBudget) => addedBudget !== parseFloat(budget)
       );
+    },
+    loadState() {
+      console.log(JSON.parse(localStorage.getItem("debtonate")));
+      this.loans = JSON.parse(localStorage.getItem("debtonate")).map(
+        (loan) =>
+          new moneyfunx.Loan(
+            loan.principal,
+            loan.annualRate,
+            12,
+            loan.termInYears
+          )
+      );
+    },
+    saveState() {
+      localStorage.setItem("debtonate", JSON.stringify(this.loans));
+    },
+    clearState() {
+      localStorage.clear();
     },
   },
 });
