@@ -1,5 +1,6 @@
 // import * as Vue from "vue";
 import * as moneyfunx from "moneyfunx";
+// import * as Plotly from "plotly.js-dist";
 
 const app = Vue.createApp({
   data() {
@@ -7,14 +8,18 @@ const app = Vue.createApp({
       principal: null,
       interestRate: null,
       termInYears: null,
+      budget: null,
       createFormActive: false,
+      snowballSort: true,
       loans: [],
-      paymentBudgets: [],
+      addedBudgets: [],
     };
   },
   computed: {
-    paymentSchedules() {
-      return this.loans;
+    createLoanButtonEnabled() {
+      return [this.principal, this.interestRate, this.termInYears].every(
+        (current) => !Number.isNaN(parseFloat(current))
+      );
     },
     globalMinPayment() {
       return this.loans.reduce(
@@ -23,14 +28,48 @@ const app = Vue.createApp({
         0
       );
     },
-    createLoanButtonEnabled() {
-      return this.principal && this.interestRate && this.termInYears;
+    monthlyBudgets() {
+      return this.addedBudgets.map((budget) => {
+        return { relative: budget, absolute: budget + this.globalMinPayment };
+      });
+    },
+    paymentSchedules() {
+      return this.monthlyBudgets.map((budget) => {
+        return {
+          paymentAmount: budget.relative,
+          paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
+        };
+      });
+    },
+    lifetimeInterestTotals() {
+      return this.loans.map((loan) => {
+        return {
+          x: this.addedBudgets,
+          y: this.addedBudgets.map((budget) => {
+            this.paymentSchedules.filter(
+              (schedule) => schedule.paymentAmount === budget
+            )[0].paymentSchedule[loan.id].lifetimeInterest;
+          }),
+          type: "bar",
+        };
+      });
     },
   },
   watch: {},
   methods: {
     toggleCreate() {
       this.createFormActive = !this.createFormActive;
+    },
+    sortFunction() {
+      return this.snowballSort ? moneyfunx.snowball : moneyfunx.avalanche;
+    },
+    avalanche() {
+      this.snowballSort = false;
+      this.loans = moneyfunx.sortLoans(this.loans, moneyfunx.avalanche);
+    },
+    snowball() {
+      this.snowballSort = true;
+      this.loans = moneyfunx.sortLoans(this.loans, moneyfunx.snowball);
     },
     createLoan(createFormActive = false) {
       const principal = parseFloat(this.principal);
@@ -44,15 +83,42 @@ const app = Vue.createApp({
         termInYears
       );
 
-      console.log(`New loan: ${JSON.stringify(newLoan)}`);
+      if (this.currentId) {
+        this.loans = this.loans.filter((loan) => loan.id !== this.currentId);
+      }
+
       this.loans.push(newLoan);
+      this.loans = moneyfunx.sortLoans(this.loans, this.sortFunction());
+      this.currentId = "";
       this.principal = null;
       this.interestRate = null;
       this.termInYears = null;
       this.createFormActive = createFormActive;
     },
     deleteLoan(id) {
-      this.loans = this.loans.filter((loan) => loan.id != id);
+      this.loans = this.loans.filter((loan) => loan.id !== id);
+      this.loans = moneyfunx.sortLoans(this.loans, this.sortFunction());
+    },
+    editLoan(id) {
+      this.currentId = id;
+      const loan = this.loans.filter((loan) => loan.id === this.currentId)[0];
+      this.principal = loan.principal;
+      this.interestRate = loan.annualRate * 100;
+      this.termInYears = loan.termInYears;
+      this.createFormActive = true;
+    },
+    addBudget() {
+      this.addedBudgets = this.addedBudgets.filter(
+        (budget) => budget !== parseFloat(this.budget)
+      );
+      this.addedBudgets.push(parseFloat(this.budget));
+      this.addedBudgets.sort((a, b) => b - a);
+      this.budget = null;
+    },
+    deleteBudget(budget) {
+      this.addedBudgets = this.addedBudgets.filter(
+        (addedBudget) => addedBudget !== parseFloat(budget)
+      );
     },
   },
 });

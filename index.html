@@ -25,34 +25,69 @@
         <hr />
         <p>Principal</p>
         <input v-model="principal" type="text" label="Principal"/>
-        <p>{{ principal || '' }}</p>
+        <p>{{ principal || "" }}</p>
         <hr />
         <p>Interest</p>
         <input v-model="interestRate" type="text" label="Interest"/>
-        <p>{{ interestRate || '' }}</p>
+        <p>{{ interestRate || "" }}</p>
         <hr />
         <p>Term</p>
         <input v-model="termInYears" type="text" label="Term Length"/>
-        <p>{{ termInYears || '' }}</p>
+        <p>{{ termInYears || "" }}</p>
         <hr />
-        <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create</button>
+        <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Loan</button>
         <button @click="createLoan(true)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Another</button>
         <button @click="toggleCreate" :class="{active: createFormActive}" :disabled="!createFormActive">Back</button>
       </div>
       <hr>
       <h2>Your Loans</h2>
+      <button @click="avalanche" :class="{active: snowballSort}" :disabled="!snowballSort">Avalanche</button>
+      <button @click="snowball" :class="{active: !snowballSort}" :disabled="snowballSort">Snowball</button>
       <hr>
       <ul>
-        <li v-for="loan in loans">
+        <li v-for="loan of loans">
           ID: {{ loan.id }}
           <br>
           Principal: {{ loan.principal }}, Interest Rate: {{ loan.annualRate * 100}}%, Term: {{ loan.termInYears }} Years, Minimum Monthly Payment: ${{ loan.minPayment }}
           <br>
+          <button @click="editLoan(loan.id)">Edit</button>
           <button @click="deleteLoan(loan.id)">X</button>
         </li>
       </ul>
       <p>Minimum Budget: ${{ globalMinPayment }}</p>
       <hr />
+      <h2>Your Budgets</h2>
+      <p>Budget</p>
+      <input v-model="budget" type="text" label="Budget Amount"/>
+      <p>{{ budget || "" }}</p>
+      <button @click="addBudget">Create Budget</button>
+      <hr />
+      <ul>
+        <li v-for="budget of addedBudgets">
+          {{ budget }}
+          <br>
+          <button @click="deleteBudget(budget)">X</button>
+        </li>
+      </ul>
+      <h2>Your Payment Schedules</h2>
+      <ul>
+        <li v-for="schedule of paymentSchedules">
+          <p>Additional ${{ schedule.paymentAmount }} per month</p>
+          <ul>
+            <li v-for="loan of loans">
+              ID: {{loan.id}}
+              <br>
+              Lifetime Interest Paid: {{schedule.paymentSchedule[loan.id].lifetimeInterest}}
+              <br>
+              Number of Months Paying {{schedule.paymentSchedule[loan.id].amortizationSchedule.length}}
+              <br>
+            </li>
+          </ul>
+          <hr />
+        </li>
+      </ul>
+      <hr />
+      <div>{{ JSON.stringify(lifetimeInterestTotals) }}</div>
     </section>
   </body>
 </html>
