@@ -30,12 +30,13 @@ const app = Vue.createApp({
     },
     monthlyBudgets() {
       return this.addedBudgets.map((budget) => {
-        return { relative: budget, absolute: budget + this.globalMinPayment };
+        return { id: String(Math.floor(Math.random() * Date.now())), relative: budget, absolute: budget + this.globalMinPayment };
       });
     },
     paymentSchedules() {
       return this.monthlyBudgets.map((budget) => {
         return {
+          budgetId: budget.id,
           paymentAmount: budget.relative,
           paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
         };
@@ -44,10 +45,10 @@ const app = Vue.createApp({
     lifetimeInterestTotals() {
       return this.loans.map((loan) => {
         return {
-          x: this.addedBudgets,
-          y: this.addedBudgets.map((budget) => {
+          x: [...this.monthlyBudgets, 0].map((budget) => budget.relative),
+          y: [...this.monthlyBudgets, 0].map((budget) => {
             this.paymentSchedules.filter(
-              (schedule) => schedule.paymentAmount === budget
+              (schedule) => schedule.budgetId === budget.budgetId
             )[0].paymentSchedule[loan.id].lifetimeInterest;
           }),
           type: "bar",
