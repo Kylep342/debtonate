@@ -29,6 +29,7 @@ import * as moneyfunx from "moneyfunx";
 const app = Vue.createApp({
   data() {
     return {
+      currentId: null,
       principal: null,
       interestRate: null,
       termInYears: null,
@@ -42,8 +43,20 @@ const app = Vue.createApp({
   computed: {
     createLoanButtonEnabled() {
       return [this.principal, this.interestRate, this.termInYears].every(
-        (current) => !Number.isNaN(parseFloat(current))
+        (current) =>
+          !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0
       );
+    },
+    createLoanFormTitle() {
+      return this.currentId ? "Editing a Loan" : "Creating a Loan";
+    },
+    createBudgetButtonEnabled() {
+      return (
+        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
+      );
+    },
+    createLoanButtonText() {
+      return this.currentId ? "Save Changes" : "Create Loan";
     },
     globalMinPayment() {
       return this.loans.reduce(
@@ -103,6 +116,16 @@ const app = Vue.createApp({
     toggleCreate() {
       this.createFormActive = !this.createFormActive;
     },
+    clearCreate() {
+      this.currentId = "";
+      this.principal = null;
+      this.interestRate = null;
+      this.termInYears = null;
+    },
+    backCreate() {
+      this.clearCreate();
+      this.toggleCreate();
+    },
     sortFunction() {
       return this.snowballSort ? moneyfunx.snowball : moneyfunx.avalanche;
     },
@@ -132,15 +155,11 @@ const app = Vue.createApp({
 
       this.loans.push(newLoan);
       this.loans = moneyfunx.sortLoans(this.loans, this.sortFunction());
-      this.currentId = "";
-      this.principal = null;
-      this.interestRate = null;
-      this.termInYears = null;
+      this.clearCreate();
       this.createFormActive = createFormActive;
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id !== id);
-      this.loans = moneyfunx.sortLoans(this.loans, this.sortFunction());
     },
     editLoan(id) {
       this.currentId = id;
@@ -164,8 +183,7 @@ const app = Vue.createApp({
       );
     },
     loadState() {
-      console.log(JSON.parse(localStorage.getItem("debtonate")));
-      this.loans = JSON.parse(localStorage.getItem("debtonate")).map(
+      this.loans = JSON.parse(localStorage.getItem("debtonate.loans")).map(
         (loan) =>
           new moneyfunx.Loan(
             loan.principal,
@@ -174,9 +192,14 @@ const app = Vue.createApp({
             loan.termInYears
           )
       );
+      this.addedBudgets = JSON.parse(localStorage.getItem("debtonate.budgets"));
     },
     saveState() {
-      localStorage.setItem("debtonate", JSON.stringify(this.loans));
+      localStorage.setItem("debtonate.loans", JSON.stringify(this.loans));
+      localStorage.setItem(
+        "debtonate.budgets",
+        JSON.stringify(this.addedBudgets)
+      );
     },
     clearState() {
       localStorage.clear();

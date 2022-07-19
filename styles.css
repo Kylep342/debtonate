@@ -19,6 +19,10 @@
     color: white;
     text-align: center;
   }
+
+  li {
+    list-style-type: none;
+  }
   
   #assignment {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
@@ -74,6 +78,10 @@
 
   #assignment button:disabled {
     opacity: 0.3;
+    cursor: auto;
+    border: 1px solid #ff0077;
+    background-color: #ff0077;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
   }
 
   /* #createLoanForm {

@@ -18,43 +18,40 @@
       <h1>Debtonate</h1>
     </header>
     <section id="assignment">
-      <!-- <div>
+      <div>
         <button @click="loadState">Load</button>
         <button @click="saveState">Save</button>
-        <button @click="clearState">Clear</button>
+        <button @click="clearState" :disabled="true">Clear</button>
       </div>
-      <hr /> -->
-      <div>
-        <button @click="toggleCreate" :class="{active: !createFormActive}" :disabled="createFormActive">Create a Loan</button>
-      </div>
-      <div id="createLoanForm" :hidden="!createFormActive">
-        <h2>Input a loan</h2>
+      <hr />
+      <div id="createLoanForm" v-show="createFormActive">
+        <h2>{{ createLoanFormTitle }}</h2>
         <hr />
         <p>Principal</p>
         <input v-model="principal" type="text" label="Principal"/>
-        <!-- <p>{{ principal || "" }}</p> -->
-        <p>{{ principal }}</p>
         <hr />
         <p>Interest</p>
         <input v-model="interestRate" type="text" label="Interest"/>
-        <p>{{ interestRate || "" }}</p>
         <hr />
         <p>Term</p>
         <input v-model="termInYears" type="text" label="Term Length"/>
-        <p>{{ termInYears || "" }}</p>
         <hr />
-        <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Loan</button>
-        <button @click="createLoan(true)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Another</button>
-        <button @click="toggleCreate" :class="{active: createFormActive}" :disabled="!createFormActive">Back</button>
+        <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">{{ createLoanButtonText }}</button>
+        <button @click="createLoan(true)"  :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Another</button>
+        <button @click="backCreate" :class="{active: createFormActive}" :disabled="!createFormActive">Back</button>
       </div>
       <hr>
       <h2>Your Loans</h2>
+      <div>
+        <button @click="toggleCreate" :class="{active: !createFormActive}" :disabled="createFormActive">Create a Loan</button>
+      </div>
+      <h3>Sorting Method</h3>
       <button @click="avalanche" :class="{active: snowballSort}" :disabled="!snowballSort">Avalanche</button>
       <button @click="snowball" :class="{active: !snowballSort}" :disabled="snowballSort">Snowball</button>
       <hr>
       <ul>
-        <li v-for="loan of loans">
-          ID: {{ loan.id }}
+        <li v-for="(loan, index) in loans" :key="loan.id">
+          Loan {{ index + 1 }}
           <br>
           Principal: {{ loan.principal }}, Interest Rate: {{ loan.annualRate * 100}}%, Term: {{ loan.termInYears }} Years, Minimum Monthly Payment: ${{ loan.minPayment }}
           <br>
@@ -67,23 +64,24 @@
       <h2>Your Budgets</h2>
       <p>Budget</p>
       <input v-model="budget" type="text" label="Budget Amount"/>
-      <p>{{ budget || "" }}</p>
-      <button @click="addBudget">Create Budget</button>
+      <p>{{ budget }}</p>
+      <button @click="addBudget" :disabled="!createBudgetButtonEnabled">Create Budget</button>
       <hr />
       <ul>
-        <li v-for="budget of addedBudgets">
+        <li v-for="budget in addedBudgets">
           {{ budget }}
           <br>
           <button @click="deleteBudget(budget)">X</button>
         </li>
       </ul>
+      <div v-if="loans.length">
       <h2>Your Payment Schedules</h2>
       <ul>
-        <li v-for="schedule of paymentSchedules">
+        <li v-for="schedule in paymentSchedules" :key="schedule.budgetId">
           <p>Additional ${{ schedule.paymentAmount }} per month</p>
           <ul>
-            <li v-for="loan of loans">
-              ID: {{loan.id}}
+            <li v-for="(loan, index) in loans" :key="loan.id">
+              Loan {{ index + 1 }}
               <br>
               Lifetime Interest Paid: {{schedule.paymentSchedule[loan.id].lifetimeInterest}}
               <br>
@@ -94,6 +92,7 @@
           <hr />
         </li>
       </ul>
+      </div>
       <hr />
       <div id="lifetimeInterestTotals"></div>
     </section>
