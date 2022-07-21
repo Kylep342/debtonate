@@ -28,13 +28,13 @@
         <h2>{{ createLoanFormTitle }}</h2>
         <hr />
         <p>Principal</p>
-        <input v-model="principal" type="text" label="Principal"/>
+        <input v-model="principal" type="number" label="Principal"/>
         <hr />
         <p>Interest</p>
-        <input v-model="interestRate" type="text" label="Interest"/>
+        <input v-model="interestRate" type="number" label="Interest"/>
         <hr />
         <p>Term</p>
-        <input v-model="termInYears" type="text" label="Term Length"/>
+        <input v-model="termInYears" type="number" label="Term Length"/>
         <hr />
         <button @click="createLoan(false)" :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">{{ createLoanButtonText }}</button>
         <button @click="createLoan(true)"  :class="{active: createLoanButtonEnabled}" :disabled="!createLoanButtonEnabled">Create Another</button>
@@ -63,8 +63,8 @@
       <hr />
       <h2>Your Budgets</h2>
       <p>Budget</p>
-      <input v-model="budget" type="text" label="Budget Amount"/>
-      <p>{{ budget }}</p>
+      <input v-model="budget" type="number" label="Budget Amount"/>
+      <br>
       <button @click="addBudget" :disabled="!createBudgetButtonEnabled">Create Budget</button>
       <hr />
       <ul>
@@ -78,7 +78,8 @@
       <h2>Your Payment Schedules</h2>
       <ul>
         <li v-for="schedule in paymentSchedules" :key="schedule.budgetId">
-          <p>Additional ${{ schedule.paymentAmount }} per month</p>
+          <!-- <p>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment} per month` : `Additional $${schedule.paymentAmount} per month ($${schedule.paymentAmount + globalMinPayment})` }}</p> -->
+          <p>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment} per month` : `Additional $${schedule.paymentAmount} per month ($${schedule.paymentAmount + globalMinPayment})` }}</p>
           <ul>
             <li v-for="(loan, index) in loans" :key="loan.id">
               Loan {{ index + 1 }}
