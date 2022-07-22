@@ -138,6 +138,12 @@ const app = Vue.createApp({
       this.snowballSort = true;
       this.loans = moneyfunx.sortLoans(this.loans, moneyfunx.snowball);
     },
+    deleteLoan(id) {
+      this.loans = this.loans.filter((loan) => loan.id !== id);
+    },
+    getLoan(id) {
+      return this.loans.filter((loan) => loan.id === id)[0];
+    },
     createLoan(createFormActive = false) {
       const principal = parseFloat(this.principal);
       const interestRate = parseFloat(this.interestRate) / 100;
@@ -151,7 +157,7 @@ const app = Vue.createApp({
       );
 
       if (this.currentId) {
-        this.loans = this.loans.filter((loan) => loan.id !== this.currentId);
+        this.deleteLoan(this.currentId);
       }
 
       this.loans.push(newLoan);
@@ -159,12 +165,9 @@ const app = Vue.createApp({
       this.clearCreate();
       this.createFormActive = createFormActive;
     },
-    deleteLoan(id) {
-      this.loans = this.loans.filter((loan) => loan.id !== id);
-    },
     editLoan(id) {
       this.currentId = id;
-      const loan = this.loans.filter((loan) => loan.id === this.currentId)[0];
+      const loan = this.getLoan(this.currentId);
       this.principal = loan.principal;
       this.interestRate = loan.annualRate * 100;
       this.termInYears = loan.termInYears;
