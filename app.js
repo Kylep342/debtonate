@@ -30,7 +30,7 @@ import * as moneyfunx from "moneyfunx";
 const app = Vue.createApp({
   data() {
     return {
-      currentId: null,
+      currentLoanId: null,
       principal: null,
       interestRate: null,
       termInYears: null,
@@ -49,7 +49,7 @@ const app = Vue.createApp({
       );
     },
     createLoanFormTitle() {
-      return this.currentId ? "Editing a Loan" : "Creating a Loan";
+      return this.currentLoanId ? "Editing a Loan" : "Creating a Loan";
     },
     createBudgetButtonEnabled() {
       return (
@@ -57,7 +57,7 @@ const app = Vue.createApp({
       );
     },
     createLoanButtonText() {
-      return this.currentId ? "Save Changes" : "Create Loan";
+      return this.currentLoanId ? "Save Changes" : "Create Loan";
     },
     globalMinPayment() {
       return this.loans.reduce(
@@ -118,7 +118,7 @@ const app = Vue.createApp({
       this.createFormActive = !this.createFormActive;
     },
     clearCreate() {
-      this.currentId = "";
+      this.currentLoanId = "";
       this.principal = null;
       this.interestRate = null;
       this.termInYears = null;
@@ -127,16 +127,22 @@ const app = Vue.createApp({
       this.clearCreate();
       this.toggleCreate();
     },
-    sortFunction() {
-      return this.snowballSort ? moneyfunx.snowball : moneyfunx.avalanche;
+    sortLoans() {
+      this.snowballSort ? this.snowball() : this.avalanche();
     },
     avalanche() {
       this.snowballSort = false;
-      this.loans = moneyfunx.sortLoans(this.loans, moneyfunx.avalanche);
+      this.loans = moneyfunx.sortLoans(
+        moneyfunx.sortLoans(this.loans, moneyfunx.snowball),
+        moneyfunx.avalanche
+      );
     },
     snowball() {
       this.snowballSort = true;
-      this.loans = moneyfunx.sortLoans(this.loans, moneyfunx.snowball);
+      this.loans = moneyfunx.sortLoans(
+        moneyfunx.sortLoans(this.loans, moneyfunx.avalanche),
+        moneyfunx.snowball
+      );
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id !== id);
@@ -156,18 +162,18 @@ const app = Vue.createApp({
         termInYears
       );
 
-      if (this.currentId) {
-        this.deleteLoan(this.currentId);
+      if (this.currentLoanId) {
+        this.deleteLoan(this.currentLoanId);
       }
 
       this.loans.push(newLoan);
-      this.loans = moneyfunx.sortLoans(this.loans, this.sortFunction());
+      this.sortLoans();
       this.clearCreate();
       this.createFormActive = createFormActive;
     },
     editLoan(id) {
-      this.currentId = id;
-      const loan = this.getLoan(this.currentId);
+      this.currentLoanId = id;
+      const loan = this.getLoan(this.currentLoanId);
       this.principal = loan.principal;
       this.interestRate = loan.annualRate * 100;
       this.termInYears = loan.termInYears;
