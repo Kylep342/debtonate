@@ -115,7 +115,7 @@ const app = Vue.createApp({
   watch: {},
   methods: {
     toggleCreate() {
-      this.createFormActive = !this.createFormActive;
+      this.createFormActive = true;
     },
     clearCreate() {
       this.currentLoanId = "";
@@ -125,7 +125,7 @@ const app = Vue.createApp({
     },
     backCreate() {
       this.clearCreate();
-      this.toggleCreate();
+      this.createFormActive = false;
     },
     sortLoans() {
       this.snowballSort ? this.snowball() : this.avalanche();
