@@ -74,28 +74,28 @@
           <button @click="deleteBudget(budget)">X</button>
         </li>
       </ul>
-      <div v-if="loans.length">
-      <h2>Your Payment Schedules</h2>
-      <ul>
-        <li v-for="schedule in paymentSchedules" :key="schedule.budgetId">
-          <!-- <p>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment} per month` : `Additional $${schedule.paymentAmount} per month ($${schedule.paymentAmount + globalMinPayment})` }}</p> -->
-          <p>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment} per month` : `Additional $${schedule.paymentAmount} per month ($${schedule.paymentAmount + globalMinPayment})` }}</p>
-          <ul>
-            <li v-for="(loan, index) in loans" :key="loan.id">
-              Loan {{ index + 1 }}
+      <div v-if="loans.length" id="lifetimeInterestTotals">
+        <table>
+          <tr id="lifetimeInterestTotalsHeaderRow">
+            <th>Loans</th>
+            <th v-for="(loan, index) in loans" :key="loan.id">Loan {{ index + 1 }}</th>
+            <th>Totals</th>
+          </tr>
+          <tr v-for="schedule in paymentSchedules" :key="schedule.budgetId">
+            <td>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment.toFixed(2)}/mo` : `Additional $${schedule.paymentAmount}/mo ($${(schedule.paymentAmount + globalMinPayment).toFixed(2)})` }}</td>
+            <td v-for="loan in loans" :key="loan.id">
+              ${{ schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2) }} interest paid
               <br>
-              Lifetime Interest Paid: {{schedule.paymentSchedule[loan.id].lifetimeInterest}}
+              {{ schedule.paymentSchedule[loan.id].amortizationSchedule.length - 1 }} payments
+            </td>
+            <td>
+              ${{ schedule.paymentSchedule["totalInterest"].toFixed(2)}} total interest paid
               <br>
-              Number of Months Paying {{schedule.paymentSchedule[loan.id].amortizationSchedule.length}}
-              <br>
-            </li>
-          </ul>
-          <hr />
-        </li>
-      </ul>
+              {{ schedule.paymentSchedule["totalPayments"] - 1}} total payments
+            </td>
+          </tr>
+        </table>
       </div>
-      <hr />
-      <div id="lifetimeInterestTotals"></div>
     </section>
   </body>
 </html>
