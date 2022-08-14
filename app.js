@@ -1,4 +1,4 @@
-// import * as Vue from "vue";
+import * as Vue from "vue";
 import * as moneyfunx from "moneyfunx";
 // import * as Plotly from "plotly.js-dist";
 // import * as ;
@@ -213,6 +213,22 @@ const app = Vue.createApp({
     },
     clearState() {
       localStorage.clear();
+    },
+  },
+});
+
+app.component("lifetime-interest-totals-graph", {
+  template: `
+      <div v-if="loans.length" id="lifetimeInterestTotals"></div>
+  `,
+  data() {
+    return {
+      graphData: [],
+    };
+  },
+  methods: {
+    foo() {
+      console.log("bar");
     },
   },
 });

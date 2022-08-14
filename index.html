@@ -9,8 +9,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://unpkg.com/vue@next" defer></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
+    <!-- <script src="https://unpkg.com/vue@next" defer></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js" defer></script> -->
     <script type="module" src="./app.js" defer></script>
   </head>
   <body>
@@ -75,14 +75,14 @@
         </li>
       </ul>
       <div v-if="loans.length" id="lifetimeInterestTotals">
-        <table>
-          <tr id="lifetimeInterestTotalsHeaderRow">
+        <table id="lifetimeInterestTotalsTable">
+          <tr id="lifetimeInterestTotalsTableHeaderRow">
             <th>Loans</th>
             <th v-for="(loan, index) in loans" :key="loan.id">Loan {{ index + 1 }}</th>
             <th>Totals</th>
           </tr>
           <tr v-for="schedule in paymentSchedules" :key="schedule.budgetId">
-            <td>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment.toFixed(2)}/mo` : `Additional $${schedule.paymentAmount}/mo ($${(schedule.paymentAmount + globalMinPayment).toFixed(2)})` }}</td>
+            <td><strong>{{ schedule.budgetId === "default" ? `Baseline: $${globalMinPayment.toFixed(2)}/mo` : `Additional $${schedule.paymentAmount}/mo ($${(schedule.paymentAmount + globalMinPayment).toFixed(2)})` }}</strong></td>
             <td v-for="loan in loans" :key="loan.id">
               ${{ schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2) }} interest paid
               <br>
@@ -95,6 +95,7 @@
             </td>
           </tr>
         </table>
+        <!-- <lifetime-interest-totals-graph></lifetime-interest-totals-graph> -->
       </div>
     </section>
   </body>
