@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "moneyfunx": "^0.0.19",
+    "plotly": "^1.0.6",
+    "plotly.js-dist": "^2.14.0",
     "vue": "^3.2.37"
   },
   "devDependencies": {
