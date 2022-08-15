@@ -66,24 +66,26 @@ export default {
       });
     },
     lifetimeInterestTotals() {
-      return this.loans.map((loan) => {
-        return {
-          x: this.monthlyBudgets.map((budget) => budget.relative),
+        return [{
+          x: this.monthlyBudgets.map((budget) => `$${(budget.relative + this.globalMinPayment).toFixed(2)}/month`),
           y: this.monthlyBudgets.map(
             (budget) =>
               this.paymentSchedules.filter(
                 (schedule) => schedule.budgetId === budget.id
-              )[0].paymentSchedule[loan.id].lifetimeInterest
+              )[0].paymentSchedule["totalInterest"].toFixed(2)
           ),
+          name: "Total Interest Paid",
           type: "bar",
-        };
-      });
+        }];
     },
     litChart() {
       return {
         id: "litChart",
         data: this.lifetimeInterestTotals,
-        layout: { barmode: "group" },
+        layout: {
+          barmode: "group",
+          title: "Total Interest Paid"
+        },
       };
     },
   },
@@ -264,15 +266,15 @@ export default {
       <li v-for="(loan, index) in loans" :key="loan.id">
         Loan {{ index + 1 }}
         <br />
-        Principal: {{ loan.principal }}, Interest Rate:
-        {{ loan.annualRate * 100 }}%, Term: {{ loan.termInYears }} Years,
-        Minimum Monthly Payment: ${{ loan.minPayment }}
+        Principal: {{ loan.principal.toFixed(2) }}, Interest Rate:
+        {{ (loan.annualRate * 100).toFixed(2) }}%, Term: {{ loan.termInYears }} Years,
+        Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
         <br />
         <button @click="editLoan(loan.id)">Edit</button>
         <button @click="deleteLoan(loan.id)">X</button>
       </li>
     </ul>
-    <p>Minimum Budget: ${{ globalMinPayment }}</p>
+    <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p>
     <hr />
     <h2>Your Budgets</h2>
     <p>Budget</p>
@@ -289,7 +291,7 @@ export default {
         <button @click="deleteBudget(budget)">X</button>
       </li>
     </ul>
-    <div v-if="loans.length" id="lifetimeInterestTotals">
+    <div v-show="loans.length" id="lifetimeInterestTotals">
       <table id="lifetimeInterestTotalsTable">
         <tr id="lifetimeInterestTotalsTableHeaderRow">
           <th>Loans</th>
@@ -327,7 +329,7 @@ export default {
           </td>
         </tr>
       </table>
-    <DataChart v-if="this.litChart" chart="this.litChart" />
+    <DataChart :chart="litChart" />
     </div>
   </section>
 </template>
