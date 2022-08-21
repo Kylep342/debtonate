@@ -12,6 +12,7 @@ export default {
       budget: null,
       createFormActive: false,
       snowballSort: true,
+      roundUp: false,
       loans: [],
       addedBudgets: [],
     };
@@ -34,12 +35,18 @@ export default {
     createLoanButtonText() {
       return this.currentLoanId ? "Save Changes" : "Create Loan";
     },
-    globalMinPayment() {
+    rawGlobalMinPayment() {
       return this.loans.reduce(
         (previousValue, currentValue) =>
           (previousValue += currentValue.minPayment),
         0
       );
+    },
+    roundedGlobalMinPayment() {
+      return this.rawGlobalMinPayment + (100 - this.rawGlobalMinPayment % 100);
+    },
+    globalMinPayment() {
+      return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
     },
     monthlyBudgets() {
       const budgets = this.addedBudgets.map((budget) => {
@@ -103,6 +110,9 @@ export default {
     backCreate() {
       this.clearCreate();
       this.createFormActive = false;
+    },
+    toggleRounding() {
+      this.roundUp = !this.roundUp;
     },
     sortLoans() {
       this.snowballSort ? this.snowball() : this.avalanche();
@@ -194,142 +204,161 @@ export default {
 </script>
 
 <template>
-  <section id="assignment">
+  <section id="debtonate">
+    <div id="header">
+      <h1>Debtonate</h1>
+      <div>
+        <button @click="loadState">Load</button>
+        <button @click="saveState">Save</button>
+        <button @click="clearState" :disabled="true">Clear</button>
+      </div>
+    </div>
     <div>
-      <button @click="loadState">Load</button>
-      <button @click="saveState">Save</button>
-      <button @click="clearState" :disabled="true">Clear</button>
+      <div id="createLoanForm" v-show="createFormActive">
+        <h2>{{ createLoanFormTitle }}</h2>
+        <hr />
+        <p>Principal</p>
+        <input v-model="principal" type="number" label="Principal" />
+        <hr />
+        <p>Interest</p>
+        <input v-model="interestRate" type="number" label="Interest" />
+        <hr />
+        <p>Term</p>
+        <input v-model="termInYears" type="number" label="Term Length" />
+        <hr />
+        <button
+          @click="createLoan(false)"
+          :class="{ active: createLoanButtonEnabled }"
+          :disabled="!createLoanButtonEnabled"
+        >
+          {{ createLoanButtonText }}
+        </button>
+        <button
+          @click="createLoan(true)"
+          :class="{ active: createLoanButtonEnabled }"
+          :disabled="!createLoanButtonEnabled"
+        >
+          Create Another
+        </button>
+        <button
+          @click="backCreate"
+          :class="{ active: createFormActive }"
+          :disabled="!createFormActive"
+        >
+          Back
+        </button>
+      </div>
     </div>
     <hr />
-    <div id="createLoanForm" v-show="createFormActive">
-      <h2>{{ createLoanFormTitle }}</h2>
-      <hr />
-      <p>Principal</p>
-      <input v-model="principal" type="number" label="Principal" />
-      <hr />
-      <p>Interest</p>
-      <input v-model="interestRate" type="number" label="Interest" />
-      <hr />
-      <p>Term</p>
-      <input v-model="termInYears" type="number" label="Term Length" />
-      <hr />
-      <button
-        @click="createLoan(false)"
-        :class="{ active: createLoanButtonEnabled }"
-        :disabled="!createLoanButtonEnabled"
-      >
-        {{ createLoanButtonText }}
-      </button>
-      <button
-        @click="createLoan(true)"
-        :class="{ active: createLoanButtonEnabled }"
-        :disabled="!createLoanButtonEnabled"
-      >
-        Create Another
-      </button>
-      <button
-        @click="backCreate"
-        :class="{ active: createFormActive }"
-        :disabled="!createFormActive"
-      >
-        Back
-      </button>
-    </div>
-    <hr />
-    <h2>Your Loans</h2>
-    <div>
-      <button
-        @click="toggleCreate"
-        :class="{ active: !createFormActive }"
-        :disabled="createFormActive"
-      >
-        Create a Loan
-      </button>
-    </div>
-    <h3>Sorting Method</h3>
-    <button
-      @click="avalanche"
-      :class="{ active: snowballSort }"
-      :disabled="!snowballSort"
-    >
-      Avalanche
-    </button>
-    <button
-      @click="snowball"
-      :class="{ active: !snowballSort }"
-      :disabled="snowballSort"
-    >
-      Snowball
-    </button>
-    <hr />
-    <ul>
-      <li v-for="(loan, index) in loans" :key="loan.id">
-        Loan {{ index + 1 }}
-        <br />
-        Principal: {{ loan.principal.toFixed(2) }}, Interest Rate:
-        {{ (loan.annualRate * 100).toFixed(2) }}%, Term: {{ loan.termInYears }} Years,
-        Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
-        <br />
-        <button @click="editLoan(loan.id)">Edit</button>
-        <button @click="deleteLoan(loan.id)">X</button>
-      </li>
-    </ul>
-    <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p>
-    <hr />
-    <h2>Your Budgets</h2>
-    <p>Budget</p>
-    <input v-model="budget" type="number" label="Budget Amount" />
-    <br />
-    <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
-      Create Budget
-    </button>
-    <hr />
-    <ul>
-      <li v-for="budget in addedBudgets" :key="budget.id">
-        {{ budget }}
-        <br />
-        <button @click="deleteBudget(budget)">X</button>
-      </li>
-    </ul>
-    <div v-show="loans.length" id="lifetimeInterestTotals">
-      <table id="lifetimeInterestTotalsTable">
-        <tr id="lifetimeInterestTotalsTableHeaderRow">
-          <th>Loans</th>
-          <th v-for="(loan, index) in loans" :key="loan.id">
-            Loan {{ index + 1 }}
-          </th>
-          <th>Totals</th>
-        </tr>
-        <tr v-for="schedule in paymentSchedules" :key="schedule.budgetId">
-          <td>
-            <strong>{{
-              schedule.budgetId === "default"
-                ? `Baseline: $${globalMinPayment.toFixed(2)}/mo`
-                : `Additional $${schedule.paymentAmount}/mo ($${(
-                    schedule.paymentAmount + globalMinPayment
-                  ).toFixed(2)})`
-            }}</strong>
-          </td>
-          <td v-for="loan in loans" :key="loan.id">
-            ${{
-              schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2)
-            }}
-            interest paid
-            <br />
-            {{
-              schedule.paymentSchedule[loan.id].amortizationSchedule.length - 1
-            }}
-            payments
-          </td>
-          <td>
-            ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }} total
-            interest paid
-            <br />
-            {{ schedule.paymentSchedule["totalPayments"] - 1 }} total payments
-          </td>
-        </tr>
-      </table>
-    <DataChart :chart="litChart" />
+    <div id="todo" class="panel">
+      <div id="todo2" class="mgmtPanel">
+        <div id="loanManagementPanel">
+          <h2>Your Loans</h2>
+          <div>
+            <button
+              @click="toggleCreate"
+              :class="{ active: !createFormActive }"
+              :disabled="createFormActive"
+            >
+              Create a Loan
+            </button>
+          </div>
+          <h3>Sorting Method</h3>
+          <button
+            @click="avalanche"
+            :class="{ active: snowballSort }"
+            :disabled="!snowballSort"
+          >
+            Avalanche
+          </button>
+          <button
+            @click="snowball"
+            :class="{ active: !snowballSort }"
+            :disabled="snowballSort"
+          >
+            Snowball
+          </button>
+        </div>
+        <div id="loansPanel" v-show="loans.length">
+          <ul>
+            <li v-for="(loan, index) in loans" :key="loan.id">
+              Loan {{ index + 1 }}
+              <br />
+              Principal: {{ loan.principal.toFixed(2) }}, Interest Rate:
+              {{ (loan.annualRate * 100).toFixed(2) }}%, Term: {{ loan.termInYears }} Years,
+              Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
+              <br />
+              <button @click="editLoan(loan.id)">Edit</button>
+              <button @click="deleteLoan(loan.id)">X</button>
+            </li>
+          </ul>
+        </div>
+        <div id="budgetManagementPanel">
+          <h2>Your Budgets</h2>
+          <p>Budget</p>
+          <input v-model="budget" type="number" label="Budget Amount" />
+          <br />
+          <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
+            Create Budget
+          </button>
+        </div>
+        <div v-show="loans.length" id="globalMinPaymentPanel">
+          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
+          <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
+        </div>
+        <hr/>
+        <div id="budgetsPanel" v-show="addedBudgets.length">
+          <ul>
+            <li v-for="budget in addedBudgets" :key="budget.id">
+              {{ budget }}
+              <br />
+              <button @click="deleteBudget(budget)">X</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="todo3" class="presPanel">
+        <div v-show="loans.length" id="lifetimeInterestTotals">
+          <table id="lifetimeInterestTotalsTable">
+            <tr id="lifetimeInterestTotalsTableHeaderRow">
+              <th>Loans</th>
+              <th v-for="(loan, index) in loans" :key="loan.id">
+                Loan {{ index + 1 }}
+              </th>
+              <th>Totals</th>
+            </tr>
+            <tr v-for="schedule in paymentSchedules" :key="schedule.budgetId">
+              <td>
+                <strong>{{
+                  schedule.budgetId === "default"
+                    ? `Baseline: $${globalMinPayment.toFixed(2)}/mo`
+                    : `Additional $${schedule.paymentAmount}/mo ($${(
+                        schedule.paymentAmount + globalMinPayment
+                      ).toFixed(2)})`
+                }}</strong>
+              </td>
+              <td v-for="loan in loans" :key="loan.id">
+                ${{
+                  schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2)
+                }}
+                interest paid
+                <br />
+                {{
+                  schedule.paymentSchedule[loan.id].amortizationSchedule.length - 1
+                }}
+                payments
+              </td>
+              <td>
+                ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }} total
+                interest paid
+                <br />
+                {{ schedule.paymentSchedule["totalPayments"] - 1 }} total payments
+              </td>
+            </tr>
+          </table>
+          <DataChart :chart="litChart" />
+        </div>
+      </div>
     </div>
   </section>
 </template>

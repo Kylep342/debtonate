@@ -24,7 +24,7 @@ li {
   list-style-type: none;
 }
 
-#assignment {
+#debtonate {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   margin: 3rem;
   border-radius: 10px;
@@ -32,14 +32,14 @@ li {
   text-align: center;
 }
 
-#assignment h2 {
+#debtonate h1, h2 {
   font-size: 2rem;
   border-bottom: 4px solid #ccc;
   color: #1b995e;
   margin: 0 0 1rem 0;
 }
 
-#assignment p {
+#debtonate p {
   font-size: 1.25rem;
   font-weight: bold;
   background-color: #8ddba4;
@@ -48,18 +48,18 @@ li {
   border-radius: 25px;
 }
 
-#assignment input {
+#debtonate input {
   font: inherit;
   border: 1px solid #ccc;
 }
 
-#assignment input:focus {
+#debtonate input:focus {
   outline: none;
   border-color: #1b995e;
   background-color: #d7fdeb;
 }
 
-#assignment button {
+#debtonate button {
   font: inherit;
   cursor: pointer;
   border: 1px solid #ff0077;
@@ -69,14 +69,14 @@ li {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
 }
 
-#assignment button:hover,
-#assignment button:active {
+#debtonate button:hover,
+#debtonate button:active {
   background-color: #ec3169;
   border-color: #ec3169;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26);
 }
 
-#assignment button:disabled {
+#debtonate button:disabled {
   opacity: 0.3;
   cursor: auto;
   border: 1px solid #ff0077;
@@ -96,6 +96,24 @@ input[type=number] {
 -moz-appearance: textfield;
 }
 
-/* #createLoanForm {
+.panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.mgmtPanel {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.presPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+#createLoanForm {
   z-index: 1;
-} */
+}
