@@ -282,12 +282,20 @@ export default {
         <div id="loansPanel" v-show="loans.length">
           <ul>
             <li v-for="(loan, index) in loans" :key="loan.id">
-              Loan {{ index + 1 }}
-              <br />
-              Principal: {{ loan.principal.toFixed(2) }}, Interest Rate:
-              {{ (loan.annualRate * 100).toFixed(2) }}%, Term: {{ loan.termInYears }} Years,
-              Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
-              <br />
+              <ul>
+                <li>
+                  Loan {{ index + 1 }}
+                </li>
+                <li>
+                  Principal: ${{ loan.principal.toFixed(2) }}
+                </li>
+                <li>
+                  Interest Rate: {{ (loan.annualRate * 100).toFixed(2) }}%
+                </li>
+                <li>
+                  Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
+                </li>
+              </ul>
               <button @click="editLoan(loan.id)">Edit</button>
               <button @click="deleteLoan(loan.id)">X</button>
             </li>
