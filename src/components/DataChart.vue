@@ -22,5 +22,5 @@ export default {
 </script>
 
 <template>
-  <div id="litChart" :ref="chart.id"></div>
+  <div v-bind:id="chart.id" :ref="chart.id"></div>
 </template>

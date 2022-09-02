@@ -1,6 +1,9 @@
 <script>
 import * as moneyfunx from "moneyfunx";
+import BudgetsCard from "./components/BudgetsCard.vue";
 import DataChart from "./components/DataChart.vue";
+import InterestTable from './components/InterestTable.vue';
+import LoanCard from "./components/LoansCard.vue";
 
 export default {
   data() {
@@ -91,7 +94,10 @@ export default {
         data: this.lifetimeInterestTotals,
         layout: {
           barmode: "group",
-          title: "Total Interest Paid"
+          title: "Total Interest Paid",
+          yaxis: {
+            hoverformat: "$.2f"
+          }
         },
       };
     },
@@ -199,7 +205,7 @@ export default {
       localStorage.clear();
     },
   },
-  components: { DataChart },
+  components: { DataChart, LoanCard, BudgetsCard, InterestTable },
 };
 </script>
 
@@ -279,28 +285,7 @@ export default {
             Snowball
           </button>
         </div>
-        <div id="loansPanel" v-show="loans.length">
-          <ul>
-            <li v-for="(loan, index) in loans" :key="loan.id">
-              <ul>
-                <li>
-                  Loan {{ index + 1 }}
-                </li>
-                <li>
-                  Principal: ${{ loan.principal.toFixed(2) }}
-                </li>
-                <li>
-                  Interest Rate: {{ (loan.annualRate * 100).toFixed(2) }}%
-                </li>
-                <li>
-                  Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
-                </li>
-              </ul>
-              <button @click="editLoan(loan.id)">Edit</button>
-              <button @click="deleteLoan(loan.id)">X</button>
-            </li>
-          </ul>
-        </div>
+        <LoanCard :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
         <div id="budgetManagementPanel">
           <h2>Your Budgets</h2>
           <p>Budget</p>
@@ -314,56 +299,11 @@ export default {
           <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
           <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
         </div>
-        <hr/>
-        <div id="budgetsPanel" v-show="addedBudgets.length">
-          <ul>
-            <li v-for="budget in addedBudgets" :key="budget.id">
-              {{ budget }}
-              <br />
-              <button @click="deleteBudget(budget)">X</button>
-            </li>
-          </ul>
-        </div>
+        <BudgetsCard :budgets="addedBudgets" :deleteBudget="deleteBudget" />
       </div>
       <div id="todo3" class="presPanel">
         <div v-show="loans.length" id="lifetimeInterestTotals">
-          <table id="lifetimeInterestTotalsTable">
-            <tr id="lifetimeInterestTotalsTableHeaderRow">
-              <th>Loans</th>
-              <th v-for="(loan, index) in loans" :key="loan.id">
-                Loan {{ index + 1 }}
-              </th>
-              <th>Totals</th>
-            </tr>
-            <tr v-for="schedule in paymentSchedules" :key="schedule.budgetId">
-              <td>
-                <strong>{{
-                  schedule.budgetId === "default"
-                    ? `Baseline: $${globalMinPayment.toFixed(2)}/mo`
-                    : `Additional $${schedule.paymentAmount}/mo ($${(
-                        schedule.paymentAmount + globalMinPayment
-                      ).toFixed(2)})`
-                }}</strong>
-              </td>
-              <td v-for="loan in loans" :key="loan.id">
-                ${{
-                  schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2)
-                }}
-                interest paid
-                <br />
-                {{
-                  schedule.paymentSchedule[loan.id].amortizationSchedule.length - 1
-                }}
-                payments
-              </td>
-              <td>
-                ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }} total
-                interest paid
-                <br />
-                {{ schedule.paymentSchedule["totalPayments"] - 1 }} total payments
-              </td>
-            </tr>
-          </table>
+          <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="litChart" />
         </div>
       </div>

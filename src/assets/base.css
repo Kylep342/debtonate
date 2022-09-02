@@ -36,16 +36,16 @@ li {
   font-size: 2rem;
   border-bottom: 4px solid #ccc;
   color: #1b995e;
-  margin: 0 0 1rem 0;
+  margin: 1rem;
 }
 
 #debtonate p {
   font-size: 1.25rem;
   font-weight: bold;
-  background-color: #8ddba4;
+  /* background-color: #8ddba4; */
   padding: 0.5rem;
   color: #1f1f1f;
-  border-radius: 25px;
+  /* border-radius: 25px; */
 }
 
 #debtonate input {
