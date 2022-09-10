@@ -1,6 +1,6 @@
-# debtonate
+# Debtonate
 
-This template should help get you started developing with Vue 3 in Vite.
+Debtonate is a simple, visual, data-rich financial calculator for budgeting repayment of debt
 
 ## Recommended IDE Setup
 

@@ -73,10 +73,27 @@ export default {
           paymentAmount: budget.relative,
           paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
           label: budget.id === "default" ?
-            `Baseline $${this.globalMinPayment}/mo` :
+            `Baseline $${this.globalMinPayment.toFixed(2)}/mo` :
             `Additional $${budget.relative.toFixed(2)}/mo ($${budget.absolute.toFixed(2)}/mo)`,
         };
       });
+    },
+    balancesOverTime() {
+      return 5;
+    },
+    amortizationSchedulesPerLoan() {
+      const balances = {};
+      this.loans.map((loan) => {
+        balances[loan.id] = {}
+        this.paymentSchedules.map((schedule) => {
+          balances[loan.id][schedule.budgetId] = {
+            label: schedule.label,
+            totalPayemntAmount: schedule.paymentAmount,
+            amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule
+          };
+        })
+      });
+      return balances;
     },
     lifetimeInterestTotals() {
         return [{
@@ -213,7 +230,7 @@ export default {
 </script>
 
 <template>
-  <section id="debtonate">
+  <div id="debtonate">
     <div id="header">
       <h1>Debtonate</h1>
       <div>
@@ -223,39 +240,41 @@ export default {
       </div>
     </div>
     <div>
-      <div id="createLoanForm" v-show="createFormActive">
-        <h2>{{ createLoanFormTitle }}</h2>
-        <hr />
-        <p>Principal</p>
-        <input v-model="principal" type="number" label="Principal" />
-        <hr />
-        <p>Interest</p>
-        <input v-model="interestRate" type="number" label="Interest" />
-        <hr />
-        <p>Term</p>
-        <input v-model="termInYears" type="number" label="Term Length" />
-        <hr />
-        <button
-          @click="createLoan(false)"
-          :class="{ active: createLoanButtonEnabled }"
-          :disabled="!createLoanButtonEnabled"
-        >
-          {{ createLoanButtonText }}
-        </button>
-        <button
-          @click="createLoan(true)"
-          :class="{ active: createLoanButtonEnabled }"
-          :disabled="!createLoanButtonEnabled"
-        >
-          Create Another
-        </button>
-        <button
-          @click="backCreate"
-          :class="{ active: createFormActive }"
-          :disabled="!createFormActive"
-        >
-          Back
-        </button>
+      <div id="createLoanForm" class="formFrame" v-show="createFormActive">
+        <div class="form">
+          <h2>{{ createLoanFormTitle }}</h2>
+          <hr />
+          <p>Principal</p>
+          <input v-model="principal" type="number" label="Principal" />
+          <hr />
+          <p>Interest</p>
+          <input v-model="interestRate" type="number" label="Interest" />
+          <hr />
+          <p>Term</p>
+          <input v-model="termInYears" type="number" label="Term Length" />
+          <hr />
+          <button
+            @click="createLoan(false)"
+            :class="{ active: createLoanButtonEnabled }"
+            :disabled="!createLoanButtonEnabled"
+          >
+            {{ createLoanButtonText }}
+          </button>
+          <button
+            @click="createLoan(true)"
+            :class="{ active: createLoanButtonEnabled }"
+            :disabled="!createLoanButtonEnabled"
+          >
+            Create Another
+          </button>
+          <button
+            @click="backCreate"
+            :class="{ active: createFormActive }"
+            :disabled="!createFormActive"
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
     <hr />
@@ -309,9 +328,12 @@ export default {
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
+        <div v-show="loans.length">
+        {{ amortizationSchedulesPerLoan }}
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <style scoped></style>
