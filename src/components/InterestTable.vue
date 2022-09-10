@@ -15,13 +15,7 @@ export default {
     </tr>
     <tr v-for="schedule in this.paymentSchedules" :key="schedule.budgetId">
       <td>
-        <strong>{{
-          schedule.budgetId === "default"
-            ? `Baseline: $${this.globalMinPayment.toFixed(2)}/mo`
-            : `Additional $${schedule.paymentAmount}/mo ($${(
-                schedule.paymentAmount + this.globalMinPayment
-              ).toFixed(2)})`
-        }}</strong>
+        <strong>{{ schedule.label }}</strong>
       </td>
       <td v-for="loan in this.loans" :key="loan.id">
         ${{
@@ -30,7 +24,7 @@ export default {
         interest paid
         <br />
         {{
-          schedule.paymentSchedule[loan.id].amortizationSchedule.length - 1
+          schedule.paymentSchedule[loan.id].amortizationSchedule.length
         }}
         payments
       </td>
@@ -38,7 +32,7 @@ export default {
         ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }} total
         interest paid
         <br />
-        {{ schedule.paymentSchedule["totalPayments"] - 1 }} total payments
+        {{ schedule.paymentSchedule["totalPayments"] }} total payments
       </td>
     </tr>
   </table>

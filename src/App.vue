@@ -1,9 +1,9 @@
 <script>
 import * as moneyfunx from "moneyfunx";
-import BudgetsCard from "./components/BudgetsCard.vue";
+import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DataChart from "./components/DataChart.vue";
 import InterestTable from './components/InterestTable.vue';
-import LoanCard from "./components/LoansCard.vue";
+import LoansPanel from "./components/LoansPanel.vue";
 
 export default {
   data() {
@@ -17,7 +17,7 @@ export default {
       snowballSort: true,
       roundUp: false,
       loans: [],
-      addedBudgets: [],
+      budgets: [],
     };
   },
   computed: {
@@ -52,7 +52,7 @@ export default {
       return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
     },
     monthlyBudgets() {
-      const budgets = this.addedBudgets.map((budget) => {
+      const budgets = this.budgets.map((budget) => {
         return {
           id: String(Math.floor(Math.random() * Date.now())),
           relative: budget,
@@ -72,6 +72,9 @@ export default {
           budgetId: budget.id,
           paymentAmount: budget.relative,
           paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
+          label: budget.id === "default" ?
+            `Baseline $${this.globalMinPayment}/mo` :
+            `Additional $${budget.relative.toFixed(2)}/mo ($${budget.absolute.toFixed(2)}/mo)`,
         };
       });
     },
@@ -88,9 +91,9 @@ export default {
           type: "bar",
         }];
     },
-    litChart() {
+    lifetimeInterestTotalsChart() {
       return {
-        id: "litChart",
+        id: "lifetimeInterestTotalsChart",
         data: this.lifetimeInterestTotals,
         layout: {
           barmode: "group",
@@ -170,15 +173,15 @@ export default {
       this.createFormActive = true;
     },
     addBudget() {
-      this.addedBudgets = this.addedBudgets.filter(
+      this.budgets = this.budgets.filter(
         (budget) => budget !== parseFloat(this.budget)
       );
-      this.addedBudgets.push(parseFloat(this.budget));
-      this.addedBudgets.sort((a, b) => b - a);
+      this.budgets.push(parseFloat(this.budget));
+      this.budgets.sort((a, b) => b - a);
       this.budget = null;
     },
     deleteBudget(budget) {
-      this.addedBudgets = this.addedBudgets.filter(
+      this.budgets = this.budgets.filter(
         (addedBudget) => addedBudget !== parseFloat(budget)
       );
     },
@@ -192,20 +195,20 @@ export default {
             loan.termInYears
           )
       );
-      this.addedBudgets = JSON.parse(localStorage.getItem("debtonate.budgets"));
+      this.budgets = JSON.parse(localStorage.getItem("debtonate.budgets"));
     },
     saveState() {
       localStorage.setItem("debtonate.loans", JSON.stringify(this.loans));
       localStorage.setItem(
         "debtonate.budgets",
-        JSON.stringify(this.addedBudgets)
+        JSON.stringify(this.budgets)
       );
     },
     clearState() {
       localStorage.clear();
     },
   },
-  components: { DataChart, LoanCard, BudgetsCard, InterestTable },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable },
 };
 </script>
 
@@ -285,7 +288,7 @@ export default {
             Snowball
           </button>
         </div>
-        <LoanCard :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
+        <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
         <div id="budgetManagementPanel">
           <h2>Your Budgets</h2>
           <p>Budget</p>
@@ -299,12 +302,12 @@ export default {
           <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
           <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
         </div>
-        <BudgetsCard :budgets="addedBudgets" :deleteBudget="deleteBudget" />
+        <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
       </div>
       <div id="todo3" class="presPanel">
         <div v-show="loans.length" id="lifetimeInterestTotals">
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
-          <DataChart :chart="litChart" />
+          <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script>
 export default {
-   props: ["budgets", "deleteBudget"], 
+   props: ["budgets", "deleteBudget"],
 }
 </script>
 
