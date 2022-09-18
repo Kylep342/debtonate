@@ -40,6 +40,9 @@ export default {
     createLoanButtonText() {
       return this.currentLoanId ? "Save Changes" : "Create Loan";
     },
+    toggleReducePaymentsButtonText() {
+      return this.reducePayments ? "Turn Off" : "Turn On";
+    },
     rawGlobalMinPayment() {
       return this.loans.reduce(
         (previousValue, currentValue) =>
@@ -140,6 +143,9 @@ export default {
     backCreate() {
       this.clearCreate();
       this.createFormActive = false;
+    },
+    toggleReducePayments() {
+      this.reducePayments = !this.reducePayments;
     },
     toggleRounding() {
       this.roundUp = !this.roundUp;
@@ -310,7 +316,7 @@ export default {
           >
             Snowball
           </button>
-        </div>
+       </div>
         <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
         <div id="budgetManagementPanel">
           <h2>Your Budgets</h2>
@@ -326,6 +332,16 @@ export default {
           <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
         </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
+        <div>
+          <h2>Options</h2>
+          <h3>Reduce Payments</h3>
+          <button
+            @click="toggleReducePayments"
+            :class="{ active: true }"
+          >
+            {{ toggleReducePaymentsButtonText }}
+          </button>
+        </div>
       </div>
       <div id="todo3" class="presPanel">
         <div v-show="loans.length" id="lifetimeInterestTotals">
