@@ -1,5 +1,6 @@
 <script>
 import * as moneyfunx from "moneyfunx";
+import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DataChart from "./components/DataChart.vue";
 import InterestTable from './components/InterestTable.vue';
@@ -15,6 +16,7 @@ export default {
       budget: null,
       createFormActive: false,
       snowballSort: true,
+      reducePayments: false,
       roundUp: false,
       loans: [],
       budgets: [],
@@ -89,7 +91,7 @@ export default {
           balances[loan.id][schedule.budgetId] = {
             label: schedule.label,
             totalPayemntAmount: schedule.paymentAmount,
-            amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule
+            amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule,
           };
         })
       });
@@ -225,7 +227,7 @@ export default {
       localStorage.clear();
     },
   },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
 };
 </script>
 
@@ -328,8 +330,8 @@ export default {
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
-        <div v-show="loans.length">
-        {{ amortizationSchedulesPerLoan }}
+        <div id="todo4">
+          <AmortizationTable :loans="loans" :monthlyBudgets="monthlyBudgets" :amortizationSchedulesPerLoan="amortizationSchedulesPerLoan" />
         </div>
       </div>
     </div>
