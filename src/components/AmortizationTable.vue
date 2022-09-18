@@ -24,6 +24,12 @@
                 <td>${{ record.interest.toFixed(2) }}</td>
                 <td>${{ record.principalRemaining.toFixed(2) }}</td>
               </tr>
+              <tr>
+                <td>Totals:</td>
+                <td>${{ this.amortizationSchedulesPerLoan[loan.id][budget.id].totalPrincipalPaid.toFixed(2) }}</td>
+                <td>${{ this.amortizationSchedulesPerLoan[loan.id][budget.id].totalInterestPaid.toFixed(2) }}</td>
+                <td> -- </td>
+              </tr>
             </table>
           </li>
         </ul>

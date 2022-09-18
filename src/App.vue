@@ -92,6 +92,8 @@ export default {
             label: schedule.label,
             totalPayemntAmount: schedule.paymentAmount,
             amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule,
+            totalPrincipalPaid: loan.principal,
+            totalInterestPaid: schedule.paymentSchedule[loan.id].lifetimeInterest,
           };
         })
       });

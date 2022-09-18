@@ -5,6 +5,7 @@ export default {
 </script>
 
 <template>
+  <h2>Comparison of Totals</h2>
   <table id="lifetimeInterestTotalsTable">
     <tr id="lifetimeInterestTotalsTableHeaderRow">
       <th>Budgets (Down) | Loans (Right)</th>
