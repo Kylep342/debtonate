@@ -6,8 +6,8 @@ export default {
 
 <template>
   <div v-show="this.loans.length">
-    <ul>
-      <li v-for="(loan, index) in this.loans" :key="loan.id">
+    <ul class="cardHolder">
+      <li v-for="(loan, index) in this.loans" :key="loan.id" class="card">
         <ul>
           <li>
             Loan {{ index + 1 }}

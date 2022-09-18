@@ -6,8 +6,8 @@ export default {
 
 <template>
   <div id="budgetsPanel" v-show="this.budgets.length">
-    <ul>
-      <li v-for="budget in this.budgets" :key="budget.id">
+    <ul class="cardHolder">
+      <li v-for="budget in this.budgets" :key="budget.id" class="card">
         {{ budget }}
         <br />
         <button @click="this.deleteBudget(budget)">X</button>

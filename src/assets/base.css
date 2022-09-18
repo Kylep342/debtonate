@@ -105,12 +105,14 @@ input[type=number] {
 
 .mgmtPanel {
   display: flex;
+  max-width: 20%;
   flex-direction: column;
   flex-wrap: nowrap;
 }
 
 .presPanel {
   display: flex;
+  max-width: 80%;
   flex-direction: column;
 }
 
@@ -137,3 +139,27 @@ input[type=number] {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
+
+/* TODO: augment */
+
+/* .cardHolder {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.card {
+  flex: 1;
+  margin: 0.5em;
+  height: 100px;
+  min-width: 100px;
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+  animation: populate 0.5s ease-out normal backwards;
+}
+.card:hover {
+  transform: scale(1.05);
+  z-index: 1;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+} */
