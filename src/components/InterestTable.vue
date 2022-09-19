@@ -10,7 +10,7 @@ export default {
     <thead id="lifetimeInterestTotalsTableHeaderRow">
       <th>Budgets (Down) | Loans (Right)</th>
       <th v-for="(loan, index) in this.loans" :key="loan.id">
-        Loan {{ index + 1 }}
+        Loan {{ index + 1 }} (${{ loan.principal.toFixed(2) }} @ {{ (loan.annualRate * 100).toFixed(2) }}%)
       </th>
       <th>Totals</th>
     </thead>
