@@ -1,6 +1,6 @@
 <script>
 import * as moneyfunx from "moneyfunx";
-import AmortizationTable from "./components/AmortizationTable.vue";
+// import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DataChart from "./components/DataChart.vue";
 import InterestTable from './components/InterestTable.vue';
@@ -97,10 +97,46 @@ export default {
             amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule,
             totalPrincipalPaid: loan.principal,
             totalInterestPaid: schedule.paymentSchedule[loan.id].lifetimeInterest,
+            totalPayments: schedule.paymentSchedule[loan.id].totalPayments,
           };
         })
       });
       return balances;
+    },
+    amortizationSchedulesGraphData() {
+      const balances = {};
+      this.loans.map((loan) => {
+        balances[loan.id] = [];
+        this.paymentSchedules.map((schedule) => {
+          balances[loan.id].push({
+            x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (_, index) => index + 1),
+            y: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.principalRemaining),
+            hovertemplate: "Payment %{x}: %{y} principal remaining",
+            name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
+            type: "scatter",
+          });
+        })
+      });
+      return balances;
+    },
+    amortizationSchedulesChart() {
+      const charts = {};
+      this.loans.map((loan, index) => {
+          charts[loan.id] = {
+            id: `amortizationSchedulesChart,${loan.id}`,
+            data: this.amortizationSchedulesGraphData[loan.id],
+            layout: {
+              showLegend: false,
+              barmode: "group",
+              title: `Balances Over Time: Loan ${index + 1}`,
+              yaxis: {
+                hoverformat: "$,.2f"
+              },
+            },
+          }
+        });
+      // });
+      return charts;
     },
     lifetimeInterestTotals() {
         return [{
@@ -123,7 +159,7 @@ export default {
           barmode: "group",
           title: "Total Interest Paid",
           yaxis: {
-            hoverformat: "$.2f"
+            hoverformat: "$,.2f"
           }
         },
       };
@@ -235,7 +271,8 @@ export default {
       localStorage.clear();
     },
   },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
+  // components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, },
 };
 </script>
 
@@ -301,6 +338,23 @@ export default {
               Create a Loan
             </button>
           </div>
+       </div>
+        <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
+        <div id="budgetManagementPanel">
+          <h2>Your Budgets</h2>
+          <p>Budget</p>
+          <input v-model="budget" type="number" label="Budget Amount" />
+          <br />
+          <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
+            Create Budget
+          </button>
+        </div>
+        <div v-show="loans.length" id="globalMinPaymentPanel">
+          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
+        </div>
+        <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
+        <div>
+          <h2>Options</h2>
           <h3>Sorting Method</h3>
           <button
             @click="avalanche"
@@ -316,24 +370,6 @@ export default {
           >
             Snowball
           </button>
-       </div>
-        <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
-        <div id="budgetManagementPanel">
-          <h2>Your Budgets</h2>
-          <p>Budget</p>
-          <input v-model="budget" type="number" label="Budget Amount" />
-          <br />
-          <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
-            Create Budget
-          </button>
-        </div>
-        <div v-show="loans.length" id="globalMinPaymentPanel">
-          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
-          <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
-        </div>
-        <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
-        <div>
-          <h2>Options</h2>
           <h3>Reduce Payments</h3>
           <button
             @click="toggleReducePayments"
@@ -341,6 +377,8 @@ export default {
           >
             {{ toggleReducePaymentsButtonText }}
           </button>
+          <h3>Rounding</h3>
+          <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
         </div>
       </div>
       <div id="todo3" class="presPanel">
@@ -348,8 +386,16 @@ export default {
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
-        <div id="todo4">
+        <!-- <div id="todo4">
           <AmortizationTable :loans="loans" :monthlyBudgets="monthlyBudgets" :amortizationSchedulesPerLoan="amortizationSchedulesPerLoan" />
+        </div> -->
+        <div v-show="loans.length" id="amortizationSchedules">
+          <ul v-for="loan in loans" :key="loan.id">
+            <li>
+                <DataChart :chart="amortizationSchedulesChart[loan.id]" />
+            </li>
+
+          </ul>
         </div>
       </div>
     </div>

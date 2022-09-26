@@ -19,7 +19,7 @@ export default {
             Interest Rate: {{ (loan.annualRate * 100).toFixed(2) }}%
           </li>
           <li>
-            Minimum Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
+            Monthly Payment: ${{ loan.minPayment.toFixed(2) }}
           </li>
         </ul>
         <button @click="this.editLoan(loan.id)">Edit</button>
