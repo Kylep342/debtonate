@@ -111,7 +111,7 @@ export default {
           balances[loan.id].push({
             x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (_, index) => index + 1),
             y: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.principalRemaining),
-            hovertemplate: "Payment %{x}: %{y} principal remaining",
+            hovertemplate: "Payment %{x}: %{y}",
             name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
             type: "scatter",
           });
@@ -129,8 +129,17 @@ export default {
               showLegend: false,
               barmode: "group",
               title: `Balances Over Time: Loan ${index + 1}`,
+              xaxis: {
+                title: {
+                  text: "Payments"
+                }
+              },
               yaxis: {
-                hoverformat: "$,.2f"
+                hoverformat: "$,.2f",
+                tickformat: "$,.2f",
+                title: {
+                  text: "Principal Remaining"
+                }
               },
             },
           }
