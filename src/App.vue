@@ -1,6 +1,6 @@
 <script>
 import * as moneyfunx from "moneyfunx";
-// import AmortizationTable from "./components/AmortizationTable.vue";
+import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DataChart from "./components/DataChart.vue";
 import InterestTable from './components/InterestTable.vue';
@@ -111,7 +111,7 @@ export default {
           balances[loan.id].push({
             x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (_, index) => index + 1),
             y: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.principalRemaining),
-            hovertemplate: "Payment %{x}: %{y}",
+            hovertemplate: "Payment %{x}: %{y} Remaining",
             name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
             type: "scatter",
           });
@@ -280,8 +280,8 @@ export default {
       localStorage.clear();
     },
   },
-  // components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
+  // components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, },
 };
 </script>
 
@@ -395,9 +395,9 @@ export default {
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
-        <!-- <div id="todo4">
+        <div id="todo4">
           <AmortizationTable :loans="loans" :monthlyBudgets="monthlyBudgets" :amortizationSchedulesPerLoan="amortizationSchedulesPerLoan" />
-        </div> -->
+        </div>
         <div v-show="loans.length" id="amortizationSchedules">
           <ul v-for="loan in loans" :key="loan.id">
             <li>
