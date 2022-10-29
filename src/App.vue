@@ -1,5 +1,6 @@
 <script>
 import * as moneyfunx from "moneyfunx";
+
 import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DataChart from "./components/DataChart.vue";
@@ -86,7 +87,7 @@ export default {
     balancesOverTime() {
       return 5;
     },
-    amortizationSchedulesPerLoan() {
+    paymentSummaries() {
       const balances = {};
       this.loans.map((loan) => {
         balances[loan.id] = {}
@@ -396,14 +397,21 @@ export default {
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
         <div id="todo4">
-          <AmortizationTable :loans="loans" :monthlyBudgets="monthlyBudgets" :amortizationSchedulesPerLoan="amortizationSchedulesPerLoan" />
+          <ul>
+            <li v-for="(loan, index) in this.loans" :key="loan.id">
+              <ul>
+                <li v-for="budget in this.monthlyBudgets" :key="budget.id">
+                  <AmortizationTable :loan="loan" :index="index" :budget="budget" :paymentSummary="paymentSummaries[loan.id][budget.id]" />
+                </li>
+              </ul>
+            </li>
+          </ul>
         </div>
         <div v-show="loans.length" id="amortizationSchedules">
           <ul v-for="loan in loans" :key="loan.id">
             <li>
                 <DataChart :chart="amortizationSchedulesChart[loan.id]" />
             </li>
-
           </ul>
         </div>
       </div>
