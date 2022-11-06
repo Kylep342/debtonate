@@ -34,10 +34,10 @@ export default {
         </div>
         <div :class="['cardFooter', 'footer']">
           <div class="cardFooterButtonContainer">
-            <button @click="this.editLoan(loan.id)">Edit</button>
+            <button @click="this.viewLoan(loan.id)">View</button>
           </div>
           <div class="cardFooterButtonContainer">
-            <button @click="this.viewLoan(loan.id)">View</button>
+            <button @click="this.editLoan(loan.id)">Edit</button>
           </div>
         </div>
       </li>
