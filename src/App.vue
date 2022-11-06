@@ -19,6 +19,7 @@ export default {
       snowballSort: true,
       reducePayments: false,
       roundUp: false,
+      showLoanManagementPanel: false,
       loans: [],
       budgets: [],
     };
@@ -31,7 +32,14 @@ export default {
       );
     },
     createLoanFormTitle() {
-      return this.currentLoanId ? "Editing a Loan" : "Creating a Loan";
+      return this.currentLoanId ? `Editing Loan ${this.currentLoanIndex}` : "Creating a Loan";
+    },
+    currentLoanIndex() {
+      return this.currentLoanId ?
+        this.loans.findIndex((loan) => {
+            return loan.id === this.currentLoanId;
+        }) + 1:
+        null
     },
     createBudgetButtonEnabled() {
       return (
@@ -245,6 +253,10 @@ export default {
       this.termInYears = loan.termInYears;
       this.createFormActive = true;
     },
+    viewLoan(id) {
+      this.currentLoanId = id;
+      this.showLoanManagementPanel = true;
+    },
     addBudget() {
       this.budgets = this.budgets.filter(
         (budget) => budget !== parseFloat(this.budget)
@@ -298,52 +310,80 @@ export default {
     </div>
     <div>
       <div id="createLoanForm" class="formFrame" v-show="createFormActive">
-        <div class="form">
-          <h2>{{ createLoanFormTitle }}</h2>
-          <hr />
-          <p>Principal</p>
-          <input v-model="principal" type="number" label="Principal" />
-          <hr />
-          <p>Interest</p>
-          <input v-model="interestRate" type="number" label="Interest" />
-          <hr />
-          <p>Term</p>
-          <input v-model="termInYears" type="number" label="Term Length" />
-          <hr />
-          <button
-            @click="createLoan(false)"
-            :class="{ active: createLoanButtonEnabled }"
-            :disabled="!createLoanButtonEnabled"
-          >
-            {{ createLoanButtonText }}
-          </button>
-          <button
-            @click="createLoan(true)"
-            :class="{ active: createLoanButtonEnabled }"
-            :disabled="!createLoanButtonEnabled"
-          >
-            Create Another
-          </button>
-          <button
-            @click="backCreate"
-            :class="{ active: createFormActive }"
-            :disabled="!createFormActive"
-          >
-            Back
-          </button>
+        <div :class="['form']">
+          <div :class="['formHeader', 'header']">
+            <div :class="['cardHeader']">
+              <h2 :class="['formHeaderTitle']">{{ createLoanFormTitle }}</h2>
+              <div :class="['formHeaderButtonContainer']">
+                <button
+                  @click="backCreate"
+                  :class="{ active: createFormActive, exitButton: true, bold: true }"
+                  :disabled="!createFormActive"
+                >
+                  x
+                </button>
+              </div>
+            </div>
+          </div>
+          <div :class="['formBody']">
+            <table :class="['formInputs']">
+              <tr :class="['formInputItem']">
+                <td :class="['textLeft', 'cell']">
+                  <label>Principal</label>
+                </td>
+                <td :class="['cell', 'wide']">
+                  <input v-model="principal" type="number" label="Principal" />
+                </td>
+              </tr>
+              <tr :class="['formInputItem']">
+                <td :class="['textLeft', 'cell']">
+                  <label>Interest</label>
+                </td>
+                <td :class="['cell', 'wide']">
+                  <input v-model="interestRate" type="number" label="Interest" />
+                </td>
+              </tr>
+              <tr :class="['formInputItem']">
+                <td :class="['textLeft', 'cell']">
+                  <label>Term</label>
+                </td>
+                <td :class="['cell', 'wide']">
+                  <input v-model="termInYears" type="number" label="Term Length" />
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div :class="['formFooter', 'footer']">
+            <div :class="['formFooterButtonContainer']">
+              <button
+                @click="createLoan(false)"
+                :class="{ active: createLoanButtonEnabled }"
+                :disabled="!createLoanButtonEnabled"
+              >
+                {{ createLoanButtonText }}
+              </button>
+              <button
+                @click="createLoan(true)"
+                :class="{ active: createLoanButtonEnabled }"
+                :disabled="!createLoanButtonEnabled"
+              >
+                Create Another
+              </button>
+            </div>
+         </div>
         </div>
       </div>
     </div>
     <br />
-    <div id="todo" class="panel">
+    <div id="appBody" class="panel">
       <div id="todo2" class="mgmtPanel">
         <div id="loanManagementPanel">
-          <div class="cardHeader">
+          <div :class="['cardHeader', 'header']">
             <h2 class="cardHeaderTitle">Your Loans</h2>
             <div class="cardHeaderButtonContainer">
               <button
                 @click="toggleCreate"
-                :class="{ active: !createFormActive }"
+                :class="{ active: !createFormActive, bold: true }"
                 :disabled="createFormActive"
               >
               +

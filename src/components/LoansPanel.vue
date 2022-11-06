@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["loans", "editLoan", "deleteLoan"]
+  props: ["deleteLoan", "editLoan", "loans", "viewLoan"]
 }
 </script>
 
@@ -13,28 +13,31 @@ export default {
             Loan {{ index + 1 }}
           </p>
           <div class="cardHeaderButtonContainer">
-            <button class="exitButton" @click="this.deleteLoan(loan.id)">x</button>
+            <button :class="['exitButton', 'bold']" @click="this.deleteLoan(loan.id)">x</button>
           </div>
         </div>
         <div class="cardBody">
           <table class="">
             <tr>
-              <td class="justifyLeft">Principal</td>
-              <td class="justifyRight"><b>${{ loan.principal.toFixed(2) }}</b></td>
+              <td class="textLeft">Principal</td>
+              <td class="textRight"><b>${{ loan.principal.toFixed(2) }}</b></td>
             </tr>
             <tr>
-              <td class="justifyLeft">Interest Rate</td>
-              <td class="justifyRight"><b>{{ (loan.annualRate * 100).toFixed(2) }}%</b></td>
+              <td class="textLeft">Interest Rate</td>
+              <td class="textRight"><b>{{ (loan.annualRate * 100).toFixed(2) }}%</b></td>
             </tr>
             <tr>
-              <td class="justifyLeft">Monthly Payment</td>
-              <td class="justifyRight"><b>${{ loan.minPayment.toFixed(2) }}</b></td>
+              <td class="textLeft">Monthly Payment</td>
+              <td class="textRight"><b>${{ loan.minPayment.toFixed(2) }}</b></td>
             </tr>
           </table>
         </div>
         <div :class="['cardFooter', 'footer']">
           <div class="cardFooterButtonContainer">
             <button @click="this.editLoan(loan.id)">Edit</button>
+          </div>
+          <div class="cardFooterButtonContainer">
+            <button @click="this.viewLoan(loan.id)">View</button>
           </div>
         </div>
       </li>
