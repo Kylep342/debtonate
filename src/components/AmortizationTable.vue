@@ -21,10 +21,10 @@
         <td>${{ record.principalRemaining.toFixed(2) }}</td>
       </tr>
       <tr>
-        <td>Totals:</td>
-        <td>${{ this.paymentSummary.totalPrincipalPaid.toFixed(2) }}</td>
-        <td>${{ this.paymentSummary.totalInterestPaid.toFixed(2) }}</td>
-        <td> -- </td>
+        <td><b>Totals:</b></td>
+        <td><b>${{ this.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b></td>
+        <td><b>${{ this.paymentSummary.totalInterestPaid.toFixed(2) }}</b></td>
+        <td><b> -- </b></td>
       </tr>
     </table>
   </div>

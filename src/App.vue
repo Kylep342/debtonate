@@ -120,7 +120,7 @@ export default {
       });
       return balances;
     },
-    amortizationSchedulesChart() {
+    amortizationSchedulesChartPerLoan() {
       const charts = {};
       this.loans.map((loan, index) => {
           charts[loan.id] = {
@@ -129,7 +129,7 @@ export default {
             layout: {
               showLegend: false,
               barmode: "group",
-              title: `Balances Over Time: Loan ${index + 1}`,
+              title: `Balances Over Time - Loan ${index + 1}`,
               xaxis: {
                 title: {
                   text: "Payments"
@@ -167,7 +167,7 @@ export default {
         data: this.lifetimeInterestTotals,
         layout: {
           barmode: "group",
-          title: "Total Interest Paid",
+          title: "Total Interest Paid - All Loans",
           yaxis: {
             hoverformat: "$,.2f"
           }
@@ -334,21 +334,23 @@ export default {
         </div>
       </div>
     </div>
-    <hr />
+    <br />
     <div id="todo" class="panel">
       <div id="todo2" class="mgmtPanel">
         <div id="loanManagementPanel">
-          <h2>Your Loans</h2>
-          <div>
-            <button
-              @click="toggleCreate"
-              :class="{ active: !createFormActive }"
-              :disabled="createFormActive"
-            >
-              Create a Loan
-            </button>
+          <div class="cardHeader">
+            <h2 class="cardHeaderTitle">Your Loans</h2>
+            <div class="cardHeaderButtonContainer">
+              <button
+                @click="toggleCreate"
+                :class="{ active: !createFormActive }"
+                :disabled="createFormActive"
+              >
+              +
+              </button>
+            </div>
           </div>
-       </div>
+        </div>
         <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
         <div id="budgetManagementPanel">
           <h2>Your Budgets</h2>
@@ -410,7 +412,7 @@ export default {
         <div v-show="loans.length" id="amortizationSchedules">
           <ul v-for="loan in loans" :key="loan.id">
             <li>
-                <DataChart :chart="amortizationSchedulesChart[loan.id]" />
+              <DataChart :chart="amortizationSchedulesChartPerLoan[loan.id]" />
             </li>
           </ul>
         </div>
