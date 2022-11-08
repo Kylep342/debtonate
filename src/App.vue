@@ -441,14 +441,7 @@ export default {
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
         <div>
-          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="getLoanIndex(currentLoanId)" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :exit="unviewLoan" />
-        </div>
-        <div v-show="loans.length" id="amortizationSchedules">
-          <ul v-for="loan in loans" :key="loan.id">
-            <li>
-              <DataChart :chart="amortizationSchedulesChartPerLoan[loan.id]" />
-            </li>
-          </ul>
+          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="getLoanIndex(currentLoanId)" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :loanAmortizationSchedulesChart="amortizationSchedulesChartPerLoan[currentLoanId]" :exit="unviewLoan" />
         </div>
       </div>
     </div>

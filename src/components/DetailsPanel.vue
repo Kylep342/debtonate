@@ -1,9 +1,10 @@
 <script>
 import AmortizationTable from './AmortizationTable.vue';
+import DataChart from './DataChart.vue';
 
 export default {
-    props: ["loan", "index", "monthlyBudgets", "loanPaymentSummaries", "exit"],
-    components: { AmortizationTable }
+    props: ["loan", "index", "monthlyBudgets", "loanPaymentSummaries", "loanAmortizationSchedulesChart", "exit"],
+    components: { AmortizationTable, DataChart }
 }
 </script>
 
@@ -22,6 +23,7 @@ export default {
             <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget" :paymentSummary="this.loanPaymentSummaries[budget.id]" />
           </li>
         </ul>
+        <DataChart :chart="this.loanAmortizationSchedulesChart" />
       </div>
     </div>
   </div>
