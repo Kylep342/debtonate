@@ -18,7 +18,7 @@ export default {
       </div>
       <div :class="['verticalScroll']">
         <ul>
-          <li v-for="budget in this.monthlyBudgets" :key="budget.id">
+          <li v-for="budget in this.monthlyBudgets" :key="this.loan.id + budget.id">
             <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget" :paymentSummary="this.loanPaymentSummaries[budget.id]" />
           </li>
         </ul>

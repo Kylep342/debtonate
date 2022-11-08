@@ -151,6 +151,7 @@ thead, tr {
   top: 10%;
   width: 50%;
   /* margin: 1em; */
+  min-height: 40%;
   max-height: 80%;
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(255, 255, 255);

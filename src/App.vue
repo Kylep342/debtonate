@@ -1,7 +1,6 @@
 <script>
 import * as moneyfunx from "moneyfunx";
 
-import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import DataChart from "./components/DataChart.vue";
@@ -119,7 +118,7 @@ export default {
         balances[loan.id] = [];
         this.paymentSchedules.map((schedule) => {
           balances[loan.id].push({
-            x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (_, index) => index + 1),
+            x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.period),
             y: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.principalRemaining),
             hovertemplate: "Payment %{x}: %{y} Remaining",
             name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
@@ -298,7 +297,7 @@ export default {
       localStorage.clear();
     },
   },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable, DetailsPanel },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel },
 };
 </script>
 
