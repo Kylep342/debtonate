@@ -3,6 +3,7 @@ import * as moneyfunx from "moneyfunx";
 
 import AmortizationTable from "./components/AmortizationTable.vue";
 import BudgetsPanel from "./components/BudgetsPanel.vue";
+import DetailsPanel from "./components/DetailsPanel.vue";
 import DataChart from "./components/DataChart.vue";
 import InterestTable from './components/InterestTable.vue';
 import LoansPanel from "./components/LoansPanel.vue";
@@ -19,7 +20,7 @@ export default {
       snowballSort: true,
       reducePayments: false,
       roundUp: false,
-      showLoanManagementPanel: false,
+      showLoanDetailsPanel: false,
       loans: [],
       budgets: [],
     };
@@ -255,7 +256,11 @@ export default {
     },
     viewLoan(id) {
       this.currentLoanId = id;
-      this.showLoanManagementPanel = true;
+      this.showLoanDetailsPanel = true;
+    },
+    unviewLoan() {
+      this.showLoanDetailsPanel = false;
+      this.currentLoanId = null;
     },
     addBudget() {
       this.budgets = this.budgets.filter(
@@ -293,8 +298,7 @@ export default {
       localStorage.clear();
     },
   },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable },
-  // components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, },
+  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, AmortizationTable, DetailsPanel },
 };
 </script>
 
@@ -309,8 +313,9 @@ export default {
       </div>
     </div>
     <div>
-      <div id="createLoanForm" class="formFrame" v-show="createFormActive">
-        <div :class="['form']">
+      <!-- NOTE: form start -->
+      <div id="createLoanForm" class="modalFrame" v-show="createFormActive">
+        <div :class="['modal']">
           <div :class="['formHeader', 'header']">
             <div :class="['cardHeader']">
               <h2 :class="['formHeaderTitle']">{{ createLoanFormTitle }}</h2>
@@ -391,7 +396,7 @@ export default {
             </div>
           </div>
         </div>
-        <LoansPanel :loans="loans" :editLoan="editLoan" :deleteLoan="deleteLoan"/>
+        <LoansPanel :loans="loans" :deleteLoan="deleteLoan" :editLoan="editLoan" :viewLoan="viewLoan" />
         <div id="budgetManagementPanel">
           <h2>Your Budgets</h2>
           <p>Budget</p>
@@ -438,16 +443,8 @@ export default {
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
-        <div id="todo4">
-          <ul>
-            <li v-for="(loan, index) in this.loans" :key="loan.id">
-              <ul>
-                <li v-for="budget in this.monthlyBudgets" :key="budget.id">
-                  <AmortizationTable :loan="loan" :index="index" :budget="budget" :paymentSummary="paymentSummaries[loan.id][budget.id]" />
-                </li>
-              </ul>
-            </li>
-          </ul>
+        <div>
+          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="currentLoanIndex" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :exit="unviewLoan" />
         </div>
         <div v-show="loans.length" id="amortizationSchedules">
           <ul v-for="loan in loans" :key="loan.id">

@@ -6,7 +6,7 @@
 
 <template>
   <div>
-    <h2>Loan {{ this.index + 1 }} (${{ this.loan.principal.toFixed(2) }} @ {{ (this.loan.annualRate * 100).toFixed(2)}}%), Total Budget: ${{ this.budget.absolute.toFixed(2) }}/mo</h2>
+    <h2>Loan {{ this.index }} (${{ this.loan.principal.toFixed(2) }} @ {{ (this.loan.annualRate * 100).toFixed(2)}}%), Total Budget: ${{ this.budget.absolute.toFixed(2) }}/mo</h2>
     <table class="table table-hover table-mc-light-blue">
       <thead>
         <th>Payment Number</th>

@@ -141,7 +141,7 @@ thead, tr {
   flex-direction: column;
 }
 
-.form {
+.modal {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -151,12 +151,12 @@ thead, tr {
   top: 10%;
   width: 50%;
   /* margin: 1em; */
-  /* min-height: 60%; */
+  max-height: 80%;
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(255, 255, 255);
 }
 
-.formFrame {
+.modalFrame {
   display: block; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 2; /* Sit on top */
@@ -255,6 +255,7 @@ thead, tr {
   display: flex;
   justify-content: right;
   align-items: center;
+  margin-right: .5em;
 }
 
 .cardHeaderTitle {
@@ -339,4 +340,10 @@ thead, tr {
 
 .wide {
   min-width: 80%;
+}
+
+.verticalScroll {
+  max-height: 50%;
+  position: relative;
+  overflow-y: scroll;
 }
