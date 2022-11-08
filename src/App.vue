@@ -32,14 +32,7 @@ export default {
       );
     },
     createLoanFormTitle() {
-      return this.currentLoanId ? `Editing Loan ${this.currentLoanIndex}` : "Creating a Loan";
-    },
-    currentLoanIndex() {
-      return this.currentLoanId ?
-        this.loans.findIndex((loan) => {
-            return loan.id === this.currentLoanId;
-        }) + 1:
-        null
+      return this.currentLoanId ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}` : "Creating a Loan";
     },
     createBudgetButtonEnabled() {
       return (
@@ -226,6 +219,11 @@ export default {
     },
     getLoan(id) {
       return this.loans.filter((loan) => loan.id === id)[0];
+    },
+    getLoanIndex(id) {
+      return this.loans.findIndex((loan) => {
+            return loan.id === id;
+        }) + 1;
     },
     createLoan(createFormActive = false) {
       const principal = parseFloat(this.principal);
@@ -443,7 +441,7 @@ export default {
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
         <div>
-          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="currentLoanIndex" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :exit="unviewLoan" />
+          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="getLoanIndex(currentLoanId)" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :exit="unviewLoan" />
         </div>
         <div v-show="loans.length" id="amortizationSchedules">
           <ul v-for="loan in loans" :key="loan.id">
