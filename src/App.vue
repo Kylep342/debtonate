@@ -22,6 +22,14 @@ export default {
       showLoanDetailsPanel: false,
       loans: [],
       budgets: [],
+      colors: [
+        '#DAF7A6',
+        '#FFC300',
+        '#FF5733',
+        '#C70039',
+        '#900C3F',
+        '#581845'
+      ]
     };
   },
   computed: {
@@ -57,6 +65,13 @@ export default {
     },
     globalMinPayment() {
       return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
+    },
+    globalPrincipal() {
+      return this.loans.reduce(
+        (previousValue, currentValue) =>
+          (previousValue += currentValue.principal),
+        0
+      );
     },
     monthlyBudgets() {
       const budgets = this.budgets.map((budget) => {
@@ -143,6 +158,7 @@ export default {
                   text: "Principal Remaining"
                 }
               },
+              colorway: this.colors,
             },
           }
         });
@@ -171,7 +187,8 @@ export default {
           title: "Total Interest Paid - All Loans",
           yaxis: {
             hoverformat: "$,.2f"
-          }
+          },
+          colorway: this.colors,
         },
       };
     },
@@ -187,7 +204,7 @@ export default {
       this.interestRate = null;
       this.termInYears = null;
     },
-    backCreate() {
+    exitCreate() {
       this.clearCreate();
       this.createFormActive = false;
     },
@@ -301,87 +318,83 @@ export default {
 
 <template>
   <div id="debtonate">
-    <div id="header">
-      <h1>Debtonate</h1>
-      <div>
-        <button @click="loadState">Load</button>
-        <button @click="saveState">Save</button>
-        <button @click="clearState" :disabled="true">Clear</button>
+    <header id="header">
+      <h1 :class="['headerTitle']">Debtonate</h1>
+      <div :class="['headerButtonContainer']">
+        <button :class="['headerButton']" @click="loadState">Load</button>
+        <button :class="['headerButton']" @click="saveState">Save</button>
+        <button :class="['headerButton']" @click="clearState" :disabled="false">Clear</button>
       </div>
-    </div>
-    <div>
-      <!-- NOTE: form start -->
-      <div id="createLoanForm" class="modalFrame" v-show="createFormActive">
-        <div :class="['modal']">
-          <div :class="['formHeader', 'header']">
-            <div :class="['cardHeader']">
-              <h2 :class="['formHeaderTitle']">{{ createLoanFormTitle }}</h2>
-              <div :class="['formHeaderButtonContainer']">
-                <button
-                  @click="backCreate"
-                  :class="{ active: createFormActive, exitButton: true, bold: true }"
-                  :disabled="!createFormActive"
-                >
-                  x
-                </button>
-              </div>
+    </header>
+    <!-- NOTE: form start -->
+    <div id="createLoanForm" class="modalFrame" v-show="createFormActive">
+      <div :class="['modal']">
+        <div :class="['header']">
+          <h2 :class="['headerTitle']">{{ createLoanFormTitle }}</h2>
+          <div :class="['headerButtonContainer']">
+            <button
+              @click="exitCreate"
+              :class="{ active: createFormActive, exitButton: true, bold: true }"
+              :disabled="!createFormActive"
+            >
+              x
+            </button>
+          </div>
+        </div>
+        <div :class="['cardBody']">
+          <div :class="['formInputs']">
+            <div :class="['formInputItem']">
+              <td :class="['textLeft', 'cell']">
+                <label>Principal</label>
+              </td>
+              <td :class="['cell', 'wide']">
+                <input v-model="principal" type="number" label="Principal" />
+              </td>
+            </div>
+            <div :class="['formInputItem']">
+              <td :class="['textLeft', 'cell']">
+                <label>Interest</label>
+              </td>
+              <td :class="['cell', 'wide']">
+                <input v-model="interestRate" type="number" label="Interest" />
+              </td>
+            </div>
+            <div :class="['formInputItem']">
+              <td :class="['textLeft', 'cell']">
+                <label>Term</label>
+              </td>
+              <td :class="['cell', 'wide']">
+                <input v-model="termInYears" type="number" label="Term Length" />
+              </td>
             </div>
           </div>
-          <div :class="['formBody']">
-            <table :class="['formInputs']">
-              <tr :class="['formInputItem']">
-                <td :class="['textLeft', 'cell']">
-                  <label>Principal</label>
-                </td>
-                <td :class="['cell', 'wide']">
-                  <input v-model="principal" type="number" label="Principal" />
-                </td>
-              </tr>
-              <tr :class="['formInputItem']">
-                <td :class="['textLeft', 'cell']">
-                  <label>Interest</label>
-                </td>
-                <td :class="['cell', 'wide']">
-                  <input v-model="interestRate" type="number" label="Interest" />
-                </td>
-              </tr>
-              <tr :class="['formInputItem']">
-                <td :class="['textLeft', 'cell']">
-                  <label>Term</label>
-                </td>
-                <td :class="['cell', 'wide']">
-                  <input v-model="termInYears" type="number" label="Term Length" />
-                </td>
-              </tr>
-            </table>
+        </div>
+        <div :class="['cardFooter', 'footer']">
+          <div :class="['cardFooterButtonContainer']">
+            <button
+              @click="createLoan(false)"
+              :class="{ active: createLoanButtonEnabled }"
+              :disabled="!createLoanButtonEnabled"
+            >
+              {{ createLoanButtonText }}
+            </button>
+            <button
+              @click="createLoan(true)"
+              :class="{ active: createLoanButtonEnabled }"
+              :disabled="!createLoanButtonEnabled"
+            >
+              Create Another
+            </button>
           </div>
-          <div :class="['formFooter', 'footer']">
-            <div :class="['formFooterButtonContainer']">
-              <button
-                @click="createLoan(false)"
-                :class="{ active: createLoanButtonEnabled }"
-                :disabled="!createLoanButtonEnabled"
-              >
-                {{ createLoanButtonText }}
-              </button>
-              <button
-                @click="createLoan(true)"
-                :class="{ active: createLoanButtonEnabled }"
-                :disabled="!createLoanButtonEnabled"
-              >
-                Create Another
-              </button>
-            </div>
-         </div>
         </div>
       </div>
     </div>
     <br />
-    <div id="appBody" class="panel">
+    <div :class="['panel']">
       <div id="todo2" class="mgmtPanel">
         <div id="loanManagementPanel">
           <div :class="['cardHeader', 'header']">
-            <h2 class="cardHeaderTitle">Your Loans</h2>
+            <h2 class="cardHeaderTitle">Loans</h2>
             <div class="cardHeaderButtonContainer">
               <button
                 @click="toggleCreate"
@@ -395,7 +408,7 @@ export default {
         </div>
         <LoansPanel :loans="loans" :deleteLoan="deleteLoan" :editLoan="editLoan" :viewLoan="viewLoan" />
         <div id="budgetManagementPanel">
-          <h2>Your Budgets</h2>
+          <h2>Budgets</h2>
           <p>Budget</p>
           <input v-model="budget" type="number" label="Budget Amount" />
           <br />
@@ -403,12 +416,10 @@ export default {
             Create Budget
           </button>
         </div>
-        <div v-show="loans.length" id="globalMinPaymentPanel">
-          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><br/><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
-        </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
         <div>
           <h2>Options</h2>
+          <!-- <Button :title="'Sorting Method'" :label="'Avalanche'" :onClick="avalanche" :classes="{ active: snowballSort }" :disabled="!snowballSort"/> -->
           <h3>Sorting Method</h3>
           <button
             @click="avalanche"
@@ -436,6 +447,14 @@ export default {
         </div>
       </div>
       <div id="todo3" class="presPanel">
+      <div id="infoPanel" :class="['infoPanel']">
+        <div v-show="loans.length" id="globalMinPaymentPanel">
+          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
+        </div>
+        <div v-show="loans.length" id="globalPrincipalPanel">
+          <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
+        </div>
+      </div>
         <div v-show="loans.length" id="lifetimeInterestTotals">
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />

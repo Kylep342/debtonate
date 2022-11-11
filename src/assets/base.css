@@ -13,13 +13,14 @@ body {
 }
 
 header {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
-  margin: 3rem;
-  border-radius: 10px;
-  padding: 1rem;
-  background-color: #1b995e;
-  color: white;
   text-align: center;
+  color: #000000;
+  background-color: #ffffff;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: .5em;
 }
 
 ul {
@@ -35,10 +36,8 @@ li {
   text-align: center;
 }
 
-#debtonate h1, h2 {
+h1, h2 {
   font-size: 2rem;
-  /* border-bottom: 4px solid #ccc; */
-  /* color: #1b995e; */
   color: #000000;
   margin: 1rem;
 }
@@ -46,17 +45,14 @@ li {
 #debtonate p {
   font-size: 1.5rem;
   font-weight: bold;
-  /* background-color: #8ddba4; */
   padding: 0.5rem;
-  color: #1f1f1f;
-  /* border-radius: 25px; */
 }
 
 #debtonate input {
   font: inherit;
   width: 100%;
-  background-color: #f4f4f4;
-  border: 1px solid #fff;
+  border: none;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
   outline: none;
 }
 
@@ -69,20 +65,18 @@ li {
 button {
   font: inherit;
   cursor: pointer;
-  border: 1px solid #4287f5;
-  border-radius: 10px;
-  background-color: #4287f5;
-  color: white;
+  border: none;
+  color: #000;
+  background-color: #fff;
   padding: 0.05rem 1rem;
   /* margin: .05em; */
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
 }
 
 button:hover,
 button:active {
-  background-color: #4287f5;
-  border-color: #4287f5;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26);
+  /* background-color: #FF5733; */
+  /* border-color: #FF5733; */
+  /* box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26); */
   transform: scale(1.1);
   z-index: 1;
 }
@@ -91,9 +85,6 @@ button:disabled {
   opacity: 0.3;
   transform: none;
   cursor: auto;
-  border: 1px solid #4287f5;
-  background-color: #4287f5;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -112,9 +103,14 @@ table {
   height: 100%;
   width: 100%;
   margin-right: 0px;
+  overflow: auto;
 }
 
-thead, tr {
+thead {
+  text-align: center;
+}
+
+tr {
   text-align: center;
 }
 
@@ -123,6 +119,10 @@ thead, tr {
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: flex-start;
+}
+
+.infoPanel {
+  display: flex;
 }
 
 .mgmtPanel {
@@ -144,13 +144,12 @@ thead, tr {
 .modal {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   position: fixed;
   z-index: 1;
   left: 25%;
   top: 10%;
   width: 50%;
-  /* margin: 1em; */
   min-height: 40%;
   max-height: 80%;
   overflow: auto; /* Enable scroll if needed */
@@ -169,42 +168,21 @@ thead, tr {
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
-.formHeader {
-  margin-top: .5em;
-  padding-top: .5em;
-}
+/* .formBody {
 
-.formHeaderTitle {
-  width: 80%;
-  text-align: left;
-  font-size: 1.5em;
-}
-
-.formHeaderButtonContainer {
-  width: 20%;
-  display: flex;
-  margin-right: 1em;
-  justify-content: right;
-  align-items: center;
-}
+} */
 
 .formFooterButtonContainer {
   display: flex;
-  flex-direction: row;
+  margin-right: .5em;
+  margin-bottom: .5em;
+  align-items: right;
   justify-content: right;
-  margin-left: 1em;
-  margin-right: 1em;
 }
 
 .formFooter {
   margin-bottom: .5em;
   padding-bottom: .5em;
-}
-
-.formBody {
-  font-size: 1em;
-  display: flex;
-  min-height: 70%;
 }
 
 .formInputs {
@@ -227,13 +205,40 @@ thead, tr {
 }
 
 .header {
-  margin-bottom: .5em;
-  padding-bottom: .5em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.headerButtonContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: top;
+}
+
+.headerButton {
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  color: #000;
+  background-color: #fff;
+  margin: .05em 1em;
+  /* padding: 0.05rem 1rem; */
+  /* margin: .05em; */
+  box-shadow: none;
+}
+
+.headerTitle {
+  text-align: left;
+  font-size: 1.5em;
 }
 
 .footer {
-  margin-top: .5em;
-  padding-top: .5em;
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
 }
 
 .bold {
@@ -243,6 +248,7 @@ thead, tr {
 .cardHeader {
   display: flex;
   flex-direction: row;
+  background-color: #fff;
 }
 
 .cardFooter {
@@ -252,11 +258,10 @@ thead, tr {
 }
 
 .cardHeaderButtonContainer {
-  width: 20%;
+  max-width: 20%;
   display: flex;
   justify-content: right;
-  align-items: center;
-  margin-right: .5em;
+  align-items: top;
 }
 
 .cardHeaderTitle {
@@ -266,12 +271,14 @@ thead, tr {
 }
 
 .cardBody {
-  width: 100%;
+  margin: .5em;
+  color: #000;
 }
 
 .cardFooterButtonContainer {
   display: flex;
   margin-right: .5em;
+  margin-bottom: .5em;
   align-items: right;
   justify-content: right;
 }
@@ -284,7 +291,6 @@ thead, tr {
 .card {
   flex: 1;
   margin: 0.5em;
-  padding: 0.5em;
   height: 100px;
   min-width: 100px;
   justify-content: left;
@@ -303,23 +309,22 @@ thead, tr {
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* .panel {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+  animation: populate 0.5s ease-out normal backwards;
+} */
+
 .exitButton {
-  background-color: #fff;
-  color: #000;
   border: none;
   box-shadow: none;
-  /* padding: 0.05rem 1rem;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26); */
-
-  /* background-color: #fff;
-  color: #000; */
 }
 
 .exitButton:hover,
 .exitButton:active {
-  background-color: #f00000;
+  background-color: #C70039;
   color: #fff;
-  border-color: #f00000;
+  border-color: #C70039;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26);
 }
 

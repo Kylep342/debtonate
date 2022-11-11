@@ -6,9 +6,11 @@
 
 <template>
   <div>
-    <h2>Loan {{ this.index }} (${{ this.loan.principal.toFixed(2) }} @ {{ (this.loan.annualRate * 100).toFixed(2)}}%), Total Budget: ${{ this.budget.absolute.toFixed(2) }}/mo</h2>
+    <div :class="['header']">
+      <p>Loan {{ this.index }} (${{ this.loan.principal.toFixed(2) }} @ {{ (this.loan.annualRate * 100).toFixed(2)}}%), Total Budget: ${{ this.budget.absolute.toFixed(2) }}/mo</p>
+    </div>
     <table class="table table-hover table-mc-light-blue">
-      <thead>
+      <thead id="AmortizationTotalsTHead">
         <th>Payment Number</th>
         <th>Principal Paid</th>
         <th>Interest Paid</th>

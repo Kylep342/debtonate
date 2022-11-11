@@ -5,10 +5,12 @@ export default {
 </script>
 
 <template>
-  <h2>Comparison of Totals</h2>
+  <div :class="['header']">
+    <p>Comparison of Totals</p>
+  </div>
   <table id="lifetimeInterestTotalsTable" class="table table-hover table-mc-light-blue">
-    <thead id="lifetimeInterestTotalsTableHeaderRow">
-      <th>Budgets (Down) | Loans (Right)</th>
+    <thead id="lifetimeInterestTotalsTHead">
+      <th>Budgets (Down) | Loans (Across)</th>
       <th :class="['cell']" v-for="(loan, index) in this.loans" :key="loan.id">
         Loan {{ index + 1 }} (${{ loan.principal.toFixed(2) }} @ {{ (loan.annualRate * 100).toFixed(2) }}%)
       </th>
