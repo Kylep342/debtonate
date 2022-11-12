@@ -74,9 +74,6 @@ button {
 
 button:hover,
 button:active {
-  /* background-color: #FF5733; */
-  /* border-color: #FF5733; */
-  /* box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.26); */
   transform: scale(1.1);
   z-index: 1;
 }

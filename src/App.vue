@@ -22,14 +22,7 @@ export default {
       showLoanDetailsPanel: false,
       loans: [],
       budgets: [],
-      colors: [
-        '#DAF7A6',
-        '#FFC300',
-        '#FF5733',
-        '#C70039',
-        '#900C3F',
-        '#581845'
-      ]
+      colors: ['#DAF7A6', '#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845']
     };
   },
   computed: {
@@ -72,6 +65,13 @@ export default {
           (previousValue += currentValue.principal),
         0
       );
+    },
+    globalEffectiveInterestRate() {
+      return this.loans.reduce(
+        (previousValue, currentValue) =>
+          (previousValue += currentValue.annualRate * (currentValue.principal / this.globalPrincipal)),
+        0
+      )
     },
     monthlyBudgets() {
       const budgets = this.budgets.map((budget) => {
@@ -145,7 +145,7 @@ export default {
             layout: {
               showLegend: false,
               barmode: "group",
-              title: `Balances Over Time - Loan ${index + 1}`,
+              title: `Balance Over Time - Loan ${index + 1}`,
               xaxis: {
                 title: {
                   text: "Payments"
@@ -199,7 +199,7 @@ export default {
       this.createFormActive = true;
     },
     clearCreate() {
-      this.currentLoanId = "";
+      this.currentLoanId = null;
       this.principal = null;
       this.interestRate = null;
       this.termInYears = null;
@@ -310,6 +310,18 @@ export default {
     },
     clearState() {
       localStorage.clear();
+      this.currentLoanId = null;
+      this.principal = null;
+      this.interestRate = null;
+      this.termInYears = null;
+      this.budget = null;
+      this.createFormActive = false;
+      this.snowballSort = true;
+      this.reducePayments = false;
+      this.roundUp = false;
+      this.showLoanDetailsPanel = false;
+      this.loans = [];
+      this.budgets = [];
     },
   },
   components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel },
@@ -446,16 +458,19 @@ export default {
           <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
         </div>
       </div>
-      <div id="todo3" class="presPanel">
+      <div id="todo3" v-show="loans.length" class="presPanel">
       <div id="infoPanel" :class="['infoPanel']">
-        <div v-show="loans.length" id="globalMinPaymentPanel">
-          <p>Minimum Budget: ${{ globalMinPayment.toFixed(2) }}</p><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
+        <div id="globalMinPaymentPanel">
+          <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
         </div>
-        <div v-show="loans.length" id="globalPrincipalPanel">
+        <div id="globalPrincipalPanel">
           <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
         </div>
+        <div>
+          <p>Effective Interest Rate: {{ (globalEffectiveInterestRate * 100).toFixed(2) }}%</p>
+        </div>
       </div>
-        <div v-show="loans.length" id="lifetimeInterestTotals">
+        <div id="lifetimeInterestTotals">
           <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
