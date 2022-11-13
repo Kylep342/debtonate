@@ -1,11 +1,11 @@
 <script>
-import * as moneyfunx from "moneyfunx";
+import * as moneyfunx from 'moneyfunx';
 
-import BudgetsPanel from "./components/BudgetsPanel.vue";
-import DetailsPanel from "./components/DetailsPanel.vue";
-import DataChart from "./components/DataChart.vue";
+import BudgetsPanel from './components/BudgetsPanel.vue';
+import DetailsPanel from './components/DetailsPanel.vue';
+import DataChart from './components/DataChart.vue';
 import InterestTable from './components/InterestTable.vue';
-import LoansPanel from "./components/LoansPanel.vue";
+import LoansPanel from './components/LoansPanel.vue';
 
 export default {
   data() {
@@ -15,25 +15,25 @@ export default {
       interestRate: null,
       termInYears: null,
       budget: null,
-      createFormActive: false,
+      createBudgetFormActive: false,
+      createLoanFormActive: false,
       snowballSort: true,
       reducePayments: false,
       roundUp: false,
       showLoanDetailsPanel: false,
       loans: [],
       budgets: [],
-      colors: ['#DAF7A6', '#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845']
+      colors: ['#DAF7A6', '#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845'],
     };
   },
   computed: {
     createLoanButtonEnabled() {
       return [this.principal, this.interestRate, this.termInYears].every(
-        (current) =>
-          !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0
+        (current) => !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0,
       );
     },
     createLoanFormTitle() {
-      return this.currentLoanId ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}` : "Creating a Loan";
+      return this.currentLoanId ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}` : 'Creating a Loan';
     },
     createBudgetButtonEnabled() {
       return (
@@ -41,73 +41,69 @@ export default {
       );
     },
     createLoanButtonText() {
-      return this.currentLoanId ? "Save Changes" : "Create Loan";
+      return this.currentLoanId ? 'Save Changes' : 'Create Loan';
     },
     toggleReducePaymentsButtonText() {
-      return this.reducePayments ? "Turn Off" : "Turn On";
+      return this.reducePayments ? 'Turn Off' : 'Turn On';
     },
     rawGlobalMinPayment() {
       return this.loans.reduce(
-        (previousValue, currentValue) =>
-          (previousValue += currentValue.minPayment),
-        0
+        (previousValue, currentValue) => (previousValue + currentValue.minPayment),
+        0,
       );
     },
     roundedGlobalMinPayment() {
-      return this.rawGlobalMinPayment + (100 - this.rawGlobalMinPayment % 100);
+      return this.rawGlobalMinPayment + (100 - (this.rawGlobalMinPayment % 100));
     },
     globalMinPayment() {
       return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
     },
     globalPrincipal() {
       return this.loans.reduce(
-        (previousValue, currentValue) =>
-          (previousValue += currentValue.principal),
-        0
+        (previousValue, currentValue) => (previousValue + currentValue.principal),
+        0,
       );
     },
     globalEffectiveInterestRate() {
       return this.loans.reduce(
-        (previousValue, currentValue) =>
-          (previousValue += currentValue.annualRate * (currentValue.principal / this.globalPrincipal)),
-        0
-      )
+        (previousValue, currentValue) => (
+          previousValue + currentValue.annualRate
+          * (currentValue.principal / this.globalPrincipal)
+        ),
+        0,
+      );
     },
     monthlyBudgets() {
-      const budgets = this.budgets.map((budget) => {
-        return {
-          id: String(Math.floor(Math.random() * Date.now())),
-          relative: budget,
-          absolute: budget + this.globalMinPayment,
-        };
-      });
+      const budgets = this.budgets.map((budget) => ({
+        id: String(Math.floor(Math.random() * Date.now())),
+        relative: budget,
+        absolute: budget + this.globalMinPayment,
+      }));
       budgets.push({
-        id: "default",
+        id: 'default',
         relative: 0,
         absolute: this.globalMinPayment,
       });
       return budgets;
     },
     paymentSchedules() {
-      return this.monthlyBudgets.map((budget) => {
-        return {
-          budgetId: budget.id,
-          paymentAmount: budget.relative,
-          paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
-          label: budget.id === "default" ?
-            `Baseline $${this.globalMinPayment.toFixed(2)}/mo` :
-            `Additional $${budget.relative.toFixed(2)}/mo ($${budget.absolute.toFixed(2)}/mo)`,
-        };
-      });
+      return this.monthlyBudgets.map((budget) => ({
+        budgetId: budget.id,
+        paymentAmount: budget.relative,
+        paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
+        label: budget.id === 'default'
+          ? `Baseline $${this.globalMinPayment.toFixed(2)}/mo`
+          : `Additional $${budget.relative.toFixed(2)}/mo ($${budget.absolute.toFixed(2)}/mo)`,
+      }));
     },
     balancesOverTime() {
       return 5;
     },
     paymentSummaries() {
       const balances = {};
-      this.loans.map((loan) => {
-        balances[loan.id] = {}
-        this.paymentSchedules.map((schedule) => {
+      this.loans.forEach((loan) => {
+        balances[loan.id] = {};
+        this.paymentSchedules.forEach((schedule) => {
           balances[loan.id][schedule.budgetId] = {
             label: schedule.label,
             totalPayemntAmount: schedule.paymentAmount,
@@ -116,77 +112,82 @@ export default {
             totalInterestPaid: schedule.paymentSchedule[loan.id].lifetimeInterest,
             totalPayments: schedule.paymentSchedule[loan.id].totalPayments,
           };
-        })
+        });
       });
       return balances;
     },
     amortizationSchedulesGraphData() {
       const balances = {};
-      this.loans.map((loan) => {
+      this.loans.forEach((loan) => {
         balances[loan.id] = [];
-        this.paymentSchedules.map((schedule) => {
+        this.paymentSchedules.forEach((schedule) => {
           balances[loan.id].push({
-            x: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.period),
-            y: Array.from(schedule.paymentSchedule[loan.id].amortizationSchedule, (record) => record.principalRemaining),
-            hovertemplate: "Payment %{x}: %{y} Remaining",
+            x: Array.from(
+              schedule.paymentSchedule[loan.id].amortizationSchedule,
+              (record) => record.period,
+            ),
+            y: Array.from(
+              schedule.paymentSchedule[loan.id].amortizationSchedule,
+              (record) => record.principalRemaining,
+            ),
+            hovertemplate: 'Payment %{x}: %{y} Remaining',
             name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
-            type: "scatter",
+            type: 'scatter',
           });
-        })
+        });
       });
       return balances;
     },
     amortizationSchedulesChartPerLoan() {
       const charts = {};
-      this.loans.map((loan, index) => {
-          charts[loan.id] = {
-            id: `amortizationSchedulesChart,${loan.id}`,
-            data: this.amortizationSchedulesGraphData[loan.id],
-            layout: {
-              showLegend: false,
-              barmode: "group",
-              title: `Balance Over Time - Loan ${index + 1}`,
-              xaxis: {
-                title: {
-                  text: "Payments"
-                }
+      this.loans.forEach((loan, index) => {
+        charts[loan.id] = {
+          id: `amortizationSchedulesChart,${loan.id}`,
+          data: this.amortizationSchedulesGraphData[loan.id],
+          layout: {
+            showLegend: false,
+            barmode: 'group',
+            title: `Balance Over Time - Loan ${index + 1}`,
+            xaxis: {
+              title: {
+                text: 'Payments',
               },
-              yaxis: {
-                hoverformat: "$,.2f",
-                tickformat: "$,.2f",
-                title: {
-                  text: "Principal Remaining"
-                }
-              },
-              colorway: this.colors,
             },
-          }
-        });
+            yaxis: {
+              hoverformat: '$,.2f',
+              tickformat: '$,.2f',
+              title: {
+                text: 'Principal Remaining',
+              },
+            },
+            colorway: this.colors,
+          },
+        };
+      });
       // });
       return charts;
     },
     lifetimeInterestTotals() {
-        return [{
-          x: this.monthlyBudgets.map((budget) => `$${(budget.relative + this.globalMinPayment).toFixed(2)}/month`),
-          y: this.monthlyBudgets.map(
-            (budget) =>
-              this.paymentSchedules.filter(
-                (schedule) => schedule.budgetId === budget.id
-              )[0].paymentSchedule["totalInterest"].toFixed(2)
-          ),
-          name: "Total Interest Paid",
-          type: "bar",
-        }];
+      return [{
+        x: this.monthlyBudgets.map((budget) => `$${(budget.relative + this.globalMinPayment).toFixed(2)}/month`),
+        y: this.monthlyBudgets.map(
+          (budget) => this.paymentSchedules.filter(
+            (schedule) => schedule.budgetId === budget.id,
+          )[0].paymentSchedule.totalInterest.toFixed(2),
+        ),
+        name: 'Total Interest Paid',
+        type: 'bar',
+      }];
     },
     lifetimeInterestTotalsChart() {
       return {
-        id: "lifetimeInterestTotalsChart",
+        id: 'lifetimeInterestTotalsChart',
         data: this.lifetimeInterestTotals,
         layout: {
-          barmode: "group",
-          title: "Total Interest Paid - All Loans",
+          barmode: 'group',
+          title: 'Total Interest Paid - All Loans',
           yaxis: {
-            hoverformat: "$,.2f"
+            hoverformat: '$,.2f',
           },
           colorway: this.colors,
         },
@@ -195,18 +196,18 @@ export default {
   },
   watch: {},
   methods: {
-    toggleCreate() {
-      this.createFormActive = true;
+    toggleCreateLoan() {
+      this.createLoanFormActive = true;
     },
-    clearCreate() {
+    clearCreateLoan() {
       this.currentLoanId = null;
       this.principal = null;
       this.interestRate = null;
       this.termInYears = null;
     },
-    exitCreate() {
-      this.clearCreate();
-      this.createFormActive = false;
+    exitCreateLoan() {
+      this.clearCreateLoan();
+      this.createLoanFormActive = false;
     },
     toggleReducePayments() {
       this.reducePayments = !this.reducePayments;
@@ -215,20 +216,20 @@ export default {
       this.roundUp = !this.roundUp;
     },
     sortLoans() {
-      this.snowballSort ? this.snowball() : this.avalanche();
+      return this.snowballSort ? this.snowball() : this.avalanche();
     },
     avalanche() {
       this.snowballSort = false;
       this.loans = moneyfunx.sortLoans(
         moneyfunx.sortLoans(this.loans, moneyfunx.snowball),
-        moneyfunx.avalanche
+        moneyfunx.avalanche,
       );
     },
     snowball() {
       this.snowballSort = true;
       this.loans = moneyfunx.sortLoans(
         moneyfunx.sortLoans(this.loans, moneyfunx.avalanche),
-        moneyfunx.snowball
+        moneyfunx.snowball,
       );
     },
     deleteLoan(id) {
@@ -238,11 +239,9 @@ export default {
       return this.loans.filter((loan) => loan.id === id)[0];
     },
     getLoanIndex(id) {
-      return this.loans.findIndex((loan) => {
-            return loan.id === id;
-        }) + 1;
+      return this.loans.findIndex((loan) => loan.id === id) + 1;
     },
-    createLoan(createFormActive = false) {
+    createLoan(createLoanFormActive = false) {
       const principal = parseFloat(this.principal);
       const interestRate = parseFloat(this.interestRate) / 100;
       const termInYears = parseFloat(this.termInYears);
@@ -250,15 +249,15 @@ export default {
         principal,
         interestRate,
         12,
-        termInYears
+        termInYears,
       );
       if (this.currentLoanId) {
         this.deleteLoan(this.currentLoanId);
       }
       this.loans.push(newLoan);
       this.sortLoans();
-      this.clearCreate();
-      this.createFormActive = createFormActive;
+      this.clearCreateLoan();
+      this.createLoanFormActive = createLoanFormActive;
     },
     editLoan(id) {
       this.currentLoanId = id;
@@ -266,7 +265,7 @@ export default {
       this.principal = loan.principal;
       this.interestRate = loan.annualRate * 100;
       this.termInYears = loan.termInYears;
-      this.createFormActive = true;
+      this.createLoanFormActive = true;
     },
     viewLoan(id) {
       this.currentLoanId = id;
@@ -278,7 +277,7 @@ export default {
     },
     addBudget() {
       this.budgets = this.budgets.filter(
-        (budget) => budget !== parseFloat(this.budget)
+        (budget) => budget !== parseFloat(this.budget),
       );
       this.budgets.push(parseFloat(this.budget));
       this.budgets.sort((a, b) => b - a);
@@ -286,26 +285,25 @@ export default {
     },
     deleteBudget(budget) {
       this.budgets = this.budgets.filter(
-        (addedBudget) => addedBudget !== parseFloat(budget)
+        (addedBudget) => addedBudget !== parseFloat(budget),
       );
     },
     loadState() {
-      this.loans = JSON.parse(localStorage.getItem("debtonate.loans")).map(
-        (loan) =>
-          new moneyfunx.Loan(
-            loan.principal,
-            loan.annualRate,
-            12,
-            loan.termInYears
-          )
+      this.loans = JSON.parse(localStorage.getItem('debtonate.loans')).map(
+        (loan) => new moneyfunx.Loan(
+          loan.principal,
+          loan.annualRate,
+          12,
+          loan.termInYears,
+        ),
       );
-      this.budgets = JSON.parse(localStorage.getItem("debtonate.budgets"));
+      this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
     },
     saveState() {
-      localStorage.setItem("debtonate.loans", JSON.stringify(this.loans));
+      localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
       localStorage.setItem(
-        "debtonate.budgets",
-        JSON.stringify(this.budgets)
+        'debtonate.budgets',
+        JSON.stringify(this.budgets),
       );
     },
     clearState() {
@@ -315,7 +313,7 @@ export default {
       this.interestRate = null;
       this.termInYears = null;
       this.budget = null;
-      this.createFormActive = false;
+      this.createLoanFormActive = false;
       this.snowballSort = true;
       this.reducePayments = false;
       this.roundUp = false;
@@ -324,7 +322,9 @@ export default {
       this.budgets = [];
     },
   },
-  components: { DataChart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel },
+  components: {
+    DataChart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel,
+  },
 };
 </script>
 
@@ -339,15 +339,15 @@ export default {
       </div>
     </header>
     <!-- NOTE: form start -->
-    <div id="createLoanForm" class="modalFrame" v-show="createFormActive">
+    <div id="createLoanForm" class="modalFrame" v-show="createLoanFormActive">
       <div :class="['modal']">
         <div :class="['header']">
           <h2 :class="['headerTitle']">{{ createLoanFormTitle }}</h2>
           <div :class="['headerButtonContainer']">
             <button
-              @click="exitCreate"
-              :class="{ active: createFormActive, exitButton: true, bold: true }"
-              :disabled="!createFormActive"
+              @click="exitCreateLoan"
+              :class="{ active: createLoanFormActive, exitButton: true, bold: true }"
+              :disabled="!createLoanFormActive"
             >
               x
             </button>
@@ -409,19 +409,32 @@ export default {
             <h2 class="cardHeaderTitle">Loans</h2>
             <div class="cardHeaderButtonContainer">
               <button
-                @click="toggleCreate"
-                :class="{ active: !createFormActive, bold: true }"
-                :disabled="createFormActive"
+                @click="toggleCreateLoan"
+                :class="{ active: !createLoanFormActive, bold: true }"
+                :disabled="createLoanFormActive"
               >
               +
               </button>
             </div>
           </div>
         </div>
-        <LoansPanel :loans="loans" :deleteLoan="deleteLoan" :editLoan="editLoan" :viewLoan="viewLoan" />
+        <LoansPanel
+          :loans="loans"
+          :deleteLoan="deleteLoan"
+          :editLoan="editLoan"
+          :viewLoan="viewLoan"
+        />
         <div id="budgetManagementPanel">
-          <h2>Budgets</h2>
-          <p>Budget</p>
+          <div :class="['cardHeader', 'header']">
+            <h2 class="cardHeaderTitle">Budgets</h2>
+            <button
+              @click="toggleCreateBudget"
+              :class="{ active: !createLoanFormActive, bold: true }"
+              :disabled="createLoanFormActive"
+            >
+            +
+            </button>
+          </div>
           <input v-model="budget" type="number" label="Budget Amount" />
           <br />
           <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
@@ -431,7 +444,6 @@ export default {
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
         <div>
           <h2>Options</h2>
-          <!-- <Button :title="'Sorting Method'" :label="'Avalanche'" :onClick="avalanche" :classes="{ active: snowballSort }" :disabled="!snowballSort"/> -->
           <h3>Sorting Method</h3>
           <button
             @click="avalanche"
@@ -461,7 +473,10 @@ export default {
       <div id="todo3" v-show="loans.length" class="presPanel">
       <div id="infoPanel" :class="['infoPanel']">
         <div id="globalMinPaymentPanel">
-          <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p><p v-if="roundUp">(Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})</p>
+          <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p>
+          <p v-if="roundUp">
+            (Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})
+          </p>
         </div>
         <div id="globalPrincipalPanel">
           <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
@@ -471,11 +486,23 @@ export default {
         </div>
       </div>
         <div id="lifetimeInterestTotals">
-          <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
+          <InterestTable
+            :loans="loans"
+            :paymentSchedules="paymentSchedules"
+            :globalMinPayment="globalMinPayment"
+          />
           <DataChart :chart="lifetimeInterestTotalsChart" />
         </div>
         <div>
-          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="getLoanIndex(currentLoanId)" :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]" :loanAmortizationSchedulesChart="amortizationSchedulesChartPerLoan[currentLoanId]" :exit="unviewLoan" />
+          <DetailsPanel
+            v-if="showLoanDetailsPanel"
+            :loan="getLoan(currentLoanId)"
+            :index="getLoanIndex(currentLoanId)"
+            :monthlyBudgets="monthlyBudgets"
+            :loanPaymentSummaries="paymentSummaries[currentLoanId]"
+            :loanAmortizationSchedulesChart="amortizationSchedulesChartPerLoan[currentLoanId]"
+            :exit="unviewLoan"
+          />
         </div>
       </div>
     </div>

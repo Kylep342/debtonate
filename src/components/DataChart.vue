@@ -1,24 +1,24 @@
 <script>
-import Plotly from "plotly.js-dist/plotly"
+import Plotly from 'plotly.js-dist/plotly';
 
 export default {
-  props: ["chart"],
+  props: ['chart'],
   mounted() {
     Plotly.newPlot(this.$refs[this.chart.id], this.chart.data, this.chart.layout);
   },
   watch: {
     chart: {
-      handler: function() {
+      handler() {
         Plotly.react(
           this.$refs[this.chart.id],
           this.chart.data,
-          this.chart.layout
+          this.chart.layout,
         );
       },
-      deep: true
-    }
-  }
-}
+      deep: true,
+    },
+  },
+};
 </script>
 
 <template>

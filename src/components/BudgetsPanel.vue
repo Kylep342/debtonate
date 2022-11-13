@@ -2,9 +2,9 @@
 import BudgetCard from './BudgetCard.vue';
 
 export default {
-    props: ["budgets", "deleteBudget"],
-    components: { BudgetCard }
-}
+  props: ['budgets', 'deleteBudget'],
+  components: { BudgetCard },
+};
 </script>
 
 <template>

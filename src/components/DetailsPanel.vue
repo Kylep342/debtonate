@@ -3,9 +3,9 @@ import AmortizationTable from './AmortizationTable.vue';
 import DataChart from './DataChart.vue';
 
 export default {
-    props: ["loan", "index", "monthlyBudgets", "loanPaymentSummaries", "loanAmortizationSchedulesChart", "exit"],
-    components: { AmortizationTable, DataChart }
-}
+  props: ['loan', 'index', 'monthlyBudgets', 'loanPaymentSummaries', 'loanAmortizationSchedulesChart', 'exit'],
+  components: { AmortizationTable, DataChart },
+};
 </script>
 
 <template>
@@ -20,11 +20,18 @@ export default {
       <div :class="['verticalScroll']">
         <ul>
           <li v-for="budget in this.monthlyBudgets" :key="this.loan.id + budget.id">
-            <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget" :paymentSummary="this.loanPaymentSummaries[budget.id]" />
+            <AmortizationTable
+              :loan="this.loan"
+              :index="this.index"
+              :budget="budget"
+              :paymentSummary="this.loanPaymentSummaries[budget.id]"
+            />
          </li>
         </ul>
-        <DataChart :id="'amortizationChart' + loan.id" :chart="this.loanAmortizationSchedulesChart" />
-        <!-- <DataChart :id="'interestChart' + loan.id" :chart="this.lifetimeInterestTotalsChart" /> -->
+        <DataChart
+          :id="'amortizationChart' + loan.id"
+          :chart="this.loanAmortizationSchedulesChart"
+        />
       </div>
     </div>
   </div>
