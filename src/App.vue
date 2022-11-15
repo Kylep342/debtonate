@@ -196,6 +196,9 @@ export default {
   },
   watch: {},
   methods: {
+    toggleCreateBudget() {
+      this.createBudgetFormActive = true;
+    },
     toggleCreateLoan() {
       this.createLoanFormActive = true;
     },
@@ -282,6 +285,7 @@ export default {
       this.budgets.push(parseFloat(this.budget));
       this.budgets.sort((a, b) => b - a);
       this.budget = null;
+      this.createBudgetFormActive = false;
     },
     deleteBudget(budget) {
       this.budgets = this.budgets.filter(
@@ -313,6 +317,7 @@ export default {
       this.interestRate = null;
       this.termInYears = null;
       this.budget = null;
+      this.createBudgetFormActive = false;
       this.createLoanFormActive = false;
       this.snowballSort = true;
       this.reducePayments = false;
@@ -401,6 +406,46 @@ export default {
         </div>
       </div>
     </div>
+
+    <div id="createBudgetnForm" class="modalFrame" v-show="createBudgetFormActive">
+      <div :class="['modal']">
+        <div :class="['header']">
+          <h2 :class="['headerTitle']">Creating a Budget</h2>
+          <div :class="['headerButtonContainer']">
+            <button
+              @click="exitCreateBudget"
+              :class="{ active: createBudgetFormActive, exitButton: true, bold: true }"
+              :disabled="!createBudgetFormActive"
+            >
+              x
+            </button>
+          </div>
+        </div>
+        <div :class="['cardBody']">
+          <div :class="['formInputs']">
+            <div :class="['formInputItem']">
+              <td :class="['textLeft', 'cell']">
+                <label>Budget</label>
+              </td>
+              <td :class="['cell', 'wide']">
+                <input v-model="budget" type="number" label="Budget" />
+              </td>
+            </div>
+          </div>
+        </div>
+          <div :class="['cardFooter', 'footer']">
+            <div :class="['cardFooterButtonContainer']">
+              <button
+                @click="addBudget"
+                :class="{ active: createBudgetButtonEnabled }"
+                :disabled="!createBudgetButtonEnabled"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
     <br />
     <div :class="['panel']">
       <div id="todo2" class="mgmtPanel">
@@ -435,11 +480,6 @@ export default {
             +
             </button>
           </div>
-          <input v-model="budget" type="number" label="Budget Amount" />
-          <br />
-          <button @click="addBudget" :disabled="!createBudgetButtonEnabled">
-            Create Budget
-          </button>
         </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
         <div>
