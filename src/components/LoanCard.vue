@@ -25,7 +25,7 @@ export default {
           <td class="textRight"><b>{{ (this.loan.annualRate * 100).toFixed(2) }}%</b></td>
         </tr>
         <tr>
-          <td class="textLeft">Monthly Payment</td>
+          <td class="textLeft">Minimum Payment</td>
           <td class="textRight"><b>${{ this.loan.minPayment.toFixed(2) }}</b></td>
         </tr>
       </table>

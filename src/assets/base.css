@@ -31,24 +31,19 @@ li {
   list-style-type: none;
 }
 
-#debtonate {
-  /* margin: 3rem; */
-  text-align: center;
-}
-
 h1, h2 {
   font-size: 2rem;
   color: #000000;
   margin: 1rem;
 }
 
-#debtonate p {
+p {
   font-size: 1.5rem;
   font-weight: bold;
   padding: 0.5rem;
 }
 
-#debtonate input {
+input {
   font: inherit;
   width: 100%;
   border: none;
@@ -56,9 +51,8 @@ h1, h2 {
   outline: none;
 }
 
-#debtonate input:focus {
+input:focus {
   outline: none;
-  /* border-color: #fff; */
   background-color: #fff;
 }
 
