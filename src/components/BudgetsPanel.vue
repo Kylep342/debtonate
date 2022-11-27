@@ -8,8 +8,8 @@ export default {
 </script>
 
 <template>
-  <div id="budgetsPanel" v-show="this.budgets.length">
-    <ul class="cardHolder">
+  <div :class="['panel']" v-show="this.budgets.length">
+    <ul :class="['cardHolder']">
       <li v-for="(budget, index) in this.budgets" :key="budget.id" class="card">
         <BudgetCard :budget="budget" :index="index + 1" :deleteBudget="this.deleteBudget" />
       </li>

@@ -7,15 +7,16 @@ export default {
 <template>
   <div>
     <div :class="['cardHeader', 'header']">
-      <p class="cardHeaderTitle">
-        Budget {{ this.index }}
-      </p>
+      <h2 class="cardHeaderTitle">
+        ${{ budget }}/month
+        <!-- Budget {{ this.index }} -->
+      </h2>
       <div class="cardHeaderButtonContainer">
         <button :class="['exitButton', 'bold']" @click="this.deleteBudget(this.budget)">x</button>
       </div>
     </div>
-    <div class="cardBody">
+    <!-- <div class="cardBody">
       <p>${{ budget }}/month</p>
-    </div>
+    </div> -->
   </div>
 </template>

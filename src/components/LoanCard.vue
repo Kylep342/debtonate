@@ -5,11 +5,12 @@ export default {
 </script>
 
 <template>
+  <!-- <div :class="['card']"> -->
   <div>
     <div :class="['cardHeader', 'header']">
-      <p class="cardHeaderTitle">
+      <h2 class="cardHeaderTitle">
         Loan {{ this.index }}
-      </p>
+      </h2>
       <div class="cardHeaderButtonContainer">
         <button :class="['exitButton', 'bold']" @click="this.deleteLoan(this.loan.id)">x</button>
       </div>

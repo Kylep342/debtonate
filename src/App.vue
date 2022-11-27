@@ -17,6 +17,7 @@ export default {
       budget: null,
       createBudgetFormActive: false,
       createLoanFormActive: false,
+      optionsFormActive: false,
       snowballSort: true,
       reducePayments: false,
       roundUp: false,
@@ -41,9 +42,9 @@ export default {
       );
     },
     createLoanButtonText() {
-      return this.currentLoanId ? 'Save Changes' : 'Create Loan';
+      return this.currentLoanId ? 'Save Changes' : 'Create';
     },
-    toggleReducePaymentsButtonText() {
+    enableReducePaymentsButtonText() {
       return this.reducePayments ? 'Turn Off' : 'Turn On';
     },
     rawGlobalMinPayment() {
@@ -186,8 +187,17 @@ export default {
         layout: {
           barmode: 'group',
           title: 'Total Interest Paid - All Loans',
+          xaxis: {
+            title: {
+              text: 'Budgets',
+            },
+          },
           yaxis: {
             hoverformat: '$,.2f',
+            tickformat: '$,.2f',
+            title: {
+              text: 'Interest',
+            },
           },
           colorway: this.colors,
         },
@@ -196,11 +206,14 @@ export default {
   },
   watch: {},
   methods: {
-    toggleCreateBudget() {
+    openCreateBudgetForm() {
       this.createBudgetFormActive = true;
     },
-    toggleCreateLoan() {
+    openCreateLoanForm() {
       this.createLoanFormActive = true;
+    },
+    openOptionsForm() {
+      this.optionsFormActive = true;
     },
     clearCreateLoan() {
       this.currentLoanId = null;
@@ -208,14 +221,20 @@ export default {
       this.interestRate = null;
       this.termInYears = null;
     },
-    exitCreateLoan() {
+    exitCreateBudgetForm() {
+      this.createBudgetFormActive = false;
+    },
+    exitCreateLoanForm() {
       this.clearCreateLoan();
       this.createLoanFormActive = false;
     },
-    toggleReducePayments() {
+    exitOptionsForm() {
+      this.optionsFormActive = false;
+    },
+    enableReducePayments() {
       this.reducePayments = !this.reducePayments;
     },
-    toggleRounding() {
+    enableRounding() {
       this.roundUp = !this.roundUp;
     },
     sortLoans() {
@@ -335,9 +354,10 @@ export default {
 
 <template>
   <div id="debtonate">
-    <header id="header">
+    <header :id="['header']" :class="['header']">
       <h1 :class="['headerTitle']">Debtonate</h1>
       <div :class="['headerButtonContainer']">
+        <button :class="['headerButton']" @click="openOptionsForm">Options</button>
         <button :class="['headerButton']" @click="loadState">Load</button>
         <button :class="['headerButton']" @click="saveState">Save</button>
         <button :class="['headerButton']" @click="clearState" :disabled="false">Clear</button>
@@ -350,7 +370,7 @@ export default {
           <h2 :class="['headerTitle']">{{ createLoanFormTitle }}</h2>
           <div :class="['headerButtonContainer']">
             <button
-              @click="exitCreateLoan"
+              @click="exitCreateLoanForm"
               :class="{ active: createLoanFormActive, exitButton: true, bold: true }"
               :disabled="!createLoanFormActive"
             >
@@ -360,29 +380,17 @@ export default {
         </div>
         <div :class="['cardBody']">
           <div :class="['formInputs']">
-            <div :class="['formInputItem']">
-              <td :class="['textLeft', 'cell']">
+            <div :class="['formInputWrapper']">
                 <label>Principal</label>
-              </td>
-              <td :class="['cell', 'wide']">
                 <input v-model="principal" type="number" label="Principal" />
-              </td>
             </div>
-            <div :class="['formInputItem']">
-              <td :class="['textLeft', 'cell']">
+            <div :class="['formInputWrapper']">
                 <label>Interest</label>
-              </td>
-              <td :class="['cell', 'wide']">
                 <input v-model="interestRate" type="number" label="Interest" />
-              </td>
             </div>
-            <div :class="['formInputItem']">
-              <td :class="['textLeft', 'cell']">
+            <div :class="['formInputWrapper']">
                 <label>Term</label>
-              </td>
-              <td :class="['cell', 'wide']">
                 <input v-model="termInYears" type="number" label="Term Length" />
-              </td>
             </div>
           </div>
         </div>
@@ -390,14 +398,14 @@ export default {
           <div :class="['cardFooterButtonContainer']">
             <button
               @click="createLoan(false)"
-              :class="{ active: createLoanButtonEnabled }"
+              :class="{ active: createLoanButtonEnabled, createButton: true }"
               :disabled="!createLoanButtonEnabled"
             >
               {{ createLoanButtonText }}
             </button>
             <button
               @click="createLoan(true)"
-              :class="{ active: createLoanButtonEnabled }"
+              :class="{ active: createLoanButtonEnabled, createButton: true }"
               :disabled="!createLoanButtonEnabled"
             >
               Create Another
@@ -407,13 +415,13 @@ export default {
       </div>
     </div>
 
-    <div id="createBudgetnForm" class="modalFrame" v-show="createBudgetFormActive">
+    <div id="createBudgetForm" class="modalFrame" v-show="createBudgetFormActive">
       <div :class="['modal']">
         <div :class="['header']">
           <h2 :class="['headerTitle']">Creating a Budget</h2>
           <div :class="['headerButtonContainer']">
             <button
-              @click="exitCreateBudget"
+              @click="exitCreateBudgetForm"
               :class="{ active: createBudgetFormActive, exitButton: true, bold: true }"
               :disabled="!createBudgetFormActive"
             >
@@ -423,13 +431,9 @@ export default {
         </div>
         <div :class="['cardBody']">
           <div :class="['formInputs']">
-            <div :class="['formInputItem']">
-              <td :class="['textLeft', 'cell']">
+            <div :class="['formInputWrapper']">
                 <label>Budget</label>
-              </td>
-              <td :class="['cell', 'wide']">
                 <input v-model="budget" type="number" label="Budget" />
-              </td>
             </div>
           </div>
         </div>
@@ -437,7 +441,7 @@ export default {
             <div :class="['cardFooterButtonContainer']">
               <button
                 @click="addBudget"
-                :class="{ active: createBudgetButtonEnabled }"
+                :class="{ active: createBudgetButtonEnabled, createButton: true }"
                 :disabled="!createBudgetButtonEnabled"
               >
                 Create
@@ -446,15 +450,69 @@ export default {
           </div>
       </div>
     </div>
-    <br />
-    <div :class="['panel']">
-      <div id="todo2" class="mgmtPanel">
-        <div id="loanManagementPanel">
-          <div :class="['cardHeader', 'header']">
-            <h2 class="cardHeaderTitle">Loans</h2>
-            <div class="cardHeaderButtonContainer">
+    <div id="optionsForm" class="modalFrame" v-show="optionsFormActive">
+      <div :class="['modal']">
+        <div :class="['header']">
+          <h2 :class="['headerTitle']">Options</h2>
+          <div :class="['headerButtonContainer']">
+            <button
+              @click="exitOptionsForm"
+              :class="{ active: optionsFormaActive, exitButton: true, bold: true }"
+              :disabled="!optionsFormActive"
+            >
+              x
+            </button>
+          </div>
+        </div>
+        <div :class="['cardBody']">
+          <div :class="['formInputs']">
+            <div :class="['formInputWrapper']">
+              <h3>Sorting Method</h3>
               <button
-                @click="toggleCreateLoan"
+                @click="avalanche"
+                :class="{ active: snowballSort }"
+                :disabled="!snowballSort"
+              >
+                Avalanche
+              </button>
+              <button
+                @click="snowball"
+                :class="{ active: !snowballSort }"
+                :disabled="snowballSort"
+              >
+                Snowball
+              </button>
+            </div>
+            <div :class="['formInputWrapper']">
+              <h3>Reduce Payments</h3>
+              <button
+                @click="enableReducePayments"
+                :class="{ active: true }"
+              >
+                {{ enableReducePaymentsButtonText }}
+              </button>
+            </div>
+            <div :class="['formInputWrapper']">
+              <h3>Rounding</h3>
+              <button
+                @click="enableRounding"
+              >
+                {{ roundUp ? "Disable" : "Enable" }} Rounding
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div :class="['appBody']">
+      <div id="todo2" :class="['mgmtPanel']">
+        <div id="loanManagementPanel">
+          <div :class="['panelHeader', 'header']">
+            <h2 class="panelHeaderTitle">Loans</h2>
+            <div class="panelHeaderButtonContainer">
+              <button
+                @click="openCreateLoanForm"
                 :class="{ active: !createLoanFormActive, bold: true }"
                 :disabled="createLoanFormActive"
               >
@@ -470,68 +528,48 @@ export default {
           :viewLoan="viewLoan"
         />
         <div id="budgetManagementPanel">
-          <div :class="['cardHeader', 'header']">
-            <h2 class="cardHeaderTitle">Budgets</h2>
-            <button
-              @click="toggleCreateBudget"
-              :class="{ active: !createLoanFormActive, bold: true }"
-              :disabled="createLoanFormActive"
-            >
-            +
-            </button>
+          <div :class="['panelHeader', 'header']">
+            <h2 class="panelHeaderTitle">Budgets</h2>
+            <div class="panelHeaderButtonContainer">
+              <button
+                @click="openCreateBudgetForm"
+                :class="{ active: !createLoanFormActive, bold: true }"
+                :disabled="createLoanFormActive"
+              >
+              +
+              </button>
+            </div>
           </div>
         </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
-        <div>
-          <h2>Options</h2>
-          <h3>Sorting Method</h3>
-          <button
-            @click="avalanche"
-            :class="{ active: snowballSort }"
-            :disabled="!snowballSort"
-          >
-            Avalanche
-          </button>
-          <button
-            @click="snowball"
-            :class="{ active: !snowballSort }"
-            :disabled="snowballSort"
-          >
-            Snowball
-          </button>
-          <h3>Reduce Payments</h3>
-          <button
-            @click="toggleReducePayments"
-            :class="{ active: true }"
-          >
-            {{ toggleReducePaymentsButtonText }}
-          </button>
-          <h3>Rounding</h3>
-          <button @click="toggleRounding">{{ roundUp ? "Disable" : "Enable" }} Rounding</button>
-        </div>
       </div>
-      <div id="todo3" v-show="loans.length" class="presPanel">
-      <div id="infoPanel" :class="['infoPanel']">
-        <div id="globalMinPaymentPanel">
-          <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p>
-          <p v-if="roundUp">
-            (Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})
-          </p>
-        </div>
-        <div id="globalPrincipalPanel">
-          <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
-        </div>
-        <div>
-          <p>Effective Interest Rate: {{ (globalEffectiveInterestRate * 100).toFixed(2) }}%</p>
-        </div>
-      </div>
-        <div id="lifetimeInterestTotals">
-          <InterestTable
-            :loans="loans"
-            :paymentSchedules="paymentSchedules"
-            :globalMinPayment="globalMinPayment"
-          />
-          <DataChart :chart="lifetimeInterestTotalsChart" />
+      <div id="todo3" v-show="loans.length" :class="['presPanel']">
+        <div :class="['panel']">
+          <div :class="['panelHeader', 'header']">
+            <h2>Repayment Information</h2>
+          </div>
+          <div id="infoPanel" :class="['infoPanel']">
+            <div id="globalMinPaymentPanel">
+              <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p>
+              <p v-if="roundUp">
+                (Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})
+              </p>
+            </div>
+            <div id="globalPrincipalPanel">
+              <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
+            </div>
+            <div>
+              <p>Effective Interest Rate: {{ (globalEffectiveInterestRate * 100).toFixed(2) }}%</p>
+            </div>
+          </div>
+          <div id="lifetimeInterestTotals">
+            <InterestTable
+              :loans="loans"
+              :paymentSchedules="paymentSchedules"
+              :globalMinPayment="globalMinPayment"
+            />
+            <DataChart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
+          </div>
         </div>
         <div>
           <DetailsPanel

@@ -12,7 +12,9 @@ export default {
   <div id="loanDetailsPanel" class="modalFrame">
     <div :class="['modal']">
       <div :class="['cardHeader', 'header']">
-        <p :class="['cardHeaderTitle']">Loan Details - Loan {{ this.index }}</p>
+        <h2 :class="['cardHeaderTitle']">Loan Details - Loan {{ this.index }}
+          (${{ loan.principal.toFixed(2) }}
+          @ {{ (loan.annualRate * 100).toFixed(2) }}%)</h2>
         <div :class="['cardHeaderButtonContainer']">
             <button :class="['exitButton', 'bold']" @click="this.exit">x</button>
         </div>

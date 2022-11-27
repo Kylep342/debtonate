@@ -22,5 +22,7 @@ export default {
 </script>
 
 <template>
-  <div v-bind:id="chart.id" :ref="chart.id"></div>
+  <div :class="['chartWrapper']">
+    <div v-bind:id="chart.id" :ref="chart.id"></div>
+  </div>
 </template>
