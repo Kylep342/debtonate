@@ -2,8 +2,8 @@
 import * as moneyfunx from 'moneyfunx';
 
 import BudgetsPanel from './components/BudgetsPanel.vue';
+import Chart from './components/Chart.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
-import DataChart from './components/DataChart.vue';
 import InterestTable from './components/InterestTable.vue';
 import LoansPanel from './components/LoansPanel.vue';
 
@@ -347,7 +347,7 @@ export default {
     },
   },
   components: {
-    DataChart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel,
+    Chart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel,
   },
 };
 </script>
@@ -568,7 +568,7 @@ export default {
               :paymentSchedules="paymentSchedules"
               :globalMinPayment="globalMinPayment"
             />
-            <DataChart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
+            <Chart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
           </div>
         </div>
         <div>

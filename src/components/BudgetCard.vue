@@ -9,14 +9,10 @@ export default {
     <div :class="['cardHeader', 'header']">
       <h2 class="cardHeaderTitle">
         ${{ budget }}/month
-        <!-- Budget {{ this.index }} -->
       </h2>
       <div class="cardHeaderButtonContainer">
         <button :class="['exitButton', 'bold']" @click="this.deleteBudget(this.budget)">x</button>
       </div>
     </div>
-    <!-- <div class="cardBody">
-      <p>${{ budget }}/month</p>
-    </div> -->
   </div>
 </template>

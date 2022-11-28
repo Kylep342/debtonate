@@ -52,6 +52,10 @@ h1, h2 {
   margin: 1rem;
 }
 
+h3 {
+  margin: 1rem;
+}
+
 p {
   /* font-size: 1.5rem;
   font-weight: bold; */
@@ -129,7 +133,6 @@ tr {
   flex-direction: column;
   flex-wrap: nowrap;
   margin: 0 10px 10px 0;
-  /* padding-right: 10px; */
   max-width: 20vw;
   min-width: 260px;
 }
@@ -222,6 +225,10 @@ tr {
 .headerTitle {
   text-align: left;
   font-size: 1.5em;
+}
+
+.cardTitle {
+  text-align: center;
 }
 
 .footer {

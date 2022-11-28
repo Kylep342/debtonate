@@ -1,17 +1,22 @@
 <script>
 export default {
   props: ['loan', 'index', 'budget', 'paymentSummary'],
+  computed: {
+    cardTitle() {
+      return (`Loan ${this.index} `
+        + `($${this.loan.principal.toFixed(2)} `
+        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%) `
+        + `Total Budget: $${this.budget.absolute.toFixed(2)}/mo`
+      );
+    },
+  },
 };
 </script>
 
 <template>
   <div>
-    <div :class="['header']">
-      <p>
-        Loan {{ this.index }}
-        (${{ this.loan.principal.toFixed(2) }}
-        @ {{ (this.loan.annualRate * 100).toFixed(2)}}%)
-        Total Budget: ${{ this.budget.absolute.toFixed(2) }}/mo</p>
+    <div>
+      <h3 :class="['cardTitle']">{{ this.cardTitle }}</h3>
     </div>
     <table :class="['table']">
       <thead id="AmortizationTotalsTHead">
