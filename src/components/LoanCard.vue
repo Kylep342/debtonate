@@ -5,7 +5,6 @@ export default {
 </script>
 
 <template>
-  <!-- <div :class="['card']"> -->
   <div>
     <div :class="['cardHeader', 'header']">
       <h2 class="cardHeaderTitle">

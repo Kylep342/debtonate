@@ -8,7 +8,7 @@ export default {
   <div>
     <div :class="['cardHeader', 'header']">
       <h2 class="cardHeaderTitle">
-        ${{ budget }}/month
+        +${{ budget }}/month
       </h2>
       <div class="cardHeaderButtonContainer">
         <button :class="['exitButton', 'bold']" @click="this.deleteBudget(this.budget)">x</button>

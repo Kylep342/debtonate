@@ -93,8 +93,8 @@ export default {
         paymentAmount: budget.relative,
         paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
         label: budget.id === 'default'
-          ? `Baseline $${this.globalMinPayment.toFixed(2)}/mo`
-          : `Additional $${budget.relative.toFixed(2)}/mo ($${budget.absolute.toFixed(2)}/mo)`,
+          ? `$${this.globalMinPayment.toFixed(2)}/mo`
+          : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(2)}/mo)`,
       }));
     },
     balancesOverTime() {
@@ -330,7 +330,7 @@ export default {
       );
     },
     clearState() {
-      localStorage.clear();
+      // localStorage.clear();
       this.currentLoanId = null;
       this.principal = null;
       this.interestRate = null;
@@ -526,6 +526,9 @@ export default {
           :deleteLoan="deleteLoan"
           :editLoan="editLoan"
           :viewLoan="viewLoan"
+          :totalPrincipal="globalPrincipal"
+          :effectiveInterestRate="globalEffectiveInterestRate"
+          :globalMinPayment="globalMinPayment"
         />
         <div id="budgetManagementPanel">
           <div :class="['panelHeader', 'header']">
@@ -547,20 +550,6 @@ export default {
         <div :class="['panel']">
           <div :class="['panelHeader', 'header']">
             <h2>Repayment Information</h2>
-          </div>
-          <div id="infoPanel" :class="['infoPanel']">
-            <div id="globalMinPaymentPanel">
-              <p>Minimum Payment: ${{ globalMinPayment.toFixed(2) }}</p>
-              <p v-if="roundUp">
-                (Rounded by ${{ (roundedGlobalMinPayment - rawGlobalMinPayment).toFixed(2) }})
-              </p>
-            </div>
-            <div id="globalPrincipalPanel">
-              <p>Total Principal: ${{ globalPrincipal.toFixed(2) }}</p>
-            </div>
-            <div>
-              <p>Effective Interest Rate: {{ (globalEffectiveInterestRate * 100).toFixed(2) }}%</p>
-            </div>
           </div>
           <div id="lifetimeInterestTotals">
             <InterestTable

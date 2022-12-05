@@ -1,21 +1,31 @@
 <script>
 export default {
   props: ['loans', 'paymentSchedules', 'globalMinPayment'],
+  methods: {
+    headerHover(loan, index) {
+      return (`Loan ${index} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
+      );
+    },
+  },
 };
 </script>
 
 <template>
   <div>
-    <div :class="['header']">
-      <p>Comparison of Totals</p>
-    </div>
+    <!-- <div :class="['header']">
+      <h4>Comparison of Totals</h4>
+    </div> -->
     <table id="lifetimeInterestTotalsTable" class="table table-hover table-mc-light-blue">
       <thead id="lifetimeInterestTotalsTHead">
-        <th>Budgets (Down) | Loans (Across)</th>
-        <th :class="['cell']" v-for="(loan, index) in this.loans" :key="loan.id">
+        <th :class="['left']">Budgets</th>
+        <th :class="['cell']"
+          v-for="(loan, index) in this.loans"
+          :key="loan.id"
+          :title="headerHover(loan, index + 1)"
+        >
           Loan {{ index + 1 }}
-          (${{ loan.principal.toFixed(2) }}
-          @ {{ (loan.annualRate * 100).toFixed(2) }}%)
         </th>
         <th>Totals</th>
       </thead>

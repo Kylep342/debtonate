@@ -140,7 +140,7 @@ tr {
 .presPanel {
   display: flex;
   margin-left: 10px;
-  max-width: 80vw;
+  width: 80vw;
   flex-direction: column;
 }
 
