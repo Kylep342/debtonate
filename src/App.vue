@@ -170,7 +170,7 @@ export default {
     },
     lifetimeInterestTotals() {
       return [{
-        x: this.monthlyBudgets.map((budget) => `$${(budget.relative + this.globalMinPayment).toFixed(2)}/month`),
+        x: this.monthlyBudgets.map((budget) => `$${budget.absolute.toFixed(2)}/month`),
         y: this.monthlyBudgets.map(
           (budget) => this.paymentSchedules.filter(
             (schedule) => schedule.budgetId === budget.id,
@@ -275,6 +275,7 @@ export default {
       );
       if (this.currentLoanId) {
         this.deleteLoan(this.currentLoanId);
+        this.currentLoanId = null;
       }
       this.loans.push(newLoan);
       this.sortLoans();
@@ -457,7 +458,7 @@ export default {
           <div :class="['headerButtonContainer']">
             <button
               @click="exitOptionsForm"
-              :class="{ active: optionsFormaActive, exitButton: true, bold: true }"
+              :class="{ active: optionsFormActive, exitButton: true, bold: true }"
               :disabled="!optionsFormActive"
             >
               x

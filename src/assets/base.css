@@ -332,6 +332,7 @@ tr {
 
 .createButton {
   background-color: #49c1a2;
+  height: 100%;
   border-radius: 5px;
   color: #ffffff;
   margin: .2rem;
