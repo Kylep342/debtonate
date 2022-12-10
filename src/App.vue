@@ -5,6 +5,7 @@ import BudgetsPanel from './components/BudgetsPanel.vue';
 import Chart from './components/Chart.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import InterestTable from './components/InterestTable.vue';
+import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 
 export default {
@@ -263,10 +264,7 @@ export default {
     getLoanIndex(id) {
       return this.loans.findIndex((loan) => loan.id === id) + 1;
     },
-    createLoan(createLoanFormActive = false) {
-      const principal = parseFloat(this.principal);
-      const interestRate = parseFloat(this.interestRate) / 100;
-      const termInYears = parseFloat(this.termInYears);
+    createLoan(principal, interestRate, termInYears, createAnother) {
       const newLoan = new moneyfunx.Loan(
         principal,
         interestRate,
@@ -280,7 +278,7 @@ export default {
       this.loans.push(newLoan);
       this.sortLoans();
       this.clearCreateLoan();
-      this.createLoanFormActive = createLoanFormActive;
+      this.createLoanFormActive = createAnother;
     },
     editLoan(id) {
       this.currentLoanId = id;
@@ -348,7 +346,12 @@ export default {
     },
   },
   components: {
-    Chart, LoansPanel, BudgetsPanel, InterestTable, DetailsPanel,
+    BudgetsPanel,
+    Chart,
+    DetailsPanel,
+    InterestTable,
+    LoanForm,
+    LoansPanel,
   },
 };
 </script>
@@ -364,58 +367,15 @@ export default {
         <button :class="['headerButton']" @click="clearState" :disabled="false">Clear</button>
       </div>
     </header>
+    <LoanForm
+      v-show="createLoanFormActive"
+      :title="createLoanFormTitle"
+      :createButtonText="createLoanButtonText"
+      :exitCreate="exitCreateLoanForm"
+      :loan="currentLoanId ? getLoan(currentLoanId): null"
+      @create-loan="createLoan"
+    />
     <!-- NOTE: form start -->
-    <div id="createLoanForm" class="modalFrame" v-show="createLoanFormActive">
-      <div :class="['modal']">
-        <div :class="['header']">
-          <h2 :class="['headerTitle']">{{ createLoanFormTitle }}</h2>
-          <div :class="['headerButtonContainer']">
-            <button
-              @click="exitCreateLoanForm"
-              :class="{ active: createLoanFormActive, exitButton: true, bold: true }"
-              :disabled="!createLoanFormActive"
-            >
-              x
-            </button>
-          </div>
-        </div>
-        <div :class="['cardBody']">
-          <div :class="['formInputs']">
-            <div :class="['formInputWrapper']">
-                <label>Principal</label>
-                <input v-model="principal" type="number" label="Principal" />
-            </div>
-            <div :class="['formInputWrapper']">
-                <label>Interest</label>
-                <input v-model="interestRate" type="number" label="Interest" />
-            </div>
-            <div :class="['formInputWrapper']">
-                <label>Term</label>
-                <input v-model="termInYears" type="number" label="Term Length" />
-            </div>
-          </div>
-        </div>
-        <div :class="['cardFooter', 'footer']">
-          <div :class="['cardFooterButtonContainer']">
-            <button
-              @click="createLoan(false)"
-              :class="{ active: createLoanButtonEnabled, createButton: true }"
-              :disabled="!createLoanButtonEnabled"
-            >
-              {{ createLoanButtonText }}
-            </button>
-            <button
-              @click="createLoan(true)"
-              :class="{ active: createLoanButtonEnabled, createButton: true }"
-              :disabled="!createLoanButtonEnabled"
-            >
-              Create Another
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div id="createBudgetForm" class="modalFrame" v-show="createBudgetFormActive">
       <div :class="['modal']">
         <div :class="['header']">
