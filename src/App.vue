@@ -29,11 +29,6 @@ export default {
     };
   },
   computed: {
-    createLoanButtonEnabled() {
-      return [this.principal, this.interestRate, this.termInYears].every(
-        (current) => !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0,
-      );
-    },
     createLoanFormTitle() {
       return this.currentLoanId ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}` : 'Creating a Loan';
     },

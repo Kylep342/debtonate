@@ -34,15 +34,6 @@ export default {
         (current) => !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0,
       );
     },
-    currentPrincipal() {
-      return this.loan?.principal || 0;
-    },
-    currentInterestRate() {
-      return (this.loan?.annualRate || 0) * 100;
-    },
-    currentTermInYears() {
-      return this.loan?.termInYears || 0;
-    },
   },
   methods: {
     emitCreate(createAnother) {
