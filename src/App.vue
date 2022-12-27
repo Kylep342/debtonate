@@ -1,6 +1,7 @@
 <script>
 import * as moneyfunx from 'moneyfunx';
 
+import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import Chart from './components/Chart.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
@@ -12,9 +13,6 @@ export default {
   data() {
     return {
       currentLoanId: null,
-      principal: null,
-      interestRate: null,
-      termInYears: null,
       budget: null,
       createBudgetFormActive: false,
       createLoanFormActive: false,
@@ -40,8 +38,11 @@ export default {
     createLoanButtonText() {
       return this.currentLoanId ? 'Save Changes' : 'Create';
     },
-    enableReducePaymentsButtonText() {
+    toggleReducePaymentsButtonText() {
       return this.reducePayments ? 'Turn Off' : 'Turn On';
+    },
+    toggleRoundingButtonText() {
+      return this.roundUp ? 'Disable' : 'Enable';
     },
     rawGlobalMinPayment() {
       return this.loans.reduce(
@@ -211,26 +212,20 @@ export default {
     openOptionsForm() {
       this.optionsFormActive = true;
     },
-    clearCreateLoan() {
-      this.currentLoanId = null;
-      this.principal = null;
-      this.interestRate = null;
-      this.termInYears = null;
-    },
     exitCreateBudgetForm() {
       this.createBudgetFormActive = false;
     },
     exitCreateLoanForm() {
-      this.clearCreateLoan();
       this.createLoanFormActive = false;
+      this.currentLoanId = null;
     },
     exitOptionsForm() {
       this.optionsFormActive = false;
     },
-    enableReducePayments() {
+    toggleReducePayments() {
       this.reducePayments = !this.reducePayments;
     },
-    enableRounding() {
+    toggleRounding() {
       this.roundUp = !this.roundUp;
     },
     sortLoans() {
@@ -272,7 +267,6 @@ export default {
       }
       this.loans.push(newLoan);
       this.sortLoans();
-      this.clearCreateLoan();
       this.createLoanFormActive = createAnother;
     },
     editLoan(id) {
@@ -291,13 +285,12 @@ export default {
       this.showLoanDetailsPanel = false;
       this.currentLoanId = null;
     },
-    addBudget() {
+    createBudget(createdBudget) {
       this.budgets = this.budgets.filter(
-        (budget) => budget !== parseFloat(this.budget),
+        (budget) => budget !== createdBudget,
       );
-      this.budgets.push(parseFloat(this.budget));
+      this.budgets.push(createdBudget);
       this.budgets.sort((a, b) => b - a);
-      this.budget = null;
       this.createBudgetFormActive = false;
     },
     deleteBudget(budget) {
@@ -341,6 +334,7 @@ export default {
     },
   },
   components: {
+    BudgetForm,
     BudgetsPanel,
     Chart,
     DetailsPanel,
@@ -366,46 +360,16 @@ export default {
       v-show="createLoanFormActive"
       :title="createLoanFormTitle"
       :createButtonText="createLoanButtonText"
-      :exitCreate="exitCreateLoanForm"
       :loan="currentLoanId ? getLoan(currentLoanId): null"
+      @exit-create-loan="exitCreateLoanForm"
       @create-loan="createLoan"
     />
-    <!-- NOTE: form start -->
-    <div id="createBudgetForm" class="modalFrame" v-show="createBudgetFormActive">
-      <div :class="['modal']">
-        <div :class="['header']">
-          <h2 :class="['headerTitle']">Creating a Budget</h2>
-          <div :class="['headerButtonContainer']">
-            <button
-              @click="exitCreateBudgetForm"
-              :class="{ active: createBudgetFormActive, exitButton: true, bold: true }"
-              :disabled="!createBudgetFormActive"
-            >
-              x
-            </button>
-          </div>
-        </div>
-        <div :class="['cardBody']">
-          <div :class="['formInputs']">
-            <div :class="['formInputWrapper']">
-                <label>Budget</label>
-                <input v-model="budget" type="number" label="Budget" />
-            </div>
-          </div>
-        </div>
-          <div :class="['cardFooter', 'footer']">
-            <div :class="['cardFooterButtonContainer']">
-              <button
-                @click="addBudget"
-                :class="{ active: createBudgetButtonEnabled, createButton: true }"
-                :disabled="!createBudgetButtonEnabled"
-              >
-                Create
-              </button>
-            </div>
-          </div>
-      </div>
-    </div>
+    <BudgetForm
+      v-show="createBudgetFormActive"
+      @exit-create-budget="exitCreateBudgetForm"
+      @create-budget="createBudget"
+    />
+    <!-- FORM START -->
     <div id="optionsForm" class="modalFrame" v-show="optionsFormActive">
       <div :class="['modal']">
         <div :class="['header']">
@@ -442,24 +406,25 @@ export default {
             <div :class="['formInputWrapper']">
               <h3>Reduce Payments</h3>
               <button
-                @click="enableReducePayments"
+                @click="toggleReducePayments"
                 :class="{ active: true }"
               >
-                {{ enableReducePaymentsButtonText }}
+                {{ toggleReducePaymentsButtonText }}
               </button>
             </div>
             <div :class="['formInputWrapper']">
               <h3>Rounding</h3>
               <button
-                @click="enableRounding"
+                @click="toggleRounding"
               >
-                {{ roundUp ? "Disable" : "Enable" }} Rounding
+                {{ toggleRoundingButtonText }} Rounding
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- FORM END -->
     <br />
     <div :class="['appBody']">
       <div id="todo2" :class="['mgmtPanel']">

@@ -11,10 +11,6 @@ export default {
       type: String,
       required: true,
     },
-    exitCreate: {
-      type: Function,
-      required: true,
-    },
     loan: {
       type: moneyfunx.Loan,
       required: false,
@@ -36,6 +32,11 @@ export default {
     },
   },
   methods: {
+    clearCreate() {
+      this.principal = null;
+      this.interestRate = null;
+      this.termInYears = null;
+    },
     emitCreate(createAnother) {
       this.$emit(
         'create-loan',
@@ -46,10 +47,11 @@ export default {
       );
       this.clearCreate();
     },
-    clearCreate() {
-      this.principal = null;
-      this.interestRate = null;
-      this.termInYears = null;
+    emitExit() {
+      this.$emit(
+        'exit-create-loan',
+      );
+      this.clearCreate();
     },
   },
   watch: {
@@ -69,7 +71,7 @@ export default {
         <h2 :class="['headerTitle']">{{ title }}</h2>
         <div :class="['headerButtonContainer']">
           <button
-            @click="exitCreate"
+            @click="emitExit"
             :class="{ exitButton: true, bold: true }"
           >
             x
