@@ -5,9 +5,11 @@ import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import Chart from './components/Chart.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
+import HeaderBar from './components/HeaderBar.vue';
 import InterestTable from './components/InterestTable.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
+import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 
 export default {
@@ -350,9 +352,11 @@ export default {
     BudgetsPanel,
     Chart,
     DetailsPanel,
+    HeaderBar,
     InterestTable,
     LoanForm,
     LoansPanel,
+    ManagementPanel,
     OptionsForm,
   },
 };
@@ -360,15 +364,12 @@ export default {
 
 <template>
   <div id="debtonate">
-    <header :id="['header']" :class="['header']">
-      <h1 :class="['headerTitle']">Debtonate</h1>
-      <div :class="['headerButtonContainer']">
-        <button :class="['headerButton']" @click="openOptionsForm">Options</button>
-        <button :class="['headerButton']" @click="loadState">Load</button>
-        <button :class="['headerButton']" @click="saveState">Save</button>
-        <button :class="['headerButton']" @click="clearState" :disabled="false">Clear</button>
-      </div>
-    </header>
+    <HeaderBar
+      @open-options-form="openOptionsForm"
+      @load-app-state="loadState"
+      @save-app-state="saveState"
+      @clear-app-state="clearState"
+    />
     <LoanForm
       v-show="createLoanFormActive"
       :title="createLoanFormTitle"
@@ -396,20 +397,11 @@ export default {
     <br />
     <div :class="['appBody']">
       <div id="todo2" :class="['mgmtPanel']">
-        <div id="loanManagementPanel">
-          <div :class="['panelHeader', 'header']">
-            <h2 class="panelHeaderTitle">Loans</h2>
-            <div class="panelHeaderButtonContainer">
-              <button
-                @click="openCreateLoanForm"
-                :class="{ active: !createLoanFormActive, bold: true }"
-                :disabled="createLoanFormActive"
-              >
-              +
-              </button>
-            </div>
-          </div>
-        </div>
+        <ManagementPanel
+          panelId="loanManagementPanel"
+          panelTitle="Loans"
+          :createFunction="openCreateLoanForm"
+        />
         <LoansPanel
           :loans="loans"
           :deleteLoan="deleteLoan"
@@ -420,18 +412,11 @@ export default {
           :globalMinPayment="globalMinPayment"
         />
         <div id="budgetManagementPanel">
-          <div :class="['panelHeader', 'header']">
-            <h2 class="panelHeaderTitle">Budgets</h2>
-            <div class="panelHeaderButtonContainer">
-              <button
-                @click="openCreateBudgetForm"
-                :class="{ active: !createLoanFormActive, bold: true }"
-                :disabled="createLoanFormActive"
-              >
-              +
-              </button>
-            </div>
-          </div>
+          <ManagementPanel
+            panelId="budgetManagementPanel"
+            panelTitle="Budgets"
+            :createFunction="openCreateBudgetForm"
+          />
         </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
       </div>
