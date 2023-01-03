@@ -8,6 +8,7 @@ import DetailsPanel from './components/DetailsPanel.vue';
 import InterestTable from './components/InterestTable.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
+import OptionsForm from './components/OptionsForm.vue';
 
 export default {
   data() {
@@ -17,9 +18,10 @@ export default {
       createBudgetFormActive: false,
       createLoanFormActive: false,
       optionsFormActive: false,
-      snowballSort: true,
+      snowballSort: false,
       reducePayments: false,
       roundUp: false,
+      roundingScale: 100,
       showLoanDetailsPanel: false,
       loans: [],
       budgets: [],
@@ -51,7 +53,12 @@ export default {
       );
     },
     roundedGlobalMinPayment() {
-      return this.rawGlobalMinPayment + (100 - (this.rawGlobalMinPayment % 100));
+      return this.rawGlobalMinPayment + (
+        this.roundingScale - (
+          this.rawGlobalMinPayment
+          % this.roundingScale
+        )
+      );
     },
     globalMinPayment() {
       return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
@@ -94,6 +101,7 @@ export default {
           : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(2)}/mo)`,
       }));
     },
+    // TODO
     balancesOverTime() {
       return 5;
     },
@@ -162,7 +170,6 @@ export default {
           },
         };
       });
-      // });
       return charts;
     },
     lifetimeInterestTotals() {
@@ -231,15 +238,21 @@ export default {
     sortLoans() {
       return this.snowballSort ? this.snowball() : this.avalanche();
     },
-    avalanche() {
+    toggleAvalancheSort() {
       this.snowballSort = false;
+      this.avalanche();
+    },
+    toggleSnowballSort() {
+      this.snowballSort = true;
+      this.snowball();
+    },
+    avalanche() {
       this.loans = moneyfunx.sortLoans(
         moneyfunx.sortLoans(this.loans, moneyfunx.snowball),
         moneyfunx.avalanche,
       );
     },
     snowball() {
-      this.snowballSort = true;
       this.loans = moneyfunx.sortLoans(
         moneyfunx.sortLoans(this.loans, moneyfunx.avalanche),
         moneyfunx.snowball,
@@ -317,7 +330,6 @@ export default {
       );
     },
     clearState() {
-      // localStorage.clear();
       this.currentLoanId = null;
       this.principal = null;
       this.interestRate = null;
@@ -341,6 +353,7 @@ export default {
     InterestTable,
     LoanForm,
     LoansPanel,
+    OptionsForm,
   },
 };
 </script>
@@ -369,62 +382,17 @@ export default {
       @exit-create-budget="exitCreateBudgetForm"
       @create-budget="createBudget"
     />
-    <!-- FORM START -->
-    <div id="optionsForm" class="modalFrame" v-show="optionsFormActive">
-      <div :class="['modal']">
-        <div :class="['header']">
-          <h2 :class="['headerTitle']">Options</h2>
-          <div :class="['headerButtonContainer']">
-            <button
-              @click="exitOptionsForm"
-              :class="{ active: optionsFormActive, exitButton: true, bold: true }"
-              :disabled="!optionsFormActive"
-            >
-              x
-            </button>
-          </div>
-        </div>
-        <div :class="['cardBody']">
-          <div :class="['formInputs']">
-            <div :class="['formInputWrapper']">
-              <h3>Sorting Method</h3>
-              <button
-                @click="avalanche"
-                :class="{ active: snowballSort }"
-                :disabled="!snowballSort"
-              >
-                Avalanche
-              </button>
-              <button
-                @click="snowball"
-                :class="{ active: !snowballSort }"
-                :disabled="snowballSort"
-              >
-                Snowball
-              </button>
-            </div>
-            <div :class="['formInputWrapper']">
-              <h3>Reduce Payments</h3>
-              <button
-                @click="toggleReducePayments"
-                :class="{ active: true }"
-              >
-                {{ toggleReducePaymentsButtonText }}
-              </button>
-            </div>
-            <div :class="['formInputWrapper']">
-              <h3>Rounding</h3>
-              <button
-                @click="toggleRounding"
-              >
-                {{ toggleRoundingButtonText }} Rounding
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- FORM END -->
+    <OptionsForm
+      v-show="optionsFormActive"
+      :snowballSort="snowballSort"
+      :reducePayments="reducePayments"
+      :roundUp="roundUp"
+      @toggle-avalanche-sort="toggleAvalancheSort"
+      @toggle-snowball-sort="toggleSnowballSort"
+      @toggle-reduce-payments="toggleReducePayments"
+      @toggle-round-up="toggleRounding"
+      @exit-options-form="exitOptionsForm"
+    />
     <br />
     <div :class="['appBody']">
       <div id="todo2" :class="['mgmtPanel']">
