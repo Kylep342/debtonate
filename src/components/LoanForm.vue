@@ -17,6 +17,7 @@ export default {
       default: null,
     },
   },
+  emits: ['create-loan', 'exit-create-loan'],
   data() {
     return {
       principal: null,

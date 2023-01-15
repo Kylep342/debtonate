@@ -1,5 +1,6 @@
 <script>
 export default {
+  emits: ['open-options-form', 'load-app-state', 'save-app-state', 'clear-app-state'],
   methods: {
     emitOpenOptions() {
       this.$emit('open-options-form');

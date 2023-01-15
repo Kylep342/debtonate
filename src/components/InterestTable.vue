@@ -14,9 +14,6 @@ export default {
 
 <template>
   <div>
-    <!-- <div :class="['header']">
-      <h4>Comparison of Totals</h4>
-    </div> -->
     <table id="lifetimeInterestTotalsTable" class="table table-hover table-mc-light-blue">
       <thead id="lifetimeInterestTotalsTHead">
         <th :class="['left']">Budgets</th>

@@ -5,6 +5,7 @@ export default {
       budget: null,
     };
   },
+  emits: ['create-budget', 'exit-create-budget'],
   computed: {
     createButtonEnabled() {
       return !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0;

@@ -1,18 +1,6 @@
 <script>
 export default {
   props: ['budget', 'index', 'deleteBudget'],
-  //
-  // NOTE: Sample of more detailed props declaration
-  //
-  // props: {
-  //   budget: Number,
-  //   index: {
-  //     type: Number,
-  //     required: true,
-  //     validator: (value) => value > 0,
-  //   },
-  //   deleteBudget: Function,
-  // },
 };
 </script>
 
