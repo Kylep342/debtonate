@@ -1,22 +1,6 @@
 <script>
-import * as moneyfunx from 'moneyfunx';
-
 export default {
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    createButtonText: {
-      type: String,
-      required: true,
-    },
-    loan: {
-      type: moneyfunx.Loan,
-      required: false,
-      default: null,
-    },
-  },
+  props: ['title', 'createButtonText', 'loan'],
   emits: ['create-loan', 'exit-create-loan'],
   data() {
     return {

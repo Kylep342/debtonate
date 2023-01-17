@@ -3,7 +3,14 @@ import AmortizationTable from './AmortizationTable.vue';
 import DataChart from './Chart.vue';
 
 export default {
-  props: ['loan', 'index', 'monthlyBudgets', 'loanPaymentSummaries', 'loanAmortizationSchedulesChart', 'exit'],
+  props: [
+    'loan',
+    'index',
+    'monthlyBudgets',
+    'loanPaymentSummaries',
+    'loanAmortizationSchedulesChart'
+  ],
+  emits: ['exit-details-panel'],
   components: { AmortizationTable, DataChart },
   computed: {
     cardTitle() {
@@ -13,6 +20,11 @@ export default {
       );
     },
   },
+  methods: {
+    emitExit() {
+      this.$emit('exit-details-panel');
+    },
+  },
 };
 </script>
 
@@ -20,9 +32,9 @@ export default {
   <div id="loanDetailsPanel" class="modalFrame">
     <div :class="['modal']">
       <div :class="['cardHeader', 'header']">
-        <h2 :class="['cardHeaderTitle']">{{ this.cardTitle }}</h2>
+        <h2 :class="['cardHeaderTitle']">{{ cardTitle }}</h2>
         <div :class="['cardHeaderButtonContainer']">
-            <button :class="['exitButton', 'bold']" @click="this.exit">x</button>
+            <button :class="['exitButton', 'bold']" @click="this.emitExit">x</button>
         </div>
       </div>
       <div :class="['verticalScroll']">

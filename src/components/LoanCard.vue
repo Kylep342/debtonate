@@ -1,6 +1,17 @@
 <script>
 export default {
   props: ['deleteLoan', 'editLoan', 'loan', 'index', 'viewLoan'],
+  computed: {
+    renderedPrincipal() {
+      return this.loan.principal.toFixed(2)
+    },
+    renderedRate() {
+      return (this.loan.annualRate * 100).toFixed(2)
+    },
+    renderedMinPayment() {
+      return this.loan.minPayment.toFixed(2)
+    },
+  },
 };
 </script>
 
@@ -18,15 +29,15 @@ export default {
       <table class="">
         <tr>
           <td class="textLeft">Principal</td>
-          <td class="textRight"><b>${{ this.loan.principal.toFixed(2) }}</b></td>
+          <td class="textRight"><b>${{ renderedPrincipal }}</b></td>
         </tr>
         <tr>
           <td class="textLeft">Interest Rate</td>
-          <td class="textRight"><b>{{ (this.loan.annualRate * 100).toFixed(2) }}%</b></td>
+          <td class="textRight"><b>{{ renderedRate }}%</b></td>
         </tr>
         <tr>
           <td class="textLeft">Minimum Payment</td>
-          <td class="textRight"><b>${{ this.loan.minPayment.toFixed(2) }}</b></td>
+          <td class="textRight"><b>${{ renderedMinPayment }}</b></td>
         </tr>
       </table>
     </div>

@@ -5,7 +5,13 @@ export default {
     'reducePayments',
     'roundUp',
   ],
-  emits: ['toggle-avalanche-sort', 'toggle-snowball-sort', 'toggle-reduce-payments', 'toggle-round-up', 'exit-options-form'],
+  emits: [
+    'toggle-avalanche-sort',
+    'toggle-snowball-sort',
+    'toggle-reduce-payments',
+    'toggle-round-up',
+    'exit-options-form'
+  ],
   data() {
     return {
       formSnowballSort: null,

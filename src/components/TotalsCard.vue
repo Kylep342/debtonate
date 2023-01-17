@@ -1,6 +1,17 @@
 <script>
 export default {
   props: ['principal', 'effectiveRate', 'minimumPayment'],
+  computed: {
+    renderedPrincipal() {
+      return this.principal.toFixed(2)
+    },
+    renderedRate() {
+      return (this.effectiveRate * 100).toFixed(2)
+    },
+    renderedMinPayment() {
+      return this.minimumPayment.toFixed(2)
+    },
+  },
 };
 </script>
 
@@ -15,15 +26,15 @@ export default {
       <table class="">
         <tr>
           <td class="textLeft">Principal</td>
-          <td class="textRight"><b>${{ this.principal.toFixed(2) }}</b></td>
+          <td class="textRight"><b>${{ renderedPrincipal }}</b></td>
         </tr>
         <tr>
           <td class="textLeft">Effective Rate</td>
-          <td class="textRight"><b>{{ (this.effectiveRate * 100).toFixed(2) }}%</b></td>
+          <td class="textRight"><b>{{ renderedRate }}%</b></td>
         </tr>
         <tr>
           <td class="textLeft">Minimum Payment</td>
-          <td class="textRight"><b>${{ this.minimumPayment.toFixed(2) }}</b></td>
+          <td class="textRight"><b>${{ renderedMinPayment }}</b></td>
         </tr>
       </table>
     </div>

@@ -264,7 +264,7 @@ export default {
       this.loans = this.loans.filter((loan) => loan.id !== id);
     },
     getLoan(id) {
-      return this.loans.filter((loan) => loan.id === id)[0];
+      return this.loans.find((loan) => loan.id === id);
     },
     getLoanIndex(id) {
       return this.loans.findIndex((loan) => loan.id === id) + 1;
@@ -442,7 +442,7 @@ export default {
             :monthlyBudgets="monthlyBudgets"
             :loanPaymentSummaries="paymentSummaries[currentLoanId]"
             :loanAmortizationSchedulesChart="amortizationSchedulesChartPerLoan[currentLoanId]"
-            :exit="unviewLoan"
+            @exit-details-panel="unviewLoan"
           />
         </div>
       </div>

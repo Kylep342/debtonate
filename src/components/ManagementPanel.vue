@@ -1,19 +1,6 @@
 <script>
 export default {
-  props: {
-    panelId: {
-      type: String,
-      required: true,
-    },
-    panelTitle: {
-      type: String,
-      required: true,
-    },
-    createFunction: {
-      type: Function,
-      required: true,
-    },
-  },
+  props: ['panelId', 'panelTitle', 'createFunction'],
   data() {
     return {
       foo: null,
