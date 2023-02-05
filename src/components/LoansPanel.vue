@@ -13,7 +13,7 @@ export default {
     <ul :class="['cardHolder']">
       <li :class="['card']">
         <TotalsCard
-          v-if="this.loans.length"
+          v-show="this.loans.length"
           :principal="this.totalPrincipal"
           :effectiveRate="this.effectiveInterestRate"
           :minimumPayment="this.globalMinPayment"

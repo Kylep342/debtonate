@@ -8,7 +8,7 @@ export default {
     'index',
     'monthlyBudgets',
     'loanPaymentSummaries',
-    'loanAmortizationSchedulesChart'
+    'loanAmortizationSchedulesChart',
   ],
   emits: ['exit-details-panel'],
   components: { AmortizationTable, DataChart },

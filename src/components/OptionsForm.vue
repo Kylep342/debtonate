@@ -10,7 +10,7 @@ export default {
     'toggle-snowball-sort',
     'toggle-reduce-payments',
     'toggle-round-up',
-    'exit-options-form'
+    'exit-options-form',
   ],
   data() {
     return {

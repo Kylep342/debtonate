@@ -3,13 +3,13 @@ export default {
   props: ['principal', 'effectiveRate', 'minimumPayment'],
   computed: {
     renderedPrincipal() {
-      return this.principal.toFixed(2)
+      return this.principal.toFixed(2);
     },
     renderedRate() {
-      return (this.effectiveRate * 100).toFixed(2)
+      return (this.effectiveRate * 100).toFixed(2);
     },
     renderedMinPayment() {
-      return this.minimumPayment.toFixed(2)
+      return this.minimumPayment.toFixed(2);
     },
   },
 };
