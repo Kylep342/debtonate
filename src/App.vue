@@ -15,19 +15,19 @@ import OptionsForm from './components/OptionsForm.vue';
 export default {
   data() {
     return {
-      currentLoanId: null,
       budget: null,
-      createBudgetFormActive: false,
-      createLoanFormActive: false,
-      optionsFormActive: false,
-      snowballSort: false,
-      reducePayments: false,
-      roundUp: false,
-      roundingScale: 100,
-      showLoanDetailsPanel: false,
-      loans: [],
       budgets: [],
       colors: ['#DAF7A6', '#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845'],
+      createBudgetFormActive: false,
+      createLoanFormActive: false,
+      currentLoanId: null,
+      loans: [],
+      optionsFormActive: false,
+      reducePayments: false,
+      roundingScale: 100,
+      roundUp: false,
+      showLoanDetailsPanel: false,
+      snowballSort: false,
     };
   },
   computed: {

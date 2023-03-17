@@ -33,7 +33,7 @@ export default {
     <div :class="['modal']">
       <div :class="['cardHeader', 'header']">
         <h2 :class="['cardHeaderTitle']">{{ cardTitle }}</h2>
-        <div :class="['cardHeaderButtonContainer']">
+        <div :class="['cardheaderSubSection']">
             <button :class="['exitButton', 'bold']" @click="this.emitExit">x</button>
         </div>
       </div>

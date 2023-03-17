@@ -10,7 +10,7 @@ export default {
       <h2 class="cardHeaderTitle">
         +${{ budget }}/month
       </h2>
-      <div class="cardHeaderButtonContainer">
+      <div class="cardheaderSubSection">
         <button :class="['exitButton', 'bold']" @click="this.deleteBudget(this.budget)">x</button>
       </div>
     </div>

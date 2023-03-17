@@ -63,7 +63,7 @@ export default {
     <div :class="['modal']">
       <div :class="['header']">
         <h2 :class="['headerTitle']">Options</h2>
-        <div :class="['headerButtonContainer']">
+        <div :class="['headerSubSection']">
           <button
             @click="emitExit"
             :class="{ exitButton: true, bold: true }"

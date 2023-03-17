@@ -21,8 +21,11 @@ export default {
 <template>
   <div>
     <header :id="['header']" :class="['header']">
-      <h1 :class="['headerTitle']">Debtonate</h1>
-      <div :class="['headerButtonContainer']">
+      <div :class="['headerSubSection']">
+        <img src="public/sqicon.png">
+        <h1 :class="['headerTitle']">Debtonate</h1>
+      </div>
+      <div :class="['headerSubSection']">
         <button :class="['headerButton']" @click="emitOpenOptions">Options</button>
         <button :class="['headerButton']" @click="emitLoadState">Load</button>
         <button :class="['headerButton']" @click="emitSaveState">Save</button>

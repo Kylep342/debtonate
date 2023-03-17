@@ -31,6 +31,12 @@ header p {
   color: #fff
 }
 
+header img {
+  margin: 0 .5rem;
+  max-height: 60px;
+  max-width: 60px;
+}
+
 header button {
   background-color: #FF5733;
   color: #fff;
@@ -103,17 +109,14 @@ input[type=number] {
 
 table {
   height: 100%;
-  width: 100%;
-  margin-right: 0px;
+  width: 80%;
   overflow: auto;
 }
 
-thead {
-  text-align: center;
-}
-
-tr {
-  text-align: center;
+.cardTable {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 
 .appBody {
@@ -205,8 +208,8 @@ tr {
 }
 
 .cell {
-  margin: .5em;
-  padding: .5em;
+  margin: .5rem;
+  padding: .5rem;
 }
 
 .header {
@@ -216,10 +219,9 @@ tr {
   justify-content: space-between;
 }
 
-.headerButtonContainer {
+.headerSubSection {
   display: flex;
   justify-content: space-around;
-  /* align-items: top; */
 }
 
 .headerTitle {
@@ -258,7 +260,7 @@ tr {
   color: #fff;
 }
 
-.panelHeaderButtonContainer {
+.panelheaderSubSection {
   align-items: top;
   display: flex;
   justify-content: right;
@@ -271,8 +273,8 @@ tr {
   justify-content: right;
 }
 
-.cardHeaderButtonContainer,
-.panelHeaderButtonContainer {
+.cardheaderSubSection,
+.panelheaderSubSection {
   max-width: 20%;
   display: flex;
   justify-content: right;
@@ -350,6 +352,12 @@ tr {
 
 .appBody {
   margin: 0em 1em;
+}
+
+.justifyCenter {
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .justifyLeft {

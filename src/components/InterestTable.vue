@@ -13,39 +13,52 @@ export default {
 </script>
 
 <template>
-  <div>
-    <table id="lifetimeInterestTotalsTable" class="table table-hover table-mc-light-blue">
+  <div :class="['justifyCenter']">
+    <table id="lifetimeInterestTotalsTable" :class="['table']">
       <thead id="lifetimeInterestTotalsTHead">
-        <th :class="['left']">Budgets</th>
-        <th :class="['cell']"
+        <th :class="['cell', 'textLeft']">Budgets</th>
+        <th :class="['cell', 'textLeft']">Fields</th>
+        <th :class="['cell', 'textRight']"
           v-for="(loan, index) in this.loans"
           :key="loan.id"
           :title="headerHover(loan, index + 1)"
         >
           Loan {{ index + 1 }}
         </th>
-        <th>Totals</th>
+        <th :class="['cell', 'textRight']">Totals</th>
       </thead>
-      <tr :class="['textLeft']" v-for="schedule in this.paymentSchedules" :key="schedule.budgetId">
+      <tr v-for="schedule in this.paymentSchedules" :key="schedule.budgetId">
         <td :class="['cell']">
           <strong>{{ schedule.label }}</strong>
         </td>
-        <td :class="['cell']" v-for="loan in this.loans" :key="loan.id">
-          ${{
-            schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2)
-          }}
-          interest paid
-          <br />
-          {{
-            schedule.paymentSchedule[loan.id].amortizationSchedule.length
-          }}
-          payments
-        </td>
         <td :class="['cell']">
-          ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }} total
-          interest paid
-          <br />
-          {{ schedule.paymentSchedule["totalPayments"] }} total payments
+          <ul>
+            <li>
+              Interest Paid
+            </li>
+            <li>Payments</li>
+          </ul>
+        </td>
+        <td :class="['cell', 'textRight']" v-for="loan in this.loans" :key="loan.id">
+          <ul>
+            <li>
+              ${{
+                schedule.paymentSchedule[loan.id].lifetimeInterest.toFixed(2)
+              }}
+            </li>
+            <li>
+              {{
+                schedule.paymentSchedule[loan.id].amortizationSchedule.length
+              }}
+            </li>
+          </ul>
+        </td>
+        <td :class="['cell', 'textRight']">
+          <strong>
+            ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }}
+            <br />
+            {{ schedule.paymentSchedule["totalPayments"] }}
+          </strong>
         </td>
       </tr>
     </table>

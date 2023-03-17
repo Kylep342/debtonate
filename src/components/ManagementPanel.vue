@@ -13,7 +13,7 @@ export default {
   <div :id="panelId">
     <div :class="['panelHeader', 'header']">
       <h2 :class="['panelHeaderTitle']">{{ panelTitle }}</h2>
-      <div :class="['panelHeaderButtonContainer']">
+      <div :class="['panelheaderSubSection']">
         <button
           @click="createFunction"
         >
