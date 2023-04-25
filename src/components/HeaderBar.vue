@@ -22,7 +22,7 @@ export default {
   <div>
     <header :id="['header']" :class="['header']">
       <div :class="['headerSubSection']">
-        <img src="public/sqicon.png">
+        <img src="/sqicon.png">
         <h1 :class="['headerTitle']">Debtonate</h1>
       </div>
       <div :class="['headerSubSection']">

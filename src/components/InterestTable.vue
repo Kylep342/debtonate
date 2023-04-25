@@ -17,7 +17,7 @@ export default {
     <table id="lifetimeInterestTotalsTable" :class="['table']">
       <thead id="lifetimeInterestTotalsTHead">
         <th :class="['cell', 'textLeft']">Budgets</th>
-        <th :class="['cell', 'textLeft']">Fields</th>
+        <th :class="['cell', 'textLeft']">Details</th>
         <th :class="['cell', 'textRight']"
           v-for="(loan, index) in this.loans"
           :key="loan.id"
