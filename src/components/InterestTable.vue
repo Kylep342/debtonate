@@ -18,11 +18,8 @@ export default {
       <thead id="lifetimeInterestTotalsTHead">
         <th :class="['cell', 'textLeft']">Budgets</th>
         <th :class="['cell', 'textLeft']">Details</th>
-        <th :class="['cell', 'textRight']"
-          v-for="(loan, index) in this.loans"
-          :key="loan.id"
-          :title="headerHover(loan, index + 1)"
-        >
+        <th :class="['cell', 'textRight']" v-for="(loan, index) in this.loans" :key="loan.id"
+          :title="headerHover(loan, index + 1)">
           Loan {{ index + 1 }}
         </th>
         <th :class="['cell', 'textRight']">Totals</th>

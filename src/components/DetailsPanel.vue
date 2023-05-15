@@ -34,24 +34,17 @@ export default {
       <div :class="['cardHeader', 'header']">
         <h2 :class="['cardHeaderTitle']">{{ cardTitle }}</h2>
         <div :class="['cardheaderSubSection']">
-            <button :class="['exitButton', 'bold']" @click="this.emitExit">x</button>
+          <button :class="['exitButton', 'bold']" @click="this.emitExit">x</button>
         </div>
       </div>
       <div :class="['verticalScroll']">
         <ul>
           <li v-for="budget in this.monthlyBudgets" :key="this.loan.id + budget.id">
-            <AmortizationTable
-              :loan="this.loan"
-              :index="this.index"
-              :budget="budget"
-              :paymentSummary="this.loanPaymentSummaries[budget.id]"
-            />
-         </li>
+            <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget"
+              :paymentSummary="this.loanPaymentSummaries[budget.id]" />
+          </li>
         </ul>
-        <DataChart
-          :id="'amortizationChart' + loan.id"
-          :chart="this.loanAmortizationSchedulesChart"
-        />
+        <DataChart :id="'amortizationChart' + loan.id" :chart="this.loanAmortizationSchedulesChart" />
       </div>
     </div>
   </div>

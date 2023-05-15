@@ -55,10 +55,7 @@ export default {
       <div :class="['header']">
         <h2 :class="['headerTitle']">{{ title }}</h2>
         <div :class="['headerSubSection']">
-          <button
-            @click="emitExit"
-            :class="{ exitButton: true, bold: true }"
-          >
+          <button @click="emitExit" :class="{ exitButton: true, bold: true }">
             x
           </button>
         </div>
@@ -66,45 +63,27 @@ export default {
       <div :class="['cardBody']">
         <div :class="['formInputs']">
           <div :class="['formInputWrapper']">
-              <label>Principal</label>
-              <input
-                v-model="principal"
-                type="number"
-                label="Principal"
-              />
+            <label>Principal</label>
+            <input v-model="principal" type="number" label="Principal" />
           </div>
           <div :class="['formInputWrapper']">
-              <label>Interest</label>
-              <input
-                v-model="interestRate"
-                type="number"
-                label="Interest"
-              />
+            <label>Interest</label>
+            <input v-model="interestRate" type="number" label="Interest" />
           </div>
           <div :class="['formInputWrapper']">
-              <label>Term</label>
-              <input
-                v-model="termInYears"
-                type="number"
-                label="Term Length"
-              />
+            <label>Term</label>
+            <input v-model="termInYears" type="number" label="Term Length" />
           </div>
         </div>
       </div>
       <div :class="['cardFooter', 'footer']">
         <div :class="['cardFooterButtonContainer']">
-          <button
-            @click="emitCreate(false)"
-            :class="{ active: createButtonEnabled, createButton: true }"
-            :disabled="!createButtonEnabled"
-          >
+          <button @click="emitCreate(false)" :class="{ active: createButtonEnabled, createButton: true }"
+            :disabled="!createButtonEnabled">
             {{ createButtonText }}
           </button>
-          <button
-            @click="emitCreate(true)"
-            :class="{ active: createButtonEnabled, createButton: true }"
-            :disabled="!createButtonEnabled"
-          >
+          <button @click="emitCreate(true)" :class="{ active: createButtonEnabled, createButton: true }"
+            :disabled="!createButtonEnabled">
             Create Another
           </button>
         </div>

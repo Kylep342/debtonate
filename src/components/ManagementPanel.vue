@@ -14,10 +14,8 @@ export default {
     <div :class="['panelHeader', 'header']">
       <h2 :class="['panelHeaderTitle']">{{ panelTitle }}</h2>
       <div :class="['panelheaderSubSection']">
-        <button
-          @click="createFunction"
-        >
-        +
+        <button @click="createFunction">
+          +
         </button>
       </div>
     </div>

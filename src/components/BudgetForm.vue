@@ -36,10 +36,7 @@ export default {
       <div :class="['header']">
         <h2 :class="['headerTitle']">Creating a Budget</h2>
         <div :class="['headerSubSection']">
-          <button
-            @click="emitExit"
-            :class="{ exitButton: true, bold: true }"
-          >
+          <button @click="emitExit" :class="{ exitButton: true, bold: true }">
             x
           </button>
         </div>
@@ -47,22 +44,19 @@ export default {
       <div :class="['cardBody']">
         <div :class="['formInputs']">
           <div :class="['formInputWrapper']">
-              <label>Budget</label>
-              <input v-model="budget" type="number" label="Budget" />
+            <label>Budget</label>
+            <input v-model="budget" type="number" label="Budget" />
           </div>
         </div>
       </div>
-        <div :class="['cardFooter', 'footer']">
-          <div :class="['cardFooterButtonContainer']">
-            <button
-              @click="emitCreate"
-              :class="{ active: createButtonEnabled, createButton: true }"
-              :disabled="!createButtonEnabled"
-            >
-              Create
-            </button>
-          </div>
+      <div :class="['cardFooter', 'footer']">
+        <div :class="['cardFooterButtonContainer']">
+          <button @click="emitCreate" :class="{ active: createButtonEnabled, createButton: true }"
+            :disabled="!createButtonEnabled">
+            Create
+          </button>
         </div>
+      </div>
     </div>
   </div>
 </template>
