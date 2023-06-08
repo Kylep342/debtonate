@@ -31,32 +31,21 @@ export default {
 </script>
 
 <template>
-  <div id="createBudgetForm" class="modalFrame">
-    <div :class="['modal']">
-      <div :class="['header']">
-        <h2 :class="['headerTitle']">Creating a Budget</h2>
-        <div :class="['headerSubSection']">
-          <button @click="emitExit" :class="{ exitButton: true, bold: true }">
-            x
-          </button>
+  <base-modal>
+    <template v-slot:header>
+      <h2>Creating a Budget</h2>
+    </template>
+    <template v-slot:body>
+      <div :class="['formInputs']">
+        <div :class="['formInputWrapper']">
+          <label>Budget</label>
+          <input v-model="budget" type="number" label="Budget" />
         </div>
       </div>
-      <div :class="['cardBody']">
-        <div :class="['formInputs']">
-          <div :class="['formInputWrapper']">
-            <label>Budget</label>
-            <input v-model="budget" type="number" label="Budget" />
-          </div>
-        </div>
-      </div>
-      <div :class="['cardFooter', 'footer']">
-        <div :class="['cardFooterButtonContainer']">
-          <button @click="emitCreate" :class="{ active: createButtonEnabled, createButton: true }"
-            :disabled="!createButtonEnabled">
-            Create
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    </template>
+    <template v-slot:actions>
+      <base-button @click="emitCreate" :class="{ createButton: true }" :disabled="!createButtonEnabled">Create</base-button>
+      <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
+    </template>
+  </base-modal>
 </template>

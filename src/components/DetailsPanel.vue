@@ -29,23 +29,23 @@ export default {
 </script>
 
 <template>
-  <div id="loanDetailsPanel" class="modalFrame">
-    <div :class="['modal']">
-      <div :class="['cardHeader', 'header']">
-        <h2 :class="['cardHeaderTitle']">{{ cardTitle }}</h2>
-        <div :class="['cardheaderSubSection']">
-          <button :class="['exitButton', 'bold']" @click="this.emitExit">x</button>
-        </div>
-      </div>
-      <div :class="['verticalScroll']">
-        <ul>
-          <li v-for="budget in this.monthlyBudgets" :key="this.loan.id + budget.id">
-            <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget"
-              :paymentSummary="this.loanPaymentSummaries[budget.id]" />
-          </li>
-        </ul>
-        <DataChart :id="'amortizationChart' + loan.id" :chart="this.loanAmortizationSchedulesChart" />
-      </div>
+  <base-modal>
+  <template v-slot:header>
+    <h2>{{ cardTitle }}</h2>
+  </template>
+  <template v-slot:body>
+    <div>
+      <ul>
+        <li v-for="budget in this.monthlyBudgets" :key="this.loan.id + budget.id">
+          <AmortizationTable :loan="this.loan" :index="this.index" :budget="budget"
+            :paymentSummary="this.loanPaymentSummaries[budget.id]" />
+        </li>
+      </ul>
+      <DataChart :id="'amortizationChart' + loan.id" :chart="this.loanAmortizationSchedulesChart" />
     </div>
-  </div>
+  </template>
+  <template v-slot:actions>
+    <base-button :class="['createButton']" @click="emitExit">Close</base-button>
+  </template>
+  </base-modal>
 </template>

@@ -59,52 +59,43 @@ export default {
 </script>
 
 <template>
-  <div id="optionsForm" class="modalFrame">
-    <div :class="['modal']">
-      <div :class="['header']">
-        <h2 :class="['headerTitle']">Options</h2>
-        <div :class="['headerSubSection']">
-          <button
-            @click="emitExit"
-            :class="{ exitButton: true, bold: true }"
-          >
-            x
-          </button>
-        </div>
-      </div>
-      <div :class="['cardBody']">
-        <div :class="['formInputs']">
+  <base-modal>
+    <template v-slot:header>
+      <h2>Options</h2>
+    </template>
+    <template v-slot:body>
+      <div :class="['formInputs']">
+        <base-card>
           <div :class="['formInputWrapper']">
             <h3>Sorting Method</h3>
-            <button
-              @click="emitAvalancheSort"
-            >
+            <button @click="emitAvalancheSort">
               Avalanche
             </button>
-            <button
-              @click="emitSnowballSort"
-            >
+            <button @click="emitSnowballSort">
               Snowball
             </button>
           </div>
+        </base-card>
+        <base-card>
           <div :class="['formInputWrapper']">
             <h3>Reduce Payments</h3>
-            <button
-              @click="emitToggleReducePayments"
-            >
+            <button @click="emitToggleReducePayments">
               {{ reducePaymentsButtonText }}
             </button>
           </div>
+        </base-card>
+        <base-card>
           <div :class="['formInputWrapper']">
             <h3>Rounding</h3>
-            <button
-              @click="emitToggleRoundUp"
-            >
+            <button @click="emitToggleRoundUp">
               {{ roundingButtonText }} Rounding
             </button>
           </div>
-        </div>
+        </base-card>
       </div>
-    </div>
-  </div>
+    </template>
+    <template v-slot:actions>
+      <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
+    </template>
+  </base-modal>
 </template>
