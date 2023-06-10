@@ -60,10 +60,10 @@ export default {
 
 <template>
   <base-modal>
-    <template v-slot:header>
+    <template #header>
       <h2>Options</h2>
     </template>
-    <template v-slot:body>
+    <template #body>
       <div :class="['formInputs']">
         <base-card>
           <div :class="['formInputWrapper']">
@@ -94,7 +94,7 @@ export default {
         </base-card>
       </div>
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
     </template>
   </base-modal>

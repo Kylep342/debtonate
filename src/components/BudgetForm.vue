@@ -32,10 +32,10 @@ export default {
 
 <template>
   <base-modal>
-    <template v-slot:header>
+    <template #header>
       <h2>Creating a Budget</h2>
     </template>
-    <template v-slot:body>
+    <template #body>
       <div :class="['formInputs']">
         <div :class="['formInputWrapper']">
           <label>Budget</label>
@@ -43,7 +43,7 @@ export default {
         </div>
       </div>
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <base-button @click="emitCreate" :class="{ createButton: true }" :disabled="!createButtonEnabled">Create</base-button>
       <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
     </template>

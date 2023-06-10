@@ -4,15 +4,15 @@ export default {
   emits: ['create-loan', 'exit-create-loan'],
   data() {
     return {
-      principal: null,
-      interestRate: null,
-      termInYears: null,
+      principal: this.loan?.principal || null,
+      interestRate: (this.loan?.annualRate * 100).toFixed(2) || null,
+      termInYears: this.loan?.termInYears || null,
     };
   },
   computed: {
     createButtonEnabled() {
       return [this.principal, this.interestRate, this.termInYears].every(
-        (current) => !Number.isNaN(parseFloat(current)) && parseFloat(current) > 0,
+        (input) => !Number.isNaN(parseFloat(input)) && parseFloat(input) > 0,
       );
     },
   },
@@ -38,22 +38,15 @@ export default {
       this.clearCreate();
     },
   },
-  watch: {
-    loan(val) {
-      this.principal = val?.principal || null;
-      this.interestRate = ((val?.annualRate || null) * 100) || null;
-      this.termInYears = val?.termInYears || null;
-    },
-  },
 };
 </script>
 
 <template>
   <base-modal>
-    <template v-slot:header>
+    <template #header>
       <h2>{{ title }}</h2>
     </template>
-    <template v-slot:body>
+    <template #body>
       <div :class="['formInputs']">
         <div :class="['formInputWrapper']">
           <label>Principal</label>
@@ -69,7 +62,7 @@ export default {
         </div>
       </div>
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <base-button @click="emitCreate" :class="{ createButton: true }" :disabled="!createButtonEnabled">Create</base-button>
       <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
     </template>
