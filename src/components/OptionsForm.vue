@@ -1,16 +1,12 @@
 <script>
 export default {
-  props: [
-    'snowballSort',
-    'reducePayments',
-    'roundUp',
-  ],
+  props: ["snowballSort", "reducePayments", "roundUp"],
   emits: [
-    'toggle-avalanche-sort',
-    'toggle-snowball-sort',
-    'toggle-reduce-payments',
-    'toggle-round-up',
-    'exit-options-form',
+    "toggle-avalanche-sort",
+    "toggle-snowball-sort",
+    "toggle-reduce-payments",
+    "toggle-round-up",
+    "exit-options-form",
   ],
   data() {
     return {
@@ -21,27 +17,27 @@ export default {
   },
   computed: {
     reducePaymentsButtonText() {
-      return this.formReducePayments ? 'Turn Off' : 'Turn On';
+      return this.formReducePayments ? "Turn Off" : "Turn On";
     },
     roundingButtonText() {
-      return this.formRoundUp ? 'Disable' : 'Enable';
+      return this.formRoundUp ? "Disable" : "Enable";
     },
   },
   methods: {
     emitAvalancheSort() {
-      this.$emit('toggle-avalanche-sort');
+      this.$emit("toggle-avalanche-sort");
     },
     emitSnowballSort() {
-      this.$emit('toggle-snowball-sort');
+      this.$emit("toggle-snowball-sort");
     },
     emitToggleReducePayments() {
-      this.$emit('toggle-reduce-payments');
+      this.$emit("toggle-reduce-payments");
     },
     emitToggleRoundUp() {
-      this.$emit('toggle-round-up');
+      this.$emit("toggle-round-up");
     },
     emitExit() {
-      this.$emit('exit-options-form');
+      this.$emit("exit-options-form");
     },
   },
   watch: {
@@ -68,12 +64,8 @@ export default {
         <base-card>
           <div :class="['formInputWrapper']">
             <h3>Sorting Method</h3>
-            <button @click="emitAvalancheSort">
-              Avalanche
-            </button>
-            <button @click="emitSnowballSort">
-              Snowball
-            </button>
+            <button @click="emitAvalancheSort">Avalanche</button>
+            <button @click="emitSnowballSort">Snowball</button>
           </div>
         </base-card>
         <base-card>
@@ -95,7 +87,9 @@ export default {
       </div>
     </template>
     <template #actions>
-      <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
+      <base-button @click="emitExit" :class="{ createButton: true }"
+        >Close</base-button
+      >
     </template>
   </base-modal>
 </template>

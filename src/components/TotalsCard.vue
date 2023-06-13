@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ['principal', 'effectiveRate', 'minimumPayment'],
+  props: ["principal", "effectiveRate", "minimumPayment"],
   computed: {
     renderedPrincipal() {
       return this.principal.toFixed(2);
@@ -18,23 +18,27 @@ export default {
 <template>
   <div>
     <div :class="['cardHeader', 'header']">
-      <h2 :class="['cardHeaderTitle']">
-        Totals
-      </h2>
+      <h2 :class="['cardHeaderTitle']">Totals</h2>
     </div>
     <div :class="['cardBody']">
       <table :class="['cardTable']">
         <tr>
           <td :class="['textLeft']">Principal</td>
-          <td :class="['textRight']"><b>${{ renderedPrincipal }}</b></td>
+          <td :class="['textRight']">
+            <b>${{ renderedPrincipal }}</b>
+          </td>
         </tr>
         <tr>
           <td :class="['textLeft']">Effective Rate</td>
-          <td :class="['textRight']"><b>{{ renderedRate }}%</b></td>
+          <td :class="['textRight']">
+            <b>{{ renderedRate }}%</b>
+          </td>
         </tr>
         <tr>
           <td :class="['textLeft']">Minimum Payment</td>
-          <td :class="['textRight']"><b>${{ renderedMinPayment }}</b></td>
+          <td :class="['textRight']">
+            <b>${{ renderedMinPayment }}</b>
+          </td>
         </tr>
       </table>
     </div>

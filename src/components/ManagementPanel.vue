@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ['panelId', 'panelTitle', 'createFunction'],
+  props: ["panelId", "panelTitle", "createFunction"],
   data() {
     return {
       foo: null,
@@ -14,9 +14,7 @@ export default {
     <div :class="['panelHeader', 'header']">
       <h2 :class="['panelHeaderTitle']">{{ panelTitle }}</h2>
       <div :class="['panelheaderSubSection']">
-        <button @click="createFunction">
-          +
-        </button>
+        <button @click="createFunction">+</button>
       </div>
     </div>
   </div>

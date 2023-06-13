@@ -8,9 +8,7 @@
           </slot>
         </header>
         <section>
-          <slot :class="['vertical-scroll']" name="body">
-
-          </slot>
+          <slot :class="['vertical-scroll']" name="body"> </slot>
         </section>
         <menu>
           <slot name="actions">
@@ -24,16 +22,17 @@
 
 <script>
 export default {
-  props: {title: {
-    type: String,
-    required: false,
-  }},
-  emits: ['close'],
-}
+  props: {
+    title: {
+      type: String,
+      required: false,
+    },
+  },
+  emits: ["close"],
+};
 </script>
 
 <style scoped>
-
 .modal {
   position: fixed;
   top: 50%;
@@ -58,7 +57,7 @@ export default {
 }
 
 header {
-  background-color: #FF5733;
+  background-color: #ff5733;
   color: white;
 }
 
@@ -74,5 +73,4 @@ menu {
   justify-content: flex-end;
   margin: 0;
 }
-
 </style>

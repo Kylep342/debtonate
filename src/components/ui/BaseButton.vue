@@ -6,8 +6,8 @@
 
 <script>
 export default {
-  props: ['mode'],
-}
+  props: ["mode"],
+};
 </script>
 
 <style scoped>

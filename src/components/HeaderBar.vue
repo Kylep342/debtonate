@@ -1,18 +1,23 @@
 <script>
 export default {
-  emits: ['open-options-form', 'load-app-state', 'save-app-state', 'clear-app-state'],
+  emits: [
+    "open-options-form",
+    "load-app-state",
+    "save-app-state",
+    "clear-app-state",
+  ],
   methods: {
     emitOpenOptions() {
-      this.$emit('open-options-form');
+      this.$emit("open-options-form");
     },
     emitLoadState() {
-      this.$emit('load-app-state');
+      this.$emit("load-app-state");
     },
     emitSaveState() {
-      this.$emit('save-app-state');
+      this.$emit("save-app-state");
     },
     emitClearState() {
-      this.$emit('clear-app-state');
+      this.$emit("clear-app-state");
     },
   },
 };
@@ -22,11 +27,13 @@ export default {
   <div>
     <header :id="['header']" :class="['header']">
       <div :class="['headerSubSection']">
-        <img src="/sqicon.png">
+        <img src="/sqicon.png" />
         <h1 :class="['headerTitle']">Debtonate</h1>
       </div>
       <div :class="['headerSubSection']">
-        <button :class="['headerButton']" @click="emitOpenOptions">Options</button>
+        <button :class="['headerButton']" @click="emitOpenOptions">
+          Options
+        </button>
         <button :class="['headerButton']" @click="emitLoadState">Load</button>
         <button :class="['headerButton']" @click="emitSaveState">Save</button>
         <button :class="['headerButton']" @click="emitClearState">Clear</button>

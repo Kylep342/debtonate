@@ -3,7 +3,6 @@ import * as moneyfunx from 'moneyfunx';
 
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
-import Chart from './components/Chart.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import InterestTable from './components/InterestTable.vue';
@@ -17,7 +16,14 @@ export default {
     return {
       budget: null,
       budgets: [],
-      colors: ['#DAF7A6', '#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845'],
+      colors: [
+        '#DAF7A6',
+        '#FFC300',
+        '#FF5733',
+        '#C70039',
+        '#900C3F',
+        '#581845',
+      ],
       createBudgetFormActive: false,
       createLoanFormActive: false,
       currentLoanId: null,
@@ -32,7 +38,9 @@ export default {
   },
   computed: {
     createLoanFormTitle() {
-      return this.currentLoanId ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}` : 'Creating a Loan';
+      return this.currentLoanId
+        ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}`
+        : 'Creating a Loan';
     },
     createBudgetButtonEnabled() {
       return (
@@ -50,33 +58,32 @@ export default {
     },
     rawGlobalMinPayment() {
       return this.loans.reduce(
-        (previousValue, currentValue) => (previousValue + currentValue.minPayment),
+        (previousValue, currentValue) => previousValue + currentValue.minPayment,
         0,
       );
     },
     roundedGlobalMinPayment() {
-      return this.rawGlobalMinPayment + (
-        this.roundingScale - (
-          this.rawGlobalMinPayment
-          % this.roundingScale
-        )
+      return (
+        this.rawGlobalMinPayment
+        + (this.roundingScale - (this.rawGlobalMinPayment % this.roundingScale))
       );
     },
     globalMinPayment() {
-      return this.roundUp ? this.roundedGlobalMinPayment : this.rawGlobalMinPayment;
+      return this.roundUp
+        ? this.roundedGlobalMinPayment
+        : this.rawGlobalMinPayment;
     },
     globalPrincipal() {
       return this.loans.reduce(
-        (previousValue, currentValue) => (previousValue + currentValue.principal),
+        (previousValue, currentValue) => previousValue + currentValue.principal,
         0,
       );
     },
     globalEffectiveInterestRate() {
       return this.loans.reduce(
-        (previousValue, currentValue) => (
-          previousValue + currentValue.annualRate
-          * (currentValue.principal / this.globalPrincipal)
-        ),
+        (previousValue, currentValue) => previousValue
+          + currentValue.annualRate
+            * (currentValue.principal / this.globalPrincipal),
         0,
       );
     },
@@ -98,9 +105,12 @@ export default {
         budgetId: budget.id,
         paymentAmount: budget.relative,
         paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
-        label: budget.id === 'default'
-          ? `$${this.globalMinPayment.toFixed(2)}/mo`
-          : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(2)}/mo)`,
+        label:
+          budget.id === 'default'
+            ? `$${this.globalMinPayment.toFixed(2)}/mo`
+            : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(
+              2,
+            )}/mo)`,
       }));
     },
     // TODO
@@ -115,9 +125,11 @@ export default {
           balances[loan.id][schedule.budgetId] = {
             label: schedule.label,
             totalPayemntAmount: schedule.paymentAmount,
-            amortizationSchedule: schedule.paymentSchedule[loan.id].amortizationSchedule,
+            amortizationSchedule:
+              schedule.paymentSchedule[loan.id].amortizationSchedule,
             totalPrincipalPaid: loan.principal,
-            totalInterestPaid: schedule.paymentSchedule[loan.id].lifetimeInterest,
+            totalInterestPaid:
+              schedule.paymentSchedule[loan.id].lifetimeInterest,
             totalPayments: schedule.paymentSchedule[loan.id].totalPayments,
           };
         });
@@ -139,7 +151,9 @@ export default {
               (record) => record.principalRemaining,
             ),
             hovertemplate: 'Payment %{x}: %{y} Remaining',
-            name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(2)}/mo`,
+            name: `$${(schedule.paymentAmount + this.globalMinPayment).toFixed(
+              2,
+            )}/mo`,
             type: 'scatter',
           });
         });
@@ -175,16 +189,18 @@ export default {
       return charts;
     },
     lifetimeInterestTotals() {
-      return [{
-        x: this.monthlyBudgets.map((budget) => `$${budget.absolute.toFixed(2)}/month`),
-        y: this.monthlyBudgets.map(
-          (budget) => this.paymentSchedules.filter(
-            (schedule) => schedule.budgetId === budget.id,
-          )[0].paymentSchedule.totalInterest.toFixed(2),
-        ),
-        name: 'Total Interest Paid',
-        type: 'bar',
-      }];
+      return [
+        {
+          x: this.monthlyBudgets.map(
+            (budget) => `$${budget.absolute.toFixed(2)}/month`,
+          ),
+          y: this.monthlyBudgets.map((budget) => this.paymentSchedules
+            .filter((schedule) => schedule.budgetId === budget.id)[0]
+            .paymentSchedule.totalInterest.toFixed(2)),
+          name: 'Total Interest Paid',
+          type: 'bar',
+        },
+      ];
     },
     lifetimeInterestTotalsChart() {
       return {
@@ -242,11 +258,11 @@ export default {
     },
     toggleAvalancheSort() {
       this.snowballSort = false;
-      this.avalanche();
+      this.sortLoans();
     },
     toggleSnowballSort() {
       this.snowballSort = true;
-      this.snowball();
+      this.sortLoans();
     },
     avalanche() {
       this.loans = moneyfunx.sortLoans(
@@ -301,9 +317,7 @@ export default {
       this.currentLoanId = null;
     },
     createBudget(createdBudget) {
-      this.budgets = this.budgets.filter(
-        (budget) => budget !== createdBudget,
-      );
+      this.budgets = this.budgets.filter((budget) => budget !== createdBudget);
       this.budgets.push(createdBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
@@ -326,10 +340,7 @@ export default {
     },
     saveState() {
       localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
-      localStorage.setItem(
-        'debtonate.budgets',
-        JSON.stringify(this.budgets),
-      );
+      localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
     },
     clearState() {
       this.currentLoanId = null;
@@ -350,7 +361,6 @@ export default {
   components: {
     BudgetForm,
     BudgetsPanel,
-    Chart,
     DetailsPanel,
     HeaderBar,
     InterestTable,
@@ -364,26 +374,59 @@ export default {
 
 <template>
   <div id="debtonate">
-    <HeaderBar @open-options-form="openOptionsForm" @load-app-state="loadState" @save-app-state="saveState"
-      @clear-app-state="clearState" />
-    <LoanForm v-if="createLoanFormActive" :title="createLoanFormTitle" :createButtonText="createLoanButtonText"
-      :loan="currentLoanId ? getLoan(currentLoanId) : null" @exit-create-loan="exitCreateLoanForm"
-      @create-loan="createLoan" />
-    <BudgetForm v-if="createBudgetFormActive" @exit-create-budget="exitCreateBudgetForm"
-      @create-budget="createBudget" />
-    <OptionsForm v-if="optionsFormActive" :snowballSort="snowballSort" :reducePayments="reducePayments" :roundUp="roundUp"
-      @toggle-avalanche-sort="toggleAvalancheSort" @toggle-snowball-sort="toggleSnowballSort"
-      @toggle-reduce-payments="toggleReducePayments" @toggle-round-up="toggleRounding"
-      @exit-options-form="exitOptionsForm" />
+    <HeaderBar
+      @open-options-form="openOptionsForm"
+      @load-app-state="loadState"
+      @save-app-state="saveState"
+      @clear-app-state="clearState"
+    />
+    <LoanForm
+      v-if="createLoanFormActive"
+      :title="createLoanFormTitle"
+      :createButtonText="createLoanButtonText"
+      :loan="currentLoanId ? getLoan(currentLoanId) : null"
+      @exit-create-loan="exitCreateLoanForm"
+      @create-loan="createLoan"
+    />
+    <BudgetForm
+      v-if="createBudgetFormActive"
+      @exit-create-budget="exitCreateBudgetForm"
+      @create-budget="createBudget"
+    />
+    <OptionsForm
+      v-if="optionsFormActive"
+      :snowballSort="snowballSort"
+      :reducePayments="reducePayments"
+      :roundUp="roundUp"
+      @exit-options-form="exitOptionsForm"
+      @toggle-avalanche-sort="toggleAvalancheSort"
+      @toggle-snowball-sort="toggleSnowballSort"
+      @toggle-reduce-payments="toggleReducePayments"
+      @toggle-round-up="toggleRounding"
+    />
     <br />
     <div :class="['appBody']">
       <div id="todo2" :class="['mgmtPanel']">
-        <ManagementPanel panelId="loanManagementPanel" panelTitle="Loans" :createFunction="openCreateLoanForm" />
-        <LoansPanel :loans="loans" :deleteLoan="deleteLoan" :editLoan="editLoan" :viewLoan="viewLoan"
-          :totalPrincipal="globalPrincipal" :effectiveInterestRate="globalEffectiveInterestRate"
-          :globalMinPayment="globalMinPayment" />
+        <ManagementPanel
+          panelId="loanManagementPanel"
+          panelTitle="Loans"
+          :createFunction="openCreateLoanForm"
+        />
+        <LoansPanel
+          :loans="loans"
+          :deleteLoan="deleteLoan"
+          :editLoan="editLoan"
+          :viewLoan="viewLoan"
+          :totalPrincipal="globalPrincipal"
+          :effectiveInterestRate="globalEffectiveInterestRate"
+          :globalMinPayment="globalMinPayment"
+        />
         <div id="budgetManagementPanel">
-          <ManagementPanel panelId="budgetManagementPanel" panelTitle="Budgets" :createFunction="openCreateBudgetForm" />
+          <ManagementPanel
+            panelId="budgetManagementPanel"
+            panelTitle="Budgets"
+            :createFunction="openCreateBudgetForm"
+          />
         </div>
         <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
       </div>
@@ -393,15 +436,26 @@ export default {
             <h2>Repayment Information</h2>
           </div>
           <div id="lifetimeInterestTotals">
-            <InterestTable :loans="loans" :paymentSchedules="paymentSchedules" :globalMinPayment="globalMinPayment" />
-            <Chart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
+            <InterestTable
+              :loans="loans"
+              :paymentSchedules="paymentSchedules"
+              :globalMinPayment="globalMinPayment"
+            />
+            <base-chart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
           </div>
         </div>
         <div>
-          <DetailsPanel v-if="showLoanDetailsPanel" :loan="getLoan(currentLoanId)" :index="getLoanIndex(currentLoanId)"
-            :monthlyBudgets="monthlyBudgets" :loanPaymentSummaries="paymentSummaries[currentLoanId]"
-            :loanAmortizationSchedulesChart="amortizationSchedulesChartPerLoan[currentLoanId]"
-            @exit-details-panel="unviewLoan" />
+          <DetailsPanel
+            v-if="showLoanDetailsPanel"
+            :loan="getLoan(currentLoanId)"
+            :index="getLoanIndex(currentLoanId)"
+            :monthlyBudgets="monthlyBudgets"
+            :loanPaymentSummaries="paymentSummaries[currentLoanId]"
+            :loanAmortizationSchedulesChart="
+              amortizationSchedulesChartPerLoan[currentLoanId]
+            "
+            @exit-details-panel="unviewLoan"
+          />
         </div>
       </div>
     </div>

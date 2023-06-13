@@ -8,18 +8,16 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "moneyfunx": "^0.0.27",
+    "moneyfunx": "^0.0.29",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^2.14.0",
+    "@vitejs/plugin-vue": "^3.0.1",
+    "vite": "^3.0.4",
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
-    "eslint": "^8.27.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.24.1",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-vue": "^9.7.0",
-    "vite": "^3.0.4"
+    "eslint": "^8.42.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-vue": "^9.14.1"
   }
 }

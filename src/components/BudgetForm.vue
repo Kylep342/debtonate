@@ -5,10 +5,12 @@ export default {
       budget: null,
     };
   },
-  emits: ['create-budget', 'exit-create-budget'],
+  emits: ["create-budget", "exit-create-budget"],
   computed: {
     createButtonEnabled() {
-      return !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0;
+      return (
+        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
+      );
     },
   },
   methods: {
@@ -16,14 +18,11 @@ export default {
       this.budget = null;
     },
     emitCreate() {
-      this.$emit(
-        'create-budget',
-        parseFloat(this.budget),
-      );
+      this.$emit("create-budget", parseFloat(this.budget));
       this.clearCreate();
     },
     emitExit() {
-      this.$emit('exit-create-budget');
+      this.$emit("exit-create-budget");
       this.clearCreate();
     },
   },
@@ -44,8 +43,15 @@ export default {
       </div>
     </template>
     <template #actions>
-      <base-button @click="emitCreate" :class="{ createButton: true }" :disabled="!createButtonEnabled">Create</base-button>
-      <base-button @click="emitExit" :class="{ createButton: true }">Close</base-button>
+      <base-button
+        @click="emitCreate"
+        :class="{ createButton: true }"
+        :disabled="!createButtonEnabled"
+        >Create</base-button
+      >
+      <base-button @click="emitExit" :class="{ createButton: true }"
+        >Close</base-button
+      >
     </template>
   </base-modal>
 </template>
