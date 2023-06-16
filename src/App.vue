@@ -104,7 +104,7 @@ export default {
       return this.monthlyBudgets.map((budget) => ({
         budgetId: budget.id,
         paymentAmount: budget.relative,
-        paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute),
+        paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute, this.reducePayments),
         label:
           budget.id === 'default'
             ? `$${this.globalMinPayment.toFixed(2)}/mo`
@@ -194,9 +194,9 @@ export default {
           x: this.monthlyBudgets.map(
             (budget) => `$${budget.absolute.toFixed(2)}/month`,
           ),
-          y: this.monthlyBudgets.map((budget) => this.paymentSchedules
-            .filter((schedule) => schedule.budgetId === budget.id)[0]
-            .paymentSchedule.totalInterest.toFixed(2)),
+          y: this.monthlyBudgets.map((budget) => this.paymentSchedules.find(
+            (schedule) => schedule.budgetId === budget.id
+          ).paymentSchedule?.totals.lifetimeInterest),
           name: 'Total Interest Paid',
           type: 'bar',
         },

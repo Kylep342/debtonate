@@ -48,7 +48,7 @@ export default {
             />
           </li>
         </ul>
-        <DataChart
+        <base-chart
           :id="'amortizationChart' + loan.id"
           :chart="this.loanAmortizationSchedulesChart"
         />

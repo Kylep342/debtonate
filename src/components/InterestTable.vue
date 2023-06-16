@@ -59,9 +59,9 @@ export default {
         </td>
         <td :class="['cell', 'textRight']">
           <strong>
-            ${{ schedule.paymentSchedule["totalInterest"].toFixed(2) }}
+            ${{ schedule.paymentSchedule.totals.lifetimeInterest.toFixed(2) }}
             <br />
-            {{ schedule.paymentSchedule["totalPayments"] }}
+            {{ schedule.paymentSchedule.totals.amortizationSchedule.length }}
           </strong>
         </td>
       </tr>
