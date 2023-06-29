@@ -1,16 +1,16 @@
 <script>
-import LoanCard from "./LoanCard.vue";
-import TotalsCard from "./TotalsCard.vue";
+import LoanCard from './LoanCard.vue';
+import TotalsCard from './TotalsCard.vue';
 
 export default {
   props: [
-    "deleteLoan",
-    "editLoan",
-    "loans",
-    "viewLoan",
-    "totalPrincipal",
-    "effectiveInterestRate",
-    "globalMinPayment",
+    'deleteLoan',
+    'editLoan',
+    'loans',
+    'viewLoan',
+    'totalPrincipal',
+    'effectiveInterestRate',
+    'globalMinPayment',
   ],
   components: { LoanCard, TotalsCard },
 };
@@ -21,19 +21,19 @@ export default {
     <ul :class="['cardHolder']">
       <li :class="['card']">
         <TotalsCard
-          v-show="this.loans.length"
-          :principal="this.totalPrincipal"
-          :effectiveRate="this.effectiveInterestRate"
-          :minimumPayment="this.globalMinPayment"
+          v-show='this.loans.length'
+          :principal='this.totalPrincipal'
+          :effectiveRate='this.effectiveInterestRate'
+          :minimumPayment='this.globalMinPayment'
         />
       </li>
-      <li v-for="(loan, index) in this.loans" :key="loan.id" :class="['card']">
+      <li v-for='(loan, index) in this.loans' :key='loan.id' :class="['card']">
         <LoanCard
-          :deleteLoan="this.deleteLoan"
-          :editLoan="this.editLoan"
-          :loan="loan"
-          :index="index + 1"
-          :viewLoan="this.viewLoan"
+          :deleteLoan='this.deleteLoan'
+          :editLoan='this.editLoan'
+          :loan='loan'
+          :index='index + 1'
+          :viewLoan='this.viewLoan'
         />
       </li>
     </ul>

@@ -1,17 +1,17 @@
 <template>
-  <teleport to="body">
+  <teleport to='body'>
     <div :class="['modalFrame']">
       <div :class="['modal']">
         <header>
-          <slot name="header">
+          <slot name='header'>
             <h2>{{ title }}</h2>
           </slot>
         </header>
         <section>
-          <slot :class="['vertical-scroll']" name="body"> </slot>
+          <slot :class="['vertical-scroll']" name='body'> </slot>
         </section>
         <menu>
-          <slot name="actions">
+          <slot name='actions'>
             <base-button @click="$emit('close')">Close</base-button>
           </slot>
         </menu>
@@ -28,7 +28,7 @@ export default {
       required: false,
     },
   },
-  emits: ["close"],
+  emits: ['close'],
 };
 </script>
 

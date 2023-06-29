@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["principal", "effectiveRate", "minimumPayment"],
+  props: ['principal', 'effectiveRate', 'minimumPayment'],
   computed: {
     renderedPrincipal() {
       return this.principal.toFixed(2);
@@ -43,8 +43,8 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <!-- <div class="cardFooterButtonContainer">
-        <button @click="this.viewLoan(this.loan.id)">View</button>
+      <!-- <div class='cardFooterButtonContainer'>
+        <button @click='this.viewLoan(this.loan.id)'>View</button>
       </div> -->
     </div>
   </div>

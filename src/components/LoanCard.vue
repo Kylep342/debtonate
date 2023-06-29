@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["deleteLoan", "editLoan", "loan", "index", "viewLoan"],
+  props: ['deleteLoan', 'editLoan', 'loan', 'index', 'viewLoan'],
   computed: {
     renderedPrincipal() {
       return this.loan.principal.toFixed(2);
@@ -18,17 +18,17 @@ export default {
 <template>
   <div>
     <div :class="['cardHeader', 'header']">
-      <h2 class="cardHeaderTitle">Loan {{ this.index }}</h2>
-      <div class="cardheaderSubSection">
+      <h2 class='cardHeaderTitle'>Loan {{ this.index }}</h2>
+      <div class='cardheaderSubSection'>
         <button
           :class="['exitButton', 'bold']"
-          @click="this.deleteLoan(this.loan.id)"
+          @click='this.deleteLoan(this.loan.id)'
         >
           x
         </button>
       </div>
     </div>
-    <div class="cardBody">
+    <div class='cardBody'>
       <table :class="['cardTable']">
         <tr>
           <td :class="['textLeft']">Principal</td>
@@ -51,11 +51,11 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <div class="cardFooterButtonContainer">
-        <button @click="this.viewLoan(this.loan.id)">View</button>
+      <div class='cardFooterButtonContainer'>
+        <button @click='this.viewLoan(this.loan.id)'>View</button>
       </div>
-      <div class="cardFooterButtonContainer">
-        <button @click="this.editLoan(this.loan.id)">Edit</button>
+      <div class='cardFooterButtonContainer'>
+        <button @click='this.editLoan(this.loan.id)'>Edit</button>
       </div>
     </div>
   </div>

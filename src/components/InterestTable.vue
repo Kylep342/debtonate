@@ -1,12 +1,12 @@
 <script>
 export default {
-  props: ["loans", "paymentSchedules", "globalMinPayment"],
+  props: ['loans', 'paymentSchedules', 'globalMinPayment'],
   methods: {
     headerHover(loan, index) {
       return (
-        `Loan ${index} ` +
-        `($${loan.principal.toFixed(2)} ` +
-        `@ ${(loan.annualRate * 100).toFixed(2)}%)`
+        `Loan ${index} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
       );
     },
   },
@@ -15,21 +15,21 @@ export default {
 
 <template>
   <div :class="['justifyCenter']">
-    <table id="lifetimeInterestTotalsTable" :class="['table']">
-      <thead id="lifetimeInterestTotalsTHead">
+    <table id='lifetimeInterestTotalsTable' :class="['table']">
+      <thead id='lifetimeInterestTotalsTHead'>
         <th :class="['cell', 'textLeft']">Budgets</th>
         <th :class="['cell', 'textLeft']">Details</th>
         <th
           :class="['cell', 'textRight']"
-          v-for="(loan, index) in this.loans"
-          :key="loan.id"
-          :title="headerHover(loan, index + 1)"
+          v-for='(loan, index) in this.loans'
+          :key='loan.id'
+          :title='headerHover(loan, index + 1)'
         >
           Loan {{ index + 1 }}
         </th>
         <th :class="['cell', 'textRight']">Totals</th>
       </thead>
-      <tr v-for="schedule in this.paymentSchedules" :key="schedule.budgetId">
+      <tr v-for='schedule in this.paymentSchedules' :key='schedule.budgetId'>
         <td :class="['cell']">
           <strong>{{ schedule.label }}</strong>
         </td>
@@ -41,8 +41,8 @@ export default {
         </td>
         <td
           :class="['cell', 'textRight']"
-          v-for="loan in this.loans"
-          :key="loan.id"
+          v-for='loan in this.loans'
+          :key='loan.id'
         >
           <ul>
             <li>

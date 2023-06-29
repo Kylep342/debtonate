@@ -5,7 +5,7 @@ export default {
       budget: null,
     };
   },
-  emits: ["create-budget", "exit-create-budget"],
+  emits: ['create-budget', 'exit-create-budget'],
   computed: {
     createButtonEnabled() {
       return (
@@ -18,11 +18,11 @@ export default {
       this.budget = null;
     },
     emitCreate() {
-      this.$emit("create-budget", parseFloat(this.budget));
+      this.$emit('create-budget', parseFloat(this.budget));
       this.clearCreate();
     },
     emitExit() {
-      this.$emit("exit-create-budget");
+      this.$emit('exit-create-budget');
       this.clearCreate();
     },
   },
@@ -38,18 +38,18 @@ export default {
       <div :class="['formInputs']">
         <div :class="['formInputWrapper']">
           <label>Budget</label>
-          <input v-model="budget" type="number" label="Budget" />
+          <input v-model='budget' type='number' label='Budget' />
         </div>
       </div>
     </template>
     <template #actions>
       <base-button
-        @click="emitCreate"
-        :class="{ createButton: true }"
-        :disabled="!createButtonEnabled"
+        @click='emitCreate'
+        :class='{ createButton: true }'
+        :disabled='!createButtonEnabled'
         >Create</base-button
       >
-      <base-button @click="emitExit" :class="{ createButton: true }"
+      <base-button @click='emitExit' :class='{ createButton: true }'
         >Close</base-button
       >
     </template>

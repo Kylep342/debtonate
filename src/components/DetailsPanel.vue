@@ -1,28 +1,28 @@
 <script>
-import AmortizationTable from "./AmortizationTable.vue";
+import AmortizationTable from './AmortizationTable.vue';
 
 export default {
   props: [
-    "loan",
-    "index",
-    "monthlyBudgets",
-    "loanPaymentSummaries",
-    "loanAmortizationSchedulesChart",
+    'loan',
+    'index',
+    'monthlyBudgets',
+    'loanPaymentSummaries',
+    'loanAmortizationSchedulesChart',
   ],
-  emits: ["exit-details-panel"],
+  emits: ['exit-details-panel'],
   components: { AmortizationTable },
   computed: {
     cardTitle() {
       return (
-        `Loan Details - Loan ${this.index} ` +
-        `($${this.loan.principal.toFixed(2)} ` +
-        `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
+        `Loan Details - Loan ${this.index} `
+        + `($${this.loan.principal.toFixed(2)} `
+        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
       );
     },
   },
   methods: {
     emitExit() {
-      this.$emit("exit-details-panel");
+      this.$emit('exit-details-panel');
     },
   },
 };
@@ -37,25 +37,26 @@ export default {
       <div>
         <ul>
           <li
-            v-for="budget in this.monthlyBudgets"
-            :key="this.loan.id + budget.id"
+            v-for='budget in this.monthlyBudgets'
+            :key='this.loan.id + budget.id'
           >
             <AmortizationTable
-              :loan="this.loan"
-              :index="this.index"
-              :budget="budget"
-              :paymentSummary="this.loanPaymentSummaries[budget.id]"
+              :id="'amortizationTable' + loan.id + budget.id"
+              :loan='this.loan'
+              :index='this.index'
+              :budget='budget'
+              :paymentSummary='this.loanPaymentSummaries[budget.id]'
             />
           </li>
         </ul>
         <base-chart
           :id="'amortizationChart' + loan.id"
-          :chart="this.loanAmortizationSchedulesChart"
+          :chart='this.loanAmortizationSchedulesChart'
         />
       </div>
     </template>
     <template #actions>
-      <base-button :class="['createButton']" @click="emitExit"
+      <base-button :class="['createButton']" @click='emitExit'
         >Close</base-button
       >
     </template>

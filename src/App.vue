@@ -48,7 +48,7 @@ export default {
       );
     },
     createLoanButtonText() {
-      return this.currentLoanId ? 'Save Changes' : 'Create';
+      return this.currentLoanId ? 'Save' : 'Create';
     },
     toggleReducePaymentsButtonText() {
       return this.reducePayments ? 'Turn Off' : 'Turn On';
@@ -195,7 +195,7 @@ export default {
             (budget) => `$${budget.absolute.toFixed(2)}/month`,
           ),
           y: this.monthlyBudgets.map((budget) => this.paymentSchedules.find(
-            (schedule) => schedule.budgetId === budget.id
+            (schedule) => schedule.budgetId === budget.id,
           ).paymentSchedule?.totals.lifetimeInterest),
           name: 'Total Interest Paid',
           type: 'bar',
@@ -373,88 +373,88 @@ export default {
 </script>
 
 <template>
-  <div id="debtonate">
+  <div id='debtonate'>
     <HeaderBar
-      @open-options-form="openOptionsForm"
-      @load-app-state="loadState"
-      @save-app-state="saveState"
-      @clear-app-state="clearState"
+      @open-options-form='openOptionsForm'
+      @load-app-state='loadState'
+      @save-app-state='saveState'
+      @clear-app-state='clearState'
     />
     <LoanForm
-      v-if="createLoanFormActive"
-      :title="createLoanFormTitle"
-      :createButtonText="createLoanButtonText"
-      :loan="currentLoanId ? getLoan(currentLoanId) : null"
-      @exit-create-loan="exitCreateLoanForm"
-      @create-loan="createLoan"
+      v-if='createLoanFormActive'
+      :title='createLoanFormTitle'
+      :createButtonText='createLoanButtonText'
+      :loan='currentLoanId ? getLoan(currentLoanId) : null'
+      @exit-create-loan='exitCreateLoanForm'
+      @create-loan='createLoan'
     />
     <BudgetForm
-      v-if="createBudgetFormActive"
-      @exit-create-budget="exitCreateBudgetForm"
-      @create-budget="createBudget"
+      v-if='createBudgetFormActive'
+      @exit-create-budget='exitCreateBudgetForm'
+      @create-budget='createBudget'
     />
     <OptionsForm
-      v-if="optionsFormActive"
-      :snowballSort="snowballSort"
-      :reducePayments="reducePayments"
-      :roundUp="roundUp"
-      @exit-options-form="exitOptionsForm"
-      @toggle-avalanche-sort="toggleAvalancheSort"
-      @toggle-snowball-sort="toggleSnowballSort"
-      @toggle-reduce-payments="toggleReducePayments"
-      @toggle-round-up="toggleRounding"
+      v-if='optionsFormActive'
+      :snowballSort='snowballSort'
+      :reducePayments='reducePayments'
+      :roundUp='roundUp'
+      @exit-options-form='exitOptionsForm'
+      @toggle-avalanche-sort='toggleAvalancheSort'
+      @toggle-snowball-sort='toggleSnowballSort'
+      @toggle-reduce-payments='toggleReducePayments'
+      @toggle-round-up='toggleRounding'
     />
     <br />
     <div :class="['appBody']">
-      <div id="todo2" :class="['mgmtPanel']">
+      <div id='todo2' :class="['mgmtPanel']">
         <ManagementPanel
-          panelId="loanManagementPanel"
-          panelTitle="Loans"
-          :createFunction="openCreateLoanForm"
+          panelId='loanManagementPanel'
+          panelTitle='Loans'
+          :createFunction='openCreateLoanForm'
         />
         <LoansPanel
-          :loans="loans"
-          :deleteLoan="deleteLoan"
-          :editLoan="editLoan"
-          :viewLoan="viewLoan"
-          :totalPrincipal="globalPrincipal"
-          :effectiveInterestRate="globalEffectiveInterestRate"
-          :globalMinPayment="globalMinPayment"
+          :loans='loans'
+          :deleteLoan='deleteLoan'
+          :editLoan='editLoan'
+          :viewLoan='viewLoan'
+          :totalPrincipal='globalPrincipal'
+          :effectiveInterestRate='globalEffectiveInterestRate'
+          :globalMinPayment='globalMinPayment'
         />
-        <div id="budgetManagementPanel">
+        <div id='budgetManagementPanel'>
           <ManagementPanel
-            panelId="budgetManagementPanel"
-            panelTitle="Budgets"
-            :createFunction="openCreateBudgetForm"
+            panelId='budgetManagementPanel'
+            panelTitle='Budgets'
+            :createFunction='openCreateBudgetForm'
           />
         </div>
-        <BudgetsPanel :budgets="budgets" :deleteBudget="deleteBudget" />
+        <BudgetsPanel :budgets='budgets' :deleteBudget='deleteBudget' />
       </div>
-      <div id="todo3" v-show="loans.length" :class="['presPanel']">
+      <div id='todo3' v-show='loans.length' :class="['presPanel']">
         <div :class="['panel']">
           <div :class="['panelHeader', 'header']">
             <h2>Repayment Information</h2>
           </div>
-          <div id="lifetimeInterestTotals">
+          <div id='lifetimeInterestTotals'>
             <InterestTable
-              :loans="loans"
-              :paymentSchedules="paymentSchedules"
-              :globalMinPayment="globalMinPayment"
+              :loans='loans'
+              :paymentSchedules='paymentSchedules'
+              :globalMinPayment='globalMinPayment'
             />
-            <base-chart :class="['graph']" :chart="lifetimeInterestTotalsChart" />
+            <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
           </div>
         </div>
         <div>
           <DetailsPanel
-            v-if="showLoanDetailsPanel"
-            :loan="getLoan(currentLoanId)"
-            :index="getLoanIndex(currentLoanId)"
-            :monthlyBudgets="monthlyBudgets"
-            :loanPaymentSummaries="paymentSummaries[currentLoanId]"
-            :loanAmortizationSchedulesChart="
+            v-if='showLoanDetailsPanel'
+            :loan='getLoan(currentLoanId)'
+            :index='getLoanIndex(currentLoanId)'
+            :monthlyBudgets='monthlyBudgets'
+            :loanPaymentSummaries='paymentSummaries[currentLoanId]'
+            :loanAmortizationSchedulesChart='
               amortizationSchedulesChartPerLoan[currentLoanId]
-            "
-            @exit-details-panel="unviewLoan"
+            '
+            @exit-details-panel='unviewLoan'
           />
         </div>
       </div>

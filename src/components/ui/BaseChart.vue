@@ -23,6 +23,6 @@ export default {
 
 <template>
   <div :class="['chartWrapper']">
-    <div :id="chart.id" :ref="chart.id"></div>
+    <div :id='chart.id' :ref='chart.id'></div>
   </div>
 </template>
