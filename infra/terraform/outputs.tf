@@ -1,4 +1,5 @@
 
 output "bucket_url" {
-    value = resource.static_website.url
+    description = "The auto-generated URL for the GCS bucket"
+    value       = resource.google_storage_bucket.static_website.url
 }
