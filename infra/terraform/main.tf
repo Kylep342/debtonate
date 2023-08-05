@@ -17,6 +17,13 @@ resource "google_storage_bucket" "static_website" {
   }
 }
 
+resource "google_compute_backend_bucket" "static_website" {
+  name        = random_id.bucket_prefix.hex
+  description = "Contains static resources for Debtonate"
+  bucket_name = google_storage_bucket.static_website.name
+  enable_cdn  = true
+}
+
 # Make bucket public by granting allUsers READER access
 resource "google_storage_bucket_access_control" "public_rule" {
   bucket = google_storage_bucket.static_website.id
@@ -33,7 +40,7 @@ resource "google_compute_subnetwork" "group1" {
   name                     = var.network_name
   ip_cidr_range            = "10.125.0.0/20"
   network                  = google_compute_network.default.self_link
-  region                   = var.group1_region
+  region                   = var.region
   private_ip_google_access = true
 }
 
@@ -97,7 +104,7 @@ resource "google_compute_url_map" "debtonate-https-network" {
         "/",
         "/*"
       ]
-      service = google_storage_bucket.static_website.self_link
+      service = google_compute_backend_bucket.static_website.self_link
     }
   }
 }
