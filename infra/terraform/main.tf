@@ -31,6 +31,10 @@ resource "google_storage_bucket_access_control" "public_rule" {
   entity = "allUsers"
 }
 
+resource "google_compute_global_address" "default" {
+  name = "example-ip"
+}
+
 resource "google_compute_network" "default" {
   name                    = var.network_name
   auto_create_subnetworks = "false"
@@ -58,7 +62,7 @@ module "gce-lb-https" {
   project = var.project_id
   target_tags = []
   firewall_networks = [google_compute_network.default.self_link]
-  url_map           = google_compute_url_map.debtonate-https-network.self_link
+  url_map           = google_compute_url_map.default.self_link
   create_url_map    = false
   ssl               = true
   private_key       = tls_private_key.debtonate.private_key_pem
@@ -85,7 +89,7 @@ module "gce-lb-https" {
   }
 }
 
-resource "google_compute_url_map" "debtonate-https-network" {
+resource "google_compute_url_map" "default" {
   // note that this is the name of the load balancer
   name            = var.network_name
   default_service = module.gce-lb-https.backend_services["default"].self_link
@@ -107,4 +111,18 @@ resource "google_compute_url_map" "debtonate-https-network" {
       service = google_compute_backend_bucket.static_website.self_link
     }
   }
+}
+
+resource "google_compute_target_http_proxy" "default" {
+  name    = "http-lb-proxy"
+  url_map = google_compute_url_map.default.id
+}
+
+resource "google_compute_global_forwarding_rule" "default" {
+  name                  = "http-lb-forwarding-rule"
+  ip_protocol           = "TCP"
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  port_range            = "80"
+  target                = google_compute_target_http_proxy.default.id
+  ip_address            = google_compute_global_address.default.id
 }
