@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-resource "tls_private_key" "debtonate" {
+resource "tls_private_key" "default" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
-resource "tls_self_signed_cert" "debtonate" {
-  private_key_pem = tls_private_key.debtonate.private_key_pem
+resource "tls_self_signed_cert" "default" {
+  private_key_pem = tls_private_key.default.private_key_pem
 
   # Certificate expires after 12 hours.
   validity_period_hours = 12
