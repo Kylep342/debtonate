@@ -65,8 +65,8 @@ module "gce-lb-https" {
   url_map           = google_compute_url_map.default.self_link
   create_url_map    = false
   ssl               = true
-  private_key       = tls_private_key.debtonate.private_key_pem
-  certificate       = tls_self_signed_cert.debtonate.cert_pem
+  private_key       = tls_private_key.default.private_key_pem
+  certificate       = tls_self_signed_cert.default.cert_pem
 
   backends = {
     default = {
