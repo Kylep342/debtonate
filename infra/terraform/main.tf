@@ -24,7 +24,7 @@ resource "google_compute_backend_bucket" "static_website" {
   enable_cdn  = true
 }
 
-resource "google_storage_bucket_iam_member" "static_website" {
+resource "google_storage_bucket_iam_member" "public_rule" {
   bucket = google_storage_bucket.static_website.id
   role   = "roles/storage.objectViewer"
   member = "allUsers"
