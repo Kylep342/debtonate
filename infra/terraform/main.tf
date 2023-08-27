@@ -24,11 +24,10 @@ resource "google_compute_backend_bucket" "static_website" {
   enable_cdn  = true
 }
 
-# Make bucket public by granting allUsers READER access
-resource "google_storage_bucket_access_control" "public_rule" {
+resource "google_storage_bucket_iam_member" "static_website" {
   bucket = google_storage_bucket.static_website.id
-  role   = "READER"
-  entity = "allUsers"
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
 }
 
 resource "google_compute_global_address" "default" {
