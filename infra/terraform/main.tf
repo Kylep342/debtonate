@@ -56,10 +56,10 @@ locals {
 
 # [START cloudloadbalancing_ext_http_gce_plus_bucket]
 module "gce-lb-https" {
-  source  = "GoogleCloudPlatform/lb-http/google"
-  name    = var.network_name
-  project = var.project_id
-  target_tags = []
+  source            = "GoogleCloudPlatform/lb-http/google"
+  name              = var.network_name
+  project           = var.project_id
+  target_tags       = []
   firewall_networks = [google_compute_network.default.self_link]
   url_map           = google_compute_url_map.default.self_link
   create_url_map    = false
@@ -69,12 +69,12 @@ module "gce-lb-https" {
 
   backends = {
     default = {
-      protocol    = "HTTP"
-      port        = 80
-      port_name   = "http"
-      timeout_sec = 10
-      enable_cdn  = false
-      groups      = []
+      protocol     = "HTTP"
+      port         = 80
+      port_name    = "http"
+      timeout_sec  = 10
+      enable_cdn   = false
+      groups       = []
       health_check = local.health_check
       log_config = {
         enable      = true
@@ -124,4 +124,21 @@ resource "google_compute_global_forwarding_rule" "default" {
   port_range            = "80"
   target                = google_compute_target_http_proxy.default.id
   ip_address            = google_compute_global_address.default.id
+}
+
+resource "google_service_account" "project-deployer" {
+  account_id   = "project-deployer"
+  display_name = "Project Deployer"
+}
+
+resource "google_service_account_iam_binding" "gcs-object-creator-iam" {
+  service_account_id = resource.google_service_account.project-deployer.name
+  role               = "roles/storage.objectCreator"
+  members            = ["serviceAccount:${google_service_account.project-deployer.email}",]
+}
+
+resource "google_service_account_iam_binding" "gcs-bucket-reader-iam" {
+  service_account_id = resource.google_service_account.project-deployer.name
+  role               = "roles/storage.legacyBucketReader"
+  members            = ["serviceAccount:${google_service_account.project-deployer.email}",]
 }
