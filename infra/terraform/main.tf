@@ -138,9 +138,9 @@ resource "google_project_iam_binding" "gcs-object-creator" {
   depends_on = [ google_service_account.project-deployer ]
 }
 
-resource "google_project_iam_binding" "gcs-bucket-reader" {
+resource "google_project_iam_binding" "gcs-viewer" {
   project    = var.project_id
-  role       = "roles/storage.legacyBucketReader"
+  role       = "roles/viewer"
   members    = ["serviceAccount:${google_service_account.project-deployer.email}",]
   depends_on = [ google_service_account.project-deployer ]
 }
