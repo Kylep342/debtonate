@@ -131,26 +131,16 @@ resource "google_service_account" "project-deployer" {
   display_name = "Project Deployer"
 }
 
-data "google_iam_policy" "gcs-object-creator" {
-  binding {
-    role               = "roles/storage.objectCreator"
-    members            = ["serviceAccount:${google_service_account.project-deployer.email}",]
-  }
+resource "google_project_iam_binding" "gcs-object-creator" {
+  project    = var.project_id
+  role       = "roles/storage.objectCreator"
+  members    = ["serviceAccount:${google_service_account.project-deployer.email}",]
+  depends_on = [ google_service_account.project-deployer ]
 }
 
-data "google_iam_policy" "gcs-bucket-reader" {
-  binding {
-    role               = "roles/storage.legacyBucketReader"
-    members            = ["serviceAccount:${google_service_account.project-deployer.email}",]
-  }
-}
-
-resource "google_service_account_iam_policy" "gcs-object-creator-iam" {
-  service_account_id = google_service_account.project-deployer.name
-  policy_data        = data.google_iam_policy.gcs-object-creator.policy_data
-}
-
-resource "google_service_account_iam_policy" "gcs-bucket-reader-iam" {
-  service_account_id = google_service_account.project-deployer.name
-  policy_data        = data.google_iam_policy.gcs-bucket-reader.policy_data
+resource "google_project_iam_binding" "gcs-bucket-reader" {
+  project    = var.project_id
+  role       = "roles/storage.legacyBucketReader"
+  members    = ["serviceAccount:${google_service_account.project-deployer.email}",]
+  depends_on = [ google_service_account.project-deployer ]
 }
