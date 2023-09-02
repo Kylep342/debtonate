@@ -6,7 +6,46 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 env:
-  GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+  GCS_PREFIX: ${{ secrets.GCS_PREFIX }}
+  SA_ID:      ${{ secrets.SA_ID }}
+
+
+jobs:
+  build-deploy:
+    name: Builds and releases the site
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - id: 'checkout'
+      uses: 'actions/checkout@v3'
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        service_account: '$SA_ID'
+
+    - id: 'setup_nodejs'
+      run: |-
+        apt update && \
+          apt install node npm
+
+    - id: 'setup_vite'
+      run: |-
+        npm install
+
+    - name: 'build'
+      run: |-
+        npm run build
+
+    - id: 'deploy'
+      uses: 'google-github-actions/upload-cloud-storage@v1'
+      with:
+        path: '/'
+        destination: '$GCS_PREFIX'
+    
 
 jobs:
   build-deploy:
