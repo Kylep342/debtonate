@@ -40,3 +40,4 @@ jobs:
       with:
         path: './dist/'
         destination: ${{ secrets.GCS_PREFIX }}
+        parent: false
