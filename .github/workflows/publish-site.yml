@@ -24,8 +24,8 @@ jobs:
 
     - id: 'setup_nodejs'
       run: |-
-        apt update && \
-          apt install node npm
+        sudo apt update && \
+          sudo apt install node npm
 
     - id: 'setup_vite'
       run: |-
