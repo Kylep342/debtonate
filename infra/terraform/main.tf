@@ -131,9 +131,9 @@ resource "google_service_account" "project-deployer" {
   display_name = "Project Deployer"
 }
 
-resource "google_project_iam_binding" "gcs-object-creator" {
+resource "google_project_iam_binding" "gcs-object-admin" {
   project    = var.project_id
-  role       = "roles/storage.objectCreator"
+  role       = "roles/storage.objectAdmin"
   members    = ["serviceAccount:${google_service_account.project-deployer.email}",]
   depends_on = [ google_service_account.project-deployer ]
 }
