@@ -43,39 +43,39 @@ jobs:
     - id: 'deploy'
       uses: 'google-github-actions/upload-cloud-storage@v1'
       with:
-        path: '/'
+        path: './dist/'
         destination: '$GCS_PREFIX'
     
 
-jobs:
-  build-deploy:
-    name: Builds and releases the site
-    runs-on: ubuntu-latest
+# jobs:
+#   build-deploy:
+#     name: Builds and releases the site
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
+#     steps:
+#       - name: checkout
+#         uses: actions/checkout@v2
 
-      - name: Setup - gcloud / gsutil
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@v1
-        with:
-          service_account_key: ${{ secrets.GCS_SA_KEY }}
-          project_id: ${{ secrets.GCS_PROJECT }}
-          export_default_credentials: true
+#       - name: Setup - gcloud / gsutil
+#         uses: GoogleCloudPlatform/github-actions/setup-gcloud@v1
+#         with:
+#           service_account_key: ${{ secrets.GCS_SA_KEY }}
+#           project_id: ${{ secrets.GCS_PROJECT }}
+#           export_default_credentials: true
 
-      - name: Setup - nodejs
-        run: |-
-          apt update && \
-            apt install node npm
+#       - name: Setup - nodejs
+#         run: |-
+#           apt update && \
+#             apt install node npm
 
-      - name: Setup - vite
-        run: |-
-          npm install
+#       - name: Setup - vite
+#         run: |-
+#           npm install
 
-      - name: Build
-        run: |-
-          npm run build
+#       - name: Build
+#         run: |-
+#           npm run build
 
-      - name: Deploy
-        run: |-
-          gsutil -m rsync -R dist gs://$GCS_BUCKET
+#       - name: Deploy
+#         run: |-
+#           gsutil -m rsync -R dist gs://$GCS_BUCKET
