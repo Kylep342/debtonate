@@ -343,19 +343,19 @@ export default {
       localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
     },
     clearState() {
-      this.currentLoanId = null;
-      this.principal = null;
-      this.interestRate = null;
-      this.termInYears = null;
       this.budget = null;
+      this.budgets = [];
       this.createBudgetFormActive = false;
       this.createLoanFormActive = false;
-      this.snowballSort = true;
+      this.currentLoanId = null;
+      this.interestRate = null;
+      this.loans = [];
+      this.principal = null;
       this.reducePayments = false;
       this.roundUp = false;
       this.showLoanDetailsPanel = false;
-      this.loans = [];
-      this.budgets = [];
+      this.snowballSort = true;
+      this.termInYears = null;
     },
   },
   components: {
@@ -375,29 +375,29 @@ export default {
 <template>
   <div id='debtonate'>
     <HeaderBar
-      @open-options-form='openOptionsForm'
-      @load-app-state='loadState'
-      @save-app-state='saveState'
       @clear-app-state='clearState'
+      @load-app-state='loadState'
+      @open-options-form='openOptionsForm'
+      @save-app-state='saveState'
     />
     <LoanForm
       v-if='createLoanFormActive'
-      :title='createLoanFormTitle'
       :createButtonText='createLoanButtonText'
       :loan='currentLoanId ? getLoan(currentLoanId) : null'
-      @exit-create-loan='exitCreateLoanForm'
+      :title='createLoanFormTitle'
       @create-loan='createLoan'
+      @exit-create-loan='exitCreateLoanForm'
     />
     <BudgetForm
       v-if='createBudgetFormActive'
-      @exit-create-budget='exitCreateBudgetForm'
       @create-budget='createBudget'
+      @exit-create-budget='exitCreateBudgetForm'
     />
     <OptionsForm
       v-if='optionsFormActive'
-      :snowballSort='snowballSort'
       :reducePayments='reducePayments'
       :roundUp='roundUp'
+      :snowballSort='snowballSort'
       @exit-options-form='exitOptionsForm'
       @toggle-avalanche-sort='toggleAvalancheSort'
       @toggle-snowball-sort='toggleSnowballSort'
@@ -408,24 +408,24 @@ export default {
     <div :class="['appBody']">
       <div id='todo2' :class="['mgmtPanel']">
         <ManagementPanel
-          panelId='loanManagementPanel'
-          panelTitle='Loans'
           :createFunction='openCreateLoanForm'
+          :panelId='"loanManagementPanel"'
+          :panelTitle='"Loans"'
         />
         <LoansPanel
-          :loans='loans'
           :deleteLoan='deleteLoan'
           :editLoan='editLoan'
-          :viewLoan='viewLoan'
-          :totalPrincipal='globalPrincipal'
           :effectiveInterestRate='globalEffectiveInterestRate'
           :globalMinPayment='globalMinPayment'
+          :loans='loans'
+          :totalPrincipal='globalPrincipal'
+          :viewLoan='viewLoan'
         />
         <div id='budgetManagementPanel'>
           <ManagementPanel
-            panelId='budgetManagementPanel'
-            panelTitle='Budgets'
             :createFunction='openCreateBudgetForm'
+            :panelId='"budgetManagementPanel"'
+            :panelTitle='"Budgets"'
           />
         </div>
         <BudgetsPanel :budgets='budgets' :deleteBudget='deleteBudget' />
@@ -437,9 +437,9 @@ export default {
           </div>
           <div id='lifetimeInterestTotals'>
             <InterestTable
+              :globalMinPayment='globalMinPayment'
               :loans='loans'
               :paymentSchedules='paymentSchedules'
-              :globalMinPayment='globalMinPayment'
             />
             <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
           </div>
@@ -447,13 +447,13 @@ export default {
         <div>
           <DetailsPanel
             v-if='showLoanDetailsPanel'
-            :loan='getLoan(currentLoanId)'
             :index='getLoanIndex(currentLoanId)'
-            :monthlyBudgets='monthlyBudgets'
-            :loanPaymentSummaries='paymentSummaries[currentLoanId]'
+            :loan='getLoan(currentLoanId)'
             :loanAmortizationSchedulesChart='
               amortizationSchedulesChartPerLoan[currentLoanId]
             '
+            :loanPaymentSummaries='paymentSummaries[currentLoanId]'
+            :monthlyBudgets='monthlyBudgets'
             @exit-details-panel='unviewLoan'
           />
         </div>
