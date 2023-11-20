@@ -1,15 +1,15 @@
 <script>
 export default {
-  props: ['deleteLoan', 'editLoan', 'loan', 'index', 'viewLoan'],
+  props: ['deleteLoan', 'editLoan', 'index', 'loan', 'viewLoan'],
   computed: {
+    renderedMinPayment() {
+      return `$${this.loan.minPayment.toFixed(2)}/mo`;
+    },
     renderedPrincipal() {
       return `$${this.loan.principal.toFixed(2)}`;
     },
     renderedRate() {
       return `${(this.loan.annualRate * 100).toFixed(2)}%`;
-    },
-    renderedMinPayment() {
-      return `$${this.loan.minPayment.toFixed(2)}/mo`;
     },
   },
 };
@@ -28,7 +28,7 @@ export default {
         </button>
       </div>
     </div>
-    <div class='cardBody'>
+    <div :class="['cardBody']">
       <table :class="['cardTable']">
         <tr>
           <td :class="['textLeft']">Principal</td>

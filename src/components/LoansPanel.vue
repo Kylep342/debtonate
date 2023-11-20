@@ -6,11 +6,11 @@ export default {
   props: [
     'deleteLoan',
     'editLoan',
+    'effectiveInterestRate',
+    'globalMinPayment',
     'loans',
     'viewLoan',
     'totalPrincipal',
-    'effectiveInterestRate',
-    'globalMinPayment',
   ],
   components: { LoanCard, TotalsCard },
 };
@@ -21,17 +21,17 @@ export default {
     <ul :class="['cardHolder']">
       <li v-if='this.loans.length' :class="['card']">
         <TotalsCard
-          :principal='this.totalPrincipal'
           :effectiveRate='this.effectiveInterestRate'
           :minimumPayment='this.globalMinPayment'
+          :principal='this.totalPrincipal'
         />
       </li>
       <li v-for='(loan, index) in this.loans' :key='loan.id' :class="['card']">
         <LoanCard
           :deleteLoan='this.deleteLoan'
           :editLoan='this.editLoan'
-          :loan='loan'
           :index='index + 1'
+          :loan='loan'
           :viewLoan='this.viewLoan'
         />
       </li>

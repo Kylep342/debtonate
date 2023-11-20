@@ -43,7 +43,7 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <!-- <div class='cardFooterButtonContainer'>
+      <!-- <div :class="['cardFooterButtonContainer']">
         <button @click='this.viewLoan(this.loan.id)'>View</button>
       </div> -->
     </div>

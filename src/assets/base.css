@@ -136,11 +136,15 @@ table {
 
 .mgmtPanel {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   /* flex-wrap: nowrap; */
   margin: 0 10px 10px 0;
   max-width: 20vw;
   min-width: 200px;
+}
+
+.mgmtPanelHeader, .mgmtPanelBody {
+  width: 100%;
 }
 
 .presPanel {

@@ -1,21 +1,21 @@
 <script>
 export default {
-  props: ['budget', 'deleteBudget', 'index', 'budgetTotals'],
+  props: ['budget', 'budgetTotals', 'deleteBudget', 'index', 'viewBudget'],
   computed: {
-    budgetTitle() {
-      return this.budget.id === 'default' ? 'Minimum' : `Budget ${this.index}`;
-    },
     budgetAmount() {
       return `$${this.budget.absolute.toFixed(2)}/mo`;
     },
     budgetExtra() {
       return `+$${this.budget.relative.toFixed(2)}/mo`;
     },
-    budgetTotalInterest() {
-      return `$${this.budgetTotals.lifetimeInterest.toFixed(2)}`;
-    },
     budgetPayments() {
       return this.budgetTotals.amortizationSchedule.length;
+    },
+    budgetTitle() {
+      return this.budget.id === 'default' ? 'Minimum' : `Budget ${this.index}`;
+    },
+    budgetTotalInterest() {
+      return `$${this.budgetTotals.lifetimeInterest.toFixed(2)}`;
     },
   },
 };
