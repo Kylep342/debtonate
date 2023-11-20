@@ -426,6 +426,8 @@ export default {
             :viewLoan='viewLoan'
           />
         </div>
+      </div>
+      <div :class="['mgmtPanel']">
         <div>
           <div id='budgetManagementPanel'>
             <ManagementPanel
@@ -448,11 +450,11 @@ export default {
             <h2>Repayment Information</h2>
           </div>
           <div id='lifetimeInterestTotals'>
-            <InterestTable
+            <!-- <InterestTable
               :globalMinPayment='globalMinPayment'
               :loans='loans'
               :paymentSchedules='paymentSchedules'
-            />
+            /> -->
             <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
           </div>
         </div>

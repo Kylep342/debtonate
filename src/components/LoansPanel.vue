@@ -19,9 +19,8 @@ export default {
 <template>
   <div :class="['panel']">
     <ul :class="['cardHolder']">
-      <li :class="['card']">
+      <li v-if='this.loans.length' :class="['card']">
         <TotalsCard
-          v-show='this.loans.length'
           :principal='this.totalPrincipal'
           :effectiveRate='this.effectiveInterestRate'
           :minimumPayment='this.globalMinPayment'

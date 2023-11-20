@@ -139,8 +139,8 @@ table {
   flex-direction: row;
   /* flex-wrap: nowrap; */
   margin: 0 10px 10px 0;
-  max-width: 30vw;
-  min-width: 260px;
+  max-width: 20vw;
+  min-width: 200px;
 }
 
 .presPanel {

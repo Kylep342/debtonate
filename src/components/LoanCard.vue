@@ -9,7 +9,7 @@ export default {
       return `${(this.loan.annualRate * 100).toFixed(2)}%`;
     },
     renderedMinPayment() {
-      return `$${this.loan.minPayment.toFixed(2)}`;
+      return `$${this.loan.minPayment.toFixed(2)}/mo`;
     },
   },
 };
