@@ -14,7 +14,6 @@ import OptionsForm from './components/OptionsForm.vue';
 export default {
   data() {
     return {
-      budget: null,
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -41,11 +40,6 @@ export default {
       return this.currentLoanId
         ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}`
         : 'Creating a Loan';
-    },
-    createBudgetButtonEnabled() {
-      return (
-        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
-      );
     },
     createLoanButtonText() {
       return this.currentLoanId ? 'Save' : 'Create';
@@ -188,6 +182,15 @@ export default {
       });
       return charts;
     },
+    totalsByBudget() {
+      const totals = {};
+      this.monthlyBudgets.forEach((budget) => {
+        totals[budget.id] = this.paymentSchedules.find(
+          (schedule) => schedule.budgetId === budget.id,
+        ).paymentSchedule.totals;
+      });
+      return totals;
+    },
     lifetimeInterestTotals() {
       return [
         {
@@ -316,6 +319,7 @@ export default {
       this.showLoanDetailsPanel = false;
       this.currentLoanId = null;
     },
+    // TODO: enhance
     createBudget(createdBudget) {
       this.budgets = this.budgets.filter((budget) => budget !== createdBudget);
       this.budgets.push(createdBudget);
@@ -324,7 +328,7 @@ export default {
     },
     deleteBudget(budget) {
       this.budgets = this.budgets.filter(
-        (addedBudget) => addedBudget !== parseFloat(budget),
+        (addedBudget) => addedBudget !== parseFloat(budget.relative),
       );
     },
     loadState() {
@@ -343,7 +347,6 @@ export default {
       localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
     },
     clearState() {
-      this.budget = null;
       this.budgets = [];
       this.createBudgetFormActive = false;
       this.createLoanFormActive = false;
@@ -407,28 +410,37 @@ export default {
     <br />
     <div :class="['appBody']">
       <div id='todo2' :class="['mgmtPanel']">
-        <ManagementPanel
-          :createFunction='openCreateLoanForm'
-          :panelId='"loanManagementPanel"'
-          :panelTitle='"Loans"'
-        />
-        <LoansPanel
-          :deleteLoan='deleteLoan'
-          :editLoan='editLoan'
-          :effectiveInterestRate='globalEffectiveInterestRate'
-          :globalMinPayment='globalMinPayment'
-          :loans='loans'
-          :totalPrincipal='globalPrincipal'
-          :viewLoan='viewLoan'
-        />
-        <div id='budgetManagementPanel'>
+        <div>
           <ManagementPanel
-            :createFunction='openCreateBudgetForm'
-            :panelId='"budgetManagementPanel"'
-            :panelTitle='"Budgets"'
+            :createFunction='openCreateLoanForm'
+            :panelId='"loanManagementPanel"'
+            :panelTitle='"Loans"'
+          />
+          <LoansPanel
+            :deleteLoan='deleteLoan'
+            :editLoan='editLoan'
+            :effectiveInterestRate='globalEffectiveInterestRate'
+            :globalMinPayment='globalMinPayment'
+            :loans='loans'
+            :totalPrincipal='globalPrincipal'
+            :viewLoan='viewLoan'
           />
         </div>
-        <BudgetsPanel :budgets='budgets' :deleteBudget='deleteBudget' />
+        <div>
+          <div id='budgetManagementPanel'>
+            <ManagementPanel
+              :createFunction='openCreateBudgetForm'
+              :panelId='"budgetManagementPanel"'
+              :panelTitle='"Budgets"'
+            />
+          </div>
+          <BudgetsPanel
+            v-if="loans.length"
+            :budgets='monthlyBudgets'
+            :budgetsTotals='totalsByBudget'
+            :deleteBudget='deleteBudget'
+          />
+        </div>
       </div>
       <div id='todo3' v-show='loans.length' :class="['presPanel']">
         <div :class="['panel']">
@@ -459,6 +471,7 @@ export default {
         </div>
       </div>
     </div>
+    <div :id='"sandbox"'></div>
   </div>
 </template>
 

@@ -2,7 +2,7 @@
 import BudgetCard from './BudgetCard.vue';
 
 export default {
-  props: ['budgets', 'deleteBudget'],
+  props: ['budgets', 'deleteBudget', 'budgetsTotals'],
   components: { BudgetCard },
 };
 </script>
@@ -13,8 +13,9 @@ export default {
       <li v-for='(budget, index) in this.budgets' :key='budget.id' :class="['card']">
         <BudgetCard
           :budget='budget'
-          :index='index + 1'
           :deleteBudget='this.deleteBudget'
+          :index='index + 1'
+          :budgetTotals='this.budgetsTotals[budget.id]'
         />
       </li>
     </ul>
