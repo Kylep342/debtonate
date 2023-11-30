@@ -5,7 +5,7 @@ import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
-import InterestTable from './components/InterestTable.vue';
+// import InterestTable from './components/InterestTable.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
@@ -332,6 +332,7 @@ export default {
       );
     },
     loadState() {
+      this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
       this.loans = JSON.parse(localStorage.getItem('debtonate.loans')).map(
         (loan) => new moneyfunx.Loan(
           loan.principal,
@@ -340,11 +341,16 @@ export default {
           loan.termInYears,
         ),
       );
-      this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
+      this.reducePayments = JSON.parse(localStorage.getItem('debtonate.reducePayments'));
+      this.roundUp = JSON.parse(localStorage.getItem('debtonate.roundUp'));
+      this.snowballSort = JSON.parse(localStorage.getItem('debtonate.snowballSort'));
     },
     saveState() {
-      localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
       localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
+      localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
+      localStorage.setItem('debtonate.reducePayments', JSON.stringify(this.reducePayments));
+      localStorage.setItem('debtonate.roundUp', JSON.stringify(this.roundUp));
+      localStorage.setItem('debtonate.snowballSort', JSON.stringify(this.snowballSort));
     },
     clearState() {
       this.budgets = [];
@@ -366,7 +372,7 @@ export default {
     BudgetsPanel,
     DetailsPanel,
     HeaderBar,
-    InterestTable,
+    // InterestTable,
     LoanForm,
     LoansPanel,
     ManagementPanel,
