@@ -11,17 +11,19 @@ import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 
+// TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
+
 export default {
   data() {
     return {
       budgets: [],
       colors: [
-        '#DAF7A6',
-        '#FFC300',
-        '#FF5733',
         '#C70039',
-        '#900C3F',
         '#581845',
+        '#900C3F',
+        '#DAF7A6',
+        '#FF5733',
+        '#FFC300',
       ],
       createBudgetFormActive: false,
       createLoanFormActive: false,
@@ -279,15 +281,6 @@ export default {
         moneyfunx.snowball,
       );
     },
-    deleteLoan(id) {
-      this.loans = this.loans.filter((loan) => loan.id !== id);
-    },
-    getLoan(id) {
-      return this.loans.find((loan) => loan.id === id);
-    },
-    getLoanIndex(id) {
-      return this.loans.findIndex((loan) => loan.id === id) + 1;
-    },
     createLoan(principal, interestRate, termInYears) {
       const newLoan = new moneyfunx.Loan(
         principal,
@@ -303,6 +296,9 @@ export default {
       this.sortLoans();
       this.createLoanFormActive = false;
     },
+    deleteLoan(id) {
+      this.loans = this.loans.filter((loan) => loan.id !== id);
+    },
     editLoan(id) {
       this.currentLoanId = id;
       const loan = this.getLoan(this.currentLoanId);
@@ -310,6 +306,12 @@ export default {
       this.interestRate = loan.annualRate * 100;
       this.termInYears = loan.termInYears;
       this.createLoanFormActive = true;
+    },
+    getLoan(id) {
+      return this.loans.find((loan) => loan.id === id);
+    },
+    getLoanIndex(id) {
+      return this.loans.findIndex((loan) => loan.id === id) + 1;
     },
     viewLoan(id) {
       this.currentLoanId = id;
@@ -331,6 +333,28 @@ export default {
         (addedBudget) => addedBudget !== parseFloat(budget.relative),
       );
     },
+    viewBudget(id) {
+      this.currentBudgetId = id;
+      this.showBudgetDetailsPanel = true;
+    },
+    unviewBudget() {
+      this.showBudgetDetailsPanel = false;
+      this.currentBudgetId = null;
+    },
+    clearState() {
+      this.budgets = [];
+      this.createBudgetFormActive = false;
+      this.createLoanFormActive = false;
+      this.currentLoanId = null;
+      this.interestRate = null;
+      this.loans = [];
+      this.principal = null;
+      this.reducePayments = false;
+      this.roundUp = false;
+      this.showLoanDetailsPanel = false;
+      this.snowballSort = true;
+      this.termInYears = null;
+    },
     loadState() {
       this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
       this.loans = JSON.parse(localStorage.getItem('debtonate.loans')).map(
@@ -351,20 +375,6 @@ export default {
       localStorage.setItem('debtonate.reducePayments', JSON.stringify(this.reducePayments));
       localStorage.setItem('debtonate.roundUp', JSON.stringify(this.roundUp));
       localStorage.setItem('debtonate.snowballSort', JSON.stringify(this.snowballSort));
-    },
-    clearState() {
-      this.budgets = [];
-      this.createBudgetFormActive = false;
-      this.createLoanFormActive = false;
-      this.currentLoanId = null;
-      this.interestRate = null;
-      this.loans = [];
-      this.principal = null;
-      this.reducePayments = false;
-      this.roundUp = false;
-      this.showLoanDetailsPanel = false;
-      this.snowballSort = true;
-      this.termInYears = null;
     },
   },
   components: {

@@ -3,11 +3,12 @@ import AmortizationTable from './AmortizationTable.vue';
 
 export default {
   props: [
-    'loan',
     'index',
-    'monthlyBudgets',
-    'loanPaymentSummaries',
+    'loan',
     'loanAmortizationSchedulesChart',
+    'loanPaymentSummaries',
+    'monthlyBudgets',
+    'type',
   ],
   emits: ['exit-details-panel'],
   components: { AmortizationTable },

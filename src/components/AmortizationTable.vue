@@ -1,6 +1,11 @@
 <script>
 export default {
-  props: ['loan', 'index', 'budget', 'paymentSummary'],
+  props: [
+    'budget',
+    'index',
+    'loan',
+    'paymentSummary',
+  ],
   computed: {
     cardTitle() {
       return (

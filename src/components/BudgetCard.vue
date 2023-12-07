@@ -1,6 +1,13 @@
 <script>
 export default {
-  props: ['budget', 'budgetTotals', 'deleteBudget', 'index', 'viewBudget'],
+  props: [
+    'budget',
+    'budgetTotals',
+    'deleteBudget',
+    'editBudget',
+    'index',
+    'viewBudget',
+  ],
   computed: {
     budgetAmount() {
       return `$${this.budget.absolute.toFixed(2)}/mo`;
@@ -62,13 +69,13 @@ export default {
         </tr>
       </table>
     </div>
-    <!-- <div :class="['cardFooter', 'footer']">
+    <div :class="['cardFooter', 'footer']">
       <div :class="['cardFooterButtonContainer']">
-        <button @click='this.viewLoan(this.loan.id)'>View</button>
+        <button @click='this.viewBudget(this.budget.id)'>View</button>
       </div>
       <div :class="['cardFooterButtonContainer']">
-        <button @click='this.editLoan(this.loan.id)'>Edit</button>
+        <button @click='this.editBudget(this.budget.id)'>Edit</button>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
