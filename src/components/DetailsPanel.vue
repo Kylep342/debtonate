@@ -22,6 +22,9 @@ export default {
     },
   },
   methods: {
+    buildTitle() {
+      return 0;
+    },
     emitExit() {
       this.$emit('exit-details-panel');
     },

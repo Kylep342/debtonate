@@ -70,11 +70,11 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <div :class="['cardFooterButtonContainer']">
-        <button @click='this.viewBudget(this.budget.id)'>View</button>
+      <div v-if="this.budget.id !== 'default'" :class="['cardFooterButtonContainer']">
+        <button @click='this.editBudget(this.budget.id)'>Edit</button>
       </div>
       <div :class="['cardFooterButtonContainer']">
-        <button @click='this.editBudget(this.budget.id)'>Edit</button>
+        <button @click='this.viewBudget(this.budget.id)'>View</button>
       </div>
     </div>
   </div>

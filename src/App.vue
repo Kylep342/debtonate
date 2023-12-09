@@ -18,10 +18,10 @@ export default {
     return {
       budgets: [],
       colors: [
+        '#DAF7A6',
+        '#900C3F',
         '#C70039',
         '#581845',
-        '#900C3F',
-        '#DAF7A6',
         '#FF5733',
         '#FFC300',
       ],
@@ -321,6 +321,12 @@ export default {
       this.showLoanDetailsPanel = false;
       this.currentLoanId = null;
     },
+    viewTotals() {
+      this.showTotalsDetailsPanel = true;
+    },
+    unviewTotals() {
+      this.showTotalsDetailsPanel = false;
+    },
     // TODO: enhance
     createBudget(createdBudget) {
       this.budgets = this.budgets.filter((budget) => budget !== createdBudget);
@@ -352,6 +358,7 @@ export default {
       this.reducePayments = false;
       this.roundUp = false;
       this.showLoanDetailsPanel = false;
+      this.showTotalsDetailsPanel = false;
       this.snowballSort = true;
       this.termInYears = null;
     },
