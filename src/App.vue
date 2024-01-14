@@ -83,6 +83,15 @@ export default {
         0,
       );
     },
+    globalMaxPeriodsPerYear() {
+      return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0);
+    },
+    globalMaxTermInYears() {
+      return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.termInYears), 0);
+    },
+    globalLifetimeInterestPaid() {
+      return this.loans.reduce((accumulator, loan) => accumulator + loan.totalInterest, 0);
+    },
     createBudgetButtonEnabled() {
       return (
         !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
@@ -188,6 +197,19 @@ export default {
         };
       });
       return charts;
+    },
+    totalsAsLoan() {
+      return {
+        id: 'totals',
+        principal: this.globalPrincipal,
+        annualRate: this.effectiveRate,
+        periodsPerYear: this.globalMaxPeriodsPerYear,
+        termInYears: this.globalMaxTermInYears,
+        periodicRate: null, // not implemented for Totals as a Loan
+        periods: this.periodsPerYear * this.termInYears,
+        minPayment: this.globalMinPayment,
+        totalInterest: this.globalLifetimeInterestPaid,
+      };
     },
     totalsByBudget() {
       const totals = {};
@@ -498,6 +520,17 @@ export default {
             @exit-details-panel='unviewLoan'
           />
         </div>
+          <DetailsPanel
+            v-if='showBudgetDetailsPanel'
+            :index='getBudgetIndex(currentBudgetId)'
+            :loan='getLoan(currentLoanId)'
+            :loanAmortizationSchedulesChart='
+              amortizationSchedulesChartPerLoan[currentLoanId]
+            '
+            :loanPaymentSummaries='paymentSummaries[currentLoanId]'
+            :monthlyBudgets='monthlyBudgets'
+            @exit-details-panel='unviewLoan'
+          />
       </div>
     </div>
     <div :id='"sandbox"'></div>
