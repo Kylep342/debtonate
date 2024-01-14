@@ -22,11 +22,19 @@ export default {
     },
   },
   methods: {
-    buildTitle() {
-      return 0;
+    buildTitle(loan, monthlyBudget) {
+      return (
+        `Loan ${this.index} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
+        + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
+      );
     },
     emitExit() {
       this.$emit('exit-details-panel');
+    },
+    generateKey(loan, monthlyBudget) {
+      return loan.id + monthlyBudget.id;
     },
   },
 };
@@ -42,20 +50,20 @@ export default {
         <ul>
           <li
             v-for='budget in this.monthlyBudgets'
-            :key='this.loan.id + budget.id'
+            :key='this.generateKey(this.loan, budget)'
           >
             <AmortizationTable
-              :id="'amortizationTable' + loan.id + budget.id"
-              :loan='this.loan'
+              :id="'amortizationTable' + this.generateKey(this.loan, budget)"
               :index='this.index'
-              :budget='budget'
+              :keyPrefix='this.generateKey(this.loan, budget)'
               :paymentSummary='this.loanPaymentSummaries[budget.id]'
+              :title='this.buildTitle(this.loan, budget)'
             />
           </li>
         </ul>
         <base-chart
-          :id="'amortizationChart' + loan.id"
           :chart='this.loanAmortizationSchedulesChart'
+          :id="'amortizationChart' + loan.id"
         />
       </div>
     </template>

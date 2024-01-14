@@ -1,28 +1,18 @@
 <script>
 export default {
   props: [
-    'budget',
     'index',
-    'loan',
+    'keyPrefix',
     'paymentSummary',
+    'title',
   ],
-  computed: {
-    cardTitle() {
-      return (
-        `Loan ${this.index} `
-        + `($${this.loan.principal.toFixed(2)} `
-        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%) `
-        + `Total Budget: $${this.budget.absolute.toFixed(2)}/mo`
-      );
-    },
-  },
 };
 </script>
 
 <template>
   <div>
     <div>
-      <h3 :class="['cardTitle']">{{ this.cardTitle }}</h3>
+      <h3 :class="['cardTitle']">{{ this.title }}</h3>
     </div>
     <div :class="['justifyCenter']">
       <table :class="['table']">
@@ -34,7 +24,7 @@ export default {
         </thead>
         <tr
           v-for='(record, rowno) in this.paymentSummary.amortizationSchedule'
-          :key='this.loan.id + this.budget.id + rowno'
+          :key='this.keyPrefix + rowno'
         >
           <td :class="['textLeft']">{{ record.period }}</td>
           <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>

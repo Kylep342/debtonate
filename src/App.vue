@@ -83,6 +83,11 @@ export default {
         0,
       );
     },
+    createBudgetButtonEnabled() {
+      return (
+        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
+      );
+    },
     monthlyBudgets() {
       const budgets = this.budgets.map((budget) => ({
         id: String(Math.floor(Math.random() * Date.now())),
@@ -328,9 +333,9 @@ export default {
       this.showTotalsDetailsPanel = false;
     },
     // TODO: enhance
-    createBudget(createdBudget) {
-      this.budgets = this.budgets.filter((budget) => budget !== createdBudget);
-      this.budgets.push(createdBudget);
+    createBudget(proposedBudget) {
+      this.budgets = this.budgets.filter((budget) => budget !== proposedBudget);
+      this.budgets.push(proposedBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
     },
