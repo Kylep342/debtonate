@@ -140,7 +140,7 @@ export default {
             totalPayemntAmount: schedule.paymentAmount,
             amortizationSchedule:
               schedule.paymentSchedule[loanId].amortizationSchedule,
-            totalPrincipalPaid: this.getLoan(loanId)?.principal,
+            totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
             totalInterestPaid:
               schedule.paymentSchedule[loanId].lifetimeInterest,
             totalPayments: schedule.paymentSchedule[loanId].totalPayments,
