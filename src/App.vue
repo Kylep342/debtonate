@@ -380,6 +380,9 @@ export default {
         (addedBudget) => addedBudget !== parseFloat(budget.relative),
       );
     },
+    getBudget(id) {
+      return this.monthlyBudgets.find((budget) => budget.id === id);
+    },
     getBudgetIndex(id) {
       return this.monthlyBudgets.findIndex((budget) => budget.id === id) + 1;
     },
@@ -547,7 +550,7 @@ export default {
               amortizationSchedulesChartPerLoan.totals
             '
             :loan='totalsAsLoan'
-            :monthlyBudgets='monthlyBudgets'
+            :monthlyBudgets='[getBudget(currentBudgetId)]'
             :paymentSummaries='paymentSummaries.totals'
             @exit-details-panel='unviewBudget'
           />
