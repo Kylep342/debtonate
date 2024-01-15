@@ -1,13 +1,14 @@
 <script>
 import AmortizationTable from './AmortizationTable.vue';
+import * as constants from '../constants/constants';
 
 export default {
   props: [
     'index',
-    'loan',
-    'loanAmortizationSchedulesChart',
-    'loanPaymentSummaries',
+    'amortizationSchedulesChart',
+    'paymentSummaries',
     'monthlyBudgets',
+    'loan',
     'type',
   ],
   emits: ['exit-details-panel'],
@@ -56,13 +57,13 @@ export default {
               :id="'amortizationTable' + this.generateKey(this.loan, budget)"
               :index='this.index'
               :keyPrefix='this.generateKey(this.loan, budget)'
-              :paymentSummary='this.loanPaymentSummaries[budget.id]'
+              :paymentSummary='this.paymentSummaries[budget.id]'
               :title='this.buildTitle(this.loan, budget)'
             />
           </li>
         </ul>
         <base-chart
-          :chart='this.loanAmortizationSchedulesChart'
+          :chart='this.amortizationSchedulesChart'
           :id="'amortizationChart' + loan.id"
         />
       </div>

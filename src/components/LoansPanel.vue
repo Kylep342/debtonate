@@ -9,8 +9,9 @@ export default {
     'effectiveInterestRate',
     'globalMinPayment',
     'loans',
-    'viewLoan',
     'totalPrincipal',
+    'viewLoan',
+    'viewTotals',
   ],
   components: { LoanCard, TotalsCard },
 };
@@ -24,6 +25,7 @@ export default {
           :effectiveRate='this.effectiveInterestRate'
           :minimumPayment='this.globalMinPayment'
           :principal='this.totalPrincipal'
+          :viewTotals='this.viewTotals'
         />
       </li>
       <li v-for='(loan, index) in this.loans' :key='loan.id' :class="['card']">
