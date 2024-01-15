@@ -16,7 +16,7 @@ export default {
   computed: {
     cardTitle() {
       return (
-        `Loan Details - Loan ${this.index} `
+        `${this.type} Details - ${this.type} ${this.index} `
         + `($${this.loan.principal.toFixed(2)} `
         + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
       );
@@ -25,7 +25,7 @@ export default {
   methods: {
     buildTitle(loan, monthlyBudget) {
       return (
-        `Loan ${this.index} `
+        `${loan.id === constants.TOTALS ? 'All Loans' : `Loan ${this.index}`} `
         + `($${loan.principal.toFixed(2)} `
         + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
         + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
