@@ -18,6 +18,7 @@ export default {
       <table :class="['table']">
         <thead id='AmortizationTotalsTHead'>
           <th :class="['textLeft']">Payment Number</th>
+          <th :class="['textRight']">Amount Paid</th>
           <th :class="['textRight']">Principal Paid</th>
           <th :class="['textRight']">Interest Paid</th>
           <th :class="['textRight']">Principal Remaining</th>
@@ -27,6 +28,7 @@ export default {
           :key='this.keyPrefix + rowno'
         >
           <td :class="['textLeft']">{{ record.period }}</td>
+          <td :class="['textRight']">${{ (record.principal + record.interest).toFixed(2) }}</td>
           <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>
           <td :class="['textRight']">${{ record.interest.toFixed(2) }}</td>
           <td :class="['textRight']">
@@ -35,6 +37,12 @@ export default {
         </tr>
         <tr>
           <td :class="['textLeft']"><b>Totals:</b></td>
+          <td :class="['textRight']">
+            <b>${{ (
+              this.paymentSummary.totalPrincipalPaid +
+              this.paymentSummary.totalInterestPaid
+            ).toFixed(2) }}</b>
+          </td>
           <td :class="['textRight']">
             <b>${{ this.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
           </td>
