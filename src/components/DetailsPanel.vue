@@ -1,14 +1,14 @@
 <script>
 import AmortizationTable from './AmortizationTable.vue';
-import * as constants from '../constants/constants';
+import constants from '../constants/constants';
 
 export default {
   props: [
     'index',
     'amortizationSchedulesChart',
-    'paymentSummaries',
-    'monthlyBudgets',
     'loan',
+    'monthlyBudgets',
+    'paymentSummaries',
     'type',
   ],
   emits: ['exit-details-panel'],

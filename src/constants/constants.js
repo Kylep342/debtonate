@@ -1,11 +1,11 @@
-const detailsPanelTypes = {
-  BUDGET: 'BUDGET',
-  LOAN: 'LOAN',
-};
+// file for constants
 
+const BUDGET = 'BUDGET';
+const LOAN = 'LOAN';
 const TOTALS = 'totals';
 
-export default {
-  detailsPanelTypes,
+export default Object.freeze({
+  BUDGET,
+  LOAN,
   TOTALS,
-};
+});

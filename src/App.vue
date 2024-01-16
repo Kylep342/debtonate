@@ -10,13 +10,14 @@ import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
-import * as constants from './constants/constants';
+import constants from './constants/constants';
 
 // TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
 
 export default {
   data() {
     return {
+      constants,
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -184,14 +185,14 @@ export default {
       this.loans.forEach((loan) => {
         charts[loan.id] = {};
       });
-      Object.keys(charts).forEach((loanId) => {
+      Object.keys(charts).forEach((loanId, index) => {
         charts[loanId] = {
           id: `amortizationSchedulesChart,${loanId}`,
           data: this.amortizationSchedulesGraphData[loanId],
           layout: {
             showLegend: false,
             barmode: 'group',
-            title: `Balance Over Time - ${loanId !== constants.TOTALS ? this.getLoanIndex(loanId) : 'Totals'}`,
+            title: `Balance Over Time - ${loanId === constants.TOTALS ? 'All Loans' : `Loan ${index}`}`,
             xaxis: {
               title: {
                 text: 'Payments',
@@ -540,6 +541,7 @@ export default {
             :loan='getLoan(currentLoanId)'
             :monthlyBudgets='monthlyBudgets'
             :paymentSummaries='paymentSummaries[currentLoanId]'
+            :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
         </div>
@@ -552,6 +554,7 @@ export default {
             :loan='totalsAsLoan'
             :monthlyBudgets='[getBudget(currentBudgetId)]'
             :paymentSummaries='paymentSummaries.totals'
+            :type='constants.BUDGET'
             @exit-details-panel='unviewBudget'
           />
       </div>
