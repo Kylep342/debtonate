@@ -1,13 +1,14 @@
 <script>
 import AmortizationTable from './AmortizationTable.vue';
+import constants from '../constants/constants';
 
 export default {
   props: [
     'index',
+    'amortizationSchedulesChart',
     'loan',
-    'loanAmortizationSchedulesChart',
-    'loanPaymentSummaries',
     'monthlyBudgets',
+    'paymentSummaries',
     'type',
   ],
   emits: ['exit-details-panel'],
@@ -15,18 +16,26 @@ export default {
   computed: {
     cardTitle() {
       return (
-        `Loan Details - Loan ${this.index} `
+        `${this.type} Details - ${this.type} ${this.index} `
         + `($${this.loan.principal.toFixed(2)} `
         + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
       );
     },
   },
   methods: {
-    buildTitle() {
-      return 0;
+    buildTitle(loan, monthlyBudget) {
+      return (
+        `${loan.id === constants.TOTALS ? 'All Loans' : `Loan ${this.index}`} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
+        + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
+      );
     },
     emitExit() {
       this.$emit('exit-details-panel');
+    },
+    generateKey(loan, monthlyBudget) {
+      return loan.id + monthlyBudget.id;
     },
   },
 };
@@ -42,20 +51,20 @@ export default {
         <ul>
           <li
             v-for='budget in this.monthlyBudgets'
-            :key='this.loan.id + budget.id'
+            :key='this.generateKey(this.loan, budget)'
           >
             <AmortizationTable
-              :id="'amortizationTable' + loan.id + budget.id"
-              :loan='this.loan'
+              :id="'amortizationTable' + this.generateKey(this.loan, budget)"
               :index='this.index'
-              :budget='budget'
-              :paymentSummary='this.loanPaymentSummaries[budget.id]'
+              :keyPrefix='this.generateKey(this.loan, budget)'
+              :paymentSummary='this.paymentSummaries[budget.id]'
+              :title='this.buildTitle(this.loan, budget)'
             />
           </li>
         </ul>
         <base-chart
+          :chart='this.amortizationSchedulesChart'
           :id="'amortizationChart' + loan.id"
-          :chart='this.loanAmortizationSchedulesChart'
         />
       </div>
     </template>

@@ -10,12 +10,16 @@ import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
+import constants from './constants/constants';
+
+// TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
 
 // TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
 
 export default {
   data() {
     return {
+      constants,
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -33,6 +37,7 @@ export default {
       reducePayments: false,
       roundingScale: 100,
       roundUp: false,
+      showBudgetDetailsPanel: false,
       showLoanDetailsPanel: false,
       snowballSort: false,
     };
@@ -64,23 +69,34 @@ export default {
         + (this.roundingScale - (this.rawGlobalMinPayment % this.roundingScale))
       );
     },
-    globalMinPayment() {
-      return this.roundUp
-        ? this.roundedGlobalMinPayment
-        : this.rawGlobalMinPayment;
-    },
-    globalPrincipal() {
-      return this.loans.reduce(
-        (previousValue, currentValue) => previousValue + currentValue.principal,
-        0,
-      );
-    },
     globalEffectiveInterestRate() {
       return this.loans.reduce(
         (previousValue, currentValue) => previousValue
           + currentValue.annualRate
             * (currentValue.principal / this.globalPrincipal),
         0,
+      );
+    },
+    globalLifetimeInterestPaid() {
+      return this.loans.reduce((accumulator, loan) => accumulator + loan.totalInterest, 0);
+    },
+    globalMaxPeriodsPerYear() {
+      return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0);
+    },
+    globalMaxTermInYears() {
+      return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.termInYears), 0);
+    },
+    globalMinPayment() {
+      return this.roundUp
+        ? this.roundedGlobalMinPayment
+        : this.rawGlobalMinPayment;
+    },
+    globalPrincipal() {
+      return this.loans.reduce((accumulator, loan) => accumulator + loan.principal, 0);
+    },
+    createBudgetButtonEnabled() {
+      return (
+        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
       );
     },
     monthlyBudgets() {
@@ -114,36 +130,44 @@ export default {
       return 5;
     },
     paymentSummaries() {
-      const balances = {};
+      const balances = {
+        totals: {},
+      };
       this.loans.forEach((loan) => {
         balances[loan.id] = {};
+      });
+      Object.keys(balances).forEach((loanId) => {
         this.paymentSchedules.forEach((schedule) => {
-          balances[loan.id][schedule.budgetId] = {
+          balances[loanId][schedule.budgetId] = {
             label: schedule.label,
             totalPayemntAmount: schedule.paymentAmount,
             amortizationSchedule:
-              schedule.paymentSchedule[loan.id].amortizationSchedule,
-            totalPrincipalPaid: loan.principal,
+              schedule.paymentSchedule[loanId].amortizationSchedule,
+            totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
             totalInterestPaid:
-              schedule.paymentSchedule[loan.id].lifetimeInterest,
-            totalPayments: schedule.paymentSchedule[loan.id].totalPayments,
+              schedule.paymentSchedule[loanId].lifetimeInterest,
+            totalPayments: schedule.paymentSchedule[loanId].totalPayments,
           };
         });
       });
       return balances;
     },
     amortizationSchedulesGraphData() {
-      const balances = {};
+      const balances = {
+        totals: [],
+      };
       this.loans.forEach((loan) => {
         balances[loan.id] = [];
+      });
+      Object.keys(balances).forEach((loanId) => {
         this.paymentSchedules.forEach((schedule) => {
-          balances[loan.id].push({
+          balances[loanId].push({
             x: Array.from(
-              schedule.paymentSchedule[loan.id].amortizationSchedule,
+              schedule.paymentSchedule[loanId].amortizationSchedule,
               (record) => record.period,
             ),
             y: Array.from(
-              schedule.paymentSchedule[loan.id].amortizationSchedule,
+              schedule.paymentSchedule[loanId].amortizationSchedule,
               (record) => record.principalRemaining,
             ),
             hovertemplate: 'Payment %{x}: %{y} Remaining',
@@ -157,15 +181,20 @@ export default {
       return balances;
     },
     amortizationSchedulesChartPerLoan() {
-      const charts = {};
-      this.loans.forEach((loan, index) => {
-        charts[loan.id] = {
-          id: `amortizationSchedulesChart,${loan.id}`,
-          data: this.amortizationSchedulesGraphData[loan.id],
+      const charts = {
+        totals: {},
+      };
+      this.loans.forEach((loan) => {
+        charts[loan.id] = {};
+      });
+      Object.keys(charts).forEach((loanId, index) => {
+        charts[loanId] = {
+          id: `amortizationSchedulesChart,${loanId}`,
+          data: this.amortizationSchedulesGraphData[loanId],
           layout: {
             showLegend: false,
             barmode: 'group',
-            title: `Balance Over Time - Loan ${index + 1}`,
+            title: `Balance Over Time - ${loanId === constants.TOTALS ? 'All Loans' : `Loan ${index}`}`,
             xaxis: {
               title: {
                 text: 'Payments',
@@ -183,6 +212,19 @@ export default {
         };
       });
       return charts;
+    },
+    totalsAsLoan() {
+      return {
+        id: constants.TOTALS,
+        principal: this.globalPrincipal,
+        annualRate: this.globalEffectiveInterestRate,
+        periodsPerYear: this.globalMaxPeriodsPerYear,
+        termInYears: this.globalMaxTermInYears,
+        periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
+        periods: this.periodsPerYear * this.termInYears,
+        minPayment: this.globalMinPayment,
+        totalInterest: this.globalLifetimeInterestPaid,
+      };
     },
     totalsByBudget() {
       const totals = {};
@@ -308,7 +350,9 @@ export default {
       this.createLoanFormActive = true;
     },
     getLoan(id) {
-      return this.loans.find((loan) => loan.id === id);
+      return id !== constants.TOTALS ? this.loans.find(
+        (loan) => loan.id === id
+      ) : this.totalsAsLoan;
     },
     getLoanIndex(id) {
       return this.loans.findIndex((loan) => loan.id === id) + 1;
@@ -328,9 +372,9 @@ export default {
       this.showTotalsDetailsPanel = false;
     },
     // TODO: enhance
-    createBudget(createdBudget) {
-      this.budgets = this.budgets.filter((budget) => budget !== createdBudget);
-      this.budgets.push(createdBudget);
+    createBudget(proposedBudget) {
+      this.budgets = this.budgets.filter((budget) => budget !== proposedBudget);
+      this.budgets.push(proposedBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
     },
@@ -338,6 +382,12 @@ export default {
       this.budgets = this.budgets.filter(
         (addedBudget) => addedBudget !== parseFloat(budget.relative),
       );
+    },
+    getBudget(id) {
+      return this.monthlyBudgets.find((budget) => budget.id === id);
+    },
+    getBudgetIndex(id) {
+      return this.monthlyBudgets.findIndex((budget) => budget.id === id) + 1;
     },
     viewBudget(id) {
       this.currentBudgetId = id;
@@ -357,8 +407,13 @@ export default {
       this.principal = null;
       this.reducePayments = false;
       this.roundUp = false;
+      this.showBudgetDetailsPanel = false;
       this.showLoanDetailsPanel = false;
+<<<<<<< HEAD
       this.showTotalsDetailsPanel = false;
+=======
+      // this.showTotalsDetailsPanel = false;
+>>>>>>> main
       this.snowballSort = true;
       this.termInYears = null;
     },
@@ -449,6 +504,7 @@ export default {
           :loans='loans'
           :totalPrincipal='globalPrincipal'
           :viewLoan='viewLoan'
+          :viewTotals='viewTotals'
         />
       </div>
       <div :class="['mgmtPanel']">
@@ -464,6 +520,7 @@ export default {
           :budgets='monthlyBudgets'
           :budgetsTotals='totalsByBudget'
           :deleteBudget='deleteBudget'
+          :viewBudget='viewBudget'
         />
       </div>
       <div id='todo3' v-show='loans.length' :class="['presPanel']">
@@ -484,15 +541,28 @@ export default {
           <DetailsPanel
             v-if='showLoanDetailsPanel'
             :index='getLoanIndex(currentLoanId)'
-            :loan='getLoan(currentLoanId)'
-            :loanAmortizationSchedulesChart='
+            :amortizationSchedulesChart='
               amortizationSchedulesChartPerLoan[currentLoanId]
             '
-            :loanPaymentSummaries='paymentSummaries[currentLoanId]'
+            :loan='getLoan(currentLoanId)'
             :monthlyBudgets='monthlyBudgets'
+            :paymentSummaries='paymentSummaries[currentLoanId]'
+            :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
         </div>
+          <DetailsPanel
+            v-if='showBudgetDetailsPanel'
+            :index='getBudgetIndex(currentBudgetId)'
+            :amortizationSchedulesChart='
+              amortizationSchedulesChartPerLoan.totals
+            '
+            :loan='totalsAsLoan'
+            :monthlyBudgets='[getBudget(currentBudgetId)]'
+            :paymentSummaries='paymentSummaries.totals'
+            :type='constants.BUDGET'
+            @exit-details-panel='unviewBudget'
+          />
       </div>
     </div>
     <div :id='"sandbox"'></div>

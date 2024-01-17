@@ -1,42 +1,34 @@
 <script>
 export default {
   props: [
-    'budget',
     'index',
-    'loan',
+    'keyPrefix',
     'paymentSummary',
+    'title',
   ],
-  computed: {
-    cardTitle() {
-      return (
-        `Loan ${this.index} `
-        + `($${this.loan.principal.toFixed(2)} `
-        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%) `
-        + `Total Budget: $${this.budget.absolute.toFixed(2)}/mo`
-      );
-    },
-  },
 };
 </script>
 
 <template>
   <div>
     <div>
-      <h3 :class="['cardTitle']">{{ this.cardTitle }}</h3>
+      <h3 :class="['cardTitle']">{{ this.title }}</h3>
     </div>
     <div :class="['justifyCenter']">
       <table :class="['table']">
         <thead id='AmortizationTotalsTHead'>
           <th :class="['textLeft']">Payment Number</th>
+          <th :class="['textRight']">Amount Paid</th>
           <th :class="['textRight']">Principal Paid</th>
           <th :class="['textRight']">Interest Paid</th>
           <th :class="['textRight']">Principal Remaining</th>
         </thead>
         <tr
           v-for='(record, rowno) in this.paymentSummary.amortizationSchedule'
-          :key='this.loan.id + this.budget.id + rowno'
+          :key='this.keyPrefix + rowno'
         >
           <td :class="['textLeft']">{{ record.period }}</td>
+          <td :class="['textRight']">${{ (record.principal + record.interest).toFixed(2) }}</td>
           <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>
           <td :class="['textRight']">${{ record.interest.toFixed(2) }}</td>
           <td :class="['textRight']">
@@ -45,6 +37,12 @@ export default {
         </tr>
         <tr>
           <td :class="['textLeft']"><b>Totals:</b></td>
+          <td :class="['textRight']">
+            <b>${{ (
+              this.paymentSummary.totalPrincipalPaid +
+              this.paymentSummary.totalInterestPaid
+            ).toFixed(2) }}</b>
+          </td>
           <td :class="['textRight']">
             <b>${{ this.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
           </td>
