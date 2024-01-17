@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "moneyfunx": "^0.0.39",
+    "moneyfunx": "^0.0.41",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^2.14.0",
     "@vitejs/plugin-vue": "^3.0.1",
