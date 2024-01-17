@@ -16,7 +16,11 @@ export default {
   computed: {
     cardTitle() {
       return (
-        `${this.type} Details - ${this.type} ${this.index} `
+        // leave trailing whitespace in strings for formatting
+        `${this.type} Details - ${
+          this.loan.id === constants.TOTALS
+            ? 'All Loans '
+            : `Loan ${this.index}`} `
         + `($${this.loan.principal.toFixed(2)} `
         + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
       );
@@ -34,8 +38,8 @@ export default {
     emitExit() {
       this.$emit('exit-details-panel');
     },
-    generateKey(loan, monthlyBudget) {
-      return loan.id + monthlyBudget.id;
+    generateKey() {
+      return ''.concat(arguments.id);
     },
   },
 };

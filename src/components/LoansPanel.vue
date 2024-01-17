@@ -1,19 +1,15 @@
 <script>
 import LoanCard from './LoanCard.vue';
-import TotalsCard from './TotalsCard.vue';
 
 export default {
   props: [
     'deleteLoan',
     'editLoan',
-    'effectiveInterestRate',
-    'globalMinPayment',
     'loans',
-    'totalPrincipal',
+    'totalsAsALoan',
     'viewLoan',
-    'viewTotals',
   ],
-  components: { LoanCard, TotalsCard },
+  components: { LoanCard },
 };
 </script>
 
@@ -21,11 +17,9 @@ export default {
   <div :class="['panel']">
     <ul :class="['cardHolder']">
       <li v-if='this.loans.length' :class="['card']">
-        <TotalsCard
-          :effectiveRate='this.effectiveInterestRate'
-          :minimumPayment='this.globalMinPayment'
-          :principal='this.totalPrincipal'
-          :viewTotals='this.viewTotals'
+        <LoanCard
+          :loan='totalsAsALoan'
+          :viewLoan='this.viewLoan'
         />
       </li>
       <li v-for='(loan, index) in this.loans' :key='loan.id' :class="['card']">

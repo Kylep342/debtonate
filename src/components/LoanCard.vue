@@ -1,5 +1,12 @@
 <script>
+import constants from '../constants/constants';
+
 export default {
+  data() {
+    return {
+      constants,
+    };
+  },
   props: ['deleteLoan', 'editLoan', 'index', 'loan', 'viewLoan'],
   computed: {
     renderedMinPayment() {
@@ -11,6 +18,9 @@ export default {
     renderedRate() {
       return `${(this.loan.annualRate * 100).toFixed(2)}%`;
     },
+    title() {
+      return this.loan.id === constants.TOTALS ? 'All Loans' : `Loan ${this.index}`;
+    },
   },
 };
 </script>
@@ -18,9 +28,9 @@ export default {
 <template>
   <div>
     <div :class="['cardHeader', 'header']">
-      <h2 :class="['cardHeaderTitle']">Loan {{ this.index }}</h2>
+      <h2 :class="['cardHeaderTitle']">{{ title }}</h2>
       <div :class="['cardheaderSubSection']">
-        <button
+        <button v-if="loan.id !== constants.TOTALS"
           :class="['exitButton', 'bold']"
           @click='this.deleteLoan(this.loan.id)'
         >
@@ -51,7 +61,7 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <div :class="['cardFooterButtonContainer']">
+      <div v-if="loan.id !== constants.TOTALS" :class="['cardFooterButtonContainer']">
         <button @click='this.editLoan(this.loan.id)'>Edit</button>
       </div>
       <div :class="['cardFooterButtonContainer']">

@@ -222,7 +222,7 @@ export default {
       });
       return charts;
     },
-    totalsAsLoan() {
+    totalsAsALoan() {
       return {
         id: constants.TOTALS,
         principal: this.globalPrincipal,
@@ -364,7 +364,7 @@ export default {
     getLoan(id) {
       return id !== constants.TOTALS ? this.loans.find(
         (loan) => loan.id === id,
-      ) : this.totalsAsLoan;
+      ) : this.totalsAsALoan;
     },
     getLoanIndex(id) {
       return this.loans.findIndex((loan) => loan.id === id) + 1;
@@ -515,14 +515,9 @@ export default {
         <LoansPanel
           v-if="loans.length"
           :class="['mgmtPanelBody']"
-          :deleteLoan='deleteLoan'
-          :editLoan='editLoan'
-          :effectiveInterestRate='globalEffectiveInterestRate'
-          :globalMinPayment='globalMinPayment'
           :loans='loans'
-          :totalPrincipal='globalPrincipal'
+          :totalsAsALoan='totalsAsALoan'
           :viewLoan='viewLoan'
-          :viewTotals='viewTotals'
         />
       </div>
       <div :class="['mgmtPanel']">
@@ -576,7 +571,7 @@ export default {
             :amortizationSchedulesChart='
               amortizationSchedulesChartPerLoan.totals
             '
-            :loan='totalsAsLoan'
+            :loan='totalsAsALoan'
             :monthlyBudgets='[getBudget(currentBudgetId)]'
             :paymentSummaries='paymentSummaries.totals'
             :type='constants.BUDGET'
