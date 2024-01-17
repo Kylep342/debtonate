@@ -351,7 +351,7 @@ export default {
     },
     getLoan(id) {
       return id !== constants.TOTALS ? this.loans.find(
-        (loan) => loan.id === id
+        (loan) => loan.id === id,
       ) : this.totalsAsLoan;
     },
     getLoanIndex(id) {
@@ -409,11 +409,7 @@ export default {
       this.roundUp = false;
       this.showBudgetDetailsPanel = false;
       this.showLoanDetailsPanel = false;
-<<<<<<< HEAD
-      this.showTotalsDetailsPanel = false;
-=======
       // this.showTotalsDetailsPanel = false;
->>>>>>> main
       this.snowballSort = true;
       this.termInYears = null;
     },
