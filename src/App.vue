@@ -12,14 +12,12 @@ import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
 
-// TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
-
-// TODO: Add a type enum for the Details Panel (BUDGET|LOAN)
 
 export default {
   data() {
     return {
       constants,
+      budget: null,
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -32,7 +30,9 @@ export default {
       createBudgetFormActive: false,
       createLoanFormActive: false,
       currentLoanId: null,
+      interestRate: null,
       loans: [],
+      principal: null,
       optionsFormActive: false,
       reducePayments: false,
       roundingScale: 100,
@@ -40,17 +40,10 @@ export default {
       showBudgetDetailsPanel: false,
       showLoanDetailsPanel: false,
       snowballSort: false,
+      termInYears: null,
     };
   },
   computed: {
-    createLoanFormTitle() {
-      return this.currentLoanId
-        ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}`
-        : 'Creating a Loan';
-    },
-    createLoanButtonText() {
-      return this.currentLoanId ? 'Save' : 'Create';
-    },
     toggleReducePaymentsButtonText() {
       return this.reducePayments ? 'Turn Off' : 'Turn On';
     },
@@ -98,6 +91,22 @@ export default {
       return (
         !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
       );
+    },
+    createLoanButtonText() {
+      return this.currentLoanId ? 'Save' : 'Create';
+    },
+    createLoanFormTitle() {
+      return this.currentLoanId
+        ? `Editing Loan ${this.getLoanIndex(this.currentLoanId)}`
+        : 'Creating a Loan';
+    },
+    createBudgetButtonText() {
+      return this.currentBudgetId ? 'Save' : 'Create';
+    },
+    createBudgetFormTitle() {
+      return this.currentBudgetId
+        ? `Editing Budget ${this.getBudgetIndex(this.currentBudgetId)}`
+        : 'Creating a Budget';
     },
     monthlyBudgets() {
       const budgets = this.budgets.map((budget) => ({
@@ -337,6 +346,9 @@ export default {
       this.loans.push(newLoan);
       this.sortLoans();
       this.createLoanFormActive = false;
+      this.interestRate = null;
+      this.principal = null;
+      this.termInYears = null;
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id !== id);
@@ -377,11 +389,18 @@ export default {
       this.budgets.push(proposedBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
+      this.budget = null;
     },
     deleteBudget(budget) {
       this.budgets = this.budgets.filter(
         (addedBudget) => addedBudget !== parseFloat(budget.relative),
       );
+    },
+    editBudget(id) {
+      this.currentBudgetId = id;
+      const budget = this.getBudget(id);
+      this.budget = budget.relative;
+      this.createBudgetFormActive = true;
     },
     getBudget(id) {
       return this.monthlyBudgets.find((budget) => budget.id === id);
@@ -467,6 +486,9 @@ export default {
     />
     <BudgetForm
       v-if='createBudgetFormActive'
+      :createButtonText='createBudgetButtonText'
+      :budget='currentBudgetId ? getBudget(currentBudgetId) : null'
+      :title='createBudgetFormTitle'
       @create-budget='createBudget'
       @exit-create-budget='exitCreateBudgetForm'
     />
@@ -516,6 +538,7 @@ export default {
           :budgets='monthlyBudgets'
           :budgetsTotals='totalsByBudget'
           :deleteBudget='deleteBudget'
+          :editBudget='editBudget'
           :viewBudget='viewBudget'
         />
       </div>
