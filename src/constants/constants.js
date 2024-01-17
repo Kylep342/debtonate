@@ -1,7 +1,7 @@
 // file for constants
 
-const BUDGET = 'BUDGET';
-const LOAN = 'LOAN';
+const BUDGET = 'Budget';
+const LOAN = 'Loan';
 const TOTALS = 'totals';
 
 export default Object.freeze({
