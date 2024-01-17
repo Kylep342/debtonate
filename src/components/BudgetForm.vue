@@ -1,24 +1,25 @@
 <script>
 export default {
+  props: ['title', 'createButtonText', 'budget'],
+  emits: ['create-budget', 'exit-create-budget'],
   data() {
     return {
-      budget: null,
+      amount: this.budget?.relative || null,
     };
   },
-  emits: ['create-budget', 'exit-create-budget'],
   computed: {
     createButtonEnabled() {
       return (
-        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
+        !Number.isNaN(parseFloat(this.amount)) && parseFloat(this.amount) > 0
       );
     },
   },
   methods: {
     clearCreate() {
-      this.budget = null;
+      this.amount = null;
     },
     emitCreate() {
-      this.$emit('create-budget', parseFloat(this.budget));
+      this.$emit('create-budget', parseFloat(this.amount));
       this.clearCreate();
     },
     emitExit() {
@@ -32,13 +33,13 @@ export default {
 <template>
   <base-modal>
     <template #header>
-      <h2>Creating a Budget</h2>
+      <h2>{{ title }}</h2>
     </template>
     <template #body>
       <div :class="['formInputs']">
         <div :class="['formInputWrapper']">
           <label>Budget</label>
-          <input v-model='budget' type='number' label='Budget' />
+          <input v-model='amount' type='number' label='Budget' />
         </div>
       </div>
     </template>
@@ -47,7 +48,7 @@ export default {
         @click='emitCreate'
         :class='{ createButton: true }'
         :disabled='!createButtonEnabled'
-        >Create</base-button
+        >{{ createButtonText }}</base-button
       >
       <base-button @click='emitExit' :class='{ createButton: true }'
         >Close</base-button
