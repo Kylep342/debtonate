@@ -1,4 +1,6 @@
 <script>
+import constants from '../constants/constants';
+
 export default {
   props: [
     'budget',
@@ -19,7 +21,7 @@ export default {
       return this.budgetTotals.amortizationSchedule.length;
     },
     budgetTitle() {
-      return this.budget.id === 'default' ? 'Minimum' : `Budget ${this.index}`;
+      return this.budget.id === constants.DEFAULT ? 'Minimum' : `Budget ${this.index}`;
     },
     budgetTotalInterest() {
       return `$${this.budgetTotals.lifetimeInterest.toFixed(2)}`;
@@ -33,7 +35,7 @@ export default {
     <div :class="['cardHeader', 'header']">
       <h2 :class="['cardHeaderTitle']">{{ budgetTitle }}</h2>
       <div :class="['cardheaderSubSection']">
-        <button v-if="budget.id !== 'default'"
+        <button v-if="budget.id !== constants.DEFAULT"
           :class="['exitButton', 'bold']"
           @click='this.deleteBudget(this.budget)'
         >
@@ -49,7 +51,7 @@ export default {
             <b>{{ budgetAmount }}</b>
           </td>
         </tr>
-        <tr v-if="this.budget.id !== 'default'">
+        <tr v-if="this.budget.id !== constants.DEFAULT">
           <td :class="['textLeft']">Extra</td>
           <td :class="['textRight']">
             <b>{{ budgetExtra }}</b>
@@ -70,7 +72,7 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <div v-if="this.budget.id !== 'default'" :class="['cardFooterButtonContainer']">
+      <div v-if="this.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
         <button @click='this.editBudget(this.budget.id)'>Edit</button>
       </div>
       <div :class="['cardFooterButtonContainer']">
