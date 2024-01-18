@@ -2,12 +2,12 @@
 import constants from '../constants/constants';
 
 export default {
+  props: ['deleteLoan', 'editLoan', 'index', 'loan', 'viewLoan'],
   data() {
     return {
       constants,
     };
   },
-  props: ['deleteLoan', 'editLoan', 'index', 'loan', 'viewLoan'],
   computed: {
     renderedMinPayment() {
       return `$${this.loan.minPayment.toFixed(2)}/mo`;

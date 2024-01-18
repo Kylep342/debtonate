@@ -12,6 +12,11 @@ export default {
     'type',
   ],
   emits: ['exit-details-panel'],
+  data() {
+    return {
+      constants,
+    };
+  },
   components: { AmortizationTable },
   computed: {
     cardTitle() {
