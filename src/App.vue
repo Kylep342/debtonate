@@ -115,7 +115,7 @@ export default {
         absolute: budget + this.globalMinPayment,
       }));
       budgets.push({
-        id: 'default',
+        id: constants.DEFAULT,
         relative: 0,
         absolute: this.globalMinPayment,
       });
