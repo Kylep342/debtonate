@@ -10,6 +10,11 @@ export default {
     'editBudget',
     'viewBudget',
   ],
+  data() {
+    return {
+      constants,
+    };
+  },
   components: { BudgetCard },
   computed: {
     defaultBudgetIndex() {

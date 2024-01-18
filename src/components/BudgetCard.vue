@@ -10,6 +10,11 @@ export default {
     'index',
     'viewBudget',
   ],
+  data() {
+    return {
+      constants,
+    };
+  },
   computed: {
     budgetAmount() {
       return `$${this.budget.absolute.toFixed(2)}/mo`;
