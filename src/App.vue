@@ -127,7 +127,7 @@ export default {
         paymentAmount: budget.relative,
         paymentSchedule: moneyfunx.payLoans(this.loans, budget.absolute, this.reducePayments),
         label:
-          budget.id === 'default'
+          budget.id === constants.DEFAULT
             ? `$${this.globalMinPayment.toFixed(2)}/mo`
             : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(
               2,
