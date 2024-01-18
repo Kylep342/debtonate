@@ -515,6 +515,8 @@ export default {
         <LoansPanel
           v-if="loans.length"
           :class="['mgmtPanelBody']"
+          :deleteLoan='deleteLoan'
+          :editLoan='editLoan'
           :loans='loans'
           :totalsAsALoan='totalsAsALoan'
           :viewLoan='viewLoan'
