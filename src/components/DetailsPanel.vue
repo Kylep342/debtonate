@@ -19,22 +19,46 @@ export default {
   },
   components: { AmortizationTable },
   computed: {
-    cardTitle() {
+    budgetTitle() {
       return (
-        // leave trailing whitespace in strings for formatting
-        `${this.type} Details - ${
+        `${
+          this.monthlyBudgets[0].id === constants.DEFAULT
+            ? 'Minimum Budget '
+            : `Budget ${this.index}`} `
+        + `$${this.renderedBudgetAbsoluteAmount}/mo `
+        + `(+$${this.renderedBudgetRelativeAmount}/mo)`
+      );
+    },
+    cardTitle() {
+      return (`${this.type} Details - ${this.type === constants.BUDGET ? this.budgetTitle : this.loanTitle}`);
+    },
+    loanTitle() {
+      return (
+        `${
           this.loan.id === constants.TOTALS
             ? 'All Loans '
             : `Loan ${this.index}`} `
-        + `($${this.loan.principal.toFixed(2)} `
-        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
+        + `($${this.renderedLoanPrincipal} `
+        + `@ ${this.renderedLoanAnnualRate}%)`
       );
+    },
+    renderedBudgetAbsoluteAmount() {
+      return this.monthlyBudgets[0].absolute.toFixed(2);
+    },
+    renderedBudgetRelativeAmount() {
+      return this.monthlyBudgets[0].relative.toFixed(2);
+    },
+    renderedLoanAnnualRate() {
+      return (this.loan.annualRate * 100).toFixed(2);
+    },
+    renderedLoanPrincipal() {
+      return this.loan.principal.toFixed(2);
     },
   },
   methods: {
     buildTitle(loan, monthlyBudget) {
       return (
-        `${loan.id === constants.TOTALS ? 'All Loans' : `Loan ${this.index}`} `
+        `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${this.index}`} `
         + `($${loan.principal.toFixed(2)} `
         + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
         + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
