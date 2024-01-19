@@ -12,7 +12,6 @@ import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
 
-
 export default {
   data() {
     return {
@@ -133,10 +132,6 @@ export default {
               2,
             )}/mo)`,
       }));
-    },
-    // TODO
-    balancesOverTime() {
-      return 5;
     },
     paymentSummaries() {
       const balances = {
