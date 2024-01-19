@@ -9,6 +9,7 @@ export default {
     'loan',
     'monthlyBudgets',
     'paymentSummaries',
+    'title',
     'type',
   ],
   emits: ['exit-details-panel'],
@@ -19,29 +20,6 @@ export default {
   },
   components: { AmortizationTable },
   computed: {
-    budgetTitle() {
-      return (
-        `${
-          this.monthlyBudgets[0].id === constants.DEFAULT
-            ? 'Minimum Budget '
-            : `Budget ${this.index}`} `
-        + `$${this.renderedBudgetAbsoluteAmount}/mo `
-        + `(+$${this.renderedBudgetRelativeAmount}/mo)`
-      );
-    },
-    cardTitle() {
-      return (`${this.type} Details - ${this.type === constants.BUDGET ? this.budgetTitle : this.loanTitle}`);
-    },
-    loanTitle() {
-      return (
-        `${
-          this.loan.id === constants.TOTALS
-            ? 'All Loans '
-            : `Loan ${this.index}`} `
-        + `($${this.renderedLoanPrincipal} `
-        + `@ ${this.renderedLoanAnnualRate}%)`
-      );
-    },
     renderedBudgetAbsoluteAmount() {
       return this.monthlyBudgets[0].absolute.toFixed(2);
     },
@@ -77,7 +55,7 @@ export default {
 <template>
   <base-modal>
     <template #header>
-      <h2>{{ cardTitle }}</h2>
+      <h2>{{ this.title }}</h2>
     </template>
     <template #body>
       <div>

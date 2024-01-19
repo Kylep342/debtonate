@@ -403,6 +403,26 @@ export default {
       this.showBudgetDetailsPanel = false;
       this.currentBudgetId = null;
     },
+    buildBudgetDetailsTitle(monthlyBudget) {
+      return (
+        `Budget Details - ${
+          monthlyBudget.id === constants.DEFAULT
+            ? 'Minimum Budget '
+            : `Budget ${this.getBudgetIndex(monthlyBudget.id)}`} `
+        + `$${monthlyBudget.absolute.toFixed(2)}/mo `
+        + `(+$${monthlyBudget.relative.toFixed(2)}/mo)`
+      );
+    },
+    buildLoanDetailsTitle(loan) {
+      return (
+        `Loan Details - ${
+          loan.id === constants.TOTALS
+            ? 'All Loans '
+            : `Loan ${this.getLoanIndex(loan.id)}`} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
+      );
+    },
     clearState() {
       this.budgets = [];
       this.createBudgetFormActive = false;
@@ -552,6 +572,7 @@ export default {
             :loan='getLoan(currentLoanId)'
             :monthlyBudgets='monthlyBudgets'
             :paymentSummaries='paymentSummaries[currentLoanId]'
+            :title='buildLoanDetailsTitle(getLoan(currentLoanId))'
             :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
@@ -565,6 +586,7 @@ export default {
             :loan='totalsAsALoan'
             :monthlyBudgets='[getBudget(currentBudgetId)]'
             :paymentSummaries='paymentSummaries.totals'
+            :title='buildBudgetDetailsTitle(getBudget(currentBudgetId))'
             :type='constants.BUDGET'
             @exit-details-panel='unviewBudget'
           />
