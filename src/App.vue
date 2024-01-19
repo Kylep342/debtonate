@@ -33,6 +33,7 @@ export default {
       loans: [],
       principal: null,
       optionsFormActive: false,
+      periodsAsDates: false,
       reducePayments: false,
       roundingScale: 100,
       roundUp: false,
@@ -43,12 +44,6 @@ export default {
     };
   },
   computed: {
-    toggleReducePaymentsButtonText() {
-      return this.reducePayments ? 'Turn Off' : 'Turn On';
-    },
-    toggleRoundingButtonText() {
-      return this.roundUp ? 'Disable' : 'Enable';
-    },
     rawGlobalMinPayment() {
       return this.loans.reduce(
         (previousValue, currentValue) => previousValue + currentValue.minPayment,
@@ -298,6 +293,9 @@ export default {
     exitOptionsForm() {
       this.optionsFormActive = false;
     },
+    togglePeriodsAsDates() {
+      this.periodsAsDates = !this.periodsAsDates;
+    },
     toggleReducePayments() {
       this.reducePayments = !this.reducePayments;
     },
@@ -489,14 +487,16 @@ export default {
     />
     <OptionsForm
       v-if='optionsFormActive'
+      :periodsAsDates='periodsAsDates'
       :reducePayments='reducePayments'
       :roundUp='roundUp'
       :snowballSort='snowballSort'
       @exit-options-form='exitOptionsForm'
       @toggle-avalanche-sort='toggleAvalancheSort'
-      @toggle-snowball-sort='toggleSnowballSort'
+      @toggle-periods-as-dates='togglePeriodsAsDates'
       @toggle-reduce-payments='toggleReducePayments'
       @toggle-round-up='toggleRounding'
+      @toggle-snowball-sort='toggleSnowballSort'
     />
     <br />
     <div :class="['appBody']">

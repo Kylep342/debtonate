@@ -1,27 +1,34 @@
 <script>
 export default {
-  props: ['snowballSort', 'reducePayments', 'roundUp'],
+  props: ['periodsAsDates', 'reducePayments', 'roundUp', 'snowballSort'],
   emits: [
+    'exit-options-form',
     'toggle-avalanche-sort',
-    'toggle-snowball-sort',
+    'toggle-periods-as-dates',
     'toggle-reduce-payments',
     'toggle-round-up',
-    'exit-options-form',
+    'toggle-snowball-sort',
   ],
   computed: {
+    periodsAsDatesButtonText() {
+      return this.periodsAsDates ? 'Turn Off' : 'Turn On';
+    },
     reducePaymentsButtonText() {
       return this.reducePayments ? 'Turn Off' : 'Turn On';
     },
     roundingButtonText() {
-      return this.roundUp ? 'Disable' : 'Enable';
+      return this.roundUp ? 'Turn Off' : 'Turn On';
     },
   },
   methods: {
+    emitExit() {
+      this.$emit('exit-options-form');
+    },
     emitAvalancheSort() {
       this.$emit('toggle-avalanche-sort');
     },
-    emitSnowballSort() {
-      this.$emit('toggle-snowball-sort');
+    emitTogglePeriodsAsDates() {
+      this.$emit('toggle-periods-as-dates');
     },
     emitToggleReducePayments() {
       this.$emit('toggle-reduce-payments');
@@ -29,8 +36,8 @@ export default {
     emitToggleRoundUp() {
       this.$emit('toggle-round-up');
     },
-    emitExit() {
-      this.$emit('exit-options-form');
+    emitSnowballSort() {
+      this.$emit('toggle-snowball-sort');
     },
   },
 };
@@ -62,7 +69,15 @@ export default {
           <div :class="['formInputWrapper']">
             <h3>Rounding</h3>
             <button @click='emitToggleRoundUp'>
-              {{ roundingButtonText }} Rounding
+              {{ roundingButtonText }}
+            </button>
+          </div>
+        </base-card>
+        <base-card>
+          <div :class="['formInputWrapper']">
+            <h3>Periods As Dates</h3>
+            <button @click='emitTogglePeriodsAsDates'>
+              {{ periodsAsDatesButtonText }}
             </button>
           </div>
         </base-card>
