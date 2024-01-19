@@ -16,7 +16,6 @@ export default {
   data() {
     return {
       constants,
-      budget: null,
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -28,6 +27,7 @@ export default {
       ],
       createBudgetFormActive: false,
       createLoanFormActive: false,
+      currentBudgetId: null,
       currentLoanId: null,
       interestRate: null,
       loans: [],
@@ -80,11 +80,6 @@ export default {
     },
     globalPrincipal() {
       return this.loans.reduce((accumulator, loan) => accumulator + loan.principal, 0);
-    },
-    createBudgetButtonEnabled() {
-      return (
-        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
-      );
     },
     createLoanButtonText() {
       return this.currentLoanId ? 'Save' : 'Create';
@@ -285,6 +280,7 @@ export default {
     },
     exitCreateBudgetForm() {
       this.createBudgetFormActive = false;
+      this.currentBudgetId = null;
     },
     exitCreateLoanForm() {
       this.createLoanFormActive = false;
@@ -292,6 +288,9 @@ export default {
     },
     exitOptionsForm() {
       this.optionsFormActive = false;
+    },
+    sortLoans() {
+      return this.snowballSort ? this.snowball() : this.avalanche();
     },
     togglePeriodsAsDates() {
       this.periodsAsDates = !this.periodsAsDates;
@@ -301,9 +300,6 @@ export default {
     },
     toggleRounding() {
       this.roundUp = !this.roundUp;
-    },
-    sortLoans() {
-      return this.snowballSort ? this.snowball() : this.avalanche();
     },
     toggleAvalancheSort() {
       this.snowballSort = false;
@@ -355,12 +351,15 @@ export default {
       this.createLoanFormActive = true;
     },
     getLoan(id) {
-      return id !== constants.TOTALS ? this.loans.find(
-        (loan) => loan.id === id,
-      ) : this.totalsAsALoan;
+      return id !== constants.TOTALS
+        ? this.loans.find((loan) => loan.id === id)
+        : this.totalsAsALoan;
     },
     getLoanIndex(id) {
-      return this.loans.findIndex((loan) => loan.id === id) + 1;
+      // return 0 for index of Totals As A Loan
+      return id !== constants.TOTALS
+        ? this.loans.findIndex((loan) => loan.id === id) + 1
+        : 0;
     },
     viewLoan(id) {
       this.currentLoanId = id;
@@ -370,29 +369,24 @@ export default {
       this.showLoanDetailsPanel = false;
       this.currentLoanId = null;
     },
-    viewTotals() {
-      this.showTotalsDetailsPanel = true;
-    },
-    unviewTotals() {
-      this.showTotalsDetailsPanel = false;
-    },
-    // TODO: enhance
     createBudget(proposedBudget) {
-      this.budgets = this.budgets.filter((budget) => budget !== proposedBudget);
+      if (this.currentBudgetId) {
+        this.deleteBudget(this.currentBudgetId);
+        this.currentBudgetId = null;
+      }
+
       this.budgets.push(proposedBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
-      this.budget = null;
     },
-    deleteBudget(budget) {
-      this.budgets = this.budgets.filter(
-        (addedBudget) => addedBudget !== parseFloat(budget.relative),
+    deleteBudget(id) {
+      const monthlyBudget = this.monthlyBudgets.find(
+        (budget) => budget.id === id,
       );
+      this.budgets = this.budgets.filter((budget) => budget !== monthlyBudget.relative);
     },
     editBudget(id) {
       this.currentBudgetId = id;
-      const budget = this.getBudget(id);
-      this.budget = budget.relative;
       this.createBudgetFormActive = true;
     },
     getBudget(id) {
@@ -413,6 +407,7 @@ export default {
       this.budgets = [];
       this.createBudgetFormActive = false;
       this.createLoanFormActive = false;
+      this.currentBudgetId = null;
       this.currentLoanId = null;
       this.interestRate = null;
       this.loans = [];
@@ -421,7 +416,6 @@ export default {
       this.roundUp = false;
       this.showBudgetDetailsPanel = false;
       this.showLoanDetailsPanel = false;
-      // this.showTotalsDetailsPanel = false;
       this.snowballSort = true;
       this.termInYears = null;
     },
