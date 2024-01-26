@@ -9,6 +9,7 @@ export default {
     'loan',
     'monthlyBudgets',
     'paymentSummaries',
+    'title',
     'type',
   ],
   emits: ['exit-details-panel'],
@@ -19,22 +20,23 @@ export default {
   },
   components: { AmortizationTable },
   computed: {
-    cardTitle() {
-      return (
-        // leave trailing whitespace in strings for formatting
-        `${this.type} Details - ${
-          this.loan.id === constants.TOTALS
-            ? 'All Loans '
-            : `Loan ${this.index}`} `
-        + `($${this.loan.principal.toFixed(2)} `
-        + `@ ${(this.loan.annualRate * 100).toFixed(2)}%)`
-      );
+    renderedBudgetAbsoluteAmount() {
+      return this.monthlyBudgets[0].absolute.toFixed(2);
+    },
+    renderedBudgetRelativeAmount() {
+      return this.monthlyBudgets[0].relative.toFixed(2);
+    },
+    renderedLoanAnnualRate() {
+      return (this.loan.annualRate * 100).toFixed(2);
+    },
+    renderedLoanPrincipal() {
+      return this.loan.principal.toFixed(2);
     },
   },
   methods: {
     buildTitle(loan, monthlyBudget) {
       return (
-        `${loan.id === constants.TOTALS ? 'All Loans' : `Loan ${this.index}`} `
+        `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${this.index}`} `
         + `($${loan.principal.toFixed(2)} `
         + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
         + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
@@ -53,7 +55,7 @@ export default {
 <template>
   <base-modal>
     <template #header>
-      <h2>{{ cardTitle }}</h2>
+      <h2>{{ this.title }}</h2>
     </template>
     <template #body>
       <div>

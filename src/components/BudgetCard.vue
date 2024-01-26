@@ -42,7 +42,7 @@ export default {
       <div :class="['cardheaderSubSection']">
         <button v-if="budget.id !== constants.DEFAULT"
           :class="['exitButton', 'bold']"
-          @click='this.deleteBudget(this.budget)'
+          @click='this.deleteBudget(this.budget.id)'
         >
           x
         </button>

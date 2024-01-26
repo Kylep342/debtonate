@@ -5,19 +5,17 @@ import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
-// import InterestTable from './components/InterestTable.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
 
-
 export default {
   data() {
     return {
       constants,
-      budget: null,
+      baseDate: new Date(),
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -29,27 +27,20 @@ export default {
       ],
       createBudgetFormActive: false,
       createLoanFormActive: false,
+      currentBudgetId: null,
       currentLoanId: null,
-      interestRate: null,
       loans: [],
-      principal: null,
       optionsFormActive: false,
+      periodsAsDates: false,
       reducePayments: false,
       roundingScale: 100,
       roundUp: false,
       showBudgetDetailsPanel: false,
       showLoanDetailsPanel: false,
       snowballSort: false,
-      termInYears: null,
     };
   },
   computed: {
-    toggleReducePaymentsButtonText() {
-      return this.reducePayments ? 'Turn Off' : 'Turn On';
-    },
-    toggleRoundingButtonText() {
-      return this.roundUp ? 'Disable' : 'Enable';
-    },
     rawGlobalMinPayment() {
       return this.loans.reduce(
         (previousValue, currentValue) => previousValue + currentValue.minPayment,
@@ -73,6 +64,12 @@ export default {
     globalLifetimeInterestPaid() {
       return this.loans.reduce((accumulator, loan) => accumulator + loan.totalInterest, 0);
     },
+    globalMaxPeriods() {
+      return this.loans.reduce(
+        (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
+        0,
+      );
+    },
     globalMaxPeriodsPerYear() {
       return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0);
     },
@@ -87,10 +84,14 @@ export default {
     globalPrincipal() {
       return this.loans.reduce((accumulator, loan) => accumulator + loan.principal, 0);
     },
-    createBudgetButtonEnabled() {
-      return (
-        !Number.isNaN(parseFloat(this.budget)) && parseFloat(this.budget) > 0
-      );
+    periodsAsDatesButtonText() {
+      return this.periodsAsDates ? 'Turn Off' : 'Turn On';
+    },
+    reducePaymentsButtonText() {
+      return this.reducePayments ? 'Turn Off' : 'Turn On';
+    },
+    roundingButtonText() {
+      return this.roundUp ? 'Turn Off' : 'Turn On';
     },
     createLoanButtonText() {
       return this.currentLoanId ? 'Save' : 'Create';
@@ -133,10 +134,6 @@ export default {
               2,
             )}/mo)`,
       }));
-    },
-    // TODO
-    balancesOverTime() {
-      return 5;
     },
     paymentSummaries() {
       const balances = {
@@ -230,7 +227,7 @@ export default {
         periodsPerYear: this.globalMaxPeriodsPerYear,
         termInYears: this.globalMaxTermInYears,
         periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
-        periods: this.periodsPerYear * this.termInYears,
+        periods: this.globalMaxPeriods,
         minPayment: this.globalMinPayment,
         totalInterest: this.globalLifetimeInterestPaid,
       };
@@ -282,7 +279,6 @@ export default {
       };
     },
   },
-  watch: {},
   methods: {
     openCreateBudgetForm() {
       this.createBudgetFormActive = true;
@@ -295,6 +291,7 @@ export default {
     },
     exitCreateBudgetForm() {
       this.createBudgetFormActive = false;
+      this.currentBudgetId = null;
     },
     exitCreateLoanForm() {
       this.createLoanFormActive = false;
@@ -303,14 +300,17 @@ export default {
     exitOptionsForm() {
       this.optionsFormActive = false;
     },
+    sortLoans() {
+      return this.snowballSort ? this.snowball() : this.avalanche();
+    },
+    togglePeriodsAsDates() {
+      this.periodsAsDates = !this.periodsAsDates;
+    },
     toggleReducePayments() {
       this.reducePayments = !this.reducePayments;
     },
     toggleRounding() {
       this.roundUp = !this.roundUp;
-    },
-    sortLoans() {
-      return this.snowballSort ? this.snowball() : this.avalanche();
     },
     toggleAvalancheSort() {
       this.snowballSort = false;
@@ -346,28 +346,24 @@ export default {
       this.loans.push(newLoan);
       this.sortLoans();
       this.createLoanFormActive = false;
-      this.interestRate = null;
-      this.principal = null;
-      this.termInYears = null;
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id !== id);
     },
     editLoan(id) {
       this.currentLoanId = id;
-      const loan = this.getLoan(this.currentLoanId);
-      this.principal = loan.principal;
-      this.interestRate = loan.annualRate * 100;
-      this.termInYears = loan.termInYears;
       this.createLoanFormActive = true;
     },
     getLoan(id) {
-      return id !== constants.TOTALS ? this.loans.find(
-        (loan) => loan.id === id,
-      ) : this.totalsAsALoan;
+      return id !== constants.TOTALS
+        ? this.loans.find((loan) => loan.id === id)
+        : this.totalsAsALoan;
     },
     getLoanIndex(id) {
-      return this.loans.findIndex((loan) => loan.id === id) + 1;
+      // return 0 for index of Totals As A Loan
+      return id !== constants.TOTALS
+        ? this.loans.findIndex((loan) => loan.id === id) + 1
+        : 0;
     },
     viewLoan(id) {
       this.currentLoanId = id;
@@ -377,29 +373,24 @@ export default {
       this.showLoanDetailsPanel = false;
       this.currentLoanId = null;
     },
-    viewTotals() {
-      this.showTotalsDetailsPanel = true;
-    },
-    unviewTotals() {
-      this.showTotalsDetailsPanel = false;
-    },
-    // TODO: enhance
     createBudget(proposedBudget) {
-      this.budgets = this.budgets.filter((budget) => budget !== proposedBudget);
+      if (this.currentBudgetId) {
+        this.deleteBudget(this.currentBudgetId);
+        this.currentBudgetId = null;
+      }
+
       this.budgets.push(proposedBudget);
       this.budgets.sort((a, b) => b - a);
       this.createBudgetFormActive = false;
-      this.budget = null;
     },
-    deleteBudget(budget) {
-      this.budgets = this.budgets.filter(
-        (addedBudget) => addedBudget !== parseFloat(budget.relative),
+    deleteBudget(id) {
+      const monthlyBudget = this.monthlyBudgets.find(
+        (budget) => budget.id === id,
       );
+      this.budgets = this.budgets.filter((budget) => budget !== monthlyBudget.relative);
     },
     editBudget(id) {
       this.currentBudgetId = id;
-      const budget = this.getBudget(id);
-      this.budget = budget.relative;
       this.createBudgetFormActive = true;
     },
     getBudget(id) {
@@ -416,21 +407,38 @@ export default {
       this.showBudgetDetailsPanel = false;
       this.currentBudgetId = null;
     },
+    buildBudgetDetailsTitle(monthlyBudget) {
+      return (
+        `Budget Details - ${
+          monthlyBudget.id === constants.DEFAULT
+            ? 'Minimum Budget '
+            : `Budget ${this.getBudgetIndex(monthlyBudget.id)}`} `
+        + `$${monthlyBudget.absolute.toFixed(2)}/mo `
+        + `(+$${monthlyBudget.relative.toFixed(2)}/mo)`
+      );
+    },
+    buildLoanDetailsTitle(loan) {
+      return (
+        `Loan Details - ${
+          loan.id === constants.TOTALS
+            ? 'All Loans '
+            : `Loan ${this.getLoanIndex(loan.id)}`} `
+        + `($${loan.principal.toFixed(2)} `
+        + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
+      );
+    },
     clearState() {
       this.budgets = [];
       this.createBudgetFormActive = false;
       this.createLoanFormActive = false;
+      this.currentBudgetId = null;
       this.currentLoanId = null;
-      this.interestRate = null;
       this.loans = [];
-      this.principal = null;
       this.reducePayments = false;
       this.roundUp = false;
       this.showBudgetDetailsPanel = false;
       this.showLoanDetailsPanel = false;
-      // this.showTotalsDetailsPanel = false;
       this.snowballSort = true;
-      this.termInYears = null;
     },
     loadState() {
       this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
@@ -442,6 +450,7 @@ export default {
           loan.termInYears,
         ),
       );
+      this.periodsAsDates = JSON.parse(localStorage.getItem('debtonate.periodsAsDates'));
       this.reducePayments = JSON.parse(localStorage.getItem('debtonate.reducePayments'));
       this.roundUp = JSON.parse(localStorage.getItem('debtonate.roundUp'));
       this.snowballSort = JSON.parse(localStorage.getItem('debtonate.snowballSort'));
@@ -449,6 +458,7 @@ export default {
     saveState() {
       localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
       localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
+      localStorage.setItem('debtonate.periodsAsDates', JSON.stringify(this.periodsAsDates));
       localStorage.setItem('debtonate.reducePayments', JSON.stringify(this.reducePayments));
       localStorage.setItem('debtonate.roundUp', JSON.stringify(this.roundUp));
       localStorage.setItem('debtonate.snowballSort', JSON.stringify(this.snowballSort));
@@ -459,7 +469,6 @@ export default {
     BudgetsPanel,
     DetailsPanel,
     HeaderBar,
-    // InterestTable,
     LoanForm,
     LoansPanel,
     ManagementPanel,
@@ -492,16 +501,18 @@ export default {
       @create-budget='createBudget'
       @exit-create-budget='exitCreateBudgetForm'
     />
+    <!-- TODO: Make the ButtonText attributes computed in the component itself -->
     <OptionsForm
       v-if='optionsFormActive'
-      :reducePayments='reducePayments'
-      :roundUp='roundUp'
-      :snowballSort='snowballSort'
+      :periodsAsDatesButtonText='periodsAsDatesButtonText'
+      :reducePaymentsButtonText='reducePaymentsButtonText'
+      :roundingButtonText='roundingButtonText'
       @exit-options-form='exitOptionsForm'
       @toggle-avalanche-sort='toggleAvalancheSort'
-      @toggle-snowball-sort='toggleSnowballSort'
+      @toggle-periods-as-dates='togglePeriodsAsDates'
       @toggle-reduce-payments='toggleReducePayments'
       @toggle-round-up='toggleRounding'
+      @toggle-snowball-sort='toggleSnowballSort'
     />
     <br />
     <div :class="['appBody']">
@@ -539,17 +550,12 @@ export default {
           :viewBudget='viewBudget'
         />
       </div>
-      <div id='todo3' v-show='loans.length' :class="['presPanel']">
+      <div id='todo' v-if='loans.length' :class="['presPanel']">
         <div :class="['panel']">
           <div :class="['panelHeader', 'header']">
             <h2>Repayment Information</h2>
           </div>
           <div id='lifetimeInterestTotals'>
-            <!-- <InterestTable
-              :globalMinPayment='globalMinPayment'
-              :loans='loans'
-              :paymentSchedules='paymentSchedules'
-            /> -->
             <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
           </div>
         </div>
@@ -563,6 +569,7 @@ export default {
             :loan='getLoan(currentLoanId)'
             :monthlyBudgets='monthlyBudgets'
             :paymentSummaries='paymentSummaries[currentLoanId]'
+            :title='buildLoanDetailsTitle(getLoan(currentLoanId))'
             :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
@@ -576,6 +583,7 @@ export default {
             :loan='totalsAsALoan'
             :monthlyBudgets='[getBudget(currentBudgetId)]'
             :paymentSummaries='paymentSummaries.totals'
+            :title='buildBudgetDetailsTitle(getBudget(currentBudgetId))'
             :type='constants.BUDGET'
             @exit-details-panel='unviewBudget'
           />
