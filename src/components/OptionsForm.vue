@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ['periodsAsDates', 'reducePayments', 'roundUp', 'snowballSort'],
+  props: ['periodsAsDatesButtonText', 'reducePaymentsButtonText', 'roundingButtonText'],
   emits: [
     'exit-options-form',
     'toggle-avalanche-sort',
@@ -9,17 +9,6 @@ export default {
     'toggle-round-up',
     'toggle-snowball-sort',
   ],
-  computed: {
-    periodsAsDatesButtonText() {
-      return this.periodsAsDates ? 'Turn Off' : 'Turn On';
-    },
-    reducePaymentsButtonText() {
-      return this.reducePayments ? 'Turn Off' : 'Turn On';
-    },
-    roundingButtonText() {
-      return this.roundUp ? 'Turn Off' : 'Turn On';
-    },
-  },
   methods: {
     emitExit() {
       this.$emit('exit-options-form');

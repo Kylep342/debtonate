@@ -5,7 +5,6 @@ import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
-// import InterestTable from './components/InterestTable.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import ManagementPanel from './components/ManagementPanel.vue';
@@ -16,6 +15,7 @@ export default {
   data() {
     return {
       constants,
+      baseDate: new Date(),
       budgets: [],
       colors: [
         '#DAF7A6',
@@ -29,9 +29,7 @@ export default {
       createLoanFormActive: false,
       currentBudgetId: null,
       currentLoanId: null,
-      interestRate: null,
       loans: [],
-      principal: null,
       optionsFormActive: false,
       periodsAsDates: false,
       reducePayments: false,
@@ -40,7 +38,6 @@ export default {
       showBudgetDetailsPanel: false,
       showLoanDetailsPanel: false,
       snowballSort: false,
-      termInYears: null,
     };
   },
   computed: {
@@ -67,6 +64,12 @@ export default {
     globalLifetimeInterestPaid() {
       return this.loans.reduce((accumulator, loan) => accumulator + loan.totalInterest, 0);
     },
+    globalMaxPeriods() {
+      return this.loans.reduce(
+        (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
+        0,
+      );
+    },
     globalMaxPeriodsPerYear() {
       return this.loans.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0);
     },
@@ -80,6 +83,15 @@ export default {
     },
     globalPrincipal() {
       return this.loans.reduce((accumulator, loan) => accumulator + loan.principal, 0);
+    },
+    periodsAsDatesButtonText() {
+      return this.periodsAsDates ? 'Turn Off' : 'Turn On';
+    },
+    reducePaymentsButtonText() {
+      return this.reducePayments ? 'Turn Off' : 'Turn On';
+    },
+    roundingButtonText() {
+      return this.roundUp ? 'Turn Off' : 'Turn On';
     },
     createLoanButtonText() {
       return this.currentLoanId ? 'Save' : 'Create';
@@ -215,7 +227,7 @@ export default {
         periodsPerYear: this.globalMaxPeriodsPerYear,
         termInYears: this.globalMaxTermInYears,
         periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
-        periods: this.periodsPerYear * this.termInYears,
+        periods: this.globalMaxPeriods,
         minPayment: this.globalMinPayment,
         totalInterest: this.globalLifetimeInterestPaid,
       };
@@ -267,7 +279,6 @@ export default {
       };
     },
   },
-  watch: {},
   methods: {
     openCreateBudgetForm() {
       this.createBudgetFormActive = true;
@@ -335,19 +346,12 @@ export default {
       this.loans.push(newLoan);
       this.sortLoans();
       this.createLoanFormActive = false;
-      this.interestRate = null;
-      this.principal = null;
-      this.termInYears = null;
     },
     deleteLoan(id) {
       this.loans = this.loans.filter((loan) => loan.id !== id);
     },
     editLoan(id) {
       this.currentLoanId = id;
-      const loan = this.getLoan(this.currentLoanId);
-      this.principal = loan.principal;
-      this.interestRate = loan.annualRate * 100;
-      this.termInYears = loan.termInYears;
       this.createLoanFormActive = true;
     },
     getLoan(id) {
@@ -429,15 +433,12 @@ export default {
       this.createLoanFormActive = false;
       this.currentBudgetId = null;
       this.currentLoanId = null;
-      this.interestRate = null;
       this.loans = [];
-      this.principal = null;
       this.reducePayments = false;
       this.roundUp = false;
       this.showBudgetDetailsPanel = false;
       this.showLoanDetailsPanel = false;
       this.snowballSort = true;
-      this.termInYears = null;
     },
     loadState() {
       this.budgets = JSON.parse(localStorage.getItem('debtonate.budgets'));
@@ -449,6 +450,7 @@ export default {
           loan.termInYears,
         ),
       );
+      this.periodsAsDates = JSON.parse(localStorage.getItem('debtonate.periodsAsDates'));
       this.reducePayments = JSON.parse(localStorage.getItem('debtonate.reducePayments'));
       this.roundUp = JSON.parse(localStorage.getItem('debtonate.roundUp'));
       this.snowballSort = JSON.parse(localStorage.getItem('debtonate.snowballSort'));
@@ -456,6 +458,7 @@ export default {
     saveState() {
       localStorage.setItem('debtonate.budgets', JSON.stringify(this.budgets));
       localStorage.setItem('debtonate.loans', JSON.stringify(this.loans));
+      localStorage.setItem('debtonate.periodsAsDates', JSON.stringify(this.periodsAsDates));
       localStorage.setItem('debtonate.reducePayments', JSON.stringify(this.reducePayments));
       localStorage.setItem('debtonate.roundUp', JSON.stringify(this.roundUp));
       localStorage.setItem('debtonate.snowballSort', JSON.stringify(this.snowballSort));
@@ -466,7 +469,6 @@ export default {
     BudgetsPanel,
     DetailsPanel,
     HeaderBar,
-    // InterestTable,
     LoanForm,
     LoansPanel,
     ManagementPanel,
@@ -499,12 +501,12 @@ export default {
       @create-budget='createBudget'
       @exit-create-budget='exitCreateBudgetForm'
     />
+    <!-- TODO: Make the ButtonText attributes computed in the component itself -->
     <OptionsForm
       v-if='optionsFormActive'
-      :periodsAsDates='periodsAsDates'
-      :reducePayments='reducePayments'
-      :roundUp='roundUp'
-      :snowballSort='snowballSort'
+      :periodsAsDatesButtonText='periodsAsDatesButtonText'
+      :reducePaymentsButtonText='reducePaymentsButtonText'
+      :roundingButtonText='roundingButtonText'
       @exit-options-form='exitOptionsForm'
       @toggle-avalanche-sort='toggleAvalancheSort'
       @toggle-periods-as-dates='togglePeriodsAsDates'
@@ -548,17 +550,12 @@ export default {
           :viewBudget='viewBudget'
         />
       </div>
-      <div id='todo3' v-show='loans.length' :class="['presPanel']">
+      <div id='todo' v-if='loans.length' :class="['presPanel']">
         <div :class="['panel']">
           <div :class="['panelHeader', 'header']">
             <h2>Repayment Information</h2>
           </div>
           <div id='lifetimeInterestTotals'>
-            <!-- <InterestTable
-              :globalMinPayment='globalMinPayment'
-              :loans='loans'
-              :paymentSchedules='paymentSchedules'
-            /> -->
             <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
           </div>
         </div>

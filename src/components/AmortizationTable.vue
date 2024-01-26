@@ -1,4 +1,6 @@
 <script>
+import { inject, ref } from 'vue';
+
 export default {
   props: [
     'index',
@@ -6,6 +8,27 @@ export default {
     'paymentSummary',
     'title',
   ],
+  setup() {
+    const options = inject('options');
+    const baseDate = ref(options.baseDate);
+    const periodsAsDates = ref(options.periodsAsDates);
+
+    return {
+      baseDate,
+      periodsAsDates,
+    };
+  },
+  methods: {
+    renderPeriod(period) {
+      return this.options.periodsAsDates
+        ? new Date(
+          this.options.baseDate.getFullYear(),
+          this.options.baseDate.getMonth() + period,
+          this.options.baseDate.getDate(),
+        ).toLocaleDateString()
+        : period;
+    },
+  },
 };
 </script>
 
