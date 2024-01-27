@@ -1,38 +1,16 @@
-<script>
+<script setup>
+import { computed } from 'vue';
 import constants from '../constants/constants';
 
-export default {
-  props: [
-    'budget',
-    'budgetTotals',
-    'deleteBudget',
-    'editBudget',
-    'index',
-    'viewBudget',
-  ],
-  data() {
-    return {
-      constants,
-    };
-  },
-  computed: {
-    budgetAmount() {
-      return `$${this.budget.absolute.toFixed(2)}/mo`;
-    },
-    budgetExtra() {
-      return `+$${this.budget.relative.toFixed(2)}/mo`;
-    },
-    budgetPayments() {
-      return this.budgetTotals.amortizationSchedule.length;
-    },
-    budgetTitle() {
-      return this.budget.id === constants.DEFAULT ? 'Minimum' : `Budget ${this.index}`;
-    },
-    budgetTotalInterest() {
-      return `$${this.budgetTotals.lifetimeInterest.toFixed(2)}`;
-    },
-  },
-};
+const props = defineProps(['budget', 'budgetTotals', 'deleteBudget', 'editBudget', 'index', 'viewBudget']);
+
+const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/mo`);
+const budgetExtra = computed(() => `+$${props.budget.relative.toFixed(2)}/mo`);
+const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
+const budgetTitle = computed(() => (
+  props.budget.id === constants.DEFAULT ? 'Minimum' : `Budget ${props.index}`
+));
+const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeInterest.toFixed(2)}`);
 </script>
 
 <template>
@@ -42,7 +20,7 @@ export default {
       <div :class="['cardheaderSubSection']">
         <button v-if="budget.id !== constants.DEFAULT"
           :class="['exitButton', 'bold']"
-          @click='this.deleteBudget(this.budget.id)'
+          @click='props.deleteBudget(props.budget.id)'
         >
           x
         </button>
@@ -56,7 +34,7 @@ export default {
             <b>{{ budgetAmount }}</b>
           </td>
         </tr>
-        <tr v-if="this.budget.id !== constants.DEFAULT">
+        <tr v-if="props.budget.id !== constants.DEFAULT">
           <td :class="['textLeft']">Extra</td>
           <td :class="['textRight']">
             <b>{{ budgetExtra }}</b>
@@ -77,11 +55,11 @@ export default {
       </table>
     </div>
     <div :class="['cardFooter', 'footer']">
-      <div v-if="this.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
-        <button @click='this.editBudget(this.budget.id)'>Edit</button>
+      <div v-if="props.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
+        <button @click='props.editBudget(props.budget.id)'>Edit</button>
       </div>
       <div :class="['cardFooterButtonContainer']">
-        <button @click='this.viewBudget(this.budget.id)'>View</button>
+        <button @click='props.viewBudget(props.budget.id)'>View</button>
       </div>
     </div>
   </div>

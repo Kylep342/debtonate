@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 import { inject, ref } from 'vue';
 
 export default {
@@ -30,12 +30,31 @@ export default {
     },
   },
 };
+</script> -->
+
+<script setup>
+import { inject, ref } from 'vue';
+
+const props = defineProps(['keyPrefix', 'paymentSummary', 'title']);
+// const options = inject('options');
+// const baseDate = ref(options.baseDate);
+// const periodsAsDates = ref(options.periodsAsDates);
+
+// const renderPeriod = (period) => {
+//   return periodsAsDates.value
+//     ? new Date(
+//       baseDate.value.getFullYear(),
+//       baseDate.value.getMonth() + period,
+//       baseDate.value.getDate(),
+//     ).toLocaleDateString()
+//     : period;
+// };
 </script>
 
 <template>
   <div>
     <div>
-      <h3 :class="['cardTitle']">{{ this.title }}</h3>
+      <h3 :class="['cardTitle']">{{ props.title }}</h3>
     </div>
     <div :class="['justifyCenter']">
       <table :class="['table']">
@@ -47,8 +66,8 @@ export default {
           <th :class="['textRight']">Principal Remaining</th>
         </thead>
         <tr
-          v-for='(record, rowno) in this.paymentSummary.amortizationSchedule'
-          :key='this.keyPrefix + rowno'
+          v-for='(record, rowno) in props.paymentSummary.amortizationSchedule'
+          :key='props.keyPrefix + rowno'
         >
           <td :class="['textLeft']">{{ record.period }}</td>
           <td :class="['textRight']">${{ (record.principal + record.interest).toFixed(2) }}</td>
@@ -62,15 +81,15 @@ export default {
           <td :class="['textLeft']"><b>Totals:</b></td>
           <td :class="['textRight']">
             <b>${{ (
-              this.paymentSummary.totalPrincipalPaid +
-              this.paymentSummary.totalInterestPaid
+              props.paymentSummary.totalPrincipalPaid +
+              props.paymentSummary.totalInterestPaid
             ).toFixed(2) }}</b>
           </td>
           <td :class="['textRight']">
-            <b>${{ this.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
+            <b>${{ props.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']">
-            <b>${{ this.paymentSummary.totalInterestPaid.toFixed(2) }}</b>
+            <b>${{ props.paymentSummary.totalInterestPaid.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']"><b> -- </b></td>
         </tr>

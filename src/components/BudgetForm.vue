@@ -1,32 +1,32 @@
-<script>
-export default {
-  props: ['title', 'createButtonText', 'budget'],
-  emits: ['create-budget', 'exit-create-budget'],
-  data() {
-    return {
-      amount: this.budget?.relative || null,
-    };
-  },
-  computed: {
-    createButtonEnabled() {
-      return (
-        !Number.isNaN(parseFloat(this.amount)) && parseFloat(this.amount) > 0
-      );
-    },
-  },
-  methods: {
-    clearCreate() {
-      this.amount = null;
-    },
-    emitCreate() {
-      this.$emit('create-budget', parseFloat(this.amount));
-      this.clearCreate();
-    },
-    emitExit() {
-      this.$emit('exit-create-budget');
-      this.clearCreate();
-    },
-  },
+<script setup>
+import {
+  computed,
+  defineEmits,
+  defineProps,
+  ref,
+} from 'vue';
+
+const props = defineProps(['title', 'createButtonText', 'budget']);
+const emits = defineEmits(['create-budget', 'exit-create-budget']);
+
+const amount = ref(props.budget?.relative || null);
+
+const createButtonEnabled = computed(
+  () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
+);
+
+const clearCreate = () => {
+  amount.value = null;
+};
+
+const emitCreate = () => {
+  emits('create-budget', parseFloat(amount.value));
+  clearCreate();
+};
+
+const emitExit = () => {
+  emits('exit-create-budget');
+  clearCreate();
 };
 </script>
 

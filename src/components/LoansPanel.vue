@@ -1,34 +1,35 @@
-<script>
+<script setup>
 import LoanCard from './LoanCard.vue';
 
-export default {
-  props: [
-    'deleteLoan',
-    'editLoan',
-    'loans',
-    'totalsAsALoan',
-    'viewLoan',
-  ],
-  components: { LoanCard },
-};
+const props = defineProps([
+  'deleteLoan',
+  'editLoan',
+  'loans',
+  'totalsAsALoan',
+  'viewLoan',
+]);
 </script>
 
 <template>
   <div :class="['panel']">
     <ul :class="['cardHolder']">
-      <li v-if='this.loans.length' :class="['card']">
+      <li v-if='props.loans.length' :class="['card']">
         <LoanCard
-          :loan='totalsAsALoan'
-          :viewLoan='this.viewLoan'
+          :loan='props.totalsAsALoan'
+          :viewLoan='props.viewLoan'
         />
       </li>
-      <li v-for='(loan, index) in this.loans' :key='loan.id' :class="['card']">
+      <li
+        v-for='(loan, index) in props.loans'
+        :key='loan.id'
+        :class="['card']"
+      >
         <LoanCard
-          :deleteLoan='this.deleteLoan'
-          :editLoan='this.editLoan'
+          :deleteLoan='props.deleteLoan'
+          :editLoan='props.editLoan'
           :index='index + 1'
           :loan='loan'
-          :viewLoan='this.viewLoan'
+          :viewLoan='props.viewLoan'
         />
       </li>
     </ul>

@@ -1,47 +1,32 @@
-<script>
+<script setup>
+import { computed } from 'vue';
+
 import BudgetCard from './BudgetCard.vue';
 import constants from '../constants/constants';
 
-export default {
-  props: [
-    'budgets',
-    'budgetsTotals',
-    'deleteBudget',
-    'editBudget',
-    'viewBudget',
-  ],
-  data() {
-    return {
-      constants,
-    };
-  },
-  components: { BudgetCard },
-  computed: {
-    defaultBudgetIndex() {
-      return this.budgets.findIndex((budget) => budget.id === constants.DEFAULT);
-    },
-    orderedBudgets() {
-      return [
-        this.budgets[this.defaultBudgetIndex],
-        ...this.budgets.slice(0, this.defaultBudgetIndex),
-        ...this.budgets.slice(this.defaultBudgetIndex + 1),
-      ];
-    },
-  },
-};
+const props = defineProps(['budgets', 'budgetsTotals', 'deleteBudget', 'editBudget', 'viewBudget']);
+
+const defaultBudgetIndex = computed(() => (
+  props.budgets.findIndex((budget) => budget.id === constants.DEFAULT)
+));
+const orderedBudgets = computed(() => [
+  props.budgets[defaultBudgetIndex.value],
+  ...props.budgets.slice(0, defaultBudgetIndex.value),
+  ...props.budgets.slice(defaultBudgetIndex.value + 1),
+]);
 </script>
 
 <template>
-  <div :class="['panel']" v-show='this.budgets.length'>
+  <div :class="['panel']" v-show='props.budgets.length'>
     <ul :class="['cardHolder']">
-      <li v-for='(budget, index) in this.orderedBudgets' :key='budget.id' :class="['card']">
+      <li v-for='(budget, index) in orderedBudgets' :key='budget.id' :class="['card']">
         <BudgetCard
           :budget='budget'
-          :budgetTotals='this.budgetsTotals[budget.id]'
-          :deleteBudget='this.deleteBudget'
-          :editBudget='this.editBudget'
+          :budgetTotals='props.budgetsTotals[budget.id]'
+          :deleteBudget='props.deleteBudget'
+          :editBudget='props.editBudget'
           :index='index'
-          :viewBudget='this.viewBudget'
+          :viewBudget='props.viewBudget'
         />
       </li>
     </ul>
