@@ -1,26 +1,15 @@
-<script>
-export default {
-  emits: [
-    'open-options-form',
-    'load-app-state',
-    'save-app-state',
-    'clear-app-state',
-  ],
-  methods: {
-    emitOpenOptions() {
-      this.$emit('open-options-form');
-    },
-    emitLoadState() {
-      this.$emit('load-app-state');
-    },
-    emitSaveState() {
-      this.$emit('save-app-state');
-    },
-    emitClearState() {
-      this.$emit('clear-app-state');
-    },
-  },
-};
+<script setup>
+const emits = defineEmits([
+  'clear-app-state',
+  'load-app-state',
+  'open-options-form',
+  'save-app-state',
+]);
+
+const emitClearState = () => emits('clear-app-state');
+const emitLoadState = () => emits('load-app-state');
+const emitOpenOptions = () => emits('open-options-form');
+const emitSaveState = () => emits('save-app-state');
 </script>
 
 <template>

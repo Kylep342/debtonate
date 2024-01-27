@@ -1,41 +1,38 @@
-<script>
-export default {
-  props: ['title', 'createButtonText', 'loan'],
-  emits: ['create-loan', 'exit-create-loan'],
-  data() {
-    return {
-      principal: this.loan?.principal || null,
-      interestRate: ((this.loan?.annualRate || null) * 100).toFixed(2) || null,
-      termInYears: this.loan?.termInYears || null,
-    };
-  },
-  computed: {
-    createButtonEnabled() {
-      return [this.principal, this.interestRate, this.termInYears].every(
-        (input) => !Number.isNaN(parseFloat(input)) && parseFloat(input) > 0,
-      );
-    },
-  },
-  methods: {
-    clearCreate() {
-      this.principal = null;
-      this.interestRate = null;
-      this.termInYears = null;
-    },
-    emitCreate() {
-      this.$emit(
-        'create-loan',
-        parseFloat(this.principal),
-        parseFloat(this.interestRate) / 100,
-        parseFloat(this.termInYears),
-      );
-      this.clearCreate();
-    },
-    emitExit() {
-      this.$emit('exit-create-loan');
-      this.clearCreate();
-    },
-  },
+<script setup>
+import {
+  computed,
+  defineEmits,
+  defineProps,
+  ref,
+} from 'vue';
+
+const props = defineProps(['title', 'createButtonText', 'loan']);
+const emits = defineEmits(['create-loan', 'exit-create-loan']);
+
+const principal = ref(props.loan?.principal || null);
+const interestRate = ref(((props.loan?.annualRate || null) * 100).toFixed(2) || null);
+const termInYears = ref(props.loan?.termInYears || null);
+
+const createButtonEnabled = computed(() => (
+  [principal.value, interestRate.value, termInYears.value].every(
+    (input) => !Number.isNaN(parseFloat(input)) && parseFloat(input) > 0,
+  )
+));
+
+const clearCreate = () => {
+  principal.value = null;
+  interestRate.value = null;
+  termInYears.value = null;
+};
+
+const emitCreate = () => {
+  emits('create-loan', parseFloat(principal.value), parseFloat(interestRate.value) / 100, parseFloat(termInYears.value));
+  clearCreate();
+};
+
+const emitExit = () => {
+  emits('exit-create-loan');
+  clearCreate();
 };
 </script>
 

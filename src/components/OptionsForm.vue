@@ -1,35 +1,24 @@
-<script>
-export default {
-  props: ['periodsAsDatesButtonText', 'reducePaymentsButtonText', 'roundingButtonText'],
-  emits: [
-    'exit-options-form',
-    'toggle-avalanche-sort',
-    'toggle-periods-as-dates',
-    'toggle-reduce-payments',
-    'toggle-round-up',
-    'toggle-snowball-sort',
-  ],
-  methods: {
-    emitExit() {
-      this.$emit('exit-options-form');
-    },
-    emitAvalancheSort() {
-      this.$emit('toggle-avalanche-sort');
-    },
-    emitTogglePeriodsAsDates() {
-      this.$emit('toggle-periods-as-dates');
-    },
-    emitToggleReducePayments() {
-      this.$emit('toggle-reduce-payments');
-    },
-    emitToggleRoundUp() {
-      this.$emit('toggle-round-up');
-    },
-    emitSnowballSort() {
-      this.$emit('toggle-snowball-sort');
-    },
-  },
-};
+<script setup>
+const props = defineProps([
+  'periodsAsDatesButtonText',
+  'reducePaymentsButtonText',
+  'roundingButtonText',
+]);
+const emits = defineEmits([
+  'exit-options-form',
+  'toggle-avalanche-sort',
+  'toggle-periods-as-dates',
+  'toggle-reduce-payments',
+  'toggle-round-up',
+  'toggle-snowball-sort',
+]);
+
+const emitExit = () => emits('exit-options-form');
+const emitAvalancheSort = () => emits('toggle-avalanche-sort');
+const emitTogglePeriodsAsDates = () => emits('toggle-periods-as-dates');
+const emitToggleReducePayments = () => emits('toggle-reduce-payments');
+const emitToggleRoundUp = () => emits('toggle-round-up');
+const emitSnowballSort = () => emits('toggle-snowball-sort');
 </script>
 
 <template>
@@ -50,7 +39,7 @@ export default {
           <div :class="['formInputWrapper']">
             <h3>Reduce Payments</h3>
             <button @click='emitToggleReducePayments'>
-              {{ reducePaymentsButtonText }}
+              {{ props.reducePaymentsButtonText }}
             </button>
           </div>
         </base-card>
@@ -58,7 +47,7 @@ export default {
           <div :class="['formInputWrapper']">
             <h3>Rounding</h3>
             <button @click='emitToggleRoundUp'>
-              {{ roundingButtonText }}
+              {{ props.roundingButtonText }}
             </button>
           </div>
         </base-card>
@@ -66,7 +55,7 @@ export default {
           <div :class="['formInputWrapper']">
             <h3>Periods As Dates</h3>
             <button @click='emitTogglePeriodsAsDates'>
-              {{ periodsAsDatesButtonText }}
+              {{ props.periodsAsDatesButtonText }}
             </button>
           </div>
         </base-card>
