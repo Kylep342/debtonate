@@ -13,6 +13,8 @@ import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
 
+// data
+
 const budgets = ref([]);
 const baseDate = ref(new Date());
 const colors = ['#DAF7A6', '#900C3F', '#C70039', '#581845', '#FF5733', '#FFC300'];
@@ -106,6 +108,164 @@ const monthlyBudgets = computed(() => {
   return budgetsArray;
 });
 
+// independent methods
+
+const openCreateBudgetForm = () => { createBudgetFormActive.value = true; };
+const openCreateLoanForm = () => { createLoanFormActive.value = true; };
+const openOptionsForm = () => { optionsFormActive.value = true; };
+const exitCreateBudgetForm = () => {
+  createBudgetFormActive.value = false;
+  currentBudgetId.value = null;
+};
+const exitCreateLoanForm = () => {
+  createLoanFormActive.value = false;
+  currentLoanId.value = null;
+};
+const exitOptionsForm = () => { optionsFormActive.value = false; };
+const togglePeriodsAsDates = () => { periodsAsDates.value = !periodsAsDates.value; };
+const toggleReducePayments = () => { reducePayments.value = !reducePayments.value; };
+const toggleRounding = () => { roundUp.value = !roundUp.value; };
+const avalanche = () => {
+  return moneyfunx.sortLoans(
+    moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
+    moneyfunx.avalanche,
+  );
+};
+const snowball = () => {
+  return moneyfunx.sortLoans(
+    moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
+    moneyfunx.snowball,
+  );
+};
+
+const deleteLoan = (id) => {
+  loans.value = loans.value.filter((loan) => loan.id !== id);
+};
+const editLoan = (id) => {
+  currentLoanId.value = id;
+  createLoanFormActive.value = true;
+};
+const getLoanIndex = (id) => (id !== constants.TOTALS
+  ? loans.value.findIndex((loan) => loan.id === id) + 1
+  : 0
+);
+const viewLoan = (id) => {
+  currentLoanId.value = id;
+  showLoanDetailsPanel.value = true;
+};
+const unviewLoan = () => {
+  showLoanDetailsPanel.value = false;
+  currentLoanId.value = null;
+};
+
+const deleteBudget = (id) => {
+  const monthlyBudget = monthlyBudgets.value.find(
+    (budget) => budget.id === id,
+  );
+  budgets.value = budgets.value.filter((budget) => budget !== monthlyBudget.relative);
+};
+const editBudget = (id) => {
+  currentBudgetId.value = id;
+  createBudgetFormActive.value = true;
+};
+const getBudget = (id) => (monthlyBudgets.value.find((budget) => budget.id === id));
+const getBudgetIndex = (id) => (monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1);
+const viewBudget = (id) => {
+  currentBudgetId.value = id;
+  showBudgetDetailsPanel.value = true;
+};
+const unviewBudget = () => {
+  showBudgetDetailsPanel.value = false;
+  currentBudgetId.value = null;
+};
+
+const buildBudgetDetailsTitle = (monthlyBudget) => (`Budget Details - ${
+  monthlyBudget.id === constants.DEFAULT
+    ? 'Minimum Budget '
+    : `Budget ${getBudgetIndex(monthlyBudget.id)}`} `
+  + `$${monthlyBudget.absolute.toFixed(2)}/mo `
+  + `(+$${monthlyBudget.relative.toFixed(2)}/mo)`
+);
+const buildLoanDetailsTitle = (loan) => (`Loan Details - ${
+  loan.id === constants.TOTALS
+    ? 'All Loans '
+    : `Loan ${getLoanIndex(loan.id)}`} `
+  + `($${loan.principal.toFixed(2)} `
+  + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
+);
+
+const clearState = () => {
+  budgets.value = [];
+  createBudgetFormActive.value = false;
+  createLoanFormActive.value = false;
+  currentBudgetId.value = null;
+  currentLoanId.value = null;
+  loans.value = [];
+  reducePayments.value = false;
+  roundUp.value = false;
+  showBudgetDetailsPanel.value = false;
+  showLoanDetailsPanel.value = false;
+  snowballSort.value = true;
+};
+const loadState = () => {
+  budgets.value = JSON.parse(localStorage.getItem('debtonate.budgets'));
+  loans.value = JSON.parse(localStorage.getItem('debtonate.loans')).map(
+    (loan) => new moneyfunx.Loan(
+      loan.principal,
+      loan.annualRate,
+      12,
+      loan.termInYears,
+    ),
+  );
+  periodsAsDates.value = JSON.parse(localStorage.getItem('debtonate.periodsAsDates'));
+  reducePayments.value = JSON.parse(localStorage.getItem('debtonate.reducePayments'));
+  roundUp.value = JSON.parse(localStorage.getItem('debtonate.roundUp'));
+  snowballSort.value = JSON.parse(localStorage.getItem('debtonate.snowballSort'));
+};
+const saveState = () => {
+  localStorage.setItem('debtonate.budgets', JSON.stringify(budgets.value));
+  localStorage.setItem('debtonate.loans', JSON.stringify(loans.value));
+  localStorage.setItem('debtonate.periodsAsDates', JSON.stringify(periodsAsDates.value));
+  localStorage.setItem('debtonate.reducePayments', JSON.stringify(reducePayments.value));
+  localStorage.setItem('debtonate.roundUp', JSON.stringify(roundUp.value));
+  localStorage.setItem('debtonate.snowballSort', JSON.stringify(snowballSort.value));
+};
+
+// dependent computed values
+
+const createLoanFormTitle = computed(() => (currentLoanId.value
+  ? `Editing Loan ${getLoanIndex(currentLoanId.value)}`
+  : 'Creating a Loan'
+));
+const createBudgetButtonText = computed(() => (currentBudgetId.value ? 'Save' : 'Create'));
+const createBudgetFormTitle = computed(() => (currentBudgetId.value
+  ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
+  : 'Creating a Budget'
+));
+
+const globalEffectiveInterestRate = computed(
+  () => (
+    loans.value.reduce(
+      (weightedRate, loan) => (
+        weightedRate + (loan.annualRate * (loan.principal / globalPrincipal.value))
+      ),
+      0,
+    )
+  ),
+);
+
+const totalsAsALoan = computed(() => ({
+  id: constants.TOTALS,
+  principal: globalPrincipal.value,
+  annualRate: globalEffectiveInterestRate.value,
+  periodsPerYear: globalMaxPeriodsPerYear.value,
+  termInYears: globalMaxTermInYears.value,
+  periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
+  periods: globalMaxPeriods.value,
+  minPayment: globalMinPayment.value,
+  totalInterest: globalLifetimeInterestPaid.value,
+}));
+
 const paymentSchedules = computed(() => (
   monthlyBudgets.value.map(
     (budget) => ({
@@ -118,29 +278,6 @@ const paymentSchedules = computed(() => (
     }),
   )
 ));
-
-const paymentSummaries = computed(() => {
-  const balances = { totals: {} };
-
-  loans.value.forEach((loan) => {
-    balances[loan.id] = {};
-  });
-
-  Object.keys(balances).forEach((loanId) => {
-    paymentSchedules.value.forEach((schedule) => {
-      balances[loanId][schedule.budgetId] = {
-        label: schedule.label,
-        totalPaymentAmount: schedule.paymentAmount,
-        amortizationSchedule: schedule.paymentSchedule[loanId].amortizationSchedule,
-        totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
-        totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
-        totalPayments: schedule.paymentSchedule[loanId].totalPayments,
-      };
-    });
-  });
-
-  return balances;
-});
 
 const amortizationSchedulesGraphData = computed(() => {
   const balances = { totals: [] };
@@ -247,173 +384,28 @@ const lifetimeInterestTotalsChart = computed(() => ({
   },
 }));
 
-// independent methods
+const paymentSummaries = computed(() => {
+  const balances = { totals: {} };
 
-const openCreateBudgetForm = () => { createBudgetFormActive.value = true; };
-const openCreateLoanForm = () => { createLoanFormActive.value = true; };
-const openOptionsForm = () => { optionsFormActive.value = true; };
-const exitCreateBudgetForm = () => {
-  createBudgetFormActive.value = false;
-  currentBudgetId.value = null;
-};
-const exitCreateLoanForm = () => {
-  createLoanFormActive.value = false;
-  currentLoanId.value = null;
-};
-const exitOptionsForm = () => { optionsFormActive.value = false; };
-const togglePeriodsAsDates = () => { periodsAsDates.value = !periodsAsDates.value; };
-const toggleReducePayments = () => { reducePayments.value = !reducePayments.value; };
-const toggleRounding = () => { roundUp.value = !roundUp.value; };
-const avalanche = () => {
-  loans.value = moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
-    moneyfunx.avalanche,
-  );
-};
-const snowball = () => {
-  loans.value = moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
-    moneyfunx.snowball,
-  );
-};
+  loans.value.forEach((loan) => {
+    balances[loan.id] = {};
+  });
 
-const deleteLoan = (id) => {
-  loans.value = loans.value.filter((loan) => loan.id !== id);
-};
-const editLoan = (id) => {
-  currentLoanId.value = id;
-  createLoanFormActive.value = true;
-};
-const getLoanIndex = (id) => (id !== constants.TOTALS
-  ? loans.value.findIndex((loan) => loan.id === id) + 1
-  : 0
-);
-const viewLoan = (id) => {
-  currentLoanId.value = id;
-  showLoanDetailsPanel.value = true;
-};
-const unviewLoan = () => {
-  showLoanDetailsPanel.value = false;
-  currentLoanId.value = null;
-};
+  Object.keys(balances).forEach((loanId) => {
+    paymentSchedules.value.forEach((schedule) => {
+      balances[loanId][schedule.budgetId] = {
+        label: schedule.label,
+        totalPaymentAmount: schedule.paymentAmount,
+        amortizationSchedule: schedule.paymentSchedule[loanId].amortizationSchedule,
+        totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
+        totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
+        totalPayments: schedule.paymentSchedule[loanId].totalPayments,
+      };
+    });
+  });
 
-const deleteBudget = (id) => {
-  const monthlyBudget = monthlyBudgets.value.find(
-    (budget) => budget.id === id,
-  );
-  budgets.value = budgets.value.filter((budget) => budget !== monthlyBudget.relative);
-};
-const createBudget = (proposedBudget) => {
-  if (currentBudgetId.value) {
-    deleteBudget(currentBudgetId.value);
-    currentBudgetId.value = null;
-  }
-
-  budgets.value.push(proposedBudget);
-  budgets.value.sort((a, b) => b - a);
-  createBudgetFormActive.value = false;
-};
-const editBudget = (id) => {
-  currentBudgetId.value = id;
-  createBudgetFormActive.value = true;
-};
-const getBudget = (id) => (monthlyBudgets.value.find((budget) => budget.id === id));
-const getBudgetIndex = (id) => (monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1);
-const viewBudget = (id) => {
-  currentBudgetId.value = id;
-  showBudgetDetailsPanel.value = true;
-};
-const unviewBudget = () => {
-  showBudgetDetailsPanel.value = false;
-  currentBudgetId.value = null;
-};
-
-const buildBudgetDetailsTitle = (monthlyBudget) => (`Budget Details - ${
-  monthlyBudget.id === constants.DEFAULT
-    ? 'Minimum Budget '
-    : `Budget ${getBudgetIndex(monthlyBudget.id)}`} `
-  + `$${monthlyBudget.absolute.toFixed(2)}/mo `
-  + `(+$${monthlyBudget.relative.toFixed(2)}/mo)`
-);
-const buildLoanDetailsTitle = (loan) => (`Loan Details - ${
-  loan.id === constants.TOTALS
-    ? 'All Loans '
-    : `Loan ${getLoanIndex(loan.id)}`} `
-  + `($${loan.principal.toFixed(2)} `
-  + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
-);
-
-const clearState = () => {
-  budgets.value = [];
-  createBudgetFormActive.value = false;
-  createLoanFormActive.value = false;
-  currentBudgetId.value = null;
-  currentLoanId.value = null;
-  loans.value = [];
-  reducePayments.value = false;
-  roundUp.value = false;
-  showBudgetDetailsPanel.value = false;
-  showLoanDetailsPanel.value = false;
-  snowballSort.value = true;
-};
-const loadState = () => {
-  budgets.value = JSON.parse(localStorage.getItem('debtonate.budgets'));
-  loans.value = JSON.parse(localStorage.getItem('debtonate.loans')).map(
-    (loan) => new moneyfunx.Loan(
-      loan.principal,
-      loan.annualRate,
-      12,
-      loan.termInYears,
-    ),
-  );
-  periodsAsDates.value = JSON.parse(localStorage.getItem('debtonate.periodsAsDates'));
-  reducePayments.value = JSON.parse(localStorage.getItem('debtonate.reducePayments'));
-  roundUp.value = JSON.parse(localStorage.getItem('debtonate.roundUp'));
-  snowballSort.value = JSON.parse(localStorage.getItem('debtonate.snowballSort'));
-};
-const saveState = () => {
-  localStorage.setItem('debtonate.budgets', JSON.stringify(budgets.value));
-  localStorage.setItem('debtonate.loans', JSON.stringify(loans.value));
-  localStorage.setItem('debtonate.periodsAsDates', JSON.stringify(periodsAsDates.value));
-  localStorage.setItem('debtonate.reducePayments', JSON.stringify(reducePayments.value));
-  localStorage.setItem('debtonate.roundUp', JSON.stringify(roundUp.value));
-  localStorage.setItem('debtonate.snowballSort', JSON.stringify(snowballSort.value));
-};
-
-// dependent computed values
-
-const createLoanFormTitle = computed(() => (currentLoanId.value
-  ? `Editing Loan ${getLoanIndex(currentLoanId.value)}`
-  : 'Creating a Loan'
-));
-const createBudgetButtonText = computed(() => (currentBudgetId.value ? 'Save' : 'Create'));
-const createBudgetFormTitle = computed(() => (currentBudgetId.value
-  ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
-  : 'Creating a Budget'
-));
-
-const globalEffectiveInterestRate = computed(
-  () => (
-    loans.value.reduce(
-      (weightedRate, loan) => (
-        weightedRate + (loan.annualRate * (loan.principal / globalPrincipal.value))
-      ),
-      0,
-    )
-  ),
-);
-
-const totalsAsALoan = computed(() => ({
-  id: constants.TOTALS,
-  principal: globalPrincipal.value,
-  annualRate: globalEffectiveInterestRate.value,
-  periodsPerYear: globalMaxPeriodsPerYear.value,
-  termInYears: globalMaxTermInYears.value,
-  periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
-  periods: globalMaxPeriods.value,
-  minPayment: globalMinPayment.value,
-  totalInterest: globalLifetimeInterestPaid.value,
-}));
+  return balances;
+});
 
 // dependent methods
 
@@ -422,9 +414,11 @@ const getLoan = (id) => (id !== constants.TOTALS
   : totalsAsALoan.value
 );
 const sortLoans = () => {
-  snowballSort.value === true
-    ? snowball()
-    : avalanche();
+  loans.value = (
+    snowballSort.value === true
+      ? snowball()
+      : avalanche()
+    );
 };
 const toggleAvalancheSort = () => {
   snowballSort.value = false;
@@ -434,7 +428,15 @@ const toggleSnowballSort = () => {
   snowballSort.value = true;
   sortLoans();
 };
-
+const createBudget = (proposedBudget) => {
+  if (currentBudgetId.value) {
+    deleteBudget(currentBudgetId.value);
+    currentBudgetId.value = null;
+  }
+  budgets.value.push(proposedBudget);
+  budgets.value.sort((a, b) => b - a);
+  createBudgetFormActive.value = false;
+};
 const createLoan = (principal, interestRate, termInYears) => {
   const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears);
   if (currentLoanId.value) {
@@ -467,7 +469,6 @@ provide('loanFunctions', {
   editLoan,
   viewLoan,
 });
-
 </script>
 
 <template>
