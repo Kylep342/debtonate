@@ -9,12 +9,12 @@
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
-        "sourceType": "module",
-        "allowTernary": true
+        "sourceType": "module"
     },
     "plugins": [
         "vue"
     ],
     "rules": {
+        "allowTernary": true
     }
 }
