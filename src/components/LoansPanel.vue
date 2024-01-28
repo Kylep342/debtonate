@@ -1,13 +1,7 @@
 <script setup>
 import LoanCard from './LoanCard.vue';
 
-const props = defineProps([
-  'deleteLoan',
-  'editLoan',
-  'loans',
-  'totalsAsALoan',
-  'viewLoan',
-]);
+const props = defineProps(['loans', 'totalsAsALoan']);
 </script>
 
 <template>
@@ -16,7 +10,6 @@ const props = defineProps([
       <li v-if='props.loans.length' :class="['card']">
         <LoanCard
           :loan='props.totalsAsALoan'
-          :viewLoan='props.viewLoan'
         />
       </li>
       <li
@@ -25,11 +18,8 @@ const props = defineProps([
         :class="['card']"
       >
         <LoanCard
-          :deleteLoan='props.deleteLoan'
-          :editLoan='props.editLoan'
           :index='index + 1'
           :loan='loan'
-          :viewLoan='props.viewLoan'
         />
       </li>
     </ul>

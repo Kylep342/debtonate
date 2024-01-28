@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['deleteLoan', 'editLoan', 'index', 'loan', 'viewLoan']);
+const props = defineProps(['index', 'loan']);
+const loanFunctions = inject('loanFunctions');
 
 const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
 const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/mo`);
@@ -17,7 +18,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
       <div :class="['cardheaderSubSection']">
         <button v-if="loan.id !== constants.TOTALS"
           :class="['exitButton', 'bold']"
-          @click='props.deleteLoan(props.loan.id)'
+          @click='loanFunctions.deleteLoan(props.loan.id)'
         >
           x
         </button>
@@ -47,10 +48,10 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
     </div>
     <div :class="['cardFooter', 'footer']">
       <div v-if="loan.id !== constants.TOTALS" :class="['cardFooterButtonContainer']">
-        <button @click='props.editLoan(props.loan.id)'>Edit</button>
+        <button @click='loanFunctions.editLoan(props.loan.id)'>Edit</button>
       </div>
       <div :class="['cardFooterButtonContainer']">
-        <button @click='props.viewLoan(props.loan.id)'>View</button>
+        <button @click='loanFunctions.viewLoan(props.loan.id)'>View</button>
       </div>
     </div>
   </div>

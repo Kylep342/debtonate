@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 
 import * as moneyfunx from 'moneyfunx';
 
@@ -161,7 +161,7 @@ const amortizationSchedulesGraphData = computed(() => {
           (record) => record.principalRemaining,
         ),
         hovertemplate: 'Payment %{x}: %{y} Remaining',
-        name: `$${(schedule.PaymentAmount + globalMinPayment.value).toFixed(2)}/mo`,
+        name: `$${(schedule.paymentAmount + globalMinPayment.value).toFixed(2)}/mo`,
         type: 'scatter',
       });
     });
@@ -305,7 +305,7 @@ const deleteBudget = (id) => {
 };
 const createBudget = (proposedBudget) => {
   if (currentBudgetId.value) {
-    deleteBudget(currentBudgetId);
+    deleteBudget(currentBudgetId.value);
     currentBudgetId.value = null;
   }
 
@@ -438,13 +438,35 @@ const toggleSnowballSort = () => {
 const createLoan = (principal, interestRate, termInYears) => {
   const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears);
   if (currentLoanId.value) {
-    deleteLoan(currentLoanId);
+    deleteLoan(currentLoanId.value);
     currentLoanId.value = null;
   }
   loans.value.push(newLoan);
   sortLoans();
   createLoanFormActive.value = false;
 };
+
+// provide
+
+provide('options', {
+  baseDate,
+  periodsAsDates,
+  reducePayments,
+  roundUp,
+  snowballSort,
+});
+
+provide('budgetFunctions', {
+  deleteBudget,
+  editBudget,
+  viewBudget,
+});
+
+provide('loanFunctions', {
+  deleteLoan,
+  editLoan,
+  viewLoan,
+});
 
 </script>
 
