@@ -20,7 +20,7 @@ const buildTitle = (loan, monthlyBudget) => (
   + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
 );
 
-const generateKey = () => (''.concat(arguments.id));
+const generateKey = (...args) => (''.concat(args.id));
 
 const emitExit = () => { emits('exit-details-panel'); };
 </script>

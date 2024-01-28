@@ -14,7 +14,5 @@
     "plugins": [
         "vue"
     ],
-    "rules": {
-        "allowTernary": true
-    }
+    "rules": {}
 }
