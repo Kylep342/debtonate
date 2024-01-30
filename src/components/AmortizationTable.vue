@@ -29,7 +29,7 @@ const paymentHeader = computed(() => (
       <h3 :class="['cardTitle']">{{ props.title }}</h3>
     </div>
     <div :class="['justifyCenter']">
-      <table :class="['table']">
+      <table v-if='props.paymentSummary' :class="['table']">
         <thead id='AmortizationTotalsTHead'>
           <th :class="['textRight']">{{ paymentHeader }}</th>
           <th :class="['textRight']">Amount Paid</th>

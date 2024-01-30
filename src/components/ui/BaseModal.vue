@@ -1,19 +1,6 @@
 <script setup>
 const props = defineProps(['title', 'id']);
 const emits = defineEmits(['close']);
-
-// const dialog = document.getElementById(props.id);
-
-// document.addEventListener('keydown', (e) => {
-//   if (e.key === 'Escape') {
-//     e.preventDefault(); // Prevent default behavior (closing the dialog)
-
-//     // Perform custom action instead
-//     if (dialog.open) {
-//       emits('close');
-//     }
-//   }
-// });
 </script>
 
 <template>

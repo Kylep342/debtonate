@@ -11,9 +11,10 @@ const props = defineProps([
 ]);
 const emits = defineEmits(['exit-details-panel']);
 
+const appData = inject('appData');
+const builders = inject('builders');
 const budgetPrimitives = inject('budgetPrimitives');
 const loanPrimitives = inject('loanPrimitives');
-const appData = inject('appData');
 
 const loan = computed(() => (
   props.type.value === constants.LOAN
@@ -54,13 +55,17 @@ const emitExit = () => { emits('exit-details-panel'); };
               :id="'amortizationTable' + generateKey(loan, budget)"
               :keyPrefix='generateKey(loan, budget)'
               :paymentSummary='paymentSummary'
-              :title='props.buildAmortizationTableTitle(loan, budget)'
+              :title='builders.buildAmortizationTableTitle(
+                loan,
+                budget,
+                loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId),
+              )'
             />
           </li>
         </ul>
         <base-chart
           :chart='amortizationSchedulesChart'
-          :id="'amortizationSchedulesChart' + loan.id"
+          :id="'amortizationSchedulesChart'"
         />
       </div>
     </template>

@@ -206,7 +206,7 @@ const buildAmortizationTableTitle = (loan, monthlyBudget, index) => (
   `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${index}`} `
     + `($${loan.principal.toFixed(2)} `
     + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
-    + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
+    + `Total Budget: $${monthlyBudget.absolute?.toFixed(2)}/mo`
 );
 
 const clearState = () => {
@@ -329,7 +329,7 @@ const amortizationSchedulesChartPerLoan = computed(() => {
   });
   Object.keys(charts).forEach((loanId, index) => {
     charts[loanId] = {
-      id: `amortizationSchedulesChart${loanId}`,
+      id: 'amortizationSchedulesChart',
       data: amortizationSchedulesGraphData.value[loanId],
       layout: {
         showLegend: false,
@@ -371,7 +371,7 @@ const lifetimeInterestTotals = computed(() => ([
     ),
     y: monthlyBudgets.value.map((budget) => paymentSchedules.value.find(
       (schedule) => schedule.budgetId === budget.id,
-    ).paymentSchedule?.totals.lifetimeInterest),
+    ).paymentSchedule.totals.lifetimeInterest),
     name: 'Total Interest Paid',
     type: 'bar',
   },
@@ -515,6 +515,12 @@ provide('options', {
   snowballSort,
 });
 
+provide('builders', {
+  buildAmortizationTableTitle,
+  buildBudgetDetailsTitle,
+  buildLoanDetailsTitle,
+});
+
 provide('budgetPrimitives', {
   deleteBudget,
   editBudget,
@@ -522,6 +528,7 @@ provide('budgetPrimitives', {
   getBudget,
   getBudgetIndex,
   currentBudgetId,
+  monthlyBudgets,
 });
 
 provide('loanPrimitives', {
@@ -531,6 +538,7 @@ provide('loanPrimitives', {
   getLoan,
   getLoanIndex,
   currentLoanId,
+  loans,
 });
 
 provide('appData', {
@@ -583,7 +591,7 @@ provide('appData', {
     />
     <br />
     <div :class="['appBody']">
-      <div id='todo2' :class="['mgmtPanel']">
+      <div :class="['mgmtPanel']">
         <ManagementPanel
           :class="['mgmtPanelHeader']"
           :createFunction='openCreateLoanForm'
@@ -617,7 +625,7 @@ provide('appData', {
           :viewBudget='viewBudget'
         />
       </div>
-      <div id='todo' v-if='loans.length' :class="['presPanel']">
+      <div v-if='loans.length' :class="['presPanel']">
         <div :class="['panel']">
           <div :class="['panelHeader', 'header']">
             <h2>Repayment Information</h2>
@@ -627,42 +635,17 @@ provide('appData', {
           </div>
         </div>
         <div>
-          <!-- <DetailsPanel
-            v-if='loanDetailsPanelActive.value'
-            :id='constants.LOAN_DETAILS_ID'
-            :amortizationSchedulesChart='
-              amortizationSchedulesChartPerLoan.value[currentLoanId.value]
-            '
-            :buildAmortizationTableTitle='buildAmortizationTableTitle'
-            :loan='getLoan(currentLoanId.value)'
-            :monthlyBudgets='monthlyBudgets.value'
-            :paymentSummaries='paymentSummaries.value[currentLoanId.value]'
-            :title='buildLoanDetailsTitle(getLoan(currentLoanId.value))'
-            :type='constants.LOAN'
-            @exit-details-panel='unviewLoan'
-          /> -->
           <DetailsPanel
+            v-if='loanDetailsPanelActive'
             :id='constants.LOAN_DETAILS_ID'
             :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
-          <!-- <DetailsPanel
-            v-if='budgetDetailsPanelActive.value'
+          <DetailsPanel
+            v-if='budgetDetailsPanelActive'
             :id='constants.BUDGET_DETAILS_ID'
-            :amortizationSchedulesChart='
-              amortizationSchedulesChartPerLoan.value.totals
-            '
-            :loan='totalsAsALoan.value'
-            :monthlyBudgets='[getBudget(currentBudgetId.value)]'
-            :paymentSummaries='paymentSummaries.value.totals'
-            :title='buildBudgetDetailsTitle(getBudget(currentBudgetId.value))'
             :type='constants.BUDGET'
             @exit-details-panel='unviewBudget'
-          /> -->
-          <DetailsPanel
-            :id='constants.LOAN_DETAILS_ID'
-            :type='constants.LOAN'
-            @exit-details-panel='unviewLoan'
           />
         </div>
       </div>
