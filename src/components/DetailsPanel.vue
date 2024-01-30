@@ -1,24 +1,37 @@
 <script setup>
+import { computed, inject } from 'vue';
+
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 
 const props = defineProps([
-  'index',
-  'amortizationSchedulesChart',
-  'loan',
-  'monthlyBudgets',
-  'paymentSummaries',
-  'title',
+  'id',
   'type',
+  'title',
 ]);
 const emits = defineEmits(['exit-details-panel']);
 
-const buildTitle = (loan, monthlyBudget) => (
-  `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${props.index}`} `
-  + `($${loan.principal.toFixed(2)} `
-  + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
-  + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
-);
+const budgetPrimitives = inject('budgetPrimitives');
+const loanPrimitives = inject('loanPrimitives');
+const appData = inject('appData');
+
+const loan = computed(() => (
+  props.type.value === constants.LOAN
+    ? loanPrimitives.getLoan(loanPrimitives.currentLoanId)
+    : loanPrimitives.getLoan(constants.TOTALS)
+));
+
+const amortizationSchedulesChart = computed(() => (
+  props.type.value === constants.LOAN
+    ? appData.amortizationSchedulesChartPerLoan[loanPrimitives.currentLoanId]
+    : appData.amortizationSchedulesChartPerLoan.totals
+));
+
+const paymentSummary = computed(() => (
+  props.type.value === constants.LOAN
+    ? appData.paymentSummaries[loanPrimitives.currentLoanId]
+    : appData.paymentSummaries.totals
+));
 
 const generateKey = (...args) => (''.concat(args.id));
 
@@ -26,7 +39,7 @@ const emitExit = () => { emits('exit-details-panel'); };
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id='props.id'>
     <template #header>
       <h2>{{ props.title }}</h2>
     </template>
@@ -34,21 +47,20 @@ const emitExit = () => { emits('exit-details-panel'); };
       <div>
         <ul>
           <li
-            v-for='budget in props.monthlyBudgets'
-            :key='generateKey(props.loan, budget)'
+            v-for='budget in budgetPrimitives.monthlyBudgets'
+            :key='generateKey(loan, budget)'
           >
             <AmortizationTable
-              :id="'amortizationTable' + generateKey(props.loan, budget)"
-              :index='props.index'
-              :keyPrefix='generateKey(props.loan, budget)'
-              :paymentSummary='props.paymentSummaries[budget.id]'
-              :title='buildTitle(props.loan, budget)'
+              :id="'amortizationTable' + generateKey(loan, budget)"
+              :keyPrefix='generateKey(loan, budget)'
+              :paymentSummary='paymentSummary'
+              :title='props.buildAmortizationTableTitle(loan, budget)'
             />
           </li>
         </ul>
         <base-chart
-          :chart='props.amortizationSchedulesChart'
-          :id="'amortizationChart' + loan.id"
+          :chart='amortizationSchedulesChart'
+          :id="'amortizationSchedulesChart' + loan.id"
         />
       </div>
     </template>

@@ -3,7 +3,7 @@ import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['budget', 'budgetTotals', 'index']);
-const budgetFunctions = inject('budgetFunctions');
+const budgetPrimitives = inject('budgetPrimitives');
 
 const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/mo`);
 const budgetExtra = computed(() => `+$${props.budget.relative.toFixed(2)}/mo`);
@@ -20,8 +20,8 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
       <h2 :class="['cardHeaderTitle']">{{ budgetTitle }}</h2>
       <div :class="['cardheaderSubSection']">
         <button v-if="budget.id !== constants.DEFAULT"
-          :class="['exitButton', 'bold']"
-          @click='budgetFunctions.deleteBudget(props.budget.id)'
+          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square']"
+          @click='budgetPrimitives.deleteBudget(props.budget.id)'
         >
           x
         </button>
@@ -57,10 +57,10 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
     </div>
     <div :class="['cardFooter', 'footer']">
       <div v-if="props.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
-        <button @click='budgetFunctions.editBudget(props.budget.id)'>Edit</button>
+        <base-button @click='budgetPrimitives.editBudget(props.budget.id)'>Edit</base-button>
       </div>
       <div :class="['cardFooterButtonContainer']">
-        <button @click='budgetFunctions.viewBudget(props.budget.id)'>View</button>
+        <base-button @click='budgetPrimitives.viewBudget(props.budget.id)'>View</base-button>
       </div>
     </div>
   </div>

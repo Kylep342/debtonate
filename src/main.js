@@ -6,6 +6,7 @@ import BaseChart from './components/ui/BaseChart.vue';
 import BaseModal from './components/ui/BaseModal.vue';
 
 import './assets/main.css';
+import './assets/built.css';
 
 const app = createApp(App);
 

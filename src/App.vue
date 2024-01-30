@@ -1,5 +1,10 @@
 <script setup>
-import { computed, provide, ref } from 'vue';
+import {
+  computed,
+  provide,
+  ref,
+  watch,
+} from 'vue';
 
 import * as moneyfunx from 'moneyfunx';
 
@@ -28,8 +33,8 @@ const periodsAsDates = ref(false);
 const reducePayments = ref(false);
 const roundingScale = ref(100);
 const roundUp = ref(false);
-const showBudgetDetailsPanel = ref(false);
-const showLoanDetailsPanel = ref(false);
+const budgetDetailsPanelActive = ref(false);
+const loanDetailsPanelActive = ref(false);
 const snowballSort = ref(false);
 
 // independent computed values
@@ -110,9 +115,15 @@ const monthlyBudgets = computed(() => {
 
 // independent methods
 
-const openCreateBudgetForm = () => { createBudgetFormActive.value = true; };
-const openCreateLoanForm = () => { createLoanFormActive.value = true; };
-const openOptionsForm = () => { optionsFormActive.value = true; };
+const openCreateBudgetForm = () => {
+  createBudgetFormActive.value = true;
+};
+const openCreateLoanForm = () => {
+  createLoanFormActive.value = true;
+};
+const openOptionsForm = () => {
+  optionsFormActive.value = true;
+};
 const exitCreateBudgetForm = () => {
   createBudgetFormActive.value = false;
   currentBudgetId.value = null;
@@ -121,22 +132,20 @@ const exitCreateLoanForm = () => {
   createLoanFormActive.value = false;
   currentLoanId.value = null;
 };
-const exitOptionsForm = () => { optionsFormActive.value = false; };
+const exitOptionsForm = () => {
+  optionsFormActive.value = false;
+};
 const togglePeriodsAsDates = () => { periodsAsDates.value = !periodsAsDates.value; };
 const toggleReducePayments = () => { reducePayments.value = !reducePayments.value; };
 const toggleRounding = () => { roundUp.value = !roundUp.value; };
-const avalanche = () => {
-  return moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
-    moneyfunx.avalanche,
-  );
-};
-const snowball = () => {
-  return moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
-    moneyfunx.snowball,
-  );
-};
+const avalanche = () => (moneyfunx.sortLoans(
+  moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
+  moneyfunx.avalanche,
+));
+const snowball = () => (moneyfunx.sortLoans(
+  moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
+  moneyfunx.snowball,
+));
 
 const deleteLoan = (id) => {
   loans.value = loans.value.filter((loan) => loan.id !== id);
@@ -151,10 +160,10 @@ const getLoanIndex = (id) => (id !== constants.TOTALS
 );
 const viewLoan = (id) => {
   currentLoanId.value = id;
-  showLoanDetailsPanel.value = true;
+  loanDetailsPanelActive.value = true;
 };
 const unviewLoan = () => {
-  showLoanDetailsPanel.value = false;
+  loanDetailsPanelActive.value = false;
   currentLoanId.value = null;
 };
 
@@ -172,10 +181,10 @@ const getBudget = (id) => (monthlyBudgets.value.find((budget) => budget.id === i
 const getBudgetIndex = (id) => (monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1);
 const viewBudget = (id) => {
   currentBudgetId.value = id;
-  showBudgetDetailsPanel.value = true;
+  budgetDetailsPanelActive.value = true;
 };
 const unviewBudget = () => {
-  showBudgetDetailsPanel.value = false;
+  budgetDetailsPanelActive.value = false;
   currentBudgetId.value = null;
 };
 
@@ -193,6 +202,12 @@ const buildLoanDetailsTitle = (loan) => (`Loan Details - ${
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`
 );
+const buildAmortizationTableTitle = (loan, monthlyBudget, index) => (
+  `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${index}`} `
+    + `($${loan.principal.toFixed(2)} `
+    + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
+    + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
+);
 
 const clearState = () => {
   budgets.value = [];
@@ -203,8 +218,8 @@ const clearState = () => {
   loans.value = [];
   reducePayments.value = false;
   roundUp.value = false;
-  showBudgetDetailsPanel.value = false;
-  showLoanDetailsPanel.value = false;
+  budgetDetailsPanelActive.value = false;
+  loanDetailsPanelActive.value = false;
   snowballSort.value = true;
 };
 const loadState = () => {
@@ -314,7 +329,7 @@ const amortizationSchedulesChartPerLoan = computed(() => {
   });
   Object.keys(charts).forEach((loanId, index) => {
     charts[loanId] = {
-      id: `amortizationSchedulesChart,${loanId}`,
+      id: `amortizationSchedulesChart${loanId}`,
       data: amortizationSchedulesGraphData.value[loanId],
       layout: {
         showLegend: false,
@@ -418,7 +433,7 @@ const sortLoans = () => {
     snowballSort.value === true
       ? snowball()
       : avalanche()
-    );
+  );
 };
 const toggleAvalancheSort = () => {
   snowballSort.value = false;
@@ -448,6 +463,48 @@ const createLoan = (principal, interestRate, termInYears) => {
   createLoanFormActive.value = false;
 };
 
+// watch
+
+watch(optionsFormActive, async (newValue) => {
+  if (newValue) {
+    document.getElementById(constants.OPTIONS_FORM_ID).showModal();
+  } else if (!newValue) {
+    document.getElementById(constants.OPTIONS_FORM_ID).close();
+  }
+});
+
+watch(createBudgetFormActive, async (newValue) => {
+  if (newValue) {
+    document.getElementById(constants.BUDGET_FORM_ID).showModal();
+  } else if (!newValue) {
+    document.getElementById(constants.BUDGET_FORM_ID).close();
+  }
+});
+
+watch(createLoanFormActive, async (newValue) => {
+  if (newValue) {
+    document.getElementById(constants.LOAN_FORM_ID).showModal();
+  } else if (!newValue) {
+    document.getElementById(constants.LOAN_FORM_ID).close();
+  }
+});
+
+watch(budgetDetailsPanelActive, async (newValue) => {
+  if (newValue) {
+    document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
+  } else if (!newValue) {
+    document.getElementById(constants.BUDGET_DETAILS_ID).close();
+  }
+});
+
+watch(loanDetailsPanelActive, async (newValue) => {
+  if (newValue) {
+    document.getElementById(constants.LOAN_DETAILS_ID).showModal();
+  } else if (!newValue) {
+    document.getElementById(constants.LOAN_DETAILS_ID).close();
+  }
+});
+
 // provide
 
 provide('options', {
@@ -458,21 +515,37 @@ provide('options', {
   snowballSort,
 });
 
-provide('budgetFunctions', {
+provide('budgetPrimitives', {
   deleteBudget,
   editBudget,
   viewBudget,
+  getBudget,
+  getBudgetIndex,
+  currentBudgetId,
 });
 
-provide('loanFunctions', {
+provide('loanPrimitives', {
   deleteLoan,
   editLoan,
   viewLoan,
+  getLoan,
+  getLoanIndex,
+  currentLoanId,
+});
+
+provide('appData', {
+  amortizationSchedulesChartPerLoan,
+  paymentSummaries,
 });
 </script>
 
 <template>
-  <div id='debtonate'>
+  <div
+    id='debtonate'
+    :class='[
+      "font-mono"
+    ]'
+  >
     <HeaderBar
       @clear-app-state='clearState'
       @load-app-state='loadState'
@@ -480,7 +553,7 @@ provide('loanFunctions', {
       @save-app-state='saveState'
     />
     <LoanForm
-      v-if='createLoanFormActive'
+      :id='constants.LOAN_FORM_ID'
       :createButtonText='createLoanButtonText'
       :loan='currentLoanId ? getLoan(currentLoanId) : null'
       :title='createLoanFormTitle'
@@ -488,7 +561,7 @@ provide('loanFunctions', {
       @exit-create-loan='exitCreateLoanForm'
     />
     <BudgetForm
-      v-if='createBudgetFormActive'
+      :id='constants.BUDGET_FORM_ID'
       :createButtonText='createBudgetButtonText'
       :budget='currentBudgetId ? getBudget(currentBudgetId) : null'
       :title='createBudgetFormTitle'
@@ -497,7 +570,7 @@ provide('loanFunctions', {
     />
     <!-- TODO: Make the ButtonText attributes computed in the component itself -->
     <OptionsForm
-      v-if='optionsFormActive'
+      :id='constants.OPTIONS_FORM_ID'
       :periodsAsDatesButtonText='periodsAsDatesButtonText'
       :reducePaymentsButtonText='reducePaymentsButtonText'
       :roundingButtonText='roundingButtonText'
@@ -535,7 +608,7 @@ provide('loanFunctions', {
           :panelTitle='"Budgets"'
         />
         <BudgetsPanel
-          v-if="loans.length"
+          v-if="budgets.length"
           :class="['mgmtPanelBody']"
           :budgets='monthlyBudgets'
           :budgetsTotals='totalsByBudget'
@@ -554,37 +627,45 @@ provide('loanFunctions', {
           </div>
         </div>
         <div>
-          <DetailsPanel
-            v-if='showLoanDetailsPanel'
-            :index='getLoanIndex(currentLoanId)'
+          <!-- <DetailsPanel
+            v-if='loanDetailsPanelActive.value'
+            :id='constants.LOAN_DETAILS_ID'
             :amortizationSchedulesChart='
-              amortizationSchedulesChartPerLoan[currentLoanId]
+              amortizationSchedulesChartPerLoan.value[currentLoanId.value]
             '
-            :loan='getLoan(currentLoanId)'
-            :monthlyBudgets='monthlyBudgets'
-            :paymentSummaries='paymentSummaries[currentLoanId]'
-            :title='buildLoanDetailsTitle(getLoan(currentLoanId))'
+            :buildAmortizationTableTitle='buildAmortizationTableTitle'
+            :loan='getLoan(currentLoanId.value)'
+            :monthlyBudgets='monthlyBudgets.value'
+            :paymentSummaries='paymentSummaries.value[currentLoanId.value]'
+            :title='buildLoanDetailsTitle(getLoan(currentLoanId.value))'
+            :type='constants.LOAN'
+            @exit-details-panel='unviewLoan'
+          /> -->
+          <DetailsPanel
+            :id='constants.LOAN_DETAILS_ID'
+            :type='constants.LOAN'
+            @exit-details-panel='unviewLoan'
+          />
+          <!-- <DetailsPanel
+            v-if='budgetDetailsPanelActive.value'
+            :id='constants.BUDGET_DETAILS_ID'
+            :amortizationSchedulesChart='
+              amortizationSchedulesChartPerLoan.value.totals
+            '
+            :loan='totalsAsALoan.value'
+            :monthlyBudgets='[getBudget(currentBudgetId.value)]'
+            :paymentSummaries='paymentSummaries.value.totals'
+            :title='buildBudgetDetailsTitle(getBudget(currentBudgetId.value))'
+            :type='constants.BUDGET'
+            @exit-details-panel='unviewBudget'
+          /> -->
+          <DetailsPanel
+            :id='constants.LOAN_DETAILS_ID'
             :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
         </div>
-          <DetailsPanel
-            v-if='showBudgetDetailsPanel'
-            :index='getBudgetIndex(currentBudgetId)'
-            :amortizationSchedulesChart='
-              amortizationSchedulesChartPerLoan.totals
-            '
-            :loan='totalsAsALoan'
-            :monthlyBudgets='[getBudget(currentBudgetId)]'
-            :paymentSummaries='paymentSummaries.totals'
-            :title='buildBudgetDetailsTitle(getBudget(currentBudgetId))'
-            :type='constants.BUDGET'
-            @exit-details-panel='unviewBudget'
-          />
       </div>
     </div>
-    <div :id='"sandbox"'></div>
   </div>
 </template>
-
-<style scoped></style>

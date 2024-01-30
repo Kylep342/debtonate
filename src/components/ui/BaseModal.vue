@@ -1,76 +1,43 @@
-<template>
-  <teleport to='body'>
-    <div :class="['modalFrame']">
-      <div :class="['modal']">
-        <header>
-          <slot name='header'>
-            <h2>{{ title }}</h2>
-          </slot>
-        </header>
-        <section>
-          <slot :class="['vertical-scroll']" name='body'> </slot>
-        </section>
-        <menu>
-          <slot name='actions'>
-            <base-button @click="$emit('close')">Close</base-button>
-          </slot>
-        </menu>
-      </div>
-    </div>
-  </teleport>
-</template>
+<script setup>
+const props = defineProps(['title', 'id']);
+const emits = defineEmits(['close']);
 
-<script>
-export default {
-  props: {
-    title: {
-      type: String,
-      required: false,
-    },
-  },
-  emits: ['close'],
-};
+// const dialog = document.getElementById(props.id);
+
+// document.addEventListener('keydown', (e) => {
+//   if (e.key === 'Escape') {
+//     e.preventDefault(); // Prevent default behavior (closing the dialog)
+
+//     // Perform custom action instead
+//     if (dialog.open) {
+//       emits('close');
+//     }
+//   }
+// });
 </script>
 
-<style scoped>
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  box-sizing: border-box;
-  /* width: 600px; */
-  max-width: calc(100% - 80px);
-  max-height: calc(100% - 80px);
-}
-
-.modalFrame {
-  display: block; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 2; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
-
-header {
-  background-color: #ff5733;
-  color: white;
-}
-
-section {
-  padding: 1rem;
-  overflow: auto;
-  max-height: calc(100vh - 125px);
-}
-
-menu {
-  padding: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  margin: 0;
-}
-</style>
+<template>
+  <teleport to='body'>
+    <dialog :id='props.id' :class="['modal']">
+        <div :class="['modal-box']">
+          <div :class="['modal-action']">
+            <header>
+              <slot name='header'>
+                <h2>{{ title }}</h2>
+              </slot>
+            </header>
+            <section>
+              <slot :class="['vertical-scroll']" name='body'> </slot>
+            </section>
+            <menu>
+              <!-- <form method="dialog"> -->
+                <slot name='actions'>
+                  <base-button @click="emits('close')">Close</base-button>
+                </slot>
+              <!-- </form> -->
+            </menu>
+          </div>
+        </div>
+    </dialog>
+  </teleport>
+</template>

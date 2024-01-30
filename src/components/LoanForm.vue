@@ -1,17 +1,23 @@
 <script setup>
 import {
   computed,
-  defineEmits,
-  defineProps,
   ref,
 } from 'vue';
 
-const props = defineProps(['title', 'createButtonText', 'loan']);
-const emits = defineEmits(['create-loan', 'exit-create-loan']);
+const props = defineProps([
+  'id',
+  'createButtonText',
+  'loan',
+  'title',
+]);
+const emits = defineEmits([
+  'create-loan',
+  'exit-create-loan',
+]);
 
-const principal = ref(props.loan?.principal || null);
-const interestRate = ref(((props.loan?.annualRate || null) * 100).toFixed(2) || null);
-const termInYears = ref(props.loan?.termInYears || null);
+const principal = ref(props.loan?.principal || 0);
+const interestRate = ref(((props.loan?.annualRate || 0) * 100).toFixed(2));
+const termInYears = ref(props.loan?.termInYears || 0);
 
 const createButtonEnabled = computed(() => (
   [principal.value, interestRate.value, termInYears.value].every(
@@ -37,7 +43,7 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id='props.id'>
     <template #header>
       <h2>{{ title }}</h2>
     </template>

@@ -11,10 +11,8 @@ const props = defineProps([
     <div :class="['panelHeader', 'header']">
       <h2 :class="['panelHeaderTitle']">{{ props.panelTitle }}</h2>
       <div :class="['panelheaderSubSection']">
-        <button @click='props.createFunction'>+</button>
+        <base-button @click='props.createFunction'>+</base-button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>

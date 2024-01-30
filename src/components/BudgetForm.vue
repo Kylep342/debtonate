@@ -1,13 +1,16 @@
 <script setup>
-import {
-  computed,
-  defineEmits,
-  defineProps,
-  ref,
-} from 'vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps(['title', 'createButtonText', 'budget']);
-const emits = defineEmits(['create-budget', 'exit-create-budget']);
+const props = defineProps([
+  'id',
+  'budget',
+  'createButtonText',
+  'title',
+]);
+const emits = defineEmits([
+  'create-budget',
+  'exit-create-budget',
+]);
 
 const amount = ref(props.budget?.relative || null);
 
@@ -31,7 +34,7 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id='props.id'>
     <template #header>
       <h2>{{ title }}</h2>
     </template>

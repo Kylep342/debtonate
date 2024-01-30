@@ -20,15 +20,11 @@ const emitSaveState = () => emits('save-app-state');
         <h1 :class="['headerTitle']">Debtonate</h1>
       </div>
       <div :class="['headerSubSection']">
-        <button :class="['headerButton']" @click='emitOpenOptions'>
-          Options
-        </button>
-        <button :class="['headerButton']" @click='emitLoadState'>Load</button>
-        <button :class="['headerButton']" @click='emitSaveState'>Save</button>
-        <button :class="['headerButton']" @click='emitClearState'>Clear</button>
+        <base-button :class="['rounded-none']" @click='emitOpenOptions'>Options</base-button>
+        <base-button :class="['rounded-none']" @click='emitLoadState'>Load</base-button>
+        <base-button :class="['rounded-none']" @click='emitSaveState'>Save</base-button>
+        <base-button :class="['rounded-none']" @click='emitClearState'>Clear</base-button>
       </div>
     </header>
   </div>
 </template>
-
-<style scoped></style>

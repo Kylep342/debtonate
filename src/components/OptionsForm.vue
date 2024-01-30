@@ -1,5 +1,6 @@
 <script setup>
 const props = defineProps([
+  'id',
   'periodsAsDatesButtonText',
   'reducePaymentsButtonText',
   'roundingButtonText',
@@ -22,7 +23,7 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id='props.id'>
     <template #header>
       <h2>Options</h2>
     </template>
@@ -31,32 +32,32 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
         <base-card>
           <div :class="['formInputWrapper']">
             <h3>Sorting Method</h3>
-            <button @click='emitAvalancheSort'>Avalanche</button>
-            <button @click='emitSnowballSort'>Snowball</button>
+            <base-button @click='emitAvalancheSort'>Avalanche</base-button>
+            <base-button @click='emitSnowballSort'>Snowball</base-button>
           </div>
         </base-card>
         <base-card>
           <div :class="['formInputWrapper']">
             <h3>Reduce Payments</h3>
-            <button @click='emitToggleReducePayments'>
+            <base-button @click='emitToggleReducePayments'>
               {{ props.reducePaymentsButtonText }}
-            </button>
+            </base-button>
           </div>
         </base-card>
         <base-card>
           <div :class="['formInputWrapper']">
             <h3>Rounding</h3>
-            <button @click='emitToggleRoundUp'>
+            <base-button @click='emitToggleRoundUp'>
               {{ props.roundingButtonText }}
-            </button>
+            </base-button>
           </div>
         </base-card>
         <base-card>
           <div :class="['formInputWrapper']">
             <h3>Periods As Dates</h3>
-            <button @click='emitTogglePeriodsAsDates'>
+            <base-button @click='emitTogglePeriodsAsDates'>
               {{ props.periodsAsDatesButtonText }}
-            </button>
+            </base-button>
           </div>
         </base-card>
       </div>
