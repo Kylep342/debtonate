@@ -1,10 +1,5 @@
 <script setup>
-import {
-  computed,
-  defineEmits,
-  defineProps,
-  ref,
-} from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps(['title', 'createButtonText', 'loan']);
 const emits = defineEmits(['create-loan', 'exit-create-loan']);
