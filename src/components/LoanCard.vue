@@ -12,8 +12,8 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
 </script>
 
 <template>
-  <div>
-    <div :class="['cardHeader', 'header']">
+  <base-card>
+    <template #cardTitle>
       <h2 :class="['cardHeaderTitle']">{{ title }}</h2>
       <div :class="['cardheaderSubSection']">
         <button v-if="loan.id !== constants.TOTALS"
@@ -23,8 +23,8 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
           x
         </button>
       </div>
-    </div>
-    <div :class="['cardBody']">
+    </template>
+    <template #cardContent>
       <table :class="['cardTable']">
         <tr>
           <td :class="['textLeft']">Principal</td>
@@ -45,14 +45,14 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
           </td>
         </tr>
       </table>
-    </div>
-    <div :class="['cardFooter', 'footer']">
+    </template>
+    <template #cardActions>
       <div v-if="loan.id !== constants.TOTALS" :class="['cardFooterButtonContainer']">
         <base-button @click='loanPrimitives.editLoan(props.loan.id)'>Edit</base-button>
       </div>
       <div :class="['cardFooterButtonContainer']">
         <base-button @click='loanPrimitives.viewLoan(props.loan.id)'>View</base-button>
       </div>
-    </div>
-  </div>
+    </template>
+  </base-card>
 </template>

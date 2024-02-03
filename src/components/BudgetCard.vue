@@ -15,8 +15,8 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
 </script>
 
 <template>
-  <div>
-    <div :class="['cardHeader', 'header']">
+  <base-card>
+    <template #cardTitle>
       <h2 :class="['cardHeaderTitle']">{{ budgetTitle }}</h2>
       <div :class="['cardheaderSubSection']">
         <button v-if="budget.id !== constants.DEFAULT"
@@ -26,8 +26,8 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
           x
         </button>
       </div>
-    </div>
-    <div :class="['cardBody']">
+    </template>
+    <template #cardContent>
       <table :class="['cardTable']">
         <tr>
           <td :class="['textLeft']">Amount</td>
@@ -54,14 +54,14 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
           </td>
         </tr>
       </table>
-    </div>
-    <div :class="['cardFooter', 'footer']">
+    </template>
+    <template #cardActions>
       <div v-if="props.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
         <base-button @click='budgetPrimitives.editBudget(props.budget.id)'>Edit</base-button>
       </div>
       <div :class="['cardFooterButtonContainer']">
         <base-button @click='budgetPrimitives.viewBudget(props.budget.id)'>View</base-button>
       </div>
-    </div>
-  </div>
+    </template>
+  </base-card>
 </template>
