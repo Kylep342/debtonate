@@ -37,6 +37,6 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <div :id='props.chart.id' ref="chartRef"></div>
+    <div :id='props.chart?.id' ref="chartRef"></div>
   </div>
 </template>

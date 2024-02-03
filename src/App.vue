@@ -636,13 +636,11 @@ provide('appData', {
         </div>
         <div>
           <DetailsPanel
-            v-if='loanDetailsPanelActive'
             :id='constants.LOAN_DETAILS_ID'
             :type='constants.LOAN'
             @exit-details-panel='unviewLoan'
           />
           <DetailsPanel
-            v-if='budgetDetailsPanelActive'
             :id='constants.BUDGET_DETAILS_ID'
             :type='constants.BUDGET'
             @exit-details-panel='unviewBudget'
