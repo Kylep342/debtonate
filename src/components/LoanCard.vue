@@ -14,10 +14,10 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
 <template>
   <base-card>
     <template #cardTitle>
-      <h2 :class="['cardHeaderTitle']">{{ title }}</h2>
-      <div :class="['cardheaderSubSection']">
+      <div class="card-actions flow-root">
+        <h2 :class="['cardHeaderTitle', 'float-left']">{{ title }}</h2>
         <button v-if="loan.id !== constants.TOTALS"
-          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square']"
+          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
           @click='loanPrimitives.deleteLoan(props.loan.id)'
         >
           x

@@ -17,10 +17,10 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
 <template>
   <base-card>
     <template #cardTitle>
-      <h2 :class="['cardHeaderTitle']">{{ budgetTitle }}</h2>
-      <div :class="['cardheaderSubSection']">
+      <div class="card-actions flow-root">
+        <h2 :class="['cardHeaderTitle', 'float-left']">{{ budgetTitle }}</h2>
         <button v-if="budget.id !== constants.DEFAULT"
-          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square']"
+          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
           @click='budgetPrimitives.deleteBudget(props.budget.id)'
         >
           x
