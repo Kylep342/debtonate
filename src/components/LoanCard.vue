@@ -12,7 +12,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
 </script>
 
 <template>
-  <base-card>
+  <base-card :class="['w-96', 'bg-base-100', 'shadow-xl']">
     <template #cardTitle>
       <div class="card-actions flow-root">
         <h2 :class="['cardHeaderTitle', 'float-left']">{{ title }}</h2>
@@ -25,33 +25,47 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
       </div>
     </template>
     <template #cardContent>
-      <table :class="['cardTable']">
-        <tr>
-          <td :class="['textLeft']">Principal</td>
-          <td :class="['textRight']">
-            <b>{{ principal }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Interest Rate</td>
-          <td :class="['textRight']">
-            <b>{{ interestRate }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Minimum Payment</td>
-          <td :class="['textRight']">
-            <b>{{ minPayment }}</b>
-          </td>
-        </tr>
-      </table>
+      <base-table :size="['table-sm']">
+        <template #body>
+          <tbody>
+            <tr>
+              <td>Principal</td>
+              <td>
+                <b>{{ principal }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Interest Rate</td>
+              <td>
+                <b>{{ interestRate }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Minimum Payment</td>
+              <td>
+                <b>{{ minPayment }}</b>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </base-table>
     </template>
     <template #cardActions>
-      <div v-if="loan.id !== constants.TOTALS" :class="['cardFooterButtonContainer']">
-        <base-button @click='loanPrimitives.editLoan(props.loan.id)'>Edit</base-button>
+      <div v-if="loan.id !== constants.TOTALS">
+        <base-button
+          :class="['btn-accent']"
+          @click='loanPrimitives.editLoan(props.loan.id)'
+        >
+          Edit
+        </base-button>
       </div>
-      <div :class="['cardFooterButtonContainer']">
-        <base-button @click='loanPrimitives.viewLoan(props.loan.id)'>View</base-button>
+      <div>
+        <base-button
+          :class="['btn-accent']"
+          @click='loanPrimitives.viewLoan(props.loan.id)'
+        >
+          View
+        </base-button>
       </div>
     </template>
   </base-card>

@@ -47,33 +47,46 @@ const emitExit = () => {
     <template #header>
       <h2>{{ title }}</h2>
     </template>
+    <template #headerActions>
+      <base-button @click='emitExit' :class="['btn btn-circle btn-ghost']">
+        x
+      </base-button>
+    </template>
     <template #body>
       <div :class="['formInputs']">
-        <div :class="['formInputWrapper']">
-          <label>Principal</label>
-          <input v-model='principal' type='number' label='Principal' />
+        <div :class="['label']">
+          <span :class="['label-text']">Principal</span>
         </div>
-        <div :class="['formInputWrapper']">
-          <label>Interest</label>
-          <input v-model='interestRate' type='number' label='Interest' />
+        <input
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          v-model='principal'
+          type='number'
+          label='Principal'
+        />
+        <div :class="['label']">
+          <span :class="['label-text']">Interest</span>
         </div>
-        <div :class="['formInputWrapper']">
-          <label>Term</label>
-          <input v-model='termInYears' type='number' label='Term Length' />
+        <input
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          v-model='interestRate'
+          type='number'
+          label='Interest'
+        />
+        <div :class="['label']">
+          <span :class="['label-text']">Term</span>
         </div>
+        <input
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          v-model='termInYears'
+          type='number'
+          label='Term Length'
+        />
       </div>
     </template>
     <template #actions>
-      <base-button
-        @click='emitCreate'
-        :class='{ createButton: true }'
-        :disabled='!createButtonEnabled'
-      >
+      <base-button @click='emitCreate' :disabled='!createButtonEnabled'>
         {{ createButtonText }}
       </base-button>
-      <base-button @click='emitExit' :class='{ createButton: true }'
-        >Close</base-button
-      >
     </template>
   </base-modal>
 </template>

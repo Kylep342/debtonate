@@ -1,5 +1,5 @@
 <template>
-  <div :class="['card', 'w-96', 'bg-base-100', 'shadow-xl']">
+  <div :class="['card']">
     <div :class="['card-body']">
       <div>
         <slot name="cardTitle"></slot>

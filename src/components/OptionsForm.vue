@@ -1,10 +1,8 @@
 <script setup>
-const props = defineProps([
-  'id',
-  'periodsAsDatesButtonText',
-  'reducePaymentsButtonText',
-  'roundingButtonText',
-]);
+import { inject, ref } from 'vue';
+
+const props = defineProps(['id']);
+
 const emits = defineEmits([
   'exit-options-form',
   'toggle-avalanche-sort',
@@ -13,6 +11,15 @@ const emits = defineEmits([
   'toggle-round-up',
   'toggle-snowball-sort',
 ]);
+
+const options = inject('options');
+const periodsAsDates = ref(options.periodsAsDates);
+const reducePayments = ref(options.reducePayments);
+const roundUp = ref(options.roundUp);
+const snowballSort = ref(options.snowballSort);
+
+const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag) => (flag ? 'On' : 'Off');
 
 const emitExit = () => emits('exit-options-form');
 const emitAvalancheSort = () => emits('toggle-avalanche-sort');
@@ -27,45 +34,72 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
     <template #header>
       <h2>Options</h2>
     </template>
+    <template #headerActions>
+      <base-button @click='emitExit' :class="['btn btn-circle btn-ghost']">
+        x
+      </base-button>
+    </template>
     <template #body>
       <div :class="['formInputs']">
         <base-card>
-          <div :class="['formInputWrapper']">
+          <template #cardTitle>
             <h3>Sorting Method</h3>
-            <base-button @click='emitAvalancheSort'>Avalanche</base-button>
-            <base-button @click='emitSnowballSort'>Snowball</base-button>
-          </div>
+          </template>
+          <template #cardActions>
+            <base-button
+              :class='buttonStyle(!snowballSort)'
+              @click='emitAvalancheSort'
+            >
+              Avalanche
+            </base-button>
+            <base-button
+              :class='buttonStyle(snowballSort)'
+              @click='emitSnowballSort'
+            >
+              Snowball
+            </base-button>
+          </template>
         </base-card>
         <base-card>
-          <div :class="['formInputWrapper']">
+          <template #cardTitle>
             <h3>Reduce Payments</h3>
-            <base-button @click='emitToggleReducePayments'>
-              {{ props.reducePaymentsButtonText }}
+          </template>
+          <template #cardActions>
+            <base-button
+              :class='buttonStyle(reducePayments)'
+              @click='emitToggleReducePayments'
+            >
+              {{ buttonText(reducePayments) }}
             </base-button>
-          </div>
+          </template>
         </base-card>
         <base-card>
-          <div :class="['formInputWrapper']">
+          <template #cardTitle>
             <h3>Rounding</h3>
-            <base-button @click='emitToggleRoundUp'>
-              {{ props.roundingButtonText }}
+          </template>
+          <template #cardActions>
+            <base-button
+              :class='buttonStyle(roundUp)'
+              @click='emitToggleRoundUp'
+            >
+              {{ buttonText(roundUp) }}
             </base-button>
-          </div>
+          </template>
         </base-card>
         <base-card>
-          <div :class="['formInputWrapper']">
+          <template #cardTitle>
             <h3>Periods As Dates</h3>
-            <base-button @click='emitTogglePeriodsAsDates'>
-              {{ props.periodsAsDatesButtonText }}
+          </template>
+          <template #cardActions>
+            <base-button
+              :class='buttonStyle(periodsAsDates)'
+              @click='emitTogglePeriodsAsDates'
+            >
+              {{ buttonText(periodsAsDates) }}
             </base-button>
-          </div>
+          </template>
         </base-card>
       </div>
-    </template>
-    <template #actions>
-      <base-button @click='emitExit' :class='{ createButton: true }'
-        >Close</base-button
-      >
     </template>
   </base-modal>
 </template>

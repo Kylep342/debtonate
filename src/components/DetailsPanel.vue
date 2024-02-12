@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
@@ -15,6 +15,8 @@ const appData = inject('appData');
 const builders = inject('builders');
 const budgetPrimitives = inject('budgetPrimitives');
 const loanPrimitives = inject('loanPrimitives');
+
+const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
 const loan = computed(() => (
   props.type.value === constants.LOAN
@@ -48,7 +50,7 @@ const emitExit = () => { emits('exit-details-panel'); };
       <div>
         <ul>
           <li
-            v-for='budget in budgetPrimitives.monthlyBudgets'
+            v-for='budget in monthlyBudgets'
             :key='generateKey(loan, budget)'
           >
             <AmortizationTable

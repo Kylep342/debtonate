@@ -2,6 +2,7 @@
   "name": "debtonate",
   "version": "1.0.1",
   "scripts": {
+    "css": "npx tailwindcss -i ./src/assets/main.css -o ./src/assets/built.css --watch",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",

@@ -6,6 +6,10 @@ const options = inject('options');
 const baseDate = ref(options.baseDate);
 const periodsAsDates = ref(options.periodsAsDates);
 
+const keyPrefix = ref(props.keyPrefix);
+const paymentSummary = ref(props.paymentSummary);
+const title = ref(props.title);
+
 const renderPeriod = (period) => (
   periodsAsDates.value
     ? new Date(
@@ -26,10 +30,10 @@ const paymentHeader = computed(() => (
 <template>
   <div>
     <div>
-      <h3 :class="['cardTitle']">{{ props.title }}</h3>
+      <h3 :class="['cardTitle']">{{ title }}</h3>
     </div>
     <div :class="['justifyCenter']">
-      <table v-if='props.paymentSummary' :class="['table']">
+      <table :class="['table']">
         <thead id='AmortizationTotalsTHead'>
           <th :class="['textRight']">{{ paymentHeader }}</th>
           <th :class="['textRight']">Amount Paid</th>
@@ -38,8 +42,8 @@ const paymentHeader = computed(() => (
           <th :class="['textRight']">Principal Remaining</th>
         </thead>
         <tr
-          v-for='(record, rowno) in props.paymentSummary.amortizationSchedule'
-          :key='props.keyPrefix + rowno'
+          v-for='(record, rowno) in paymentSummary?.amortizationSchedule'
+          :key='keyPrefix + rowno'
         >
           <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
           <td :class="['textRight']">${{ (record.principal + record.interest).toFixed(2) }}</td>
@@ -53,15 +57,15 @@ const paymentHeader = computed(() => (
           <td :class="['textLeft']"><b>Totals:</b></td>
           <td :class="['textRight']">
             <b>${{ (
-              props.paymentSummary.totalPrincipalPaid +
-              props.paymentSummary.totalInterestPaid
+              paymentSummary?.totalPrincipalPaid +
+              paymentSummary?.totalInterestPaid
             ).toFixed(2) }}</b>
           </td>
           <td :class="['textRight']">
-            <b>${{ props.paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
+            <b>${{ paymentSummary?.totalPrincipalPaid.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']">
-            <b>${{ props.paymentSummary.totalInterestPaid.toFixed(2) }}</b>
+            <b>${{ paymentSummary?.totalInterestPaid.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']"><b> -- </b></td>
         </tr>

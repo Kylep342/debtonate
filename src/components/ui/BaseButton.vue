@@ -1,11 +1,5 @@
 <template>
-  <button :class='[mode, "btn btn-accent btn-outline"]'>
+  <button :class='["btn"]'>
     <slot></slot>
   </button>
 </template>
-
-<script>
-export default {
-  props: ['mode'],
-};
-</script>

@@ -92,9 +92,6 @@ const globalPrincipal = computed(
   ),
 );
 
-const periodsAsDatesButtonText = computed(() => (periodsAsDates.value ? 'Turn Off' : 'Turn On'));
-const reducePaymentsButtonText = computed(() => (reducePayments.value ? 'Turn Off' : 'Turn On'));
-const roundingButtonText = computed(() => (roundUp.value ? 'Turn Off' : 'Turn On'));
 const createLoanButtonText = computed(() => (currentLoanId.value ? 'Save' : 'Create'));
 
 const monthlyBudgets = computed(() => {
@@ -576,12 +573,8 @@ provide('appData', {
       @create-budget='createBudget'
       @exit-create-budget='exitCreateBudgetForm'
     />
-    <!-- TODO: Make the ButtonText attributes computed in the component itself -->
     <OptionsForm
       :id='constants.OPTIONS_FORM_ID'
-      :periodsAsDatesButtonText='periodsAsDatesButtonText'
-      :reducePaymentsButtonText='reducePaymentsButtonText'
-      :roundingButtonText='roundingButtonText'
       @exit-options-form='exitOptionsForm'
       @toggle-avalanche-sort='toggleAvalancheSort'
       @toggle-periods-as-dates='togglePeriodsAsDates'
@@ -589,8 +582,7 @@ provide('appData', {
       @toggle-round-up='toggleRounding'
       @toggle-snowball-sort='toggleSnowballSort'
     />
-    <br />
-    <div :class="['appBody']">
+    <div :class="['appBody', 'bg-base-100']">
       <div :class="['mgmtPanel']">
         <ManagementPanel
           :class="['mgmtPanelHeader']"

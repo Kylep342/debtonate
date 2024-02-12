@@ -15,7 +15,7 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
 </script>
 
 <template>
-  <base-card>
+  <base-card :class="['w-96', 'bg-base-100', 'shadow-xl']">
     <template #cardTitle>
       <div class="card-actions flow-root">
         <h2 :class="['cardHeaderTitle', 'float-left']">{{ budgetTitle }}</h2>
@@ -28,39 +28,53 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
       </div>
     </template>
     <template #cardContent>
-      <table :class="['cardTable']">
-        <tr>
-          <td :class="['textLeft']">Amount</td>
-          <td :class="['textRight']">
-            <b>{{ budgetAmount }}</b>
-          </td>
-        </tr>
-        <tr v-if="props.budget.id !== constants.DEFAULT">
-          <td :class="['textLeft']">Extra</td>
-          <td :class="['textRight']">
-            <b>{{ budgetExtra }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Interest</td>
-          <td :class="['textRight']">
-            <b>{{ budgetTotalInterest }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Payments</td>
-          <td :class="['textRight']">
-            <b>{{ budgetPayments }}</b>
-          </td>
-        </tr>
-      </table>
+      <base-table>
+        <template #body>
+          <tbody>
+            <tr>
+              <td>Amount</td>
+              <td>
+                <b>{{ budgetAmount }}</b>
+              </td>
+            </tr>
+            <tr v-if="props.budget.id !== constants.DEFAULT">
+              <td>Extra</td>
+              <td>
+                <b>{{ budgetExtra }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Interest</td>
+              <td>
+                <b>{{ budgetTotalInterest }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Payments</td>
+              <td>
+                <b>{{ budgetPayments }}</b>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </base-table>
     </template>
     <template #cardActions>
-      <div v-if="props.budget.id !== constants.DEFAULT" :class="['cardFooterButtonContainer']">
-        <base-button @click='budgetPrimitives.editBudget(props.budget.id)'>Edit</base-button>
+      <div v-if="props.budget.id !== constants.DEFAULT">
+        <base-button
+          :class="['btn-accent']"
+          @click='budgetPrimitives.editBudget(props.budget.id)'
+        >
+          Edit
+        </base-button>
       </div>
-      <div :class="['cardFooterButtonContainer']">
-        <base-button @click='budgetPrimitives.viewBudget(props.budget.id)'>View</base-button>
+      <div>
+        <base-button
+          :class="['btn-accent']"
+          @click='budgetPrimitives.viewBudget(props.budget.id)'
+        >
+          View
+        </base-button>
       </div>
     </template>
   </base-card>

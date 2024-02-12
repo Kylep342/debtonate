@@ -14,17 +14,45 @@ const emitSaveState = () => emits('save-app-state');
 
 <template>
   <div>
-    <header :id="['header']" :class="['header']">
-      <div :class="['headerSubSection']">
+    <header :id="['header']" :class="['navbar bg-secondary']">
+      <div :class="['flex-1']">
         <img src='/sqicon.png' />
-        <h1 :class="['headerTitle']">Debtonate</h1>
+        <h1>Debtonate</h1>
       </div>
-      <div :class="['headerSubSection']">
-        <base-button :class="['rounded-none']" @click='emitOpenOptions'>Options</base-button>
-        <base-button :class="['rounded-none']" @click='emitLoadState'>Load</base-button>
-        <base-button :class="['rounded-none']" @click='emitSaveState'>Save</base-button>
-        <base-button :class="['rounded-none']" @click='emitClearState'>Clear</base-button>
-      </div>
+      <ul :class="['menu menu-horizontal bg-secondary']">
+        <li>
+          <base-button
+            :class="['rounded-none btn-accent']"
+            @click='emitOpenOptions'
+          >
+            Options
+          </base-button>
+        </li>
+        <li>
+          <base-button
+            :class="['rounded-none btn-accent']"
+            @click='emitLoadState'
+          >
+            Load
+          </base-button>
+        </li>
+        <li>
+          <base-button
+            :class="['rounded-none btn-accent']"
+            @click='emitSaveState'
+          >
+            Save
+          </base-button>
+        </li>
+        <li>
+          <base-button
+            :class="['rounded-none btn-accent']"
+            @click='emitClearState'
+          >
+            Clear
+          </base-button>
+        </li>
+      </ul>
     </header>
   </div>
 </template>

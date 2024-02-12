@@ -38,24 +38,28 @@ const emitExit = () => {
     <template #header>
       <h2>{{ title }}</h2>
     </template>
+    <template #headerActions>
+      <base-button @click='emitExit' :class="['btn btn-circle btn-ghost']">
+        x
+      </base-button>
+    </template>
     <template #body>
       <div :class="['formInputs']">
-        <div :class="['formInputWrapper']">
-          <label>Budget</label>
-          <input v-model='amount' type='number' label='Budget' />
+        <div :class="['label']">
+          <span :class="['label-text']">Budget</span>
         </div>
+        <input
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          v-model='amount'
+          type='number'
+          label='Budget'
+        />
       </div>
     </template>
     <template #actions>
-      <base-button
-        @click='emitCreate'
-        :class='{ createButton: true }'
-        :disabled='!createButtonEnabled'
-        >{{ createButtonText }}</base-button
-      >
-      <base-button @click='emitExit' :class='{ createButton: true }'
-        >Close</base-button
-      >
+      <base-button @click='emitCreate' :disabled='!createButtonEnabled'>
+        {{ createButtonText }}
+      </base-button>
     </template>
   </base-modal>
 </template>
