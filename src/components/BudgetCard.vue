@@ -33,27 +33,19 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
           <tbody>
             <tr>
               <td>Amount</td>
-              <td>
-                <b>{{ budgetAmount }}</b>
-              </td>
+              <td><b>{{ budgetAmount }}</b></td>
             </tr>
             <tr v-if="props.budget.id !== constants.DEFAULT">
               <td>Extra</td>
-              <td>
-                <b>{{ budgetExtra }}</b>
-              </td>
+              <td><b>{{ budgetExtra }}</b></td>
             </tr>
             <tr>
               <td>Interest</td>
-              <td>
-                <b>{{ budgetTotalInterest }}</b>
-              </td>
+              <td><b>{{ budgetTotalInterest }}</b></td>
             </tr>
             <tr>
               <td>Payments</td>
-              <td>
-                <b>{{ budgetPayments }}</b>
-              </td>
+              <td><b>{{ budgetPayments }}</b></td>
             </tr>
           </tbody>
         </template>

@@ -18,7 +18,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
         <h2 :class="['cardHeaderTitle', 'float-left']">{{ title }}</h2>
         <button v-if="loan.id !== constants.TOTALS"
           :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
-          @click='loanPrimitives.deleteLoan(props.loan.id)'
+          @click='loanPrimitives.deleteLoan(loan.id)'
         >
           x
         </button>
@@ -30,21 +30,15 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
           <tbody>
             <tr>
               <td>Principal</td>
-              <td>
-                <b>{{ principal }}</b>
-              </td>
+              <td><b>{{ principal }}</b></td>
             </tr>
             <tr>
               <td>Interest Rate</td>
-              <td>
-                <b>{{ interestRate }}</b>
-              </td>
+              <td><b>{{ interestRate }}</b></td>
             </tr>
             <tr>
               <td>Minimum Payment</td>
-              <td>
-                <b>{{ minPayment }}</b>
-              </td>
+              <td><b>{{ minPayment }}</b></td>
             </tr>
           </tbody>
         </template>
@@ -54,7 +48,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
       <div v-if="loan.id !== constants.TOTALS">
         <base-button
           :class="['btn-accent']"
-          @click='loanPrimitives.editLoan(props.loan.id)'
+          @click='loanPrimitives.editLoan(loan.id)'
         >
           Edit
         </base-button>
@@ -62,7 +56,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
       <div>
         <base-button
           :class="['btn-accent']"
-          @click='loanPrimitives.viewLoan(props.loan.id)'
+          @click='loanPrimitives.viewLoan(loan.id)'
         >
           View
         </base-button>

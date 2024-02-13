@@ -10,6 +10,7 @@ const emitClearState = () => emits('clear-app-state');
 const emitLoadState = () => emits('load-app-state');
 const emitOpenOptions = () => emits('open-options-form');
 const emitSaveState = () => emits('save-app-state');
+const classes = ['rounded-none btn-accent'];
 </script>
 
 <template>
@@ -21,36 +22,16 @@ const emitSaveState = () => emits('save-app-state');
       </div>
       <ul :class="['menu menu-horizontal bg-secondary']">
         <li>
-          <base-button
-            :class="['rounded-none btn-accent']"
-            @click='emitOpenOptions'
-          >
-            Options
-          </base-button>
+          <base-button :class='classes' @click='emitOpenOptions'>Options</base-button>
         </li>
         <li>
-          <base-button
-            :class="['rounded-none btn-accent']"
-            @click='emitLoadState'
-          >
-            Load
-          </base-button>
+          <base-button :class='classes' @click='emitLoadState'>Load</base-button>
         </li>
         <li>
-          <base-button
-            :class="['rounded-none btn-accent']"
-            @click='emitSaveState'
-          >
-            Save
-          </base-button>
+          <base-button :class='classes' @click='emitSaveState'>Save</base-button>
         </li>
         <li>
-          <base-button
-            :class="['rounded-none btn-accent']"
-            @click='emitClearState'
-          >
-            Clear
-          </base-button>
+          <base-button :class='classes' @click='emitClearState'>Clear</base-button>
         </li>
       </ul>
     </header>

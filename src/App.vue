@@ -14,7 +14,6 @@ import DetailsPanel from './components/DetailsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
-import ManagementPanel from './components/ManagementPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
 
@@ -583,16 +582,10 @@ provide('appData', {
       @toggle-snowball-sort='toggleSnowballSort'
     />
     <div :class="['appBody', 'bg-base-100']">
-      <div :class="['mgmtPanel']">
-        <ManagementPanel
-          :class="['mgmtPanelHeader']"
-          :createFunction='openCreateLoanForm'
-          :panelId='"loanManagementPanel"'
-          :panelTitle='"Loans"'
-        />
+      <div :class="['columns']">
         <LoansPanel
-          v-if="loans.length"
           :class="['mgmtPanelBody']"
+          :createFunction='openCreateLoanForm'
           :deleteLoan='deleteLoan'
           :editLoan='editLoan'
           :loans='loans'
@@ -601,17 +594,11 @@ provide('appData', {
         />
       </div>
       <div :class="['mgmtPanel']">
-        <ManagementPanel
-          :class="['mgmtPanelHeader']"
-          :createFunction='openCreateBudgetForm'
-          :panelId='"budgetManagementPanel"'
-          :panelTitle='"Budgets"'
-        />
         <BudgetsPanel
-          v-if="budgets.length"
           :class="['mgmtPanelBody']"
           :budgets='monthlyBudgets'
           :budgetsTotals='totalsByBudget'
+          :createFunction='openCreateBudgetForm'
           :deleteBudget='deleteBudget'
           :editBudget='editBudget'
           :viewBudget='viewBudget'
