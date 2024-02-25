@@ -15,10 +15,10 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
 </script>
 
 <template>
-  <base-card :class="['w-96', 'bg-base-100', 'shadow-xl']">
+  <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div class="card-actions flow-root">
-        <h2 :class="['cardHeaderTitle', 'float-left']">{{ budgetTitle }}</h2>
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetTitle }}</h2>
         <button v-if="budget.id !== constants.DEFAULT"
           :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
           @click='budgetPrimitives.deleteBudget(props.budget.id)'
@@ -27,7 +27,7 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
         </button>
       </div>
     </template>
-    <template #cardContent>
+    <template #cardBody>
       <base-table>
         <template #body>
           <tbody>
@@ -52,21 +52,23 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
       </base-table>
     </template>
     <template #cardActions>
-      <div v-if="props.budget.id !== constants.DEFAULT">
-        <base-button
-          :class="['btn-accent']"
-          @click='budgetPrimitives.editBudget(props.budget.id)'
-        >
-          Edit
-        </base-button>
-      </div>
-      <div>
-        <base-button
-          :class="['btn-accent']"
-          @click='budgetPrimitives.viewBudget(props.budget.id)'
-        >
-          View
-        </base-button>
+      <div :class="['card-actions', 'justify-end', 'p-4']">
+        <div v-if="props.budget.id !== constants.DEFAULT">
+          <base-button
+            :class="['btn-accent']"
+            @click='budgetPrimitives.editBudget(props.budget.id)'
+          >
+            Edit
+          </base-button>
+        </div>
+        <div>
+          <base-button
+            :class="['btn-accent']"
+            @click='budgetPrimitives.viewBudget(props.budget.id)'
+          >
+            View
+          </base-button>
+        </div>
       </div>
     </template>
   </base-card>

@@ -10,30 +10,28 @@ const emitClearState = () => emits('clear-app-state');
 const emitLoadState = () => emits('load-app-state');
 const emitOpenOptions = () => emits('open-options-form');
 const emitSaveState = () => emits('save-app-state');
-const classes = ['rounded-none btn-accent'];
+const classes = ['rounded-none btn-secondary'];
 </script>
 
 <template>
-  <div>
-    <header :id="['header']" :class="['navbar bg-secondary']">
-      <div :class="['flex-1']">
-        <img src='/sqicon.png' />
-        <h1>Debtonate</h1>
-      </div>
-      <ul :class="['menu menu-horizontal bg-secondary']">
-        <li>
-          <base-button :class='classes' @click='emitOpenOptions'>Options</base-button>
-        </li>
-        <li>
-          <base-button :class='classes' @click='emitLoadState'>Load</base-button>
-        </li>
-        <li>
-          <base-button :class='classes' @click='emitSaveState'>Save</base-button>
-        </li>
-        <li>
-          <base-button :class='classes' @click='emitClearState'>Clear</base-button>
-        </li>
-      </ul>
-    </header>
-  </div>
+  <header :id="['header']" :class="['navbar', 'bg-secondary', 'fixed', 'sticky']">
+    <div :class="['flex-1']">
+      <img src='/sqicon.png' />
+      <h1>Debtonate</h1>
+    </div>
+    <ul :class="['menu menu-horizontal bg-secondary']">
+      <li>
+        <base-button :class='classes' @click='emitOpenOptions'>Options</base-button>
+      </li>
+      <li>
+        <base-button :class='classes' @click='emitLoadState'>Load</base-button>
+      </li>
+      <li>
+        <base-button :class='classes' @click='emitSaveState'>Save</base-button>
+      </li>
+      <li>
+        <base-button :class='classes' @click='emitClearState'>Clear</base-button>
+      </li>
+    </ul>
+  </header>
 </template>

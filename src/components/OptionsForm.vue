@@ -43,60 +43,81 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
       <div :class="['formInputs']">
         <base-card>
           <template #cardTitle>
-            <h3>Sorting Method</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Repayment Priority</h3>
+          </template>
+          <template #cardBody>
+            <p>Avalanche orders loans by ascending balance</p>
+            <p>Snowball orders loans by descending interest rate</p>
           </template>
           <template #cardActions>
-            <base-button
-              :class='buttonStyle(!snowballSort)'
-              @click='emitAvalancheSort'
-            >
-              Avalanche
-            </base-button>
-            <base-button
-              :class='buttonStyle(snowballSort)'
-              @click='emitSnowballSort'
-            >
-              Snowball
-            </base-button>
+            <div :class="['card-actions', 'justify-end', 'p-4']">
+              <base-button
+                :class='buttonStyle(!snowballSort)'
+                @click='emitAvalancheSort'
+              >
+                Avalanche
+              </base-button>
+              <base-button
+                :class='buttonStyle(snowballSort)'
+                @click='emitSnowballSort'
+              >
+                Snowball
+              </base-button>
+            </div>
           </template>
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3>Reduce Payments</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Reduce Payments</h3>
+          </template>
+          <template #cardBody>
+            <p>When enabled this reduces your total minimum contribution each time you pay off a loan</p>
           </template>
           <template #cardActions>
-            <base-button
-              :class='buttonStyle(reducePayments)'
-              @click='emitToggleReducePayments'
-            >
-              {{ buttonText(reducePayments) }}
-            </base-button>
+            <div :class="['card-actions', 'justify-end', 'p-4']">
+              <base-button
+                :class='buttonStyle(reducePayments)'
+                @click='emitToggleReducePayments'
+              >
+                {{ buttonText(reducePayments) }}
+              </base-button>
+              </div>
           </template>
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3>Rounding</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Rounding</h3>
+          </template>
+          <template #cardBody>
+            <p>When enabled this rounds your minimum contribution up to the next multiple of 100</p>
           </template>
           <template #cardActions>
-            <base-button
-              :class='buttonStyle(roundUp)'
-              @click='emitToggleRoundUp'
-            >
-              {{ buttonText(roundUp) }}
-            </base-button>
+            <div :class="['card-actions', 'justify-end', 'p-4']">
+              <base-button
+                :class='buttonStyle(roundUp)'
+                @click='emitToggleRoundUp'
+              >
+                {{ buttonText(roundUp) }}
+              </base-button>
+            </div>
           </template>
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3>Periods As Dates</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Periods As Dates</h3>
+          </template>
+          <template #cardBody>
+            <p>When enabled this displays all period tags as dates (relative to today)</p>
           </template>
           <template #cardActions>
-            <base-button
-              :class='buttonStyle(periodsAsDates)'
-              @click='emitTogglePeriodsAsDates'
-            >
-              {{ buttonText(periodsAsDates) }}
-            </base-button>
+            <div :class="['card-actions', 'justify-end', 'p-4']">
+              <base-button
+                :class='buttonStyle(periodsAsDates)'
+                @click='emitTogglePeriodsAsDates'
+              >
+                {{ buttonText(periodsAsDates) }}
+              </base-button>
+            </div>
           </template>
         </base-card>
       </div>

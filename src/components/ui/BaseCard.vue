@@ -1,15 +1,9 @@
 <template>
   <div :class="['card']">
-    <div :class="['card-body']">
-      <div>
-        <slot name="cardTitle"></slot>
-      </div>
-      <div>
-        <slot name="cardContent"></slot>
-      </div>
-      <div :class="['card-actions', 'justify-end']">
-        <slot name="cardActions"></slot>
-      </div>
+    <slot name="cardTitle"></slot>
+    <div :class="['card-body', 'p-4', 'overflow-y-auto']">
+      <slot name="cardBody"></slot>
     </div>
+    <slot name="cardActions"></slot>
   </div>
 </template>

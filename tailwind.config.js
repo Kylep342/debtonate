@@ -2,7 +2,11 @@
 module.exports = {
   content: ['./src/**/*.{vue,html,js}'],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        90: '22rem',
+      },
+    },
   },
   plugins: [require('daisyui')],
   daisyui: {

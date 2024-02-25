@@ -12,10 +12,10 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
 </script>
 
 <template>
-  <base-card :class="['w-96', 'bg-base-100', 'shadow-xl']">
+  <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
-      <div class="card-actions flow-root">
-        <h2 :class="['cardHeaderTitle', 'float-left']">{{ title }}</h2>
+      <div :class="['card-actions', 'flow-root', 'p-0']">
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ title }}</h2>
         <button v-if="loan.id !== constants.TOTALS"
           :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
           @click='loanPrimitives.deleteLoan(loan.id)'
@@ -24,7 +24,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
         </button>
       </div>
     </template>
-    <template #cardContent>
+    <template #cardBody>
       <base-table :size="['table-sm']">
         <template #body>
           <tbody>
@@ -45,21 +45,23 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
       </base-table>
     </template>
     <template #cardActions>
-      <div v-if="loan.id !== constants.TOTALS">
-        <base-button
-          :class="['btn-accent']"
-          @click='loanPrimitives.editLoan(loan.id)'
-        >
-          Edit
-        </base-button>
-      </div>
-      <div>
-        <base-button
-          :class="['btn-accent']"
-          @click='loanPrimitives.viewLoan(loan.id)'
-        >
-          View
-        </base-button>
+      <div :class="['card-actions', 'justify-end', 'p-4']">
+        <div v-if="loan.id !== constants.TOTALS">
+          <base-button
+            :class="['btn-accent']"
+            @click='loanPrimitives.editLoan(loan.id)'
+          >
+            Edit
+          </base-button>
+        </div>
+        <div>
+          <base-button
+            :class="['btn-accent']"
+            @click='loanPrimitives.viewLoan(loan.id)'
+          >
+            View
+          </base-button>
+        </div>
       </div>
     </template>
   </base-card>

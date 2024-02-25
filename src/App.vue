@@ -547,7 +547,7 @@ provide('appData', {
   <div
     id='debtonate'
     :class='[
-      "font-mono"
+      "font-mono",
     ]'
   >
     <HeaderBar
@@ -582,9 +582,9 @@ provide('appData', {
       @toggle-snowball-sort='toggleSnowballSort'
     />
     <div :class="['appBody', 'bg-base-100']">
-      <div :class="['columns']">
+      <div :class="['flex']">
         <LoansPanel
-          :class="['mgmtPanelBody']"
+          :class="['flex-none']"
           :createFunction='openCreateLoanForm'
           :deleteLoan='deleteLoan'
           :editLoan='editLoan'
@@ -592,10 +592,8 @@ provide('appData', {
           :totalsAsALoan='totalsAsALoan'
           :viewLoan='viewLoan'
         />
-      </div>
-      <div :class="['mgmtPanel']">
         <BudgetsPanel
-          :class="['mgmtPanelBody']"
+          :class="['flex-initial']"
           :budgets='monthlyBudgets'
           :budgetsTotals='totalsByBudget'
           :createFunction='openCreateBudgetForm'
@@ -603,27 +601,27 @@ provide('appData', {
           :editBudget='editBudget'
           :viewBudget='viewBudget'
         />
-      </div>
-      <div v-if='loans.length' :class="['presPanel']">
-        <div :class="['panel']">
-          <div :class="['panelHeader', 'header']">
-            <h2>Repayment Information</h2>
+        <div v-if='loans.length' :class="['presPanel']">
+          <div :class="[]">
+            <div :class="['header']">
+              <h2>Repayment Information</h2>
+            </div>
+            <div id='lifetimeInterestTotals'>
+              <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
+            </div>
           </div>
-          <div id='lifetimeInterestTotals'>
-            <base-chart :class="['graph']" :chart='lifetimeInterestTotalsChart' />
+          <div>
+            <DetailsPanel
+              :id='constants.LOAN_DETAILS_ID'
+              :type='constants.LOAN'
+              @exit-details-panel='unviewLoan'
+            />
+            <DetailsPanel
+              :id='constants.BUDGET_DETAILS_ID'
+              :type='constants.BUDGET'
+              @exit-details-panel='unviewBudget'
+            />
           </div>
-        </div>
-        <div>
-          <DetailsPanel
-            :id='constants.LOAN_DETAILS_ID'
-            :type='constants.LOAN'
-            @exit-details-panel='unviewLoan'
-          />
-          <DetailsPanel
-            :id='constants.BUDGET_DETAILS_ID'
-            :type='constants.BUDGET'
-            @exit-details-panel='unviewBudget'
-          />
         </div>
       </div>
     </div>
