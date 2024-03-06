@@ -57,7 +57,7 @@ const emitExit = () => {
       </div>
     </template>
     <template #actions>
-      <base-button @click='emitCreate' :disabled='!createButtonEnabled'>
+      <base-button @click='emitCreate' :disabled='!createButtonEnabled' :class="'btn-success'">
         {{ createButtonText }}
       </base-button>
     </template>

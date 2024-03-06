@@ -461,42 +461,42 @@ const createLoan = (principal, interestRate, termInYears) => {
 
 // watch
 
-watch(optionsFormActive, async (newValue) => {
-  if (newValue) {
+watch(optionsFormActive, async (show) => {
+  if (show) {
     document.getElementById(constants.OPTIONS_FORM_ID).showModal();
-  } else if (!newValue) {
+  } else if (!show) {
     document.getElementById(constants.OPTIONS_FORM_ID).close();
   }
 });
 
-watch(createBudgetFormActive, async (newValue) => {
-  if (newValue) {
+watch(createBudgetFormActive, async (show) => {
+  if (show) {
     document.getElementById(constants.BUDGET_FORM_ID).showModal();
-  } else if (!newValue) {
+  } else if (!show) {
     document.getElementById(constants.BUDGET_FORM_ID).close();
   }
 });
 
-watch(createLoanFormActive, async (newValue) => {
-  if (newValue) {
+watch(createLoanFormActive, async (show) => {
+  if (show) {
     document.getElementById(constants.LOAN_FORM_ID).showModal();
-  } else if (!newValue) {
+  } else if (!show) {
     document.getElementById(constants.LOAN_FORM_ID).close();
   }
 });
 
-watch(budgetDetailsPanelActive, async (newValue) => {
-  if (newValue) {
+watch(budgetDetailsPanelActive, async (show) => {
+  if (show) {
     document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
-  } else if (!newValue) {
+  } else if (!show) {
     document.getElementById(constants.BUDGET_DETAILS_ID).close();
   }
 });
 
-watch(loanDetailsPanelActive, async (newValue) => {
-  if (newValue) {
+watch(loanDetailsPanelActive, async (show) => {
+  if (show) {
     document.getElementById(constants.LOAN_DETAILS_ID).showModal();
-  } else if (!newValue) {
+  } else if (!show) {
     document.getElementById(constants.LOAN_DETAILS_ID).close();
   }
 });

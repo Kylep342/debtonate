@@ -46,8 +46,8 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Repayment Priority</h3>
           </template>
           <template #cardBody>
-            <p>Avalanche orders loans by ascending balance</p>
-            <p>Snowball orders loans by descending interest rate</p>
+            <p>Avalanche orders loans by descending interest rate</p>
+            <p>Snowball orders loans by ascending balance</p>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
