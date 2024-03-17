@@ -188,8 +188,8 @@ const buildBudgetDetailsTitle = (monthlyBudget) => (`Budget Details - ${
   monthlyBudget.id === constants.DEFAULT
     ? 'Minimum Budget '
     : `Budget ${getBudgetIndex(monthlyBudget.id)}`} `
-  + `$${monthlyBudget.absolute.toFixed(2)}/mo `
-  + `(+$${monthlyBudget.relative.toFixed(2)}/mo)`
+  + `$${monthlyBudget.absolute.toFixed(2)}/month `
+  + `(+$${monthlyBudget.relative.toFixed(2)}/month)`
 );
 const buildLoanDetailsTitle = (loan) => (`Loan Details - ${
   loan.id === constants.TOTALS
@@ -202,7 +202,7 @@ const buildAmortizationTableTitle = (loan, monthlyBudget, index) => (
   `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${index}`} `
     + `($${loan.principal.toFixed(2)} `
     + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
-    + `Total Budget: $${monthlyBudget.absolute?.toFixed(2)}/mo`
+    + `Total Budget: $${monthlyBudget.absolute?.toFixed(2)}/month`
 );
 
 const clearState = () => {
@@ -284,8 +284,8 @@ const paymentSchedules = computed(() => (
       paymentAmount: budget.relative,
       paymentSchedule: moneyfunx.payLoans(loans.value, budget.absolute, reducePayments.value),
       label: budget.id === constants.DEFAULT
-        ? `$${globalMinPayment.value.toFixed(2)}/mo`
-        : `$${budget.absolute.toFixed(2)}/mo (+$${budget.relative.toFixed(2)}/mo)`,
+        ? `$${globalMinPayment.value.toFixed(2)}/month`
+        : `$${budget.absolute.toFixed(2)}/month (+$${budget.relative.toFixed(2)}/month)`,
     }),
   )
 ));
@@ -309,7 +309,7 @@ const amortizationSchedulesGraphData = computed(() => {
           (record) => record.principalRemaining,
         ),
         hovertemplate: 'Payment %{x}: %{y} Remaining',
-        name: `$${(schedule.paymentAmount + globalMinPayment.value).toFixed(2)}/mo`,
+        name: `$${(schedule.paymentAmount + globalMinPayment.value).toFixed(2)}/month`,
         type: 'scatter',
       });
     });
@@ -601,7 +601,7 @@ provide('appData', {
           :editBudget='editBudget'
           :viewBudget='viewBudget'
         />
-        <div v-if='loans.length' :class="['presPanel']">
+        <div v-if='loans.length' :class="[]">
           <div :class="[]">
             <div :class="['header']">
               <h2>Repayment Information</h2>

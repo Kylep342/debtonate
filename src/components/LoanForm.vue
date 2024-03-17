@@ -1,12 +1,9 @@
 <script setup>
-import {
-  computed,
-  ref,
-} from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps([
-  'id',
   'createButtonText',
+  'id',
   'loan',
   'title',
 ]);
@@ -15,9 +12,17 @@ const emits = defineEmits([
   'exit-create-loan',
 ]);
 
-const principal = ref(props.loan?.principal || 0);
-const interestRate = ref(((props.loan?.annualRate || 0) * 100).toFixed(2));
-const termInYears = ref(props.loan?.termInYears || 0);
+const loan = ref(props.loan);
+
+const principal = ref(0);
+const interestRate = ref(0);
+const termInYears = ref(0);
+
+watch(loan, (newValue) => {
+  principal.value = newValue.principal;
+  interestRate.value = newValue.interestRate;
+  termInYears.value = newValue.termInYears;
+});
 
 const createButtonEnabled = computed(() => (
   [principal.value, interestRate.value, termInYears.value].every(
@@ -61,25 +66,27 @@ const emitExit = () => {
           :class="['input input-bordered input-secondary w-full max-ws']"
           v-model='principal'
           type='number'
+          step="0.01"
           label='Principal'
         />
         <div :class="['label']">
-          <span :class="['label-text']">Interest</span>
+          <span :class="['label-text']">Interest Rate</span>
         </div>
         <input
           :class="['input input-bordered input-secondary w-full max-ws']"
           v-model='interestRate'
           type='number'
-          label='Interest'
+          step="0.01"
+          label='Interest Rate'
         />
         <div :class="['label']">
-          <span :class="['label-text']">Term</span>
+          <span :class="['label-text']">Term (In Years)</span>
         </div>
         <input
           :class="['input input-bordered input-secondary w-full max-ws']"
           v-model='termInYears'
           type='number'
-          label='Term Length'
+          label='Term In Years'
         />
       </div>
     </template>

@@ -16,7 +16,7 @@ const classes = ['rounded-none btn-secondary'];
 <template>
   <header :id="['header']" :class="['navbar', 'bg-secondary', 'fixed', 'sticky']">
     <div :class="['flex-1']">
-      <img src='/sqicon.png' />
+      <img src='/icon.png' />
       <h1>Debtonate</h1>
     </div>
     <ul :class="['menu menu-horizontal bg-secondary']">

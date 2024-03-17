@@ -5,7 +5,11 @@ import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['createFunction', 'budgets', 'budgetsTotals']);
+const props = defineProps([
+  'budgets',
+  'budgetsTotals',
+  'createFunction',
+]);
 const title = 'Budgets';
 
 const defaultBudgetIndex = computed(() => (

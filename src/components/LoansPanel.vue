@@ -2,7 +2,11 @@
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 
-const props = defineProps(['createFunction', 'loans', 'totalsAsALoan']);
+const props = defineProps([
+  'createFunction',
+  'loans',
+  'totalsAsALoan',
+]);
 const title = 'Loans';
 </script>
 

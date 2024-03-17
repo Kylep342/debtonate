@@ -2,9 +2,9 @@
 import { computed, ref } from 'vue';
 
 const props = defineProps([
-  'id',
   'budget',
   'createButtonText',
+  'id',
   'title',
 ]);
 const emits = defineEmits([
