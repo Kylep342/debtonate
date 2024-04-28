@@ -318,7 +318,7 @@ const amortizationSchedulesGraphData = computed(() => {
 });
 
 const amortizationSchedulesChartPerLoan = computed(() => {
-  const charts = { totals: [] };
+  const charts = {};
 
   loans.value.forEach((loan) => {
     charts[loan.id] = {};

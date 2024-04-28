@@ -1,24 +1,30 @@
 <script setup>
-import { computed } from 'vue';
+import {
+  computed,
+  inject,
+  ref,
+} from 'vue';
 
 import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 
 const props = defineProps([
-  'budgets',
   'budgetsTotals',
   'createFunction',
 ]);
+
+const budgetPrimitives = inject('budgetPrimitives');
+const budgets = ref(budgetPrimitives.monthlyBudgets);
 const title = 'Budgets';
 
 const defaultBudgetIndex = computed(() => (
-  props.budgets.findIndex((budget) => budget.id === constants.DEFAULT)
+  budgets.value.findIndex((budget) => budget.id === constants.DEFAULT)
 ));
 const orderedBudgets = computed(() => [
-  props.budgets[defaultBudgetIndex.value],
-  ...props.budgets.slice(0, defaultBudgetIndex.value),
-  ...props.budgets.slice(defaultBudgetIndex.value + 1),
+  budgets.value[defaultBudgetIndex.value],
+  ...budgets.value.slice(0, defaultBudgetIndex.value),
+  ...budgets.value.slice(defaultBudgetIndex.value + 1),
 ]);
 </script>
 
@@ -34,7 +40,8 @@ const orderedBudgets = computed(() => [
       />
     </template>
     <template #cardBody>
-      <div :class="['overscroll-y-auto']" v-show='props.budgets.length'>
+      <!-- props.budgers always has min budget, so don't show it until another is created-->
+      <div :class="['overscroll-y-auto']" v-show='budgets.length'>
         <div v-for='(budget, index) in orderedBudgets' :key='budget.id' :class="['card']">
           <BudgetCard
             :budget='budget'
