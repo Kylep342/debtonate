@@ -21,7 +21,7 @@ import constants from './constants/constants';
 
 const budgets = ref([]);
 const baseDate = ref(new Date());
-const colors = ['#DAF7A6', '#900C3F', '#C70039', '#581845', '#FF5733', '#FFC300'];
+const colors = constants.COLORS;
 const createBudgetFormActive = ref(false);
 const createLoanFormActive = ref(false);
 const currentBudgetId = ref(null);
@@ -91,7 +91,11 @@ const globalPrincipal = computed(
   ),
 );
 
-const createLoanButtonText = computed(() => (currentLoanId.value ? 'Save' : 'Create'));
+const createLoanButtonText = computed(() => (
+  currentLoanId.value
+    ? constants.SAVE_TEXT
+    : constants.CREATE_TEXT
+));
 
 const monthlyBudgets = computed(() => {
   const budgetsArray = budgets.value.map((budget) => ({
@@ -613,11 +617,17 @@ provide('appData', {
           <div>
             <DetailsPanel
               :id='constants.LOAN_DETAILS_ID'
+              :title='currentLoanId
+                ? buildLoanDetailsTitle(getLoan(currentLoanId))
+                : "Loan Details"'
               :type='constants.LOAN'
               @exit-details-panel='unviewLoan'
             />
             <DetailsPanel
               :id='constants.BUDGET_DETAILS_ID'
+              :title='currentBudgetId
+                ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
+                : "Budget Details"'
               :type='constants.BUDGET'
               @exit-details-panel='unviewBudget'
             />

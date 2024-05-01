@@ -6,8 +6,8 @@ import constants from '../constants/constants';
 
 const props = defineProps([
   'id',
-  'type',
   'title',
+  'type',
 ]);
 const emits = defineEmits(['exit-details-panel']);
 
@@ -44,7 +44,7 @@ const emitExit = () => { emits('exit-details-panel'); };
 <template>
   <base-modal :id='props.id'>
     <template #header>
-      <h2>{{ props.title }}</h2>
+      <h2>{{ title }}</h2>
     </template>
     <template #body>
       <div>
