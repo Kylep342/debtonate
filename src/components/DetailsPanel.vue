@@ -26,8 +26,8 @@ const loan = computed(() => (
 
 const amortizationSchedulesChart = computed(() => (
   props.type.value === constants.LOAN
-    ? appData.amortizationSchedulesChartPerLoan[loanPrimitives.currentLoanId]
-    : appData.amortizationSchedulesChartPerLoan.totals
+    ? appData.amortizationSchedulesCharts[loanPrimitives.currentLoanId]
+    : appData.amortizationSchedulesCharts.totals
 ));
 
 const paymentSummary = computed(() => (

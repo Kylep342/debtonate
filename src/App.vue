@@ -294,7 +294,7 @@ const paymentSchedules = computed(() => (
   )
 ));
 
-const amortizationSchedulesGraphData = computed(() => {
+const amortizationSchedulesGraphs = computed(() => {
   const balances = { totals: [] };
 
   loans.value.forEach((loan) => {
@@ -321,7 +321,7 @@ const amortizationSchedulesGraphData = computed(() => {
   return balances;
 });
 
-const amortizationSchedulesChartPerLoan = computed(() => {
+const amortizationSchedulesCharts = computed(() => {
   const charts = {};
 
   loans.value.forEach((loan) => {
@@ -330,7 +330,7 @@ const amortizationSchedulesChartPerLoan = computed(() => {
   Object.keys(charts).forEach((loanId, index) => {
     charts[loanId] = {
       id: 'amortizationSchedulesChart',
-      data: amortizationSchedulesGraphData.value[loanId],
+      data: amortizationSchedulesGraphs.value[loanId],
       layout: {
         showLegend: false,
         barmode: 'group',
@@ -542,7 +542,7 @@ provide('loanPrimitives', {
 });
 
 provide('appData', {
-  amortizationSchedulesChartPerLoan,
+  amortizationSchedulesCharts,
   paymentSummaries,
 });
 </script>
