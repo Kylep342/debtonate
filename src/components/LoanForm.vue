@@ -1,16 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
-const props = defineProps([
-  'createButtonText',
-  'id',
-  'loan',
-  'title',
-]);
-const emits = defineEmits([
-  'create-loan',
-  'exit-create-loan',
-]);
+const props = defineProps(['createButtonText', 'id', 'loan', 'title']);
+const emits = defineEmits(['create-loan', 'exit-create-loan']);
 
 const loan = ref(props.loan);
 
@@ -24,11 +16,11 @@ watch(loan, (newValue) => {
   termInYears.value = newValue.termInYears;
 });
 
-const createButtonEnabled = computed(() => (
-  [principal.value, interestRate.value, termInYears.value].every(
+const createButtonEnabled = computed(
+  () => [principal.value, interestRate.value, termInYears.value].every(
     (input) => !Number.isNaN(parseFloat(input)) && parseFloat(input) > 0,
-  )
-));
+  ),
+);
 
 const clearCreate = () => {
   principal.value = null;
@@ -37,7 +29,12 @@ const clearCreate = () => {
 };
 
 const emitCreate = () => {
-  emits('create-loan', parseFloat(principal.value), parseFloat(interestRate.value) / 100, parseFloat(termInYears.value));
+  emits(
+    'create-loan',
+    parseFloat(principal.value),
+    parseFloat(interestRate.value) / 100,
+    parseFloat(termInYears.value),
+  );
   clearCreate();
 };
 
@@ -48,12 +45,12 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal :id='props.id'>
+  <base-modal :id="props.id">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button @click='emitExit' :class="['btn btn-circle btn-ghost']">
+      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
         x
       </base-button>
     </template>
@@ -64,34 +61,38 @@ const emitExit = () => {
         </div>
         <input
           :class="['input input-bordered input-secondary w-full max-ws']"
-          v-model='principal'
-          type='number'
+          v-model="principal"
+          type="number"
           step="0.01"
-          label='Principal'
+          label="Principal"
         />
         <div :class="['label']">
           <span :class="['label-text']">Interest Rate</span>
         </div>
         <input
           :class="['input input-bordered input-secondary w-full max-ws']"
-          v-model='interestRate'
-          type='number'
+          v-model="interestRate"
+          type="number"
           step="0.01"
-          label='Interest Rate'
+          label="Interest Rate"
         />
         <div :class="['label']">
           <span :class="['label-text']">Term (In Years)</span>
         </div>
         <input
           :class="['input input-bordered input-secondary w-full max-ws']"
-          v-model='termInYears'
-          type='number'
-          label='Term In Years'
+          v-model="termInYears"
+          type="number"
+          label="Term In Years"
         />
       </div>
     </template>
     <template #actions>
-      <base-button @click='emitCreate' :disabled='!createButtonEnabled' :class="'btn-success'">
+      <base-button
+        @click="emitCreate"
+        :disabled="!createButtonEnabled"
+        :class="'btn-success'"
+      >
         {{ createButtonText }}
       </base-button>
     </template>

@@ -8,11 +8,7 @@ const chartRef = ref(null);
 
 const initializeChart = () => {
   if (props.chart) {
-    Plotly.newPlot(
-      chartRef.value,
-      props.chart.data,
-      props.chart.layout,
-    );
+    Plotly.newPlot(chartRef.value, props.chart.data, props.chart.layout);
   }
 };
 
@@ -24,11 +20,7 @@ watch(
   () => props.chart,
   () => {
     if (props.chart) {
-      Plotly.react(
-        chartRef.value,
-        props.chart.data,
-        props.chart.layout,
-      );
+      Plotly.react(chartRef.value, props.chart.data, props.chart.layout);
     }
   },
   { deep: true },
@@ -37,6 +29,6 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <div :id='props.chart?.id' ref="chartRef"></div>
+    <div :id="props.chart?.id" ref="chartRef"></div>
   </div>
 </template>

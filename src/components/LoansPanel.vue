@@ -2,11 +2,7 @@
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 
-const props = defineProps([
-  'createFunction',
-  'loans',
-  'totalsAsALoan',
-]);
+const props = defineProps(['createFunction', 'loans', 'totalsAsALoan']);
 const title = 'Loans';
 </script>
 
@@ -16,20 +12,15 @@ const title = 'Loans';
     :id="'loanManagementPanel'"
   >
     <template #cardTitle>
-      <ManagementPanel
-        :createFunction='createFunction'
-        :title='title'
-      />
+      <ManagementPanel :createFunction="createFunction" :title="title" />
     </template>
-    <template
-      #cardBody
-    >
+    <template #cardBody>
       <div>
-        <div v-if='loans.length'>
-          <LoanCard :loan='props.totalsAsALoan' />
+        <div v-if="loans.length">
+          <LoanCard :loan="props.totalsAsALoan" />
         </div>
-        <div v-for='(loan, index) in props.loans' :key='loan.id'>
-          <LoanCard :index='index + 1' :loan='loan' />
+        <div v-for="(loan, index) in props.loans" :key="loan.id">
+          <LoanCard :index="index + 1" :loan="loan" />
         </div>
       </div>
     </template>

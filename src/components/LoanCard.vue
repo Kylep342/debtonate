@@ -2,13 +2,12 @@
 import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
-const props = defineProps([
-  'index',
-  'loan',
-]);
+const props = defineProps(['index', 'loan']);
 const loanPrimitives = inject('loanPrimitives');
 
-const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
+const interestRate = computed(
+  () => `${(props.loan.annualRate * 100).toFixed(2)}%`,
+);
 const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
 const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
 const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' : `Loan ${props.index}`));
@@ -19,9 +18,17 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ title }}</h2>
-        <button v-if="loan.id !== constants.TOTALS"
-          :class="['exitButton', 'bold', 'btn', 'btn-ghost', 'btn-square', 'float-right']"
-          @click='loanPrimitives.deleteLoan(loan.id)'
+        <button
+          v-if="loan.id !== constants.TOTALS"
+          :class="[
+            'exitButton',
+            'bold',
+            'btn',
+            'btn-ghost',
+            'btn-square',
+            'float-right',
+          ]"
+          @click="loanPrimitives.deleteLoan(loan.id)"
         >
           x
         </button>
@@ -33,15 +40,21 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
           <tbody>
             <tr>
               <td>Principal</td>
-              <td><b>{{ principal }}</b></td>
+              <td>
+                <b>{{ principal }}</b>
+              </td>
             </tr>
             <tr>
               <td>Interest Rate</td>
-              <td><b>{{ interestRate }}</b></td>
+              <td>
+                <b>{{ interestRate }}</b>
+              </td>
             </tr>
             <tr>
               <td>Minimum Payment</td>
-              <td><b>{{ minPayment }}</b></td>
+              <td>
+                <b>{{ minPayment }}</b>
+              </td>
             </tr>
           </tbody>
         </template>
@@ -52,7 +65,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
         <div v-if="loan.id !== constants.TOTALS">
           <base-button
             :class="['btn-accent']"
-            @click='loanPrimitives.editLoan(loan.id)'
+            @click="loanPrimitives.editLoan(loan.id)"
           >
             Edit
           </base-button>
@@ -60,7 +73,7 @@ const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' :
         <div>
           <base-button
             :class="['btn-accent']"
-            @click='loanPrimitives.viewLoan(loan.id)'
+            @click="loanPrimitives.viewLoan(loan.id)"
           >
             View
           </base-button>

@@ -4,75 +4,66 @@ import { computed, inject, ref } from 'vue';
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 
-const props = defineProps([
-  'id',
-  'title',
-  'type',
-]);
+const props = defineProps(['id', 'title', 'type']);
 const emits = defineEmits(['exit-details-panel']);
 
-const appData = inject('appData');
+const visuals = inject('visuals');
 const builders = inject('builders');
 const budgetPrimitives = inject('budgetPrimitives');
 const loanPrimitives = inject('loanPrimitives');
 
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
-const loan = computed(() => (
-  props.type.value === constants.LOAN
-    ? loanPrimitives.getLoan(loanPrimitives.currentLoanId)
-    : loanPrimitives.getLoan(constants.TOTALS)
-));
+const loan = computed(() => (props.type.value === constants.LOAN
+  ? loanPrimitives.getLoan(loanPrimitives.currentLoanId)
+  : loanPrimitives.getLoan(constants.TOTALS)));
 
-const amortizationSchedulesChart = computed(() => (
-  props.type.value === constants.LOAN
-    ? appData.amortizationSchedulesCharts[loanPrimitives.currentLoanId]
-    : appData.amortizationSchedulesCharts.totals
-));
+const amortizationSchedulesChart = computed(() => (props.type.value === constants.LOAN
+  ? visuals.amortizationSchedulesCharts[loanPrimitives.currentLoanId]
+  : visuals.amortizationSchedulesCharts.totals));
 
-const paymentSummary = computed(() => (
-  props.type.value === constants.LOAN
-    ? appData.paymentSummaries[loanPrimitives.currentLoanId]
-    : appData.paymentSummaries.totals
-));
+const paymentSummary = computed(() => (props.type.value === constants.LOAN
+  ? visuals.paymentSummaries[loanPrimitives.currentLoanId]
+  : visuals.paymentSummaries.totals));
 
-const generateKey = (...args) => (''.concat(args.id));
+const generateKey = (...args) => ''.concat(args.id);
 
-const emitExit = () => { emits('exit-details-panel'); };
+const emitExit = () => {
+  emits('exit-details-panel');
+};
 </script>
 
 <template>
-  <base-modal :id='props.id'>
+  <base-modal :id="props.id">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
     <template #body>
       <div>
         <ul>
-          <li
-            v-for='budget in monthlyBudgets'
-            :key='generateKey(loan, budget)'
-          >
+          <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
             <AmortizationTable
               :id="'amortizationTable' + generateKey(loan, budget)"
-              :keyPrefix='generateKey(loan, budget)'
-              :paymentSummary='paymentSummary'
-              :title='builders.buildAmortizationTableTitle(
-                loan,
-                budget,
-                loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId),
-              )'
+              :keyPrefix="generateKey(loan, budget)"
+              :paymentSummary="paymentSummary"
+              :title="
+                builders.buildAmortizationTableTitle(
+                  loan,
+                  budget,
+                  loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId)
+                )
+              "
             />
           </li>
         </ul>
         <base-chart
-          :chart='amortizationSchedulesChart'
+          :chart="amortizationSchedulesChart"
           :id="'amortizationSchedulesChart'"
         />
       </div>
     </template>
     <template #actions>
-      <base-button :class="['createButton']" @click='emitExit'
+      <base-button :class="['createButton']" @click="emitExit"
         >Close</base-button
       >
     </template>

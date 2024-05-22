@@ -30,12 +30,12 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
 </script>
 
 <template>
-  <base-modal :id='props.id'>
+  <base-modal :id="props.id">
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button @click='emitExit' :class="['btn btn-circle btn-ghost']">
+      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
         x
       </base-button>
     </template>
@@ -43,7 +43,9 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
       <div :class="['formInputs']">
         <base-card>
           <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Repayment Priority</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Repayment Priority
+            </h3>
           </template>
           <template #cardBody>
             <p>Avalanche orders loans by descending interest rate</p>
@@ -52,14 +54,14 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
               <base-button
-                :class='buttonStyle(!snowballSort)'
-                @click='emitAvalancheSort'
+                :class="buttonStyle(!snowballSort)"
+                @click="emitAvalancheSort"
               >
                 Avalanche
               </base-button>
               <base-button
-                :class='buttonStyle(snowballSort)'
-                @click='emitSnowballSort'
+                :class="buttonStyle(snowballSort)"
+                @click="emitSnowballSort"
               >
                 Snowball
               </base-button>
@@ -68,20 +70,25 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Reduce Payments</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Reduce Payments
+            </h3>
           </template>
           <template #cardBody>
-            <p>When enabled this reduces your total minimum contribution each time you pay off a loan</p>
+            <p>
+              When enabled this reduces your total minimum contribution each
+              time you pay off a loan
+            </p>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
               <base-button
-                :class='buttonStyle(reducePayments)'
-                @click='emitToggleReducePayments'
+                :class="buttonStyle(reducePayments)"
+                @click="emitToggleReducePayments"
               >
                 {{ buttonText(reducePayments) }}
               </base-button>
-              </div>
+            </div>
           </template>
         </base-card>
         <base-card>
@@ -89,13 +96,16 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Rounding</h3>
           </template>
           <template #cardBody>
-            <p>When enabled this rounds your minimum contribution up to the next multiple of 100</p>
+            <p>
+              When enabled this rounds your minimum contribution up to the next
+              multiple of 100
+            </p>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
               <base-button
-                :class='buttonStyle(roundUp)'
-                @click='emitToggleRoundUp'
+                :class="buttonStyle(roundUp)"
+                @click="emitToggleRoundUp"
               >
                 {{ buttonText(roundUp) }}
               </base-button>
@@ -104,16 +114,21 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Periods As Dates</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Periods As Dates
+            </h3>
           </template>
           <template #cardBody>
-            <p>When enabled this displays all period tags as dates (relative to today)</p>
+            <p>
+              When enabled this displays all period tags as dates (relative to
+              today)
+            </p>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
               <base-button
-                :class='buttonStyle(periodsAsDates)'
-                @click='emitTogglePeriodsAsDates'
+                :class="buttonStyle(periodsAsDates)"
+                @click="emitTogglePeriodsAsDates"
               >
                 {{ buttonText(periodsAsDates) }}
               </base-button>

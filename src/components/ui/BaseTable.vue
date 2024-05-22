@@ -5,9 +5,9 @@ const props = defineProps(['size']);
 <template>
   <div :class="['overflow-x-auto']">
     <table :class="['table', props.size]">
-      <slot name='header'></slot>
-      <slot name='body'></slot>
-      <slot name='footer'></slot>
+      <slot name="header"></slot>
+      <slot name="body"></slot>
+      <slot name="footer"></slot>
     </table>
   </div>
 </template>
