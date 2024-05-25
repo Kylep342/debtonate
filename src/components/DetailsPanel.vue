@@ -15,18 +15,18 @@ const loanPrimitives = inject('loanPrimitives');
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
 const loan = computed(() => (props.type.value === constants.LOAN
-  ? loanPrimitives.getLoan(loanPrimitives.currentLoanId)
+  ? loanPrimitives.getLoan(loanPrimitives.currentLoanId.value)
   : loanPrimitives.getLoan(constants.TOTALS)));
 
 const amortizationSchedulesChart = computed(() => (props.type.value === constants.LOAN
-  ? visuals.amortizationSchedulesCharts[loanPrimitives.currentLoanId]
-  : visuals.amortizationSchedulesCharts.totals));
+  ? visuals.amortizationSchedulesCharts.value[loanPrimitives.currentLoanId.value]
+  : visuals.amortizationSchedulesCharts.value.totals));
 
 const paymentSummary = computed(() => (props.type.value === constants.LOAN
-  ? visuals.paymentSummaries[loanPrimitives.currentLoanId]
-  : visuals.paymentSummaries.totals));
+  ? visuals.paymentSummaries.value[loanPrimitives.currentLoanId.value]
+  : visuals.paymentSummaries.value.totals));
 
-const generateKey = (...args) => ''.concat(args.id);
+const generateKey = (...args) => args.map((arg) => arg.id).join('');
 
 const emitExit = () => {
   emits('exit-details-panel');

@@ -5,7 +5,6 @@ const props = defineProps(['createButtonText', 'id', 'loan', 'title']);
 const emits = defineEmits(['create-loan', 'exit-create-loan']);
 
 const loan = ref(props.loan);
-
 const principal = ref(0);
 const interestRate = ref(0);
 const termInYears = ref(0);

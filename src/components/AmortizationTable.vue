@@ -36,7 +36,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
           <th :class="['textRight']">Principal Remaining</th>
         </thead>
         <tr
-          v-for="(record, rowno) in paymentSummary?.amortizationSchedule"
+          v-for="(record, rowno) in paymentSummary.amortizationSchedule"
           :key="keyPrefix + rowno"
         >
           <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
@@ -62,10 +62,10 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
             >
           </td>
           <td :class="['textRight']">
-            <b>${{ paymentSummary?.totalPrincipalPaid.toFixed(2) }}</b>
+            <b>${{ paymentSummary?.totalPrincipalPaid?.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']">
-            <b>${{ paymentSummary?.totalInterestPaid.toFixed(2) }}</b>
+            <b>${{ paymentSummary?.totalInterestPaid?.toFixed(2) }}</b>
           </td>
           <td :class="['textRight']"><b> -- </b></td>
         </tr>

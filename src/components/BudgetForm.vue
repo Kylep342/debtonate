@@ -1,10 +1,15 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
 const emits = defineEmits(['create-budget', 'exit-create-budget']);
 
-const amount = ref(props.budget?.relative || null);
+const budget = ref(props.budget);
+const amount = ref(0);
+
+watch(budget, (newBudget) => {
+  amount.value = newBudget.relative;
+});
 
 const createButtonEnabled = computed(
   () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
