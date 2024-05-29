@@ -4,16 +4,21 @@ import { computed, ref, watch } from 'vue';
 const props = defineProps(['createButtonText', 'id', 'loan', 'title']);
 const emits = defineEmits(['create-loan', 'exit-create-loan']);
 
-const loan = ref(props.loan);
-const principal = ref(0);
-const interestRate = ref(0);
-const termInYears = ref(0);
+const principal = ref(props.loan?.principal || 0);
+const interestRate = ref(parseFloat(props.loan?.annualRate) * 100 || 0);
+const termInYears = ref(props.loan?.termInYears || 0);
 
-watch(loan, (newValue) => {
-  principal.value = newValue.principal;
-  interestRate.value = newValue.interestRate;
-  termInYears.value = newValue.termInYears;
-});
+watch(
+  () => props.loan,
+  (newLoan) => {
+    if (newLoan) {
+      principal.value = newLoan.principal;
+      interestRate.value = parseFloat(newLoan.annualRate) * 100;
+      termInYears.value = newLoan.termInYears;
+    }
+  },
+  { immediate: true },
+);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
