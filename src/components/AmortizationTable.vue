@@ -10,13 +10,17 @@ const keyPrefix = ref(props.keyPrefix);
 const paymentSummary = ref(props.paymentSummary);
 const title = ref(props.title);
 
-const renderPeriod = (period) => (periodsAsDates.value
-  ? new Date(
-    baseDate.value.getFullYear(),
-    baseDate.value.getMonth() + period,
-    baseDate.value.getDate(),
-  ).toLocaleDateString()
-  : period);
+const renderPeriod = (period) => {
+  if (periodsAsDates.value) {
+    const date = new Date(baseDate.value);
+    return new Date(
+      date.getFullYear(),
+      date.getMonth() + period,
+      date.getDate(),
+    ).toLocaleDateString();
+  }
+  return period;
+};
 
 const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'Payment Number'));
 </script>

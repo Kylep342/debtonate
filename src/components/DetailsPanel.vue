@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
@@ -7,26 +7,35 @@ import constants from '../constants/constants';
 const props = defineProps(['id', 'title', 'type']);
 const emits = defineEmits(['exit-details-panel']);
 
-const visuals = inject('visuals');
-const builders = inject('builders');
 const budgetPrimitives = inject('budgetPrimitives');
+const builders = inject('builders');
 const loanPrimitives = inject('loanPrimitives');
+const visuals = inject('visuals');
 
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
-const loan = computed(() => (props.type.value === constants.LOAN
-  ? loanPrimitives.getLoan(loanPrimitives.currentLoanId.value)
-  : loanPrimitives.getLoan(constants.TOTALS)));
+const loan = computed(() => {
+  const currentLoanId = loanPrimitives.currentLoanId.value;
+  return props.type.value === constants.LOAN
+    ? loanPrimitives.getLoan(currentLoanId)
+    : loanPrimitives.getLoan(constants.TOTALS);
+});
 
-const amortizationSchedulesChart = computed(() => (props.type.value === constants.LOAN
-  ? visuals.amortizationSchedulesCharts.value[loanPrimitives.currentLoanId.value]
-  : visuals.amortizationSchedulesCharts.value.totals));
+const amortizationSchedulesChart = computed(() => {
+  const currentLoanId = loanPrimitives.currentLoanId.value;
+  return props.type.value === constants.LOAN
+    ? visuals.amortizationSchedulesCharts.value[currentLoanId]
+    : visuals.amortizationSchedulesCharts.value.totals;
+});
 
-const paymentSummary = computed(() => (props.type.value === constants.LOAN
-  ? visuals.paymentSummaries.value[loanPrimitives.currentLoanId.value]
-  : visuals.paymentSummaries.value.totals));
+const paymentSummary = computed(() => {
+  const currentLoanId = loanPrimitives.currentLoanId.value;
+  return props.type.value === constants.LOAN
+    ? visuals.paymentSummaries.value[currentLoanId]
+    : visuals.paymentSummaries.value.totals;
+});
 
-const generateKey = (...args) => args.map((arg) => arg.id).join('');
+const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
 const emitExit = () => {
   emits('exit-details-panel');
@@ -45,7 +54,7 @@ const emitExit = () => {
             <AmortizationTable
               :id="'amortizationTable' + generateKey(loan, budget)"
               :keyPrefix="generateKey(loan, budget)"
-              :paymentSummary="paymentSummary"
+              :paymentSummary="paymentSummary[budget.id]"
               :title="
                 builders.buildAmortizationTableTitle(
                   loan,
