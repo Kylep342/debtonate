@@ -1,13 +1,13 @@
 <script setup>
 import Plotly from 'plotly.js-dist/plotly';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watchEffect } from 'vue';
 
 const props = defineProps(['chart']);
 
 const chartRef = ref(null);
 
 const initializeChart = () => {
-  if (props.chart) {
+  if (props.chart && chartRef.value) {
     Plotly.newPlot(chartRef.value, props.chart.data, props.chart.layout);
   }
 };
@@ -16,14 +16,12 @@ onMounted(() => {
   initializeChart();
 });
 
-watch(
-  () => props.chart,
+watchEffect(
   () => {
-    if (props.chart) {
+    if (props.chart && chartRef.value) {
       Plotly.react(chartRef.value, props.chart.data, props.chart.layout);
     }
   },
-  { deep: true },
 );
 </script>
 
