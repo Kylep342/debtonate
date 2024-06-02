@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^3.0.1",
-    "moneyfunx": "^0.0.41",
+    "moneyfunx": "^0.0.44",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^2.14.0",
     "vite": "^3.0.4",

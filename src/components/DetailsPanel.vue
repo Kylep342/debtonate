@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
@@ -15,22 +15,15 @@ const visuals = inject('visuals');
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
 const loan = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId.value;
-  return props.type.value === constants.LOAN
+  const currentLoanId = loanPrimitives.currentLoanId?.value;
+  return props.type === constants.LOAN && currentLoanId
     ? loanPrimitives.getLoan(currentLoanId)
     : loanPrimitives.getLoan(constants.TOTALS);
 });
 
-const amortizationSchedulesChart = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId.value;
-  return props.type.value === constants.LOAN
-    ? visuals.amortizationSchedulesCharts.value[currentLoanId]
-    : visuals.amortizationSchedulesCharts.value.totals;
-});
-
 const paymentSummary = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId.value;
-  return props.type.value === constants.LOAN
+  const currentLoanId = loanPrimitives.currentLoanId?.value;
+  return props.type === constants.LOAN && currentLoanId
     ? visuals.paymentSummaries.value[currentLoanId]
     : visuals.paymentSummaries.value.totals;
 });
@@ -48,28 +41,34 @@ const emitExit = () => {
       <h2>{{ title }}</h2>
     </template>
     <template #body>
-      <div>
-        <ul>
+      <!-- <div role="tablist" class="tabs tabs-bordered"> -->
+        <!-- <ul> -->
+        <ul role="tablist" class="tabs tabs-bordered">
           <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
-            <AmortizationTable
-              :id="'amortizationTable' + generateKey(loan, budget)"
-              :keyPrefix="generateKey(loan, budget)"
-              :paymentSummary="paymentSummary[budget.id]"
-              :title="
-                builders.buildAmortizationTableTitle(
-                  loan,
-                  budget,
-                  loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId)
-                )
-              "
-            />
+            <input
+              type="radio"
+              name="amortization_tables"
+              role="tab"
+              class="tab"
+              :aria-label="`Tab ${budgetPrimitives.getBudgetIndex(budget.id)}`"
+            >
+            <div role="tabpanel" class="tab-content p-10">
+              <AmortizationTable
+                :id="'amortizationTable' + generateKey(loan, budget)"
+                :keyPrefix="generateKey(loan, budget)"
+                :paymentSummary="paymentSummary[budget.id]"
+                :title="
+                  builders.buildAmortizationTableTitle(
+                    loan,
+                    budget,
+                    loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId)
+                  )
+                "
+              />
+            </div>
           </li>
         </ul>
-        <base-chart
-          :chart="amortizationSchedulesChart"
-          :id="'amortizationSchedulesChart'"
-        />
-      </div>
+      <!-- </div> -->
     </template>
     <template #actions>
       <base-button :class="['createButton']" @click="emitExit"
