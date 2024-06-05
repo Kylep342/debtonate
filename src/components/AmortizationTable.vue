@@ -40,7 +40,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
           <th :class="['textRight']">Principal Remaining</th>
         </thead>
         <tr
-          v-for="(record, rowno) in paymentSummary.amortizationSchedule"
+          v-for="(record, rowno) in paymentSummary?.amortizationSchedule"
           :key="keyPrefix + rowno"
         >
           <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>

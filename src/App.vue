@@ -166,6 +166,11 @@ const editBudget = (id) => {
 };
 const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
 const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
+const getBudgetName = (id) => (
+  id === constants.DEFAULT
+    ? constants.NAME_MIN_BUDGET
+    : `${constants.BUDGET} ${getBudgetIndex(id)}`
+);
 const viewBudget = (id) => {
   currentBudgetId.value = id;
   budgetDetailsPanelActive.value = true;
@@ -477,23 +482,24 @@ provide('builders', {
 });
 
 provide('budgetPrimitives', {
+  currentBudgetId,
   deleteBudget,
   editBudget,
-  viewBudget,
   getBudget,
   getBudgetIndex,
-  currentBudgetId,
+  getBudgetName,
   monthlyBudgets,
+  viewBudget,
 });
 
 provide('loanPrimitives', {
+  currentLoanId,
   deleteLoan,
   editLoan,
-  viewLoan,
   getLoan,
   getLoanIndex,
-  currentLoanId,
   loans,
+  viewLoan,
 });
 
 provide('visuals', {

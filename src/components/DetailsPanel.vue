@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, onMounted, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
@@ -13,6 +13,14 @@ const loanPrimitives = inject('loanPrimitives');
 const visuals = inject('visuals');
 
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
+
+// const selectedBudget = ref();
+
+// onMounted(() => {
+//   selectBudget.value = monthlyBudgets.value[0];
+// });
+
+const flexBasis = computed(() => `basis-1/${monthlyBudgets.value.length}`);
 
 const loan = computed(() => {
   const currentLoanId = loanPrimitives.currentLoanId?.value;
@@ -28,6 +36,10 @@ const paymentSummary = computed(() => {
     : visuals.paymentSummaries.value.totals;
 });
 
+// const selectBudget = (budget) => {
+//   selectedBudget.value = budget.value;
+// };
+
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
 const emitExit = () => {
@@ -41,16 +53,40 @@ const emitExit = () => {
       <h2>{{ title }}</h2>
     </template>
     <template #body>
-      <!-- <div role="tablist" class="tabs tabs-bordered"> -->
-        <!-- <ul> -->
-        <ul role="tablist" class="tabs tabs-bordered">
+      <!-- <div>
+        <ul class="flex flex-row">
+          <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
+            <base-button
+              :class="'empty'"
+              @click="selectBudget(budget)">
+              Budget {{ budgetPrimitives.getBudgetIndex(budget) }}
+            </base-button>
+          </li>
+        </ul>
+        <AmortizationTable
+          v-if="selectBudget"
+          :id="'amortizationTable' + generateKey(loan, selectBudget)"
+          :keyPrefix="generateKey(loan, selectBudget)"
+          :paymentSummary="paymentSummary[selectBudget.id]"
+          :title="
+            builders.buildAmortizationTableTitle(
+              loan,
+              selectBudget,
+              loanPrimitives.getLoanIndex(loan.id)
+            )
+          "
+        />
+      </div> -->
+      <div role="tablist" class="tabs tabs-bordered w-full">
+        <ul class="flex flex-row">
           <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
             <input
               type="radio"
               name="amortization_tables"
+              :id="'tab' + index"
               role="tab"
-              class="tab"
-              :aria-label="`Tab ${budgetPrimitives.getBudgetIndex(budget.id)}`"
+              :class="['tab', flexBasis]"
+              :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`"
             >
             <div role="tabpanel" class="tab-content p-10">
               <AmortizationTable
@@ -61,14 +97,14 @@ const emitExit = () => {
                   builders.buildAmortizationTableTitle(
                     loan,
                     budget,
-                    loanPrimitives.getLoanIndex(loanPrimitives.currentLoanId)
+                    loanPrimitives.getLoanIndex(loan.id)
                   )
                 "
               />
             </div>
           </li>
         </ul>
-      <!-- </div> -->
+      </div>
     </template>
     <template #actions>
       <base-button :class="['createButton']" @click="emitExit"
