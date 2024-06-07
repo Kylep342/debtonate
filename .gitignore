@@ -17,6 +17,7 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 
+assets/*
 src/assets/built.css
 
 # Editor directories and files
