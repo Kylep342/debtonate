@@ -62,30 +62,6 @@ const emitExit = () => {
       >
     </template>
     <template #body>
-      <!-- <div>
-        <ul class="flex flex-row">
-          <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
-            <base-button
-              :class="'empty'"
-              @click="selectBudget(budget)">
-              Budget {{ budgetPrimitives.getBudgetIndex(budget) }}
-            </base-button>
-          </li>
-        </ul>
-        <AmortizationTable
-          v-if="selectBudget"
-          :id="'amortizationTable' + generateKey(loan, selectBudget)"
-          :keyPrefix="generateKey(loan, selectBudget)"
-          :paymentSummary="paymentSummary[selectBudget.id]"
-          :title="
-            builders.buildAmortizationTableTitle(
-              loan,
-              selectBudget,
-              loanPrimitives.getLoanIndex(loan.id)
-            )
-          "
-        />
-      </div> -->
       <div role="tablist" class="tabs tabs-bordered w-full">
         <ul class="flex flex-row">
           <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">

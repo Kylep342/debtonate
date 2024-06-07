@@ -37,14 +37,14 @@ const budgetTotalInterest = computed(
             'btn-square',
             'float-right',
           ]"
-          @click="budgetPrimitives.deleteBudget(props.budget.id)"
+          @click="budgetPrimitives.deleteBudget(budget.id)"
         >
           x
         </button>
       </div>
     </template>
     <template #cardBody>
-      <base-table>
+      <base-table :size="['table-sm']">
         <template #body>
           <tbody>
             <tr>
@@ -53,7 +53,7 @@ const budgetTotalInterest = computed(
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
-            <tr v-if="props.budget.id !== constants.DEFAULT">
+            <tr v-if="budget.id !== constants.DEFAULT">
               <td>Extra</td>
               <td>
                 <b>{{ budgetExtra }}</b>
@@ -77,10 +77,10 @@ const budgetTotalInterest = computed(
     </template>
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
-        <div v-if="props.budget.id !== constants.DEFAULT">
+        <div v-if="budget.id !== constants.DEFAULT">
           <base-button
             :class="['btn-accent']"
-            @click="budgetPrimitives.editBudget(props.budget.id)"
+            @click="budgetPrimitives.editBudget(budget.id)"
           >
             Edit
           </base-button>
@@ -88,7 +88,7 @@ const budgetTotalInterest = computed(
         <div>
           <base-button
             :class="['btn-accent']"
-            @click="budgetPrimitives.viewBudget(props.budget.id)"
+            @click="budgetPrimitives.viewBudget(budget.id)"
           >
             View
           </base-button>
