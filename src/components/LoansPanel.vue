@@ -21,10 +21,10 @@ const title = 'Loans';
     <template #cardBody>
       <div
         :class="[
+          'border-r-2',
           'h-screen',
           'overflow-y-auto',
           'overscroll-y-contain',
-          'border-r-2'
         ]">
         <div v-if="loans.length">
           <LoanCard :loan="props.totalsAsALoan" />
