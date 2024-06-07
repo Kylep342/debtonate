@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, onMounted, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
