@@ -1,10 +1,20 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-const props = defineProps(['title', 'createButtonText', 'budget']);
+const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
 const emits = defineEmits(['create-budget', 'exit-create-budget']);
 
-const amount = ref(props.budget?.relative || null);
+const amount = ref(props.budget?.relative);
+
+watch(
+  () => props.budget,
+  (newBudget) => {
+    if (newBudget) {
+      amount.value = newBudget.relative;
+    }
+  },
+  { immediate: true },
+);
 
 const createButtonEnabled = computed(
   () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
@@ -26,28 +36,36 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id="props.id">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
+    <template #headerActions>
+      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
+        x
+      </base-button>
+    </template>
     <template #body>
       <div :class="['formInputs']">
-        <div :class="['formInputWrapper']">
-          <label>Budget</label>
-          <input v-model='amount' type='number' label='Budget' />
+        <div :class="['label']">
+          <span :class="['label-text']">Budget</span>
         </div>
+        <input
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          v-model="amount"
+          type="number"
+          label="Budget"
+        />
       </div>
     </template>
     <template #actions>
       <base-button
-        @click='emitCreate'
-        :class='{ createButton: true }'
-        :disabled='!createButtonEnabled'
-        >{{ createButtonText }}</base-button
+        @click="emitCreate"
+        :disabled="!createButtonEnabled"
+        :class="'btn-success'"
       >
-      <base-button @click='emitExit' :class='{ createButton: true }'
-        >Close</base-button
-      >
+        {{ createButtonText }}
+      </base-button>
     </template>
   </base-modal>
 </template>

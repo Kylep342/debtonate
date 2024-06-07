@@ -3,56 +3,80 @@ import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['index', 'loan']);
-const loanFunctions = inject('loanFunctions');
+const loanPrimitives = inject('loanPrimitives');
 
 const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
-const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/mo`);
+const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
 const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
 const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' : `Loan ${props.index}`));
 </script>
 
 <template>
-  <div>
-    <div :class="['cardHeader', 'header']">
-      <h2 :class="['cardHeaderTitle']">{{ title }}</h2>
-      <div :class="['cardheaderSubSection']">
-        <button v-if="loan.id !== constants.TOTALS"
-          :class="['exitButton', 'bold']"
-          @click='loanFunctions.deleteLoan(props.loan.id)'
+  <base-card :class="['w-75', 'bg-base-100']">
+    <template #cardTitle>
+      <div :class="['card-actions', 'flow-root', 'p-0']">
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ title }}</h2>
+        <button
+          v-if="loan.id !== constants.TOTALS"
+          :class="[
+            'exitButton',
+            'bold',
+            'btn',
+            'btn-ghost',
+            'btn-square',
+            'float-right',
+          ]"
+          @click="loanPrimitives.deleteLoan(loan.id)"
         >
           x
         </button>
       </div>
-    </div>
-    <div :class="['cardBody']">
-      <table :class="['cardTable']">
-        <tr>
-          <td :class="['textLeft']">Principal</td>
-          <td :class="['textRight']">
-            <b>{{ principal }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Interest Rate</td>
-          <td :class="['textRight']">
-            <b>{{ interestRate }}</b>
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']">Minimum Payment</td>
-          <td :class="['textRight']">
-            <b>{{ minPayment }}</b>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div :class="['cardFooter', 'footer']">
-      <div v-if="loan.id !== constants.TOTALS" :class="['cardFooterButtonContainer']">
-        <button @click='loanFunctions.editLoan(props.loan.id)'>Edit</button>
+    </template>
+    <template #cardBody>
+      <base-table :size="['table-sm']">
+        <template #body>
+          <tbody>
+            <tr>
+              <td>Principal</td>
+              <td>
+                <b>{{ principal }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Interest Rate</td>
+              <td>
+                <b>{{ interestRate }}</b>
+              </td>
+            </tr>
+            <tr>
+              <td>Minimum Payment</td>
+              <td>
+                <b>{{ minPayment }}</b>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </base-table>
+    </template>
+    <template #cardActions>
+      <div :class="['card-actions', 'justify-end', 'p-4']">
+        <div v-if="loan.id !== constants.TOTALS">
+          <base-button
+            :class="['btn-accent']"
+            @click="loanPrimitives.editLoan(loan.id)"
+          >
+            Edit
+          </base-button>
+        </div>
+        <div>
+          <base-button
+            :class="['btn-accent']"
+            @click="loanPrimitives.viewLoan(loan.id)"
+          >
+            View
+          </base-button>
+        </div>
       </div>
-      <div :class="['cardFooterButtonContainer']">
-        <button @click='loanFunctions.viewLoan(props.loan.id)'>View</button>
-      </div>
-    </div>
-  </div>
+    </template>
+  </base-card>
 </template>

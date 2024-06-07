@@ -1,20 +1,24 @@
 <script setup>
-const props = defineProps([
-  'createFunction',
-  'panelId',
-  'panelTitle',
-]);
+const props = defineProps(['createFunction', 'title']);
 </script>
 
+<!-- TODO: Add show/hide functionality for the loan and budget panels -->
+
 <template>
-  <div :id='props.panelId'>
-    <div :class="['panelHeader', 'header']">
-      <h2 :class="['panelHeaderTitle']">{{ props.panelTitle }}</h2>
-      <div :class="['panelheaderSubSection']">
-        <button @click='props.createFunction'>+</button>
-      </div>
+  <div :class="['navbar']">
+    <div :class="['flex-1']">
+      <h2>{{ props.title }}</h2>
     </div>
+    <div :class="['flex-none']">
+      <base-button :class="['btn-success']" @click="props.createFunction"
+        >Create</base-button
+      >
+    </div>
+    <!-- <div :class="['flex-none']">
+      <base-button @click='props.createFunction'>+</base-button>
+    </div>
+    <div :class="['flex-none']">
+      <base-button @click='props.createFunction'>+</base-button>
+    </div> -->
   </div>
 </template>
-
-<style scoped></style>

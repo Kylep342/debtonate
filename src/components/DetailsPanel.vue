@@ -1,61 +1,95 @@
 <script setup>
+import { computed, inject, ref } from 'vue';
+
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 
-const props = defineProps([
-  'index',
-  'amortizationSchedulesChart',
-  'loan',
-  'monthlyBudgets',
-  'paymentSummaries',
-  'title',
-  'type',
-]);
+const props = defineProps(['id', 'title', 'type']);
 const emits = defineEmits(['exit-details-panel']);
 
-const buildTitle = (loan, monthlyBudget) => (
-  `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${props.index}`} `
-  + `($${loan.principal.toFixed(2)} `
-  + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
-  + `Total Budget: $${monthlyBudget.absolute.toFixed(2)}/mo`
-);
+const budgetPrimitives = inject('budgetPrimitives');
+const builders = inject('builders');
+const loanPrimitives = inject('loanPrimitives');
+const visuals = inject('visuals');
 
-const generateKey = (...args) => (''.concat(args.id));
+const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 
-const emitExit = () => { emits('exit-details-panel'); };
+// const selectedBudget = ref();
+
+// onMounted(() => {
+//   selectBudget.value = monthlyBudgets.value[0];
+// });
+
+const flexBasis = computed(() => `basis-1/${monthlyBudgets.value.length}`);
+
+const loan = computed(() => {
+  const currentLoanId = loanPrimitives.currentLoanId?.value;
+  return props.type === constants.LOAN && currentLoanId
+    ? loanPrimitives.getLoan(currentLoanId)
+    : loanPrimitives.getLoan(constants.TOTALS);
+});
+
+const paymentSummary = computed(() => {
+  const currentLoanId = loanPrimitives.currentLoanId?.value;
+  return props.type === constants.LOAN && currentLoanId
+    ? visuals.paymentSummaries.value[currentLoanId]
+    : visuals.paymentSummaries.value.totals;
+});
+
+// const selectBudget = (budget) => {
+//   selectedBudget.value = budget.value;
+// };
+
+const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
+
+const emitExit = () => {
+  emits('exit-details-panel');
+};
 </script>
 
 <template>
-  <base-modal>
+  <base-modal :id="props.id" class="">
     <template #header>
-      <h2>{{ props.title }}</h2>
+      <h2>{{ title }}</h2>
+    </template>
+    <template #headerActions>
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="emitExit"
+      >
+        x
+      </base-button
+      >
     </template>
     <template #body>
-      <div>
-        <ul>
-          <li
-            v-for='budget in props.monthlyBudgets'
-            :key='generateKey(props.loan, budget)'
-          >
-            <AmortizationTable
-              :id="'amortizationTable' + generateKey(props.loan, budget)"
-              :index='props.index'
-              :keyPrefix='generateKey(props.loan, budget)'
-              :paymentSummary='props.paymentSummaries[budget.id]'
-              :title='buildTitle(props.loan, budget)'
-            />
+      <div role="tablist" class="tabs tabs-bordered w-full">
+        <ul class="flex flex-row">
+          <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
+            <input
+              type="radio"
+              name="amortization_tables"
+              :id="'tab' + index"
+              role="tab"
+              :class="['tab', flexBasis]"
+              :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`"
+            >
+            <div role="tabpanel" class="tab-content p-10">
+              <AmortizationTable
+                :id="'amortizationTable' + generateKey(loan, budget)"
+                :keyPrefix="generateKey(loan, budget)"
+                :paymentSummary="paymentSummary[budget.id]"
+                :title="
+                  builders.buildAmortizationTableTitle(
+                    loan,
+                    budget,
+                    loanPrimitives.getLoanIndex(loan.id)
+                  )
+                "
+              />
+            </div>
           </li>
         </ul>
-        <base-chart
-          :chart='props.amortizationSchedulesChart'
-          :id="'amortizationChart' + loan.id"
-        />
       </div>
-    </template>
-    <template #actions>
-      <base-button :class="['createButton']" @click='emitExit'
-        >Close</base-button
-      >
     </template>
   </base-modal>
 </template>

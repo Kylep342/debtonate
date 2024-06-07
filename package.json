@@ -1,23 +1,26 @@
 {
   "name": "debtonate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
+    "css": "npx tailwindcss -i ./src/assets/main.css -o ./src/assets/built.css --watch",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "moneyfunx": "^0.0.41",
+    "@vitejs/plugin-vue": "^3.0.1",
+    "moneyfunx": "^0.0.44",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^2.14.0",
-    "@vitejs/plugin-vue": "^3.0.1",
     "vite": "^3.0.4",
     "vue": "^3.2.37"
   },
   "devDependencies": {
+    "daisyui": "^4.6.0",
     "eslint": "^8.42.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-vue": "^9.14.1"
+    "eslint-plugin-vue": "^9.14.1",
+    "tailwindcss": "^3.4.1"
   }
 }
