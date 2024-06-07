@@ -180,17 +180,15 @@ const unviewBudget = () => {
   currentBudgetId.value = null;
 };
 
-const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${
-  monthlyBudget.id === constants.DEFAULT
-    ? 'Minimum Budget '
-    : `Budget ${getBudgetIndex(monthlyBudget.id)}`
+const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
+  ? 'Minimum Budget '
+  : `Budget ${getBudgetIndex(monthlyBudget.id)}`
 } `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
-const buildLoanDetailsTitle = (loan) => `Loan Details - ${
-  loan.id === constants.TOTALS
-    ? 'All Loans '
-    : `Loan ${getLoanIndex(loan.id)}`
+const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
+  ? 'All Loans '
+  : `Loan ${getLoanIndex(loan.id)}`
 } `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
@@ -282,11 +280,11 @@ const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
     reducePayments.value,
   ),
   label:
-      budget.id === constants.DEFAULT
-        ? `$${globalMinPayment.value.toFixed(2)}/month`
-        : `$${budget.absolute.toFixed(2)}/month (+$${budget.relative.toFixed(
-          2,
-        )}/month)`,
+    budget.id === constants.DEFAULT
+      ? `$${globalMinPayment.value.toFixed(2)}/month`
+      : `$${budget.absolute.toFixed(2)}/month (+$${budget.relative.toFixed(
+        2,
+      )}/month)`,
 })));
 
 const amortizationSchedulesGraphs = computed(() => {
@@ -331,9 +329,7 @@ const amortizationSchedulesCharts = computed(() => {
       layout: {
         showLegend: false,
         barmode: 'group',
-        title: `Balance Over Time - ${
-          loanId === constants.TOTALS ? 'All Loans' : `Loan ${index}`
-        }`,
+        title: `Balance Over Time - ${loanId === constants.TOTALS ? 'All Loans' : `Loan ${index}`}`,
         xaxis: {
           title: {
             text: 'Payments',
@@ -514,20 +510,22 @@ provide('visuals', {
       @clear-app-state="clearState"
       @load-app-state="loadState"
       @open-options-form="openOptionsForm"
-      @save-app-state="saveState"
-    />
+      @save-app-state="saveState" />
     <LoanForm
       :id="constants.LOAN_FORM_ID"
       :createButtonText="createLoanButtonText"
-      :loan="currentLoanId ? getLoan(currentLoanId) : null"
+      :loan="currentLoanId ?
+        getLoan(currentLoanId) :
+        null"
       :title="createLoanFormTitle"
       @create-loan="createLoan"
-      @exit-create-loan="exitCreateLoanForm"
-    />
+      @exit-create-loan="exitCreateLoanForm" />
     <BudgetForm
       :id="constants.BUDGET_FORM_ID"
       :createButtonText="createBudgetButtonText"
-      :budget="currentBudgetId ? getBudget(currentBudgetId) : null"
+      :budget="currentBudgetId ?
+        getBudget(currentBudgetId) :
+        null"
       :title="createBudgetFormTitle"
       @create-budget="createBudget"
       @exit-create-budget="exitCreateBudgetForm"
@@ -546,20 +544,16 @@ provide('visuals', {
         :class="['flex-none']"
         :createFunction="openCreateLoanForm"
         :deleteLoan="deleteLoan"
-        :editLoan="editLoan"
-        :loans="loans"
+        :editLoan="editLoan" :loans="loans"
         :totalsAsALoan="totalsAsALoan"
-        :viewLoan="viewLoan"
-      />
+        :viewLoan="viewLoan" />
       <BudgetsPanel
         :class="['flex-initial']"
         :budgets="monthlyBudgets"
         :budgetsTotals="totalsByBudget"
         :createFunction="openCreateBudgetForm"
-        :deleteBudget="deleteBudget"
-        :editBudget="editBudget"
-        :viewBudget="viewBudget"
-      />
+        :deleteBudget="deleteBudget" :editBudget="editBudget"
+        :viewBudget="viewBudget" />
       <div v-if="loans.length" :class="[]">
         <div :class="['flex-grow']">
           <div :class="['header']">
@@ -570,20 +564,18 @@ provide('visuals', {
         <div>
           <DetailsPanel
             :id="constants.LOAN_DETAILS_ID"
-            :title="
-              currentLoanId
-                ? buildLoanDetailsTitle(getLoan(currentLoanId))
-                : 'Loan Details'
+            :title="currentLoanId ?
+              buildLoanDetailsTitle(getLoan(currentLoanId)) :
+              'Loan Details'
             "
             :type="constants.LOAN"
             @exit-details-panel="unviewLoan"
           />
           <DetailsPanel
-            :id="constants.BUDGET_DETAILS_ID"
-            :title="
-              currentBudgetId
-                ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
-                : 'Budget Details'
+          :id="constants.BUDGET_DETAILS_ID"
+          :title="currentBudgetId
+              ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
+              : 'Budget Details'
             "
             :type="constants.BUDGET"
             @exit-details-panel="unviewBudget"

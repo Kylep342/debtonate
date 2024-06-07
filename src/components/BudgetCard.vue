@@ -5,19 +5,11 @@ import constants from '../constants/constants';
 const props = defineProps(['budget', 'budgetTotals', 'index']);
 const budgetPrimitives = inject('budgetPrimitives');
 
-const budgetAmount = computed(
-  () => `$${props.budget.absolute.toFixed(2)}/month`,
-);
-const budgetExtra = computed(
-  () => `+$${props.budget.relative.toFixed(2)}/month`,
-);
-const budgetPayments = computed(
-  () => props.budgetTotals.amortizationSchedule.length,
-);
+const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/month`);
+const budgetExtra = computed(() => `+$${props.budget.relative.toFixed(2)}/month`);
+const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
 const budgetTitle = computed(() => (props.budget.id === constants.DEFAULT ? 'Minimum' : `Budget ${props.index}`));
-const budgetTotalInterest = computed(
-  () => `$${props.budgetTotals.lifetimeInterest.toFixed(2)}`,
-);
+const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeInterest.toFixed(2)}`);
 </script>
 
 <template>

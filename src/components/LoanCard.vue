@@ -5,9 +5,7 @@ import constants from '../constants/constants';
 const props = defineProps(['index', 'loan']);
 const loanPrimitives = inject('loanPrimitives');
 
-const interestRate = computed(
-  () => `${(props.loan.annualRate * 100).toFixed(2)}%`,
-);
+const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
 const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
 const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
 const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' : `Loan ${props.index}`));
