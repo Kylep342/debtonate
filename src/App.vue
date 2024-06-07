@@ -541,55 +541,53 @@ provide('visuals', {
       @toggle-round-up="toggleRounding"
       @toggle-snowball-sort="toggleSnowballSort"
     />
-    <div :class="['appBody', 'bg-base-100']">
-      <div :class="['flex']">
-        <LoansPanel
-          :class="['flex-none']"
-          :createFunction="openCreateLoanForm"
-          :deleteLoan="deleteLoan"
-          :editLoan="editLoan"
-          :loans="loans"
-          :totalsAsALoan="totalsAsALoan"
-          :viewLoan="viewLoan"
-        />
-        <BudgetsPanel
-          :class="['flex-initial']"
-          :budgets="monthlyBudgets"
-          :budgetsTotals="totalsByBudget"
-          :createFunction="openCreateBudgetForm"
-          :deleteBudget="deleteBudget"
-          :editBudget="editBudget"
-          :viewBudget="viewBudget"
-        />
-        <div v-if="loans.length" :class="[]">
-          <div :class="[]">
-            <div :class="['header']">
-              <h2>Repayment Information</h2>
-              <p>To Be Implemented</p>
-            </div>
+    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-contain', 'overscroll-none']">
+      <LoansPanel
+        :class="['flex-none']"
+        :createFunction="openCreateLoanForm"
+        :deleteLoan="deleteLoan"
+        :editLoan="editLoan"
+        :loans="loans"
+        :totalsAsALoan="totalsAsALoan"
+        :viewLoan="viewLoan"
+      />
+      <BudgetsPanel
+        :class="['flex-initial']"
+        :budgets="monthlyBudgets"
+        :budgetsTotals="totalsByBudget"
+        :createFunction="openCreateBudgetForm"
+        :deleteBudget="deleteBudget"
+        :editBudget="editBudget"
+        :viewBudget="viewBudget"
+      />
+      <div v-if="loans.length" :class="[]">
+        <div :class="['flex-grow']">
+          <div :class="['header']">
+            <h2>Repayment Information</h2>
+            <p>To Be Implemented</p>
           </div>
-          <div>
-            <DetailsPanel
-              :id="constants.LOAN_DETAILS_ID"
-              :title="
-                currentLoanId
-                  ? buildLoanDetailsTitle(getLoan(currentLoanId))
-                  : 'Loan Details'
-              "
-              :type="constants.LOAN"
-              @exit-details-panel="unviewLoan"
-            />
-            <DetailsPanel
-              :id="constants.BUDGET_DETAILS_ID"
-              :title="
-                currentBudgetId
-                  ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
-                  : 'Budget Details'
-              "
-              :type="constants.BUDGET"
-              @exit-details-panel="unviewBudget"
-            />
-          </div>
+        </div>
+        <div>
+          <DetailsPanel
+            :id="constants.LOAN_DETAILS_ID"
+            :title="
+              currentLoanId
+                ? buildLoanDetailsTitle(getLoan(currentLoanId))
+                : 'Loan Details'
+            "
+            :type="constants.LOAN"
+            @exit-details-panel="unviewLoan"
+          />
+          <DetailsPanel
+            :id="constants.BUDGET_DETAILS_ID"
+            :title="
+              currentBudgetId
+                ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
+                : 'Budget Details'
+            "
+            :type="constants.BUDGET"
+            @exit-details-panel="unviewBudget"
+          />
         </div>
       </div>
     </div>

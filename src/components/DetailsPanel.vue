@@ -48,9 +48,18 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal :id="props.id">
+  <base-modal :id="props.id" class="">
     <template #header>
       <h2>{{ title }}</h2>
+    </template>
+    <template #headerActions>
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="emitExit"
+      >
+        x
+      </base-button
+      >
     </template>
     <template #body>
       <!-- <div>
@@ -105,11 +114,6 @@ const emitExit = () => {
           </li>
         </ul>
       </div>
-    </template>
-    <template #actions>
-      <base-button :class="['createButton']" @click="emitExit"
-        >Close</base-button
-      >
     </template>
   </base-modal>
 </template>

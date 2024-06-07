@@ -23,26 +23,39 @@ const orderedBudgets = computed(() => [
 
 <template>
   <base-card
-    :class="['bg-base-100', 'h-screen', 'w-90']"
+    :class="['bg-base-100', 'w-90']"
     :id="'budgetManagementPanel'"
   >
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="title" />
+      <ManagementPanel
+        :createFunction="createFunction"
+        :title="title"
+        :class="['sticky', 'fixed', 'border-b-2']"/>
     </template>
     <template #cardBody>
       <!-- props.budgers always has min budget, so don't show it until another is created-->
-      <div :class="['overscroll-y-auto']" v-show="budgets.length">
-        <div
-          v-for="(budget, index) in orderedBudgets"
-          :key="budget.id"
-          :class="['card']"
-        >
-          <BudgetCard
-            :budget="budget"
-            :budgetTotals="props.budgetsTotals[budget.id]"
-            :index="index"
-          />
-        </div>
+      <div
+        v-show="budgets.length"
+        :class="[
+          'border-r-2',
+          'h-screen',
+          'overflow-y-auto',
+          'overscroll-y-contain',
+        ]"
+      >
+        <ul>
+          <li
+            v-for="(budget, index) in orderedBudgets"
+            :key="budget.id"
+            :class="['']"
+          >
+            <BudgetCard
+              :budget="budget"
+              :budgetTotals="props.budgetsTotals[budget.id]"
+              :index="index"
+            />
+          </li>
+        </ul>
       </div>
     </template>
   </base-card>

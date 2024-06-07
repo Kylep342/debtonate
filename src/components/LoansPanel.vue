@@ -8,20 +8,32 @@ const title = 'Loans';
 
 <template>
   <base-card
-    :class="['bg-base-100', 'h-screen', 'w-90']"
+    :class="['bg-base-100', 'w-90']"
     :id="'loanManagementPanel'"
   >
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="title" />
+      <ManagementPanel
+        :createFunction="createFunction"
+        :title="title"
+        :class="['sticky', 'fixed', 'border-b-2']"
+      />
     </template>
     <template #cardBody>
-      <div>
+      <div
+        :class="[
+          'h-screen',
+          'overflow-y-auto',
+          'overscroll-y-contain',
+          'border-r-2'
+        ]">
         <div v-if="loans.length">
           <LoanCard :loan="props.totalsAsALoan" />
         </div>
-        <div v-for="(loan, index) in props.loans" :key="loan.id">
-          <LoanCard :index="index + 1" :loan="loan" />
-        </div>
+        <ul>
+          <li v-for="(loan, index) in props.loans" :key="loan.id">
+            <LoanCard :index="index + 1" :loan="loan" />
+          </li>
+        </ul>
       </div>
     </template>
   </base-card>

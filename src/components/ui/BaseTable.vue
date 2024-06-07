@@ -4,7 +4,7 @@ const props = defineProps(['size']);
 
 <template>
   <div :class="['overflow-x-auto']">
-    <table :class="['table', props.size]">
+    <table :class="['table', 'table-pin-rows', props.size]">
       <slot name="header"></slot>
       <slot name="body"></slot>
       <slot name="footer"></slot>

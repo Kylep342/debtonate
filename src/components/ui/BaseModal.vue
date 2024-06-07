@@ -5,7 +5,7 @@ const props = defineProps(['title', 'id']);
 <template>
   <dialog :id="props.id" :class="['modal', 'modal-bottom', 'sm:modal-middle']">
     <div :class="['modal-box', 'p-0']">
-      <base-card :class="'overflow-hidden'">
+      <base-card :class="[]">
         <template #cardTitle>
           <header :class="['navbar', 'bg-secondary']">
             <div :class="['flex-1']">
@@ -15,13 +15,13 @@ const props = defineProps(['title', 'id']);
             </div>
             <div :class="['modal-action', 'flex-none', 'mt-0']">
               <menu>
-                <slot name="headerActions"> </slot>
+                <slot name="headerActions"></slot>
               </menu>
             </div>
           </header>
         </template>
         <template #cardBody>
-          <slot :class="['vertical-scroll']" name="body"> </slot>
+          <slot :class="['overscroll-y-contain']" name="body"></slot>
         </template>
         <template #cardActions>
           <div :class="['card-actions', 'justify-end', 'p-4']">
