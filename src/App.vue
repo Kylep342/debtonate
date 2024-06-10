@@ -145,6 +145,11 @@ const editLoan = (id) => {
 const getLoanIndex = (id) => (id !== constants.TOTALS
   ? loans.value.findIndex((loan) => loan.id === id) + 1
   : 0);
+const getLoanName = (id) => (
+  id === constants.TOTALS
+    ? constants.NAME_TOTALS_AS_LOAN
+    : `${constants.LOAN} ${getLoanIndex(id)}`
+);
 const viewLoan = (id) => {
   currentLoanId.value = id;
   loanDetailsPanelActive.value = true;
@@ -192,7 +197,7 @@ const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.
 } `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
-const buildAmortizationTableTitle = (loan, monthlyBudget, index) => `${loan.id === constants.TOTALS ? 'All Loans ' : `Loan ${index}`} `
+const buildAmortizationTableTitle = (loan, monthlyBudget) => `${getLoanName(loan.id)} `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
   + `Total Budget: $${monthlyBudget.absolute?.toFixed(2)}/month`;
@@ -322,14 +327,14 @@ const amortizationSchedulesCharts = computed(() => {
   loans.value.forEach((loan) => {
     charts[loan.id] = {};
   });
-  Object.keys(charts).forEach((loanId, index) => {
+  Object.keys(charts).forEach((loanId) => {
     charts[loanId] = {
       id: 'amortizationSchedulesChart',
       data: amortizationSchedulesGraphs.value[loanId],
       layout: {
         showLegend: false,
         barmode: 'group',
-        title: `Balance Over Time - ${loanId === constants.TOTALS ? 'All Loans' : `Loan ${index}`}`,
+        title: `Balance Over Time - ${getLoanName(loanId)}`,
         xaxis: {
           title: {
             text: 'Payments',
@@ -494,6 +499,7 @@ provide('loanPrimitives', {
   editLoan,
   getLoan,
   getLoanIndex,
+  getLoanName,
   loans,
   viewLoan,
 });

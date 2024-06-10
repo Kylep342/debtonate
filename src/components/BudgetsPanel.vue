@@ -35,7 +35,6 @@ const orderedBudgets = computed(() => [
     <template #cardBody>
       <!-- props.budgers always has min budget, so don't show it until another is created-->
       <div
-        v-show="budgets.length"
         :class="[
           'border-r-2',
           'h-screen',
@@ -45,14 +44,13 @@ const orderedBudgets = computed(() => [
       >
         <ul>
           <li
-            v-for="(budget, index) in orderedBudgets"
+            v-for="(budget) in orderedBudgets"
             :key="budget.id"
             :class="['']"
           >
             <BudgetCard
               :budget="budget"
               :budgetTotals="props.budgetsTotals[budget.id]"
-              :index="index"
             />
           </li>
         </ul>

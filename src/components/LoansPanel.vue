@@ -30,8 +30,8 @@ const title = 'Loans';
           <LoanCard :loan="props.totalsAsALoan" />
         </div>
         <ul>
-          <li v-for="(loan, index) in props.loans" :key="loan.id">
-            <LoanCard :index="index + 1" :loan="loan" />
+          <li v-for="(loan) in props.loans" :key="loan.id">
+            <LoanCard :loan="loan" />
           </li>
         </ul>
       </div>

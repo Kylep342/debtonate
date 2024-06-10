@@ -2,13 +2,12 @@
 import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['budget', 'budgetTotals', 'index']);
+const props = defineProps(['budget', 'budgetTotals']);
 const budgetPrimitives = inject('budgetPrimitives');
 
 const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/month`);
 const budgetExtra = computed(() => `+$${props.budget.relative.toFixed(2)}/month`);
 const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
-const budgetTitle = computed(() => (props.budget.id === constants.DEFAULT ? 'Minimum' : `Budget ${props.index}`));
 const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeInterest.toFixed(2)}`);
 </script>
 
@@ -17,7 +16,7 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
     <template #cardTitle>
       <div class="card-actions flow-root">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ budgetTitle }}
+          {{ budgetPrimitives.getBudgetName(budget.id) }}
         </h2>
         <button
           v-if="budget.id !== constants.DEFAULT"

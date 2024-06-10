@@ -10,7 +10,7 @@ const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
 const LOAN_FORM_ID = 'loanForm';
 const NAME_MIN_BUDGET = 'Minimum Budget';
-const NAME_TOTALS_AS_LOAND = 'All Loans';
+const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
 const SAVE_TEXT = 'Save';
 const TOTALS = 'totals';
@@ -26,7 +26,7 @@ export default Object.freeze({
   LOAN_FORM_ID,
   LOAN,
   NAME_MIN_BUDGET,
-  NAME_TOTALS_AS_LOAND,
+  NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
   SAVE_TEXT,
   TOTALS,

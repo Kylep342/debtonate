@@ -2,20 +2,21 @@
 import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['index', 'loan']);
+const props = defineProps(['loan']);
 const loanPrimitives = inject('loanPrimitives');
 
 const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
 const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
 const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
-const title = computed(() => (props.loan.id === constants.TOTALS ? 'All Loans' : `Loan ${props.index}`));
 </script>
 
 <template>
   <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
-        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ title }}</h2>
+        <h2
+          :class="['cardHeaderTitle', 'float-left', 'p-4']"
+        >{{ loanPrimitives.getLoanName(loan.id) }}</h2>
         <button
           v-if="loan.id !== constants.TOTALS"
           :class="[

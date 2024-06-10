@@ -68,7 +68,7 @@ const emitExit = () => {
             <input
               type="radio"
               name="amortization_tables"
-              :id="'tab' + index"
+              :id="'budget' + budgetPrimitives.getBudgetIndex(budget.id)"
               role="tab"
               :class="['tab', flexBasis]"
               :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`"
@@ -82,7 +82,6 @@ const emitExit = () => {
                   builders.buildAmortizationTableTitle(
                     loan,
                     budget,
-                    loanPrimitives.getLoanIndex(loan.id)
                   )
                 "
               />
