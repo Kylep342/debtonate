@@ -2,11 +2,13 @@
   "name": "debtonate",
   "version": "1.0.1",
   "scripts": {
-    "css": "npx tailwindcss -i ./src/assets/main.css -o ./src/assets/built.css --watch",
-    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "css": "npx tailwindcss -i ./src/assets/main.css -o ./src/assets/built.css --watch",
+    "deploy": "gh-pages -d dist",
+    "dev": "vite",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "predeploy": "npm run build",
+    "preview": "vite preview --port 4173"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^3.0.1",
@@ -21,6 +23,7 @@
     "eslint": "^8.42.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-vue": "^9.14.1",
+    "gh-pages": "^6.1.1",
     "tailwindcss": "^3.4.1"
   }
 }

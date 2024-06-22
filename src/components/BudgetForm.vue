@@ -2,9 +2,11 @@
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
-const emits = defineEmits(['create-budget', 'exit-create-budget']);
-
 const amount = ref(props.budget?.relative);
+
+const createButtonEnabled = computed(
+  () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
+);
 
 watch(
   () => props.budget,
@@ -16,9 +18,7 @@ watch(
   { immediate: true },
 );
 
-const createButtonEnabled = computed(
-  () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
-);
+const emits = defineEmits(['create-budget', 'exit-create-budget']);
 
 const clearCreate = () => {
   amount.value = null;

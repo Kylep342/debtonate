@@ -2,13 +2,13 @@
 import { computed, inject, ref } from 'vue';
 
 const props = defineProps(['keyPrefix', 'paymentSummary', 'title']);
-const options = inject('options');
-const baseDate = ref(options.baseDate);
-const periodsAsDates = ref(options.periodsAsDates);
-
 const keyPrefix = ref(props.keyPrefix);
 const paymentSummary = ref(props.paymentSummary);
 const title = ref(props.title);
+
+const options = inject('options');
+const baseDate = ref(options.baseDate);
+const periodsAsDates = ref(options.periodsAsDates);
 
 const renderPeriod = (period) => {
   if (periodsAsDates.value) {

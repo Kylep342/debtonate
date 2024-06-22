@@ -3,6 +3,7 @@ import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['budget', 'budgetTotals']);
+
 const budgetPrimitives = inject('budgetPrimitives');
 
 const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/month`);

@@ -3,11 +3,11 @@ import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['loan']);
-const loanPrimitives = inject('loanPrimitives');
-
 const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
 const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
 const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
+
+const loanPrimitives = inject('loanPrimitives');
 </script>
 
 <template>

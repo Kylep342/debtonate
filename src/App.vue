@@ -76,7 +76,7 @@ const globalPrincipal = computed(() => loans.value.reduce(
 ));
 
 const createLoanButtonText = computed(
-  () => (currentLoanId.value ? constants.SAVE_TEXT : constants.CREATE_TEXT),
+  () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
 );
 
 const monthlyBudgets = computed(() => {
@@ -188,13 +188,13 @@ const unviewBudget = () => {
 const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
   ? 'Minimum Budget '
   : `Budget ${getBudgetIndex(monthlyBudget.id)}`
-} `
+  } `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
   ? 'All Loans '
   : `Loan ${getLoanIndex(loan.id)}`
-} `
+  } `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
 const buildAmortizationTableTitle = (loan, monthlyBudget) => `${getLoanName(loan.id)} `
@@ -254,7 +254,11 @@ const saveState = () => {
 const createLoanFormTitle = computed(() => (currentLoanId.value
   ? `Editing Loan ${getLoanIndex(currentLoanId.value)}`
   : 'Creating a Loan'));
-const createBudgetButtonText = computed(() => (currentBudgetId.value ? 'Save' : 'Create'));
+const createBudgetButtonText = computed(() => (
+  currentBudgetId.value
+    ? constants.BTN_SAVE
+    : constants.BTN_CREATE
+));
 const createBudgetFormTitle = computed(() => (currentBudgetId.value
   ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
   : 'Creating a Budget'));
@@ -512,53 +516,23 @@ provide('visuals', {
 
 <template>
   <div id="debtonate" :class="['font-mono']">
-    <HeaderBar
-      @clear-app-state="clearState"
-      @load-app-state="loadState"
-      @open-options-form="openOptionsForm"
+    <HeaderBar @clear-app-state="clearState" @load-app-state="loadState" @open-options-form="openOptionsForm"
       @save-app-state="saveState" />
-    <LoanForm
-      :id="constants.LOAN_FORM_ID"
-      :createButtonText="createLoanButtonText"
-      :loan="currentLoanId ?
-        getLoan(currentLoanId) :
-        null"
-      :title="createLoanFormTitle"
-      @create-loan="createLoan"
-      @exit-create-loan="exitCreateLoanForm" />
-    <BudgetForm
-      :id="constants.BUDGET_FORM_ID"
-      :createButtonText="createBudgetButtonText"
-      :budget="currentBudgetId ?
-        getBudget(currentBudgetId) :
-        null"
-      :title="createBudgetFormTitle"
-      @create-budget="createBudget"
-      @exit-create-budget="exitCreateBudgetForm"
-    />
-    <OptionsForm
-      :id="constants.OPTIONS_FORM_ID"
-      @exit-options-form="exitOptionsForm"
-      @toggle-avalanche-sort="toggleAvalancheSort"
-      @toggle-periods-as-dates="togglePeriodsAsDates"
-      @toggle-reduce-payments="toggleReducePayments"
-      @toggle-round-up="toggleRounding"
-      @toggle-snowball-sort="toggleSnowballSort"
-    />
+    <LoanForm :id="constants.LOAN_FORM_ID" :createButtonText="createLoanButtonText" :loan="currentLoanId ?
+      getLoan(currentLoanId) :
+      null" :title="createLoanFormTitle" @create-loan="createLoan" @exit-create-loan="exitCreateLoanForm" />
+    <BudgetForm :id="constants.BUDGET_FORM_ID" :createButtonText="createBudgetButtonText" :budget="currentBudgetId ?
+      getBudget(currentBudgetId) :
+      null" :title="createBudgetFormTitle" @create-budget="createBudget" @exit-create-budget="exitCreateBudgetForm" />
+    <OptionsForm :id="constants.OPTIONS_FORM_ID" @exit-options-form="exitOptionsForm"
+      @toggle-avalanche-sort="toggleAvalancheSort" @toggle-periods-as-dates="togglePeriodsAsDates"
+      @toggle-reduce-payments="toggleReducePayments" @toggle-round-up="toggleRounding"
+      @toggle-snowball-sort="toggleSnowballSort" />
     <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-contain', 'overscroll-none']">
-      <LoansPanel
-        :class="['flex-none']"
-        :createFunction="openCreateLoanForm"
-        :deleteLoan="deleteLoan"
-        :editLoan="editLoan" :loans="loans"
-        :totalsAsALoan="totalsAsALoan"
-        :viewLoan="viewLoan" />
-      <BudgetsPanel
-        :class="['flex-initial']"
-        :budgets="monthlyBudgets"
-        :budgetsTotals="totalsByBudget"
-        :createFunction="openCreateBudgetForm"
-        :deleteBudget="deleteBudget" :editBudget="editBudget"
+      <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
+        :editLoan="editLoan" :loans="loans" :totalsAsALoan="totalsAsALoan" :viewLoan="viewLoan" />
+      <BudgetsPanel :class="['flex-initial']" :budgets="monthlyBudgets" :budgetsTotals="totalsByBudget"
+        :createFunction="openCreateBudgetForm" :deleteBudget="deleteBudget" :editBudget="editBudget"
         :viewBudget="viewBudget" />
       <div v-if="loans.length" :class="[]">
         <div :class="['flex-grow']">
@@ -568,24 +542,14 @@ provide('visuals', {
           </div>
         </div>
         <div>
-          <DetailsPanel
-            :id="constants.LOAN_DETAILS_ID"
-            :title="currentLoanId ?
-              buildLoanDetailsTitle(getLoan(currentLoanId)) :
-              'Loan Details'
-            "
-            :type="constants.LOAN"
-            @exit-details-panel="unviewLoan"
-          />
-          <DetailsPanel
-          :id="constants.BUDGET_DETAILS_ID"
-          :title="currentBudgetId
-              ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
-              : 'Budget Details'
-            "
-            :type="constants.BUDGET"
-            @exit-details-panel="unviewBudget"
-          />
+          <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId ?
+            buildLoanDetailsTitle(getLoan(currentLoanId)) :
+            'Loan Details'
+            " :type="constants.LOAN" @exit-details-panel="unviewLoan" />
+          <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="currentBudgetId
+            ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
+            : 'Budget Details'
+            " :type="constants.BUDGET" @exit-details-panel="unviewBudget" />
         </div>
       </div>
     </div>
