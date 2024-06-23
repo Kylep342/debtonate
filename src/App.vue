@@ -13,6 +13,7 @@ import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import constants from './constants/constants';
+import keys from './constants/keys';
 
 // data
 
@@ -216,35 +217,35 @@ const clearState = () => {
   snowballSort.value = true;
 };
 const loadState = () => {
-  budgets.value = JSON.parse(localStorage.getItem('debtonate.budgets'));
-  loans.value = JSON.parse(localStorage.getItem('debtonate.loans')).map(
+  budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS));
+  loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)).map(
     (loan) => new moneyfunx.Loan(loan.principal, loan.annualRate, 12, loan.termInYears),
   );
   periodsAsDates.value = JSON.parse(
-    localStorage.getItem('debtonate.periodsAsDates'),
+    localStorage.getItem(keys.LS_PERIODS_AS_DATES),
   );
   reducePayments.value = JSON.parse(
-    localStorage.getItem('debtonate.reducePayments'),
+    localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
   );
-  roundUp.value = JSON.parse(localStorage.getItem('debtonate.roundUp'));
+  roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
   snowballSort.value = JSON.parse(
-    localStorage.getItem('debtonate.snowballSort'),
+    localStorage.getItem(keys.LS_SNOWBALL_SORT),
   );
 };
 const saveState = () => {
-  localStorage.setItem('debtonate.budgets', JSON.stringify(budgets.value));
-  localStorage.setItem('debtonate.loans', JSON.stringify(loans.value));
+  localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
+  localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
   localStorage.setItem(
-    'debtonate.periodsAsDates',
+    keys.LS_PERIODS_AS_DATES,
     JSON.stringify(periodsAsDates.value),
   );
   localStorage.setItem(
-    'debtonate.reducePayments',
+    keys.LS_REDUCE_PAYMENTS,
     JSON.stringify(reducePayments.value),
   );
-  localStorage.setItem('debtonate.roundUp', JSON.stringify(roundUp.value));
+  localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
   localStorage.setItem(
-    'debtonate.snowballSort',
+    keys.LS_SNOWBALL_SORT,
     JSON.stringify(snowballSort.value),
   );
 };
