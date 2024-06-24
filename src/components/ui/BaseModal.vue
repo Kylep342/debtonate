@@ -3,17 +3,17 @@ const props = defineProps(['title', 'id']);
 </script>
 
 <template>
-  <dialog :id="props.id" :class="['modal', 'modal-bottom', 'sm:modal-middle']">
-    <div :class="['modal-box', 'p-0']">
-      <base-card :class="[]">
+  <dialog :id="props.id" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box p-0 w-full max-w-6xl">
+      <base-card :class="['overflow-x-hidden']">
         <template #cardTitle>
-          <header :class="['navbar', 'bg-secondary']">
-            <div :class="['flex-1']">
+          <header class="navbar bg-secondary">
+            <div class="flex-1">
               <slot name="header">
                 <h2>{{ title }}</h2>
               </slot>
             </div>
-            <div :class="['modal-action', 'flex-none', 'mt-0']">
+            <div class="modal-action flex-none mt-0">
               <menu>
                 <slot name="headerActions"></slot>
               </menu>
@@ -21,10 +21,10 @@ const props = defineProps(['title', 'id']);
           </header>
         </template>
         <template #cardBody>
-          <slot :class="['overscroll-y-contain']" name="body"></slot>
+          <slot name="body"></slot>
         </template>
         <template #cardActions>
-          <div :class="['card-actions', 'justify-end', 'p-4']">
+          <div class="card-actions justify-end p-4">
             <menu>
               <slot name="actions"></slot>
             </menu>

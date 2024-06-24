@@ -19,18 +19,14 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ budgetPrimitives.getBudgetName(budget.id) }}
         </h2>
-        <button
-          v-if="budget.id !== constants.DEFAULT"
-          :class="[
-            'exitButton',
-            'bold',
-            'btn',
-            'btn-ghost',
-            'btn-square',
-            'float-right',
-          ]"
-          @click="budgetPrimitives.deleteBudget(budget.id)"
-        >
+        <button v-if="budget.id !== constants.DEFAULT" :class="[
+          'exitButton',
+          'bold',
+          'btn',
+          'btn-ghost',
+          'btn-square',
+          'float-right',
+        ]" @click="budgetPrimitives.deleteBudget(budget.id)">
           x
         </button>
       </div>
@@ -52,7 +48,7 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
               </td>
             </tr>
             <tr>
-              <td>Interest</td>
+              <td>Interest Paid</td>
               <td>
                 <b>{{ budgetTotalInterest }}</b>
               </td>
@@ -70,18 +66,12 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="budget.id !== constants.DEFAULT">
-          <base-button
-            :class="['btn-accent']"
-            @click="budgetPrimitives.editBudget(budget.id)"
-          >
+          <base-button :class="['btn-accent']" @click="budgetPrimitives.editBudget(budget.id)">
             Edit
           </base-button>
         </div>
         <div>
-          <base-button
-            :class="['btn-accent']"
-            @click="budgetPrimitives.viewBudget(budget.id)"
-          >
+          <base-button :class="['btn-accent']" @click="budgetPrimitives.viewBudget(budget.id)">
             View
           </base-button>
         </div>

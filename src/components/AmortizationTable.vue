@@ -31,49 +31,54 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
       <h3 :class="['cardTitle']">{{ title }}</h3>
     </div>
     <div :class="['justifyCenter']">
-      <table :class="['table']">
-        <thead id="AmortizationTotalsTHead">
-          <th :class="['textRight']">{{ paymentHeader }}</th>
-          <th :class="['textRight']">Amount Paid</th>
-          <th :class="['textRight']">Principal Paid</th>
-          <th :class="['textRight']">Interest Paid</th>
-          <th :class="['textRight']">Principal Remaining</th>
-        </thead>
-        <tr
-          v-for="(record, rowno) in paymentSummary?.amortizationSchedule"
-          :key="keyPrefix + rowno"
-        >
-          <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
-          <td :class="['textRight']">
-            ${{ (record.principal + record.interest).toFixed(2) }}
-          </td>
-          <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>
-          <td :class="['textRight']">${{ record.interest.toFixed(2) }}</td>
-          <td :class="['textRight']">
-            ${{ record.principalRemaining.toFixed(2) }}
-          </td>
-        </tr>
-        <tr>
-          <td :class="['textLeft']"><b>Totals:</b></td>
-          <td :class="['textRight']">
-            <b
-              >${{
-                (
-                  paymentSummary?.totalPrincipalPaid +
-                  paymentSummary?.totalInterestPaid
-                ).toFixed(2)
-              }}</b
-            >
-          </td>
-          <td :class="['textRight']">
-            <b>${{ paymentSummary?.totalPrincipalPaid?.toFixed(2) }}</b>
-          </td>
-          <td :class="['textRight']">
-            <b>${{ paymentSummary?.totalInterestPaid?.toFixed(2) }}</b>
-          </td>
-          <td :class="['textRight']"><b> -- </b></td>
-        </tr>
-      </table>
+      <base-table :size="['table-sm']">
+        <template #header>
+          <thead id="AmortizationTotalsTHead">
+            <th :class="['textRight']">{{ paymentHeader }}</th>
+            <th :class="['textRight']">Amount Paid</th>
+            <th :class="['textRight']">Principal Paid</th>
+            <th :class="['textRight']">Interest Paid</th>
+            <th :class="['textRight']">Principal Remaining</th>
+          </thead>
+        </template>
+        <template #body>
+          <tbody>
+            <tr v-for="(record, rowno) in paymentSummary?.amortizationSchedule" :key="keyPrefix + rowno">
+              <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
+              <td :class="['textRight']">
+                ${{ (record.principal + record.interest).toFixed(2) }}
+              </td>
+              <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>
+              <td :class="['textRight']">${{ record.interest.toFixed(2) }}</td>
+              <td :class="['textRight']">
+                ${{ record.principalRemaining.toFixed(2) }}
+              </td>
+            </tr>
+          </tbody>
+        </template>
+        <template #footer>
+          <tfoot>
+            <tr>
+              <td :class="['textLeft']"><b>Totals:</b></td>
+              <td :class="['textRight']">
+                <b>${{
+                  (
+                    paymentSummary?.totalPrincipalPaid +
+                    paymentSummary?.totalInterestPaid
+                  ).toFixed(2)
+                }}</b>
+              </td>
+              <td :class="['textRight']">
+                <b>${{ paymentSummary?.totalPrincipalPaid?.toFixed(2) }}</b>
+              </td>
+              <td :class="['textRight']">
+                <b>${{ paymentSummary?.totalInterestPaid?.toFixed(2) }}</b>
+              </td>
+              <td :class="['textRight']"><b> -- </b></td>
+            </tr>
+          </tfoot>
+        </template>
+      </base-table>
     </div>
   </div>
 </template>

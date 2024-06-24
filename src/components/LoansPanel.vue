@@ -7,25 +7,17 @@ const title = 'Loans';
 </script>
 
 <template>
-  <base-card
-    :class="['bg-base-100', 'w-90']"
-    :id="'loanManagementPanel'"
-  >
+  <base-card :class="['bg-base-100', 'w-90']" :id="'loanManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel
-        :createFunction="createFunction"
-        :title="title"
-        :class="['sticky', 'fixed', 'border-b-2']"
-      />
+      <ManagementPanel :createFunction="createFunction" :title="title" :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div
-        :class="[
-          'border-r-2',
-          'h-screen',
-          'overflow-y-auto',
-          'overscroll-y-contain',
-        ]">
+      <div :class="[
+        'border-r-2',
+        'h-screen',
+        'overflow-y-auto',
+        'overscroll-y-contain',
+      ]">
         <div v-if="loans.length">
           <LoanCard :loan="props.totalsAsALoan" />
         </div>

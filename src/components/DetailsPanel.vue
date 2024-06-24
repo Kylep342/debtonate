@@ -48,43 +48,29 @@ const emitExit = () => {
 </script>
 
 <template>
-  <base-modal :id="props.id" class="">
+  <!-- <base-modal :id="props.id" :bodyClasses="['overflow-y-auto']"> -->
+  <base-modal :id="props.id">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button
-        :class="['btn btn-circle btn-ghost']"
-        @click="emitExit"
-      >
+      <base-button :class="['btn btn-circle btn-ghost']" @click="emitExit">
         x
-      </base-button
-      >
+      </base-button>
     </template>
     <template #body>
-      <div role="tablist" class="tabs tabs-bordered w-full">
+      <div role="tablist" :class="['tabs', 'tabs-bordered', 'w-full']">
         <ul class="flex flex-row">
           <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
-            <input
-              type="radio"
-              name="amortization_tables"
-              :id="'budget' + budgetPrimitives.getBudgetIndex(budget.id)"
-              role="tab"
-              :class="['tab', flexBasis]"
-              :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`"
-            >
+            <input type="radio" name="amortization_tables" :id="'budget' + budgetPrimitives.getBudgetIndex(budget.id)"
+              role="tab" :class="['tab', flexBasis]" :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`">
             <div role="tabpanel" class="tab-content p-10">
-              <AmortizationTable
-                :id="'amortizationTable' + generateKey(loan, budget)"
-                :keyPrefix="generateKey(loan, budget)"
-                :paymentSummary="paymentSummary[budget.id]"
-                :title="
-                  builders.buildAmortizationTableTitle(
-                    loan,
-                    budget,
-                  )
-                "
-              />
+              <AmortizationTable :id="'amortizationTable' + generateKey(loan, budget)"
+                :keyPrefix="generateKey(loan, budget)" :paymentSummary="paymentSummary[budget.id]" :title="builders.buildAmortizationTableTitle(
+                  loan,
+                  budget,
+                )
+                  " />
             </div>
           </li>
         </ul>
