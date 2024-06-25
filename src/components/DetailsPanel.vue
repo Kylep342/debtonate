@@ -13,12 +13,7 @@ const loanPrimitives = inject('loanPrimitives');
 const visuals = inject('visuals');
 
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
-
-// const selectedBudget = ref();
-
-// onMounted(() => {
-//   selectBudget.value = monthlyBudgets.value[0];
-// });
+const viewedBudgetId = ref(constants.DEFAULT);
 
 const flexBasis = computed(() => `basis-1/${monthlyBudgets.value.length}`);
 
@@ -36,9 +31,9 @@ const paymentSummary = computed(() => {
     : visuals.paymentSummaries.value.totals;
 });
 
-// const selectBudget = (budget) => {
-//   selectedBudget.value = budget.value;
-// };
+const setViewedBudgetId = (value) => {
+  viewedBudgetId.value = value;
+};
 
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
@@ -48,7 +43,6 @@ const emitExit = () => {
 </script>
 
 <template>
-  <!-- <base-modal :id="props.id" :bodyClasses="['overflow-y-auto']"> -->
   <base-modal :id="props.id">
     <template #header>
       <h2>{{ title }}</h2>
@@ -59,21 +53,24 @@ const emitExit = () => {
       </base-button>
     </template>
     <template #body>
-      <div role="tablist" :class="['tabs', 'tabs-bordered', 'w-full']">
-        <ul class="flex flex-row">
-          <li v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)">
-            <input type="radio" name="amortization_tables" :id="'budget' + budgetPrimitives.getBudgetIndex(budget.id)"
-              role="tab" :class="['tab', flexBasis]" :aria-label="`${budgetPrimitives.getBudgetName(budget.id)}`">
-            <div role="tabpanel" class="tab-content p-10">
-              <AmortizationTable :id="'amortizationTable' + generateKey(loan, budget)"
-                :keyPrefix="generateKey(loan, budget)" :paymentSummary="paymentSummary[budget.id]" :title="builders.buildAmortizationTableTitle(
-                  loan,
-                  budget,
-                )
-                  " />
-            </div>
-          </li>
-        </ul>
+      <div class="tabframe w-auto">
+        <div class="tabs flex join join-horizontal">
+          <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)"
+            :class="['join-item', { 'border-t-2': budget.id === viewedBudgetId }]">
+            <base-button :class="['btn', 'btn-ghost']" @click=setViewedBudgetId(budget.id)>{{
+              budgetPrimitives.getBudgetName(budget.id)
+            }}</base-button>
+          </div>
+        </div>
+        <!-- <div name="tabscontent" class="w-auto"> -->
+        <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)" name="tabscontent" class="w-auto">
+          <AmortizationTable v-show="budget.id === viewedBudgetId" :id="'amortizationTable' + generateKey(loan, budget)"
+            :keyPrefix="generateKey(loan, budget)" :paymentSummary="paymentSummary[budget.id]" :title="builders.buildAmortizationTableTitle(
+              loan,
+              budget,
+            )
+              " />
+        </div>
       </div>
     </template>
   </base-modal>

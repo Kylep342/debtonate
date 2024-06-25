@@ -29,9 +29,10 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
   <div>
     <div>
       <h3 :class="['cardTitle']">{{ title }}</h3>
+      <h5 :class="['cardTitle']">{{ title }}</h5>
     </div>
     <div :class="['justifyCenter']">
-      <base-table :size="['table-sm']">
+      <base-table :size="['table-sm']" :class="['max-h-48']">
         <template #header>
           <thead id="AmortizationTotalsTHead">
             <th :class="['textRight']">{{ paymentHeader }}</th>
@@ -43,7 +44,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
         </template>
         <template #body>
           <tbody>
-            <tr v-for="(record, rowno) in paymentSummary?.amortizationSchedule" :key="keyPrefix + rowno">
+            <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="keyPrefix + rowno">
               <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
               <td :class="['textRight']">
                 ${{ (record.principal + record.interest).toFixed(2) }}
@@ -63,16 +64,16 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
               <td :class="['textRight']">
                 <b>${{
                   (
-                    paymentSummary?.totalPrincipalPaid +
-                    paymentSummary?.totalInterestPaid
+                    paymentSummary.totalPrincipalPaid +
+                    paymentSummary.totalInterestPaid
                   ).toFixed(2)
                 }}</b>
               </td>
               <td :class="['textRight']">
-                <b>${{ paymentSummary?.totalPrincipalPaid?.toFixed(2) }}</b>
+                <b>${{ paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
               </td>
               <td :class="['textRight']">
-                <b>${{ paymentSummary?.totalInterestPaid?.toFixed(2) }}</b>
+                <b>${{ paymentSummary.totalInterestPaid.toFixed(2) }}</b>
               </td>
               <td :class="['textRight']"><b> -- </b></td>
             </tr>
