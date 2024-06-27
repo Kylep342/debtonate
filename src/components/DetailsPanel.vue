@@ -15,8 +15,6 @@ const visuals = inject('visuals');
 const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
 const viewedBudgetId = ref(constants.DEFAULT);
 
-const flexBasis = computed(() => `basis-1/${monthlyBudgets.value.length}`);
-
 const loan = computed(() => {
   const currentLoanId = loanPrimitives.currentLoanId?.value;
   return props.type === constants.LOAN && currentLoanId
@@ -62,7 +60,6 @@ const emitExit = () => {
             }}</base-button>
           </div>
         </div>
-        <!-- <div name="tabscontent" class="w-auto"> -->
         <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)" name="tabscontent" class="w-auto">
           <AmortizationTable v-show="budget.id === viewedBudgetId" :id="'amortizationTable' + generateKey(loan, budget)"
             :keyPrefix="generateKey(loan, budget)" :paymentSummary="paymentSummary[budget.id]" :title="builders.buildAmortizationTableTitle(

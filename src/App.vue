@@ -141,7 +141,7 @@ const deleteLoan = (id) => {
 };
 const editLoan = (id) => {
   currentLoanId.value = id;
-  createLoanFormActive.value = true;
+  openCreateLoanForm();
 };
 const getLoanIndex = (id) => (id !== constants.TOTALS
   ? loans.value.findIndex((loan) => loan.id === id) + 1
@@ -168,7 +168,7 @@ const deleteBudget = (id) => {
 };
 const editBudget = (id) => {
   currentBudgetId.value = id;
-  createBudgetFormActive.value = true;
+  openCreateBudgetForm();
 };
 const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
 const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
@@ -255,11 +255,13 @@ const saveState = () => {
 const createLoanFormTitle = computed(() => (currentLoanId.value
   ? `Editing Loan ${getLoanIndex(currentLoanId.value)}`
   : 'Creating a Loan'));
+
 const createBudgetButtonText = computed(() => (
   currentBudgetId.value
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
 ));
+
 const createBudgetFormTitle = computed(() => (currentBudgetId.value
   ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
   : 'Creating a Budget'));
@@ -416,7 +418,7 @@ const createBudget = (proposedBudget) => {
   }
   budgets.value.push(proposedBudget);
   budgets.value.sort((a, b) => b - a);
-  createBudgetFormActive.value = false;
+  exitCreateBudgetForm();
 };
 const createLoan = (principal, interestRate, termInYears) => {
   const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears);
@@ -426,16 +428,16 @@ const createLoan = (principal, interestRate, termInYears) => {
   }
   loans.value.push(newLoan);
   sortLoans();
-  createLoanFormActive.value = false;
+  exitCreateLoanForm();
 };
 
 // watch
 
-watch(optionsFormActive, async (show) => {
+watch(budgetDetailsPanelActive, async (show) => {
   if (show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).showModal();
+    document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
   } else if (!show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).close();
+    document.getElementById(constants.BUDGET_DETAILS_ID).close();
   }
 });
 
@@ -455,19 +457,19 @@ watch(createLoanFormActive, async (show) => {
   }
 });
 
-watch(budgetDetailsPanelActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.BUDGET_DETAILS_ID).close();
-  }
-});
-
 watch(loanDetailsPanelActive, async (show) => {
   if (show) {
     document.getElementById(constants.LOAN_DETAILS_ID).showModal();
   } else if (!show) {
     document.getElementById(constants.LOAN_DETAILS_ID).close();
+  }
+});
+
+watch(optionsFormActive, async (show) => {
+  if (show) {
+    document.getElementById(constants.OPTIONS_FORM_ID).showModal();
+  } else if (!show) {
+    document.getElementById(constants.OPTIONS_FORM_ID).close();
   }
 });
 
@@ -529,7 +531,7 @@ provide('visuals', {
       @toggle-avalanche-sort="toggleAvalancheSort" @toggle-periods-as-dates="togglePeriodsAsDates"
       @toggle-reduce-payments="toggleReducePayments" @toggle-round-up="toggleRounding"
       @toggle-snowball-sort="toggleSnowballSort" />
-    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-contain', 'overscroll-none']">
+    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', 'overscroll-none']">
       <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
         :editLoan="editLoan" :loans="loans" :totalsAsALoan="totalsAsALoan" :viewLoan="viewLoan" />
       <BudgetsPanel :class="['flex-initial']" :budgets="monthlyBudgets" :budgetsTotals="totalsByBudget"
