@@ -1,7 +1,7 @@
 <script setup>
 import { computed, inject, ref } from 'vue';
 
-const props = defineProps(['keyPrefix', 'paymentSummary', 'title']);
+const props = defineProps(['keyPrefix', 'paymentSummary', 'title', 'subtitle']);
 const keyPrefix = ref(props.keyPrefix);
 const paymentSummary = ref(props.paymentSummary);
 const title = ref(props.title);
@@ -28,8 +28,8 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
 <template>
   <div>
     <div>
-      <h3 :class="['cardTitle']">{{ title }}</h3>
-      <h5 :class="['cardTitle']">{{ title }}</h5>
+      <h3 :class="['text-center']">{{ title }}</h3>
+      <h5 :class="['text-center']">{{ subtitle }}</h5>
     </div>
     <div :class="['justifyCenter']">
       <base-table :size="['table-sm']" :class="['max-h-48']">

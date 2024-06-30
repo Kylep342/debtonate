@@ -4,7 +4,7 @@ const props = defineProps(['title', 'id']);
 
 <template>
   <dialog :id="props.id" class="modal modal-bottom sm:modal-middle">
-    <div class="modal-box p-0 w-full">
+    <div :class="['modal-box', 'p-0', 'max-w-fit', 'overflow-y-auto']">
       <base-card :class="['overflow-hidden']">
         <template #cardTitle>
           <header class="navbar bg-secondary">

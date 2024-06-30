@@ -186,23 +186,6 @@ const unviewBudget = () => {
   currentBudgetId.value = null;
 };
 
-const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
-  ? 'Minimum Budget '
-  : `Budget ${getBudgetIndex(monthlyBudget.id)}`
-  } `
-  + `$${monthlyBudget.absolute.toFixed(2)}/month `
-  + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
-const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
-  ? 'All Loans '
-  : `Loan ${getLoanIndex(loan.id)}`
-  } `
-  + `($${loan.principal.toFixed(2)} `
-  + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
-const buildAmortizationTableTitle = (loan, monthlyBudget) => `${getLoanName(loan.id)} `
-  + `($${loan.principal.toFixed(2)} `
-  + `@ ${(loan.annualRate * 100).toFixed(2)}%) `
-  + `Total Budget: $${monthlyBudget.absolute?.toFixed(2)}/month`;
-
 const clearState = () => {
   budgets.value = [];
   createBudgetFormActive.value = false;
@@ -387,7 +370,7 @@ const paymentSummaries = computed(() => {
           schedule.paymentSchedule[loanId].amortizationSchedule,
         totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
         totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
-        totalPayments: schedule.paymentSchedule[loanId].totalPayments,
+        totalPayments: schedule.paymentSchedule[loanId].amortizationSchedule.length,
       };
     });
   });
@@ -430,6 +413,28 @@ const createLoan = (principal, interestRate, termInYears) => {
   sortLoans();
   exitCreateLoanForm();
 };
+
+const getNumPayments = (loan, budget) => (
+  paymentSummaries.value[loan.id][budget.id].totalPayments
+);
+
+// title building functions
+
+const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
+  ? 'Minimum Budget '
+  : `Budget ${getBudgetIndex(monthlyBudget.id)}`
+  } `
+  + `$${monthlyBudget.absolute.toFixed(2)}/month `
+  + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
+const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
+  ? 'All Loans '
+  : `Loan ${getLoanIndex(loan.id)}`
+  } `
+  + `($${loan.principal.toFixed(2)} `
+  + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
+
+const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
+const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan, monthlyBudget)} Payments)`;
 
 // watch
 
@@ -484,6 +489,7 @@ provide('options', {
 });
 
 provide('builders', {
+  buildAmortizationTableSubtitle,
   buildAmortizationTableTitle,
   buildBudgetDetailsTitle,
   buildLoanDetailsTitle,
@@ -496,6 +502,7 @@ provide('budgetPrimitives', {
   getBudget,
   getBudgetIndex,
   getBudgetName,
+  getNumPayments,
   monthlyBudgets,
   viewBudget,
 });

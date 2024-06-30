@@ -29,9 +29,13 @@ const paymentSummary = computed(() => {
     : visuals.paymentSummaries.value.totals;
 });
 
+const flexBasis = `basis-1/${monthlyBudgets.value.length}`;
+
 const setViewedBudgetId = (value) => {
   viewedBudgetId.value = value;
 };
+
+// const buttonStyle = (flag) => (flag ? 'btn-success' : '');
 
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
@@ -51,11 +55,11 @@ const emitExit = () => {
       </base-button>
     </template>
     <template #body>
-      <div class="tabframe w-auto">
-        <div class="tabs flex join join-horizontal">
+      <div :class="['tabframe', 'w-auto']">
+        <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
           <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)"
-            :class="['join-item', { 'border-t-2': budget.id === viewedBudgetId }]">
-            <base-button :class="['btn', 'btn-ghost']" @click=setViewedBudgetId(budget.id)>{{
+            :class="['join-item', flexBasis, 'w-full', { 'border-t-2': budget.id === viewedBudgetId }]">
+            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedBudgetId(budget.id)>{{
               budgetPrimitives.getBudgetName(budget.id)
             }}</base-button>
           </div>
@@ -66,7 +70,11 @@ const emitExit = () => {
               loan,
               budget,
             )
-              " />
+              " :subtitle="builders.buildAmortizationTableSubtitle(
+                loan,
+                budget,
+              )
+                " />
         </div>
       </div>
     </template>
