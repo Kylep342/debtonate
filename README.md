@@ -57,15 +57,15 @@ Pseudo-code:
 </li>
 
 
-<li>
+<s><li>
 Take a step back and clean up the table:
 Make the title and subtitle pretty and informative
 Title: `Amortization Table - Loan X | Budget Y`
-Subtitle: `(P | Pmt | Interest | Num Payments)`: </li>
+Subtitle: `(P | Pmt | Interest | Num Payments)`: </li></s>
 
 <li>
 Clean up the presentation of tabs:
- - make menu as wide as table
+ - make modal as wide as table
  - make table scroll vertically (set a max height)
 </li>
 
