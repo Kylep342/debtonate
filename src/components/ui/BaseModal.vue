@@ -4,7 +4,7 @@ const props = defineProps(['title', 'id']);
 
 <template>
   <dialog :id="props.id" class="modal modal-bottom sm:modal-middle">
-    <div :class="['modal-box', 'p-0', 'max-w-fit', 'overflow-y-auto']">
+    <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit']">
       <base-card :class="['overflow-hidden']">
         <template #cardTitle>
           <header class="navbar bg-secondary">
@@ -34,3 +34,10 @@ const props = defineProps(['title', 'id']);
     </div>
   </dialog>
 </template>
+
+<style scoped>
+.modal-box {
+  min-width: 40%;
+  max-width: fit-content;
+}
+</style>

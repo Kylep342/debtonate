@@ -49,8 +49,10 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             </h3>
           </template>
           <template #cardBody>
-            <p>Avalanche orders loans by descending interest rate</p>
-            <p>Snowball orders loans by ascending balance</p>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>Avalanche orders loans by descending interest rate</p>
+              <p>Snowball orders loans by ascending balance</p>
+            </div>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
@@ -70,10 +72,12 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             </h3>
           </template>
           <template #cardBody>
-            <p>
-              When enabled this reduces your total minimum contribution each
-              time you pay off a loan
-            </p>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this reduces your total minimum contribution each
+                time you pay off a loan
+              </p>
+            </div>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
@@ -88,10 +92,12 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Rounding</h3>
           </template>
           <template #cardBody>
-            <p>
-              When enabled this rounds your minimum contribution up to the next
-              multiple of 100
-            </p>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this rounds your minimum contribution up to the next
+                multiple of 100
+              </p>
+            </div>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
@@ -108,10 +114,12 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
             </h3>
           </template>
           <template #cardBody>
-            <p>
-              When enabled this displays all period tags as dates (relative to
-              today)
-            </p>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this displays all period tags as dates (relative to
+                today)
+              </p>
+            </div>
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
