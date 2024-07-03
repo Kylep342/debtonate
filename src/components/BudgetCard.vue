@@ -32,7 +32,7 @@ const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeIntere
       </div>
     </template>
     <template #cardBody>
-      <base-table :size="['table-sm']">
+      <base-table :class="['table-sm']">
         <template #body>
           <tbody>
             <tr>

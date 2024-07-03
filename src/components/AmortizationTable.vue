@@ -32,9 +32,9 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
       <h5 :class="['text-center']">{{ subtitle }}</h5>
     </div>
     <div :class="['justifyCenter']">
-      <base-table :size="['table-sm']" :class="['max-h-48']">
+      <base-table :class="['table-sm', 'max-h-48', 'overflow-y-auto']">
         <template #header>
-          <thead id="AmortizationTotalsTHead">
+          <thead>
             <th :class="['textRight']">{{ paymentHeader }}</th>
             <th :class="['textRight']">Amount Paid</th>
             <th :class="['textRight']">Principal Paid</th>
@@ -75,7 +75,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
               <td :class="['textRight']">
                 <b>${{ paymentSummary.totalInterestPaid.toFixed(2) }}</b>
               </td>
-              <td :class="['textRight']"><b> -- </b></td>
+              <td :class="['textRight']"><b> $0.00 </b></td>
             </tr>
           </tfoot>
         </template>

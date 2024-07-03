@@ -423,13 +423,13 @@ const getNumPayments = (loan, budget) => (
 const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
   ? 'Minimum Budget '
   : `Budget ${getBudgetIndex(monthlyBudget.id)}`
-  } `
+} `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
   ? 'All Loans '
   : `Loan ${getLoanIndex(loan.id)}`
-  } `
+} `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
 

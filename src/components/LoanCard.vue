@@ -14,27 +14,21 @@ const loanPrimitives = inject('loanPrimitives');
   <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
-        <h2
-          :class="['cardHeaderTitle', 'float-left', 'p-4']"
-        >{{ loanPrimitives.getLoanName(loan.id) }}</h2>
-        <button
-          v-if="loan.id !== constants.TOTALS"
-          :class="[
-            'exitButton',
-            'bold',
-            'btn',
-            'btn-ghost',
-            'btn-square',
-            'float-right',
-          ]"
-          @click="loanPrimitives.deleteLoan(loan.id)"
-        >
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ loanPrimitives.getLoanName(loan.id) }}</h2>
+        <button v-if="loan.id !== constants.TOTALS" :class="[
+          'exitButton',
+          'bold',
+          'btn',
+          'btn-ghost',
+          'btn-square',
+          'float-right',
+        ]" @click="loanPrimitives.deleteLoan(loan.id)">
           x
         </button>
       </div>
     </template>
     <template #cardBody>
-      <base-table :size="['table-sm']">
+      <base-table :class="['table-sm']">
         <template #body>
           <tbody>
             <tr>
@@ -62,18 +56,12 @@ const loanPrimitives = inject('loanPrimitives');
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="loan.id !== constants.TOTALS">
-          <base-button
-            :class="['btn-accent']"
-            @click="loanPrimitives.editLoan(loan.id)"
-          >
+          <base-button :class="['btn-accent']" @click="loanPrimitives.editLoan(loan.id)">
             Edit
           </base-button>
         </div>
         <div>
-          <base-button
-            :class="['btn-accent']"
-            @click="loanPrimitives.viewLoan(loan.id)"
-          >
+          <base-button :class="['btn-accent']" @click="loanPrimitives.viewLoan(loan.id)">
             View
           </base-button>
         </div>

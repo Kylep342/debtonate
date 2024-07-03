@@ -1,11 +1,11 @@
 <script setup>
-const props = defineProps(['title', 'id']);
+const props = defineProps(['title', 'id', 'bodyClasses']);
 </script>
 
 <template>
   <dialog :id="props.id" class="modal modal-bottom sm:modal-middle">
     <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit']">
-      <base-card :class="['overflow-hidden']">
+      <base-card :class="['overflow-hidden']" :bodyClasses="props.bodyClasses">
         <template #cardTitle>
           <header class="navbar bg-secondary">
             <div class="flex-1">

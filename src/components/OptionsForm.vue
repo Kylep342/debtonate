@@ -31,7 +31,7 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
 </script>
 
 <template>
-  <base-modal :id="props.id">
+  <base-modal :id="props.id" :bodyClasses="['overflow-y-auto']">
     <template #header>
       <h2>Options</h2>
     </template>
