@@ -1,10 +1,10 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { inject, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['id', 'title', 'type']);
+const props = defineProps(['anchor', 'id', 'pivot', 'title', 'type']);
 const emits = defineEmits(['exit-details-panel']);
 
 const budgetPrimitives = inject('budgetPrimitives');
@@ -12,30 +12,37 @@ const builders = inject('builders');
 const loanPrimitives = inject('loanPrimitives');
 const visuals = inject('visuals');
 
-const monthlyBudgets = ref(budgetPrimitives.monthlyBudgets);
-const viewedBudgetId = ref(constants.DEFAULT);
+const viewedItemId = ref(props.type === constants.LOAN ? constants.DEFAULT : constants.TOTALS);
 
-const loan = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId?.value;
-  return props.type === constants.LOAN && currentLoanId
-    ? loanPrimitives.getLoan(currentLoanId)
-    : loanPrimitives.getLoan(constants.TOTALS);
-});
+const flexBasis = `basis-1/${props.pivot.length}`;
 
-const paymentSummary = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId?.value;
-  return props.type === constants.LOAN && currentLoanId
-    ? visuals.paymentSummaries.value[currentLoanId]
-    : visuals.paymentSummaries.value.totals;
-});
-
-const flexBasis = `basis-1/${monthlyBudgets.value.length}`;
-
-const setViewedBudgetId = (value) => {
-  viewedBudgetId.value = value;
+const setViewedItemId = (value) => {
+  viewedItemId.value = value;
 };
 
-// const buttonStyle = (flag) => (flag ? 'btn-success' : '');
+const getItemName = (itemId) => (
+  props.type === constants.LOAN
+    ? budgetPrimitives.getBudgetName(itemId)
+    : loanPrimitives.getLoanName(itemId)
+);
+
+const getPaymentSummary = (anchorId, itemId) => (
+  props.type === constants.LOAN
+    ? visuals.getPaymentSummary(anchorId, itemId)
+    : visuals.getPaymentSummary(itemId, anchorId)
+);
+
+const buildAmortizationTableSubtitle = (anchor, item) => (
+  props.type === constants.LOAN
+    ? builders.buildAmortizationTableSubtitle(anchor, item)
+    : builders.buildAmortizationTableSubtitle(item, anchor)
+);
+
+const buildAmortizationTableTitle = (anchor, item) => (
+  props.type === constants.LOAN
+    ? builders.buildAmortizationTableTitle(anchor, item)
+    : builders.buildAmortizationTableTitle(item, anchor)
+);
 
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
@@ -55,24 +62,24 @@ const emitExit = () => {
       </base-button>
     </template>
     <template #body>
-      <div :class="['tabframe', 'w-auto']">
+      <div v-if="anchor" :class="['tabframe', 'w-auto']">
         <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
-          <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)"
-            :class="['join-item', flexBasis, 'w-full', { 'border-t-2': budget.id === viewedBudgetId }]">
-            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedBudgetId(budget.id)>{{
-              budgetPrimitives.getBudgetName(budget.id)
+          <div v-for="item in pivot" :key="generateKey(anchor, item)"
+            :class="['join-item', flexBasis, 'w-full', { 'border-t-2': item.id === viewedItemId }]">
+            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>{{
+              getItemName(item.id)
             }}</base-button>
           </div>
         </div>
-        <div v-for="budget in monthlyBudgets" :key="generateKey(loan, budget)" name="tabscontent" class="w-auto">
-          <AmortizationTable v-show="budget.id === viewedBudgetId" :id="'amortizationTable' + generateKey(loan, budget)"
-            :keyPrefix="generateKey(loan, budget)" :paymentSummary="paymentSummary[budget.id]" :title="builders.buildAmortizationTableTitle(
-              loan,
-              budget,
+        <div v-for="item in pivot" :key="generateKey(anchor, item)" name="tabscontent" class="w-auto">
+          <AmortizationTable v-show="item.id === viewedItemId" :id="'amortizationTable' + generateKey(anchor, item)"
+            :keyPrefix="generateKey(anchor, item)" :paymentSummary="getPaymentSummary(anchor.id, item.id)" :title="buildAmortizationTableTitle(
+              anchor,
+              item,
             )
-              " :subtitle="builders.buildAmortizationTableSubtitle(
-                loan,
-                budget,
+              " :subtitle="buildAmortizationTableSubtitle(
+                anchor,
+                item,
               )
                 " />
         </div>
