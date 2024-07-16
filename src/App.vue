@@ -93,8 +93,7 @@ const totalsAsALoan = computed(() => ({
   totalInterest: globalLifetimeInterestPaid.value,
 }));
 
-const loansWithTotals = computed(() => [totalsAsALoan, ...loans.value]);
-
+const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
 
 const monthlyBudgets = computed(() => {
   const budgetsArray = budgets.value.map((budget) => ({
