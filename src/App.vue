@@ -76,9 +76,24 @@ const globalPrincipal = computed(() => loans.value.reduce(
   0,
 ));
 
-const createLoanButtonText = computed(
-  () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
-);
+const globalEffectiveInterestRate = computed(() => loans.value.reduce(
+  (weightedRate, loan) => weightedRate + loan.annualRate * (loan.principal / globalPrincipal.value),
+  0,
+));
+
+const totalsAsALoan = computed(() => ({
+  id: constants.TOTALS,
+  principal: globalPrincipal.value,
+  annualRate: globalEffectiveInterestRate.value,
+  periodsPerYear: globalMaxPeriodsPerYear.value,
+  termInYears: globalMaxTermInYears.value,
+  periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
+  periods: globalMaxPeriods.value,
+  minPayment: globalMinPayment.value,
+  totalInterest: globalLifetimeInterestPaid.value,
+}));
+
+const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
 
 const monthlyBudgets = computed(() => {
   const budgetsArray = budgets.value.map((budget) => ({
@@ -143,9 +158,7 @@ const editLoan = (id) => {
   currentLoanId.value = id;
   openCreateLoanForm();
 };
-const getLoanIndex = (id) => (id !== constants.TOTALS
-  ? loans.value.findIndex((loan) => loan.id === id) + 1
-  : 0);
+const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
 const getLoanName = (id) => (
   id === constants.TOTALS
     ? constants.NAME_TOTALS_AS_LOAN
@@ -245,26 +258,13 @@ const createBudgetButtonText = computed(() => (
     : constants.BTN_CREATE
 ));
 
+const createLoanButtonText = computed(
+  () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
+);
+
 const createBudgetFormTitle = computed(() => (currentBudgetId.value
   ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
   : 'Creating a Budget'));
-
-const globalEffectiveInterestRate = computed(() => loans.value.reduce(
-  (weightedRate, loan) => weightedRate + loan.annualRate * (loan.principal / globalPrincipal.value),
-  0,
-));
-
-const totalsAsALoan = computed(() => ({
-  id: constants.TOTALS,
-  principal: globalPrincipal.value,
-  annualRate: globalEffectiveInterestRate.value,
-  periodsPerYear: globalMaxPeriodsPerYear.value,
-  termInYears: globalMaxTermInYears.value,
-  periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
-  periods: globalMaxPeriods.value,
-  minPayment: globalMinPayment.value,
-  totalInterest: globalLifetimeInterestPaid.value,
-}));
 
 const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
   budgetId: budget.id,
@@ -355,15 +355,15 @@ const totalsByBudget = computed(() => {
 });
 
 const paymentSummaries = computed(() => {
-  const balances = { totals: {} };
+  const summaries = { totals: {} };
 
   loans.value.forEach((loan) => {
-    balances[loan.id] = {};
+    summaries[loan.id] = {};
   });
 
-  Object.keys(balances).forEach((loanId) => {
+  Object.keys(summaries).forEach((loanId) => {
     paymentSchedules.value.forEach((schedule) => {
-      balances[loanId][schedule.budgetId] = {
+      summaries[loanId][schedule.budgetId] = {
         label: schedule.label,
         totalPaymentAmount: schedule.paymentAmount,
         amortizationSchedule:
@@ -375,14 +375,12 @@ const paymentSummaries = computed(() => {
     });
   });
 
-  return balances;
+  return summaries;
 });
 
 // dependent methods
 
-const getLoan = (id) => (id !== constants.TOTALS
-  ? loans.value.find((loan) => loan.id === id)
-  : totalsAsALoan.value);
+const getLoan = (id) => loansWithTotals.value.find((loan) => loan.id === id);
 const sortLoans = () => {
   loans.value = snowballSort.value === true ? snowball() : avalanche();
 };
@@ -395,7 +393,7 @@ const toggleSnowballSort = () => {
   sortLoans();
 };
 const createBudget = (proposedBudget) => {
-  if (currentBudgetId.value) {
+  if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
     deleteBudget(currentBudgetId.value);
     currentBudgetId.value = null;
   }
@@ -405,7 +403,7 @@ const createBudget = (proposedBudget) => {
 };
 const createLoan = (principal, interestRate, termInYears) => {
   const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears);
-  if (currentLoanId.value) {
+  if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
     deleteLoan(currentLoanId.value);
     currentLoanId.value = null;
   }
@@ -414,27 +412,22 @@ const createLoan = (principal, interestRate, termInYears) => {
   exitCreateLoanForm();
 };
 
-const getNumPayments = (loan, budget) => (
-  paymentSummaries.value[loan.id][budget.id].totalPayments
-);
+const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
+
+const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId].totalPayments;
 
 // title building functions
 
-const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${monthlyBudget.id === constants.DEFAULT
-  ? 'Minimum Budget '
-  : `Budget ${getBudgetIndex(monthlyBudget.id)}`
-} `
+const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)
+  } `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
-const buildLoanDetailsTitle = (loan) => `Loan Details - ${loan.id === constants.TOTALS
-  ? 'All Loans '
-  : `Loan ${getLoanIndex(loan.id)}`
-} `
+const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
   + `($${loan.principal.toFixed(2)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
 
 const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan, monthlyBudget)} Payments)`;
+const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
 
 // watch
 
@@ -520,6 +513,7 @@ provide('loanPrimitives', {
 
 provide('visuals', {
   amortizationSchedulesCharts,
+  getPaymentSummary,
   paymentSummaries,
 });
 </script>
@@ -552,14 +546,16 @@ provide('visuals', {
           </div>
         </div>
         <div>
-          <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId ?
-            buildLoanDetailsTitle(getLoan(currentLoanId)) :
-            'Loan Details'
-            " :type="constants.LOAN" @exit-details-panel="unviewLoan" />
+          <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId
+            ? buildLoanDetailsTitle(getLoan(currentLoanId))
+            : 'Loan Details'
+            " :type="constants.LOAN" :anchor="getLoan(currentLoanId)" :pivot="monthlyBudgets"
+            @exit-details-panel="unviewLoan" />
           <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="currentBudgetId
             ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
             : 'Budget Details'
-            " :type="constants.BUDGET" @exit-details-panel="unviewBudget" />
+            " :type="constants.BUDGET" :anchor="getBudget(currentBudgetId)" :pivot="loansWithTotals"
+            @exit-details-panel="unviewBudget" />
         </div>
       </div>
     </div>
