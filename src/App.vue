@@ -419,7 +419,7 @@ const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budg
 // title building functions
 
 const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)
-  } `
+} `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
