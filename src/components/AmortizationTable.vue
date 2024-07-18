@@ -35,23 +35,23 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
       <base-table :class="['table-sm', 'max-h-48', 'overflow-y-auto']">
         <template #header>
           <thead>
-            <th :class="['textRight']">{{ paymentHeader }}</th>
-            <th :class="['textRight']">Amount Paid</th>
-            <th :class="['textRight']">Principal Paid</th>
-            <th :class="['textRight']">Interest Paid</th>
-            <th :class="['textRight']">Principal Remaining</th>
+            <th :class="['text-right']">{{ paymentHeader }}</th>
+            <th :class="['text-right']">Amount Paid</th>
+            <th :class="['text-right']">Principal Paid</th>
+            <th :class="['text-right']">Interest Paid</th>
+            <th :class="['text-right']">Principal Remaining</th>
           </thead>
         </template>
         <template #body>
           <tbody>
             <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="keyPrefix + rowno">
-              <td :class="['textRight']">{{ renderPeriod(record.period) }}</td>
-              <td :class="['textRight']">
+              <td :class="['text-center']">{{ renderPeriod(record.period) }}</td>
+              <td :class="['text-right']">
                 ${{ (record.principal + record.interest).toFixed(2) }}
               </td>
-              <td :class="['textRight']">${{ record.principal.toFixed(2) }}</td>
-              <td :class="['textRight']">${{ record.interest.toFixed(2) }}</td>
-              <td :class="['textRight']">
+              <td :class="['text-right']">${{ record.principal.toFixed(2) }}</td>
+              <td :class="['text-right']">${{ record.interest.toFixed(2) }}</td>
+              <td :class="['text-right']">
                 ${{ record.principalRemaining.toFixed(2) }}
               </td>
             </tr>
@@ -61,7 +61,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
           <tfoot>
             <tr>
               <td :class="['textLeft']"><b>Totals:</b></td>
-              <td :class="['textRight']">
+              <td :class="['text-right']">
                 <b>${{
                   (
                     paymentSummary.totalPrincipalPaid +
@@ -69,13 +69,13 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
                   ).toFixed(2)
                 }}</b>
               </td>
-              <td :class="['textRight']">
+              <td :class="['text-right']">
                 <b>${{ paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
               </td>
-              <td :class="['textRight']">
+              <td :class="['text-right']">
                 <b>${{ paymentSummary.totalInterestPaid.toFixed(2) }}</b>
               </td>
-              <td :class="['textRight']"><b> $0.00 </b></td>
+              <td :class="['text-right']"><b> $0.00 </b></td>
             </tr>
           </tfoot>
         </template>
