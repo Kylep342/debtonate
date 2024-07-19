@@ -31,15 +31,17 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
       <h3 :class="['text-center']">{{ title }}</h3>
       <h5 :class="['text-center']">{{ subtitle }}</h5>
     </div>
-    <div :class="['justifyCenter']">
-      <base-table :class="['table-sm', 'max-h-48', 'overflow-y-auto']">
+    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto']">
+      <base-table :class="['table-sm']">
         <template #header>
           <thead>
-            <th :class="['text-right']">{{ paymentHeader }}</th>
-            <th :class="['text-right']">Amount Paid</th>
-            <th :class="['text-right']">Principal Paid</th>
-            <th :class="['text-right']">Interest Paid</th>
-            <th :class="['text-right']">Principal Remaining</th>
+            <tr>
+              <th :class="['text-right']">{{ paymentHeader }}</th>
+              <th :class="['text-right']">Amount Paid</th>
+              <th :class="['text-right']">Principal Paid</th>
+              <th :class="['text-right']">Interest Paid</th>
+              <th :class="['text-right']">Principal Remaining</th>
+            </tr>
           </thead>
         </template>
         <template #body>
