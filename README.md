@@ -12,13 +12,7 @@ Debtonate is a simple, visual, data-rich financial calculator for budgeting repa
 
 ## next UP
 
-<ul>
-<li>
-d3
-</li>
-<li>
-Clean up the presentation of base objects:
- - ensure that everything has a min size, but certain things fill to contain widest child (vertical scroll is good)
- - set base objects to have a max height
-</li>
-</ul>
+- d3
+- Clean up the presentation of base objects:
+    - ensure that everything has a min size, but certain things fill to contain widest child (vertical scroll is good)
+    - set base objects to have a max height

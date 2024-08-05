@@ -18,7 +18,6 @@ import keys from './constants/keys';
 // data
 
 const budgets = ref([]);
-const colors = constants.COLORS;
 const createBudgetFormActive = ref(false);
 const createLoanFormActive = ref(false);
 const currentBudgetId = ref(null);
@@ -36,6 +35,18 @@ const snowballSort = ref(false);
 // independent computed values
 
 const baseDate = computed(() => Date.now());
+
+const renderPeriod = (period) => {
+  if (periodsAsDates.value) {
+    const date = new Date(baseDate.value);
+    return new Date(
+      date.getFullYear(),
+      date.getMonth() + period,
+      date.getDate(),
+    ).toLocaleDateString();
+  }
+  return period;
+};
 
 const rawGlobalMinPayment = computed(
   () => loans.value.reduce(
@@ -249,7 +260,7 @@ const saveState = () => {
 // dependent computed values
 
 const createLoanFormTitle = computed(() => (currentLoanId.value
-  ? `Editing Loan ${getLoanIndex(currentLoanId.value)}`
+  ? `Editing ${getLoanName(currentLoanId.value)}`
   : 'Creating a Loan'));
 
 const createBudgetButtonText = computed(() => (
@@ -263,7 +274,7 @@ const createLoanButtonText = computed(
 );
 
 const createBudgetFormTitle = computed(() => (currentBudgetId.value
-  ? `Editing Budget ${getBudgetIndex(currentBudgetId.value)}`
+  ? `Editing ${getBudgetName(currentBudgetId.value)}`
   : 'Creating a Budget'));
 
 const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
@@ -282,68 +293,6 @@ const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
       )}/month)`,
 })));
 
-const amortizationSchedulesGraphs = computed(() => {
-  const balances = { totals: [] };
-
-  loans.value.forEach((loan) => {
-    balances[loan.id] = [];
-  });
-
-  Object.keys(balances).forEach((loanId) => {
-    paymentSchedules.value.forEach((schedule) => {
-      balances[loanId].push({
-        x: Array.from(
-          schedule.paymentSchedule[loanId].amortizationSchedule,
-          (record) => record.period,
-        ),
-        y: Array.from(
-          schedule.paymentSchedule[loanId].amortizationSchedule,
-          (record) => record.principalRemaining,
-        ),
-        hovertemplate: 'Payment %{x}: %{y} Remaining',
-        name: `$${(schedule.paymentAmount + globalMinPayment.value).toFixed(
-          2,
-        )}/month`,
-        type: 'scatter',
-      });
-    });
-  });
-  return balances;
-});
-
-const amortizationSchedulesCharts = computed(() => {
-  const charts = {};
-
-  loans.value.forEach((loan) => {
-    charts[loan.id] = {};
-  });
-  Object.keys(charts).forEach((loanId) => {
-    charts[loanId] = {
-      id: 'amortizationSchedulesChart',
-      data: amortizationSchedulesGraphs.value[loanId],
-      layout: {
-        showLegend: false,
-        barmode: 'group',
-        title: `Balance Over Time - ${getLoanName(loanId)}`,
-        xaxis: {
-          title: {
-            text: 'Payments',
-          },
-        },
-        yaxis: {
-          hoverformat: '$,.2f',
-          tickformat: '$,.2f',
-          title: {
-            text: 'Principal Remaining',
-          },
-        },
-        colorway: colors,
-      },
-    };
-  });
-  return charts;
-});
-
 const totalsByBudget = computed(() => {
   const totals = {};
   monthlyBudgets.value.forEach((budget) => {
@@ -355,9 +304,9 @@ const totalsByBudget = computed(() => {
 });
 
 const paymentSummaries = computed(() => {
-  const summaries = { totals: {} };
+  const summaries = {};
 
-  loans.value.forEach((loan) => {
+  loansWithTotals.value.forEach((loan) => {
     summaries[loan.id] = {};
   });
 
@@ -419,7 +368,7 @@ const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budg
 // title building functions
 
 const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)
-} `
+  } `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
@@ -428,6 +377,37 @@ const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} 
 
 const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
 const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+
+// graph data
+
+const balanceOverTimeGraphs = computed(() => {
+  const balances = {};
+
+  loansWithTotals.value.forEach((loan) => {
+    balances[loan.id] = {
+      config: {
+        maxX: globalMaxPeriods.value,
+        maxY: getLoan(loan.id).principal,
+        hovertemplate: 'Payment %{x}: %{y} Remaining',
+        header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
+      },
+      lines: [],
+    };
+  });
+
+  Object.keys(balances).forEach((loanId) => {
+    paymentSchedules.value.forEach((schedule) => {
+      const line = [];
+      schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+        line.push({ x: record.period, y: record.principalRemaining });
+      });
+      // console.log(line);
+      balances[loanId].lines.push(line);
+    });
+  });
+  console.log(balances);
+  return balances;
+});
 
 // watch
 
@@ -511,8 +491,12 @@ provide('loanPrimitives', {
   viewLoan,
 });
 
+provide('formatters', {
+  renderPeriod,
+});
+
 provide('visuals', {
-  amortizationSchedulesCharts,
+  balanceOverTimeGraphs,
   getPaymentSummary,
   paymentSummaries,
 });
@@ -542,7 +526,9 @@ provide('visuals', {
         <div :class="['flex-grow']">
           <div :class="['header']">
             <h2>Repayment Information</h2>
-            <p>To Be Implemented</p>
+            <div v-for="loan in loansWithTotals" :key="loan.id">
+              <base-chart :chartConfig="balanceOverTimeGraphs" :filter="loan.id"></base-chart>
+            </div>
           </div>
         </div>
         <div>

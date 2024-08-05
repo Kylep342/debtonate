@@ -6,21 +6,9 @@ const keyPrefix = ref(props.keyPrefix);
 const paymentSummary = ref(props.paymentSummary);
 const title = ref(props.title);
 
+const formatters = inject('formatters');
 const options = inject('options');
-const baseDate = ref(options.baseDate);
 const periodsAsDates = ref(options.periodsAsDates);
-
-const renderPeriod = (period) => {
-  if (periodsAsDates.value) {
-    const date = new Date(baseDate.value);
-    return new Date(
-      date.getFullYear(),
-      date.getMonth() + period,
-      date.getDate(),
-    ).toLocaleDateString();
-  }
-  return period;
-};
 
 const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'Payment Number'));
 </script>
@@ -47,7 +35,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
         <template #body>
           <tbody>
             <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="keyPrefix + rowno">
-              <td :class="['text-center']">{{ renderPeriod(record.period) }}</td>
+              <td :class="['text-center']">{{ formatters.renderPeriod(record.period) }}</td>
               <td :class="['text-right']">
                 ${{ (record.principal + record.interest).toFixed(2) }}
               </td>
@@ -77,7 +65,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
               <td :class="['text-right']">
                 <b>${{ paymentSummary.totalInterestPaid.toFixed(2) }}</b>
               </td>
-              <td :class="['text-right']"><b> $0.00 </b></td>
+              <td :class="['text-right']"><b>$0.00</b></td>
             </tr>
           </tfoot>
         </template>

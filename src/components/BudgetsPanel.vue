@@ -9,7 +9,6 @@ const props = defineProps(['budgetsTotals', 'createFunction']);
 
 const budgetPrimitives = inject('budgetPrimitives');
 const budgets = ref(budgetPrimitives.monthlyBudgets);
-const title = constants.BUDGETS;
 
 const defaultBudgetIndex = computed(
   () => budgets.value.findIndex((budget) => budget.id === constants.DEFAULT),
@@ -24,10 +23,10 @@ const orderedBudgets = computed(() => [
 <template>
   <base-card :class="['bg-base-100', 'w-90']" :id="'budgetManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="title" :class="['sticky', 'fixed', 'border-b-2']" />
+      <ManagementPanel :createFunction="createFunction" :title="constants.BUDGETS"
+        :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <!-- props.budgers always has min budget, so don't show it until another is created-->
       <div :class="[
         'border-r-2',
         'h-screen',

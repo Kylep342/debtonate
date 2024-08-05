@@ -3,11 +3,13 @@ import { computed, inject } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['loan']);
-const interestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
-const minPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
-const principal = computed(() => `$${props.loan.principal.toFixed(2)}`);
 
 const loanPrimitives = inject('loanPrimitives');
+
+const loanInterestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
+const loanMinPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
+const loanPrincipal = computed(() => `$${props.loan.principal.toFixed(2)}`);
+
 </script>
 
 <template>
@@ -34,19 +36,19 @@ const loanPrimitives = inject('loanPrimitives');
             <tr>
               <td>Principal</td>
               <td>
-                <b>{{ principal }}</b>
+                <b>{{ loanPrincipal }}</b>
               </td>
             </tr>
             <tr>
               <td>Interest Rate</td>
               <td>
-                <b>{{ interestRate }}</b>
+                <b>{{ loanInterestRate }}</b>
               </td>
             </tr>
             <tr>
               <td>Minimum Payment</td>
               <td>
-                <b>{{ minPayment }}</b>
+                <b>{{ loanMinPayment }}</b>
               </td>
             </tr>
           </tbody>
