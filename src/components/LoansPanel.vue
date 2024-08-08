@@ -1,15 +1,20 @@
 <script setup>
+import { inject, ref } from 'vue';
+
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 
-const props = defineProps(['createFunction', 'loans', 'totalsAsALoan']);
+const props = defineProps(['createFunction']);
+
+const loanPrimitives = inject('loanPrimitives');
+const loans = ref(loanPrimitives.loansWithTotals);
 </script>
 
 <template>
   <base-card :class="['bg-base-100', 'w-90']" :id="'loanManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="constants.LOANS"
+      <ManagementPanel :createFunction="props.createFunction" :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
@@ -19,11 +24,8 @@ const props = defineProps(['createFunction', 'loans', 'totalsAsALoan']);
         'overflow-y-auto',
         'overscroll-y-contain',
       ]">
-        <div v-if="loans.length">
-          <LoanCard :loan="props.totalsAsALoan" />
-        </div>
         <ul>
-          <li v-for="(loan) in props.loans" :key="loan.id">
+          <li v-for="(loan) in loans" :key="loan.id">
             <LoanCard :loan="loan" />
           </li>
         </ul>

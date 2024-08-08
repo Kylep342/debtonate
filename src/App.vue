@@ -106,6 +106,12 @@ const totalsAsALoan = computed(() => ({
 
 const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
 
+const minimumBudget = computed(() => ({
+  id: constants.DEFAULT,
+  relative: 0,
+  absolute: globalMinPayment.value,
+}));
+
 const monthlyBudgets = computed(() => {
   const budgetsArray = budgets.value.map((budget) => ({
     id: String(Math.floor(Math.random() * Date.now())),
@@ -113,11 +119,7 @@ const monthlyBudgets = computed(() => {
     absolute: budget + globalMinPayment.value,
   }));
 
-  budgetsArray.push({
-    id: constants.DEFAULT,
-    relative: 0,
-    absolute: globalMinPayment.value,
-  });
+  budgetsArray.push(minimumBudget.value);
 
   return budgetsArray;
 });
@@ -401,11 +403,9 @@ const balanceOverTimeGraphs = computed(() => {
       schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
         line.push({ x: record.period, y: record.principalRemaining });
       });
-      // console.log(line);
       balances[loanId].lines.push(line);
     });
   });
-  console.log(balances);
   return balances;
 });
 
@@ -487,7 +487,7 @@ provide('loanPrimitives', {
   getLoan,
   getLoanIndex,
   getLoanName,
-  loans,
+  loansWithTotals,
   viewLoan,
 });
 
@@ -518,28 +518,27 @@ provide('visuals', {
       @toggle-snowball-sort="toggleSnowballSort" />
     <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', 'overscroll-none']">
       <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
-        :editLoan="editLoan" :loans="loans" :totalsAsALoan="totalsAsALoan" :viewLoan="viewLoan" />
-      <BudgetsPanel :class="['flex-initial']" :budgets="monthlyBudgets" :budgetsTotals="totalsByBudget"
-        :createFunction="openCreateBudgetForm" :deleteBudget="deleteBudget" :editBudget="editBudget"
-        :viewBudget="viewBudget" />
+        :editLoan="editLoan" :viewLoan="viewLoan" />
+      <BudgetsPanel :class="['flex-initial']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"
+        :deleteBudget="deleteBudget" :editBudget="editBudget" :viewBudget="viewBudget" />
       <div v-if="loans.length" :class="[]">
         <div :class="['flex-grow']">
           <div :class="['header']">
             <h2>Repayment Information</h2>
             <div v-for="loan in loansWithTotals" :key="loan.id">
-              <base-chart :chartConfig="balanceOverTimeGraphs" :filter="loan.id"></base-chart>
+              <base-chart :chartConfig="balanceOverTimeGraphs[loan.id]" :label="loan.id"></base-chart>
             </div>
           </div>
         </div>
         <div>
           <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId
             ? buildLoanDetailsTitle(getLoan(currentLoanId))
-            : 'Loan Details'
+            : constants.LOAN_DETAILS
             " :type="constants.LOAN" :anchor="getLoan(currentLoanId)" :pivot="monthlyBudgets"
             @exit-details-panel="unviewLoan" />
           <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="currentBudgetId
             ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
-            : 'Budget Details'
+            : constants.BUDGET_DETAILS
             " :type="constants.BUDGET" :anchor="getBudget(currentBudgetId)" :pivot="loansWithTotals"
             @exit-details-panel="unviewBudget" />
         </div>

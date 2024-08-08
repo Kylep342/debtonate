@@ -68,7 +68,7 @@ const emitExit = () => {
             :class="['join-item', flexBasis, 'w-full', { 'border-t-2': item.id === viewedItemId }]">
             <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>{{
               getItemName(item.id)
-            }}</base-button>
+              }}</base-button>
           </div>
         </div>
         <div v-for="item in pivot" :key="generateKey(anchor, item)" name="tabscontent" class="w-auto">

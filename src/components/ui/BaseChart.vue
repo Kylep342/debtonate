@@ -1,11 +1,11 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  computed, inject, onMounted, ref,
+  computed, inject, onMounted, onUpdated, ref,
 } from 'vue';
 import constants from '../../constants/constants';
 
-const props = defineProps(['chartConfig', 'filter']);
+const props = defineProps(['chartConfig', 'label']);
 const formatters = inject('formatters');
 const options = inject('options');
 
@@ -18,18 +18,18 @@ const initializeChart = () => {
     const width = 800;
     const height = 500;
     const margin = 50;
-    const svg = d3.select(`#chart${props.filter}`).attr('width', width).attr('height', height);
+    const svg = d3.select(`#chart${props.label}`).attr('width', width).attr('height', height);
 
     const x = d3.scaleLinear(
       [
         formatters.renderPeriod(0),
-        formatters.renderPeriod(chartConfig.value[props.filter].config.maxX),
+        formatters.renderPeriod(chartConfig.value.config.maxX),
       ],
       [0, width - margin - margin],
     );
     const y = d3
       .scaleLinear(
-        [0, chartConfig.value[props.filter].config.maxY],
+        [0, chartConfig.value.config.maxY],
         [height - margin, 0],
       );
 
@@ -55,7 +55,7 @@ const initializeChart = () => {
         .attr('text-anchor', 'start')
         .text('Principal Remaining ($)'));
 
-    chartConfig.value[props.filter].lines.forEach((line, index) => {
+    chartConfig.value.lines.forEach((line, index) => {
       svg.append('path')
         .datum(line)
         .attr('fill', 'none')
@@ -69,11 +69,15 @@ const initializeChart = () => {
 onMounted(() => {
   initializeChart();
 });
+
+onUpdated(() => {
+  initializeChart();
+});
 </script>
 
 <template>
   <div :class="['chartWrapper']">
-    <h2>{{ props.chartConfig[props.filter].config.header }}</h2>
-    <svg :id="'chart' + props.filter"></svg>
+    <h2>{{ props.chartConfig.config.header }}</h2>
+    <svg :id="'chart' + props.label"></svg>
   </div>
 </template>
