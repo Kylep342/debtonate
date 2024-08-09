@@ -9,7 +9,7 @@ const props = defineProps(['chartConfig', 'label']);
 const formatters = inject('formatters');
 const options = inject('options');
 
-const xScale = computed(() => (options.periodsAsDates ? d3.scaleTime() : d3.scaleLinear()));
+const xScale = computed(() => (options.periodsAsDates ? d3.scaleTime : d3.scaleLinear));
 
 const chartConfig = ref(props.chartConfig);
 
@@ -20,7 +20,7 @@ const initializeChart = () => {
     const margin = 50;
     const svg = d3.select(`#chart${props.label}`).attr('width', width).attr('height', height);
 
-    const x = d3.scaleLinear(
+    const x = xScale.value(
       [
         formatters.renderPeriod(0),
         formatters.renderPeriod(chartConfig.value.config.maxX),

@@ -12,6 +12,7 @@ import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
+import SiteIntro from './components/SiteIntro.vue';
 import constants from './constants/constants';
 import keys from './constants/keys';
 
@@ -519,28 +520,33 @@ provide('visuals', {
     <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', 'overscroll-none']">
       <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
         :editLoan="editLoan" :viewLoan="viewLoan" />
-      <BudgetsPanel :class="['flex-initial']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"
+      <BudgetsPanel :class="['flex-none']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"
         :deleteBudget="deleteBudget" :editBudget="editBudget" :viewBudget="viewBudget" />
-      <div v-if="loans.length" :class="[]">
-        <div :class="['flex-grow']">
-          <div :class="['header']">
-            <h2>Repayment Information</h2>
-            <div v-for="loan in loansWithTotals" :key="loan.id">
-              <base-chart :chartConfig="balanceOverTimeGraphs[loan.id]" :label="loan.id"></base-chart>
+      <div>
+        <div v-if="!loans.length" :class="['text-wrap', 'text-pretty', 'w-30']">
+          <SiteIntro />
+        </div>
+        <div v-if="loans.length" :class="[]">
+          <div :class="['flex-grow']">
+            <div :class="['header']">
+              <h2>Repayment Information</h2>
+              <div v-for="loan in loansWithTotals" :key="loan.id">
+                <base-chart :chartConfig="balanceOverTimeGraphs[loan.id]" :label="loan.id"></base-chart>
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId
-            ? buildLoanDetailsTitle(getLoan(currentLoanId))
-            : constants.LOAN_DETAILS
-            " :type="constants.LOAN" :anchor="getLoan(currentLoanId)" :pivot="monthlyBudgets"
-            @exit-details-panel="unviewLoan" />
-          <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="currentBudgetId
-            ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
-            : constants.BUDGET_DETAILS
-            " :type="constants.BUDGET" :anchor="getBudget(currentBudgetId)" :pivot="loansWithTotals"
-            @exit-details-panel="unviewBudget" />
+          <div>
+            <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId
+              ? buildLoanDetailsTitle(getLoan(currentLoanId))
+              : constants.LOAN_DETAILS
+              " :type="constants.LOAN" :anchor="getLoan(currentLoanId)" :pivot="monthlyBudgets"
+              @exit-details-panel="unviewLoan" />
+            <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="currentBudgetId
+              ? buildBudgetDetailsTitle(getBudget(currentBudgetId))
+              : constants.BUDGET_DETAILS
+              " :type="constants.BUDGET" :anchor="getBudget(currentBudgetId)" :pivot="loansWithTotals"
+              @exit-details-panel="unviewBudget" />
+          </div>
         </div>
       </div>
     </div>
