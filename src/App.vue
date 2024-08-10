@@ -522,7 +522,7 @@ provide('visuals', {
         :editLoan="editLoan" :viewLoan="viewLoan" />
       <BudgetsPanel :class="['flex-none']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"
         :deleteBudget="deleteBudget" :editBudget="editBudget" :viewBudget="viewBudget" />
-      <div>
+      <div :class="['m-4']">
         <div v-if="!loans.length" :class="['text-wrap', 'text-pretty', 'w-30']">
           <SiteIntro />
         </div>

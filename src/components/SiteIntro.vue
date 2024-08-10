@@ -1,5 +1,5 @@
 <template>
-  <div :class="['w-1/2', 'm-4']">
+  <div :class="['w-1/2']">
     <p>Welcome to Debtonate!</p>
     <br />
     <p>
