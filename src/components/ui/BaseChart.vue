@@ -15,6 +15,7 @@ const chartConfig = ref(props.chartConfig);
 
 const initializeChart = () => {
   if (chartConfig.value) {
+    console.log(chartConfig);
     const width = 800;
     const height = 500;
     const margin = 50;
@@ -66,18 +67,24 @@ const initializeChart = () => {
   }
 };
 
+const updateChart = () => {
+  const svg = d3.select(`#chart${props.label}`);
+};
+
 onMounted(() => {
+  console.log('mounted called');
   initializeChart();
 });
 
 onUpdated(() => {
+  console.log('updated called');
   initializeChart();
 });
 </script>
 
 <template>
   <div :class="['chartWrapper']">
-    <h2>{{ props.chartConfig.config.header }}</h2>
+    <!-- <h2>{{ chartConfig.config.header }}</h2> -->
     <svg :id="'chart' + props.label"></svg>
   </div>
 </template>

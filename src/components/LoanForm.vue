@@ -3,12 +3,12 @@ import { computed, ref, watch } from 'vue';
 
 const props = defineProps(['createButtonText', 'id', 'loan', 'title']);
 const principal = ref(props.loan?.principal || 0);
-const interestRate = ref(parseFloat(props.loan?.annualRate) * 100 || 0);
+const interestRate = ref((props.loan?.annualRate || 0) * 100);
 const termInYears = ref(props.loan?.termInYears || 0);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
-    (input) => !Number.isNaN(parseFloat(input)) && parseFloat(input) > 0,
+    (input) => !Number.isNaN(input) && input > 0,
   ),
 );
 
@@ -17,7 +17,7 @@ watch(
   (newLoan) => {
     if (newLoan) {
       principal.value = newLoan.principal;
-      interestRate.value = parseFloat(newLoan.annualRate) * 100;
+      interestRate.value = newLoan.annualRate * 100;
       termInYears.value = newLoan.termInYears;
     }
   },
@@ -35,9 +35,9 @@ const clearCreate = () => {
 const emitCreate = () => {
   emits(
     'create-loan',
-    parseFloat(principal.value),
-    parseFloat(interestRate.value) / 100,
-    parseFloat(termInYears.value),
+    principal.value,
+    interestRate.value / 100,
+    termInYears.value,
   );
   clearCreate();
 };
@@ -63,18 +63,18 @@ const emitExit = () => {
         <div :class="['label']">
           <span :class="['label-text']">Principal</span>
         </div>
-        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model="principal" type="number"
+        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="principal" type="number"
           step="0.01" label="Principal" />
         <div :class="['label']">
           <span :class="['label-text']">Interest Rate</span>
         </div>
-        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model="interestRate" type="number"
-          step="0.01" label="Interest Rate" />
+        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="interestRate"
+          type="number" step="0.01" label="Interest Rate" />
         <div :class="['label']">
           <span :class="['label-text']">Term (In Years)</span>
         </div>
-        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model="termInYears" type="number"
-          label="Term In Years" />
+        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="termInYears"
+          type="number" label="Term In Years" />
       </div>
     </template>
     <template #actions>

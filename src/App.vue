@@ -8,6 +8,7 @@ import * as moneyfunx from 'moneyfunx';
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
+import GraphsPanel from './components/GraphsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
@@ -370,8 +371,7 @@ const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budg
 
 // title building functions
 
-const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)
-  } `
+const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} `
   + `$${monthlyBudget.absolute.toFixed(2)}/month `
   + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
@@ -384,10 +384,10 @@ const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.princi
 // graph data
 
 const balanceOverTimeGraphs = computed(() => {
-  const balances = {};
+  const configs = {};
 
   loansWithTotals.value.forEach((loan) => {
-    balances[loan.id] = {
+    configs[loan.id] = {
       config: {
         maxX: globalMaxPeriods.value,
         maxY: getLoan(loan.id).principal,
@@ -398,16 +398,16 @@ const balanceOverTimeGraphs = computed(() => {
     };
   });
 
-  Object.keys(balances).forEach((loanId) => {
+  Object.keys(configs).forEach((loanId) => {
     paymentSchedules.value.forEach((schedule) => {
       const line = [];
       schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
         line.push({ x: record.period, y: record.principalRemaining });
       });
-      balances[loanId].lines.push(line);
+      configs[loanId].lines.push(line);
     });
   });
-  return balances;
+  return configs;
 });
 
 // watch
@@ -517,7 +517,7 @@ provide('visuals', {
       @toggle-avalanche-sort="toggleAvalancheSort" @toggle-periods-as-dates="togglePeriodsAsDates"
       @toggle-reduce-payments="toggleReducePayments" @toggle-round-up="toggleRounding"
       @toggle-snowball-sort="toggleSnowballSort" />
-    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', 'overscroll-none']">
+    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', '']">
       <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
         :editLoan="editLoan" :viewLoan="viewLoan" />
       <BudgetsPanel :class="['flex-none']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"
@@ -530,9 +530,7 @@ provide('visuals', {
           <div :class="['flex-grow']">
             <div :class="['header']">
               <h2>Repayment Information</h2>
-              <div v-for="loan in loansWithTotals" :key="loan.id">
-                <base-chart :chartConfig="balanceOverTimeGraphs[loan.id]" :label="loan.id"></base-chart>
-              </div>
+              <GraphsPanel />
             </div>
           </div>
           <div>

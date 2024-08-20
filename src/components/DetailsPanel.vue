@@ -14,11 +14,17 @@ const visuals = inject('visuals');
 
 const viewedItemId = ref(props.type === constants.LOAN ? constants.DEFAULT : constants.TOTALS);
 
-const flexBasis = `basis-1/${props.pivot.length}`;
+const isViewedItemId = (itemId) => viewedItemId.value === itemId;
 
-const setViewedItemId = (value) => {
-  viewedItemId.value = value;
+const setViewedItemId = (itemId) => {
+  viewedItemId.value = itemId;
 };
+
+const getItem = (itemId) => (
+  props.type === constants.LOAN
+    ? budgetPrimitives.getBudget(itemId)
+    : loanPrimitives.getLoan(itemId)
+);
 
 const getItemName = (itemId) => (
   props.type === constants.LOAN
@@ -65,24 +71,23 @@ const emitExit = () => {
       <div v-if="anchor" :class="['tabframe', 'w-auto']">
         <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
           <div v-for="item in pivot" :key="generateKey(anchor, item)"
-            :class="['join-item', flexBasis, 'w-full', { 'border-t-2': item.id === viewedItemId }]">
+            :class="['join-item', 'w-full', { 'border-t-2': isViewedItemId(item.id) }]">
             <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>{{
               getItemName(item.id)
-              }}</base-button>
+            }}</base-button>
           </div>
         </div>
-        <div v-for="item in pivot" :key="generateKey(anchor, item)" name="tabscontent" class="w-auto">
-          <AmortizationTable v-show="item.id === viewedItemId" :id="'amortizationTable' + generateKey(anchor, item)"
-            :keyPrefix="generateKey(anchor, item)" :paymentSummary="getPaymentSummary(anchor.id, item.id)" :title="buildAmortizationTableTitle(
+        <AmortizationTable :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
+          :keyPrefix="generateKey(anchor, getItem(viewedItemId))"
+          :paymentSummary="getPaymentSummary(anchor.id, viewedItemId)" :title="buildAmortizationTableTitle(
+            anchor,
+            getItem(viewedItemId),
+          )
+            " :subtitle="buildAmortizationTableSubtitle(
               anchor,
-              item,
+              getItem(viewedItemId),
             )
-              " :subtitle="buildAmortizationTableSubtitle(
-                anchor,
-                item,
-              )
-                " />
-        </div>
+              " />
       </div>
     </template>
   </base-modal>

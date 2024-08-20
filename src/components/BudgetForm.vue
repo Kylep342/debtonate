@@ -5,7 +5,7 @@ const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
 const amount = ref(props.budget?.relative);
 
 const createButtonEnabled = computed(
-  () => !Number.isNaN(parseFloat(amount.value)) && parseFloat(amount.value) > 0,
+  () => !Number.isNaN(amount.value) && amount.value > 0,
 );
 
 watch(
@@ -25,7 +25,7 @@ const clearCreate = () => {
 };
 
 const emitCreate = () => {
-  emits('create-budget', parseFloat(amount.value));
+  emits('create-budget', amount.value);
   clearCreate();
 };
 
@@ -50,20 +50,12 @@ const emitExit = () => {
         <div :class="['label']">
           <span :class="['label-text']">Budget</span>
         </div>
-        <input
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          v-model="amount"
-          type="number"
-          label="Budget"
-        />
+        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="amount" type="number"
+          label="Budget" />
       </div>
     </template>
     <template #actions>
-      <base-button
-        @click="emitCreate"
-        :disabled="!createButtonEnabled"
-        :class="'btn-success'"
-      >
+      <base-button @click="emitCreate" :disabled="!createButtonEnabled" :class="'btn-success'">
         {{ createButtonText }}
       </base-button>
     </template>
