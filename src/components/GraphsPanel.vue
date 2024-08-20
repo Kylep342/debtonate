@@ -7,10 +7,10 @@ const loanPrimitives = inject('loanPrimitives');
 const visuals = inject('visuals');
 
 const loansWithTotals = ref(loanPrimitives.loansWithTotals);
-const viewedItemId = ref(constants.TOTALS);
+const viewedLoanId = ref(constants.TOTALS);
 
-const setViewedItemId = (value) => {
-  viewedItemId.value = value;
+const setViewedLoanId = (value) => {
+  viewedLoanId.value = value;
 };
 </script>
 
@@ -19,14 +19,14 @@ const setViewedItemId = (value) => {
     <div :class="['tabframe', 'w-auto']">
       <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
         <div v-for="loan in loansWithTotals" :key="loan.id"
-          :class="['join-item', 'w-full', { 'border-t-2': loan.id === viewedItemId }]">
-          <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(loan.id)>{{
+          :class="['join-item', 'w-full', { 'border-t-2': loan.id === viewedLoanId }]">
+          <base-button :class="['btn-ghost', 'w-full']" @click=setViewedLoanId(loan.id)>{{
             loanPrimitives.getLoanName(loan.id)
-          }}</base-button>
+            }}</base-button>
         </div>
       </div>
       <div v-for="loan in loansWithTotals" :key="loan.id" name="tabscontent" class="w-auto">
-        <base-chart v-show="loan.id === viewedItemId" :chartConfig="visuals.balanceOverTimeGraphs[loan.id]"
+        <base-chart v-show="loan.id === viewedLoanId" :chartConfig="visuals.balanceOverTimeGraphs[loan.id]"
           :label="loan.id"></base-chart>
       </div>
     </div>

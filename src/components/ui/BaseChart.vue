@@ -15,7 +15,6 @@ const chartConfig = ref(props.chartConfig);
 
 const initializeChart = () => {
   if (chartConfig.value) {
-    console.log(chartConfig);
     const width = 800;
     const height = 500;
     const margin = 50;
@@ -67,19 +66,18 @@ const initializeChart = () => {
   }
 };
 
-const updateChart = () => {
-  const svg = d3.select(`#chart${props.label}`);
-};
+// const updateChart = () => {
+//   const svg = d3.select(`#chart${props.label}`);
+// };
 
 onMounted(() => {
-  console.log('mounted called');
+  console.log(chartConfig);
   initializeChart();
 });
 
-onUpdated(() => {
-  console.log('updated called');
-  initializeChart();
-});
+// onUpdated(() => {
+//   initializeChart();
+// });
 </script>
 
 <template>

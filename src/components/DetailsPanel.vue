@@ -78,7 +78,6 @@ const emitExit = () => {
           </div>
         </div>
         <AmortizationTable :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
-          :keyPrefix="generateKey(anchor, getItem(viewedItemId))"
           :paymentSummary="getPaymentSummary(anchor.id, viewedItemId)" :title="buildAmortizationTableTitle(
             anchor,
             getItem(viewedItemId),
