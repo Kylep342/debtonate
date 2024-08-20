@@ -2,9 +2,6 @@
 import { computed, inject, ref } from 'vue';
 
 const props = defineProps(['keyPrefix', 'paymentSummary', 'title', 'subtitle']);
-const keyPrefix = ref(props.keyPrefix);
-const paymentSummary = ref(props.paymentSummary);
-const title = ref(props.title);
 
 const formatters = inject('formatters');
 const options = inject('options');
