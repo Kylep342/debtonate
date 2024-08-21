@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps(['createButtonText', 'id', 'loan', 'title']);
+const emits = defineEmits(['create-loan', 'exit-create-loan']);
+
 const principal = ref(props.loan?.principal || 0);
 const interestRate = ref((props.loan?.annualRate || 0) * 100);
 const termInYears = ref(props.loan?.termInYears || 0);
@@ -23,8 +25,6 @@ watch(
   },
   { immediate: true },
 );
-
-const emits = defineEmits(['create-loan', 'exit-create-loan']);
 
 const clearCreate = () => {
   principal.value = null;

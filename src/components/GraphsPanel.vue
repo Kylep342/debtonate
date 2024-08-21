@@ -1,12 +1,13 @@
 <script setup>
-import { inject, ref } from 'vue';
+import { inject, reactive, ref } from 'vue';
 
 import constants from '../constants/constants';
 
 const loanPrimitives = inject('loanPrimitives');
 const visuals = inject('visuals');
+const graphsConfig = ref(visuals.balanceOverTimeGraphs);
 
-const loansWithTotals = ref(loanPrimitives.loansWithTotals);
+const loansWithTotals = reactive(loanPrimitives.loansWithTotals);
 const viewedLoanId = ref(constants.TOTALS);
 
 const setViewedLoanId = (value) => {
@@ -22,11 +23,11 @@ const setViewedLoanId = (value) => {
           :class="['join-item', 'w-full', { 'border-t-2': loan.id === viewedLoanId }]">
           <base-button :class="['btn-ghost', 'w-full']" @click=setViewedLoanId(loan.id)>{{
             loanPrimitives.getLoanName(loan.id)
-            }}</base-button>
+          }}</base-button>
         </div>
       </div>
       <div v-for="loan in loansWithTotals" :key="loan.id" name="tabscontent" class="w-auto">
-        <base-chart v-show="loan.id === viewedLoanId" :chartConfig="visuals.balanceOverTimeGraphs[loan.id]"
+        <base-chart v-show="loan.id === viewedLoanId" :chartConfig="graphsConfig[loan.id]"
           :label="loan.id"></base-chart>
       </div>
     </div>

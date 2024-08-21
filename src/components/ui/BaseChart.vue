@@ -71,7 +71,7 @@ const initializeChart = () => {
 // };
 
 onMounted(() => {
-  console.log(chartConfig);
+  console.log(props);
   initializeChart();
 });
 

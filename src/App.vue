@@ -526,12 +526,12 @@ provide('visuals', {
         <div v-if="!loans.length" :class="['text-wrap', 'text-pretty', 'w-30']">
           <SiteIntro />
         </div>
-        <div v-if="loans.length" :class="[]">
+        <div v-else :class="[]">
           <div :class="['flex-grow']">
             <div :class="['header']">
               <h2>Repayment Information</h2>
-              <GraphsPanel />
             </div>
+            <GraphsPanel />
           </div>
           <div>
             <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId

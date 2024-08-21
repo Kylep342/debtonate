@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
+const emits = defineEmits(['create-budget', 'exit-create-budget']);
+
 const amount = ref(props.budget?.relative);
 
 const createButtonEnabled = computed(
@@ -17,8 +19,6 @@ watch(
   },
   { immediate: true },
 );
-
-const emits = defineEmits(['create-budget', 'exit-create-budget']);
 
 const clearCreate = () => {
   amount.value = null;
