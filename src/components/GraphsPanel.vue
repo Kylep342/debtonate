@@ -17,13 +17,13 @@ const setViewedLoanId = (value) => {
 
 <template>
   <div>
-    <div :class="['tabframe', 'w-auto']">
+    <div :class="['tabframe', 'w-fit']">
       <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
         <div v-for="loan in loansWithTotals" :key="loan.id"
           :class="['join-item', 'w-full', { 'border-t-2': loan.id === viewedLoanId }]">
           <base-button :class="['btn-ghost', 'w-full']" @click=setViewedLoanId(loan.id)>{{
             loanPrimitives.getLoanName(loan.id)
-          }}</base-button>
+            }}</base-button>
         </div>
       </div>
       <div v-for="loan in loansWithTotals" :key="loan.id" name="tabscontent" class="w-auto">

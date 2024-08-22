@@ -504,9 +504,9 @@ provide('visuals', {
 </script>
 
 <template>
-  <div id="debtonate" :class="['font-mono']">
-    <HeaderBar @clear-app-state="clearState" @load-app-state="loadState" @open-options-form="openOptionsForm"
-      @save-app-state="saveState" />
+  <div id="debtonate" :class="['font-mono', 'h-screen', 'flex', 'flex-col']">
+    <HeaderBar :class="['flex-none']" @clear-app-state="clearState" @load-app-state="loadState"
+      @open-options-form="openOptionsForm" @save-app-state="saveState" />
     <LoanForm :id="constants.LOAN_FORM_ID" :createButtonText="createLoanButtonText" :loan="currentLoanId ?
       getLoan(currentLoanId) :
       null" :title="createLoanFormTitle" @create-loan="createLoan" @exit-create-loan="exitCreateLoanForm" />
@@ -517,7 +517,7 @@ provide('visuals', {
       @toggle-avalanche-sort="toggleAvalancheSort" @toggle-periods-as-dates="togglePeriodsAsDates"
       @toggle-reduce-payments="toggleReducePayments" @toggle-round-up="toggleRounding"
       @toggle-snowball-sort="toggleSnowballSort" />
-    <div :class="['appBody', 'flex', 'bg-base-100', 'overflow-y-hidden', '']">
+    <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <LoansPanel :class="['flex-none']" :createFunction="openCreateLoanForm" :deleteLoan="deleteLoan"
         :editLoan="editLoan" :viewLoan="viewLoan" />
       <BudgetsPanel :class="['flex-none']" :budgetsTotals="totalsByBudget" :createFunction="openCreateBudgetForm"

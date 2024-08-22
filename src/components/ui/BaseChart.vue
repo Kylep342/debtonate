@@ -82,7 +82,7 @@ onMounted(() => {
 
 <template>
   <div :class="['chartWrapper']">
-    <!-- <h2>{{ chartConfig.config.header }}</h2> -->
+    <h2>{{ chartConfig.config.header }}</h2>
     <svg :id="'chart' + props.label"></svg>
   </div>
 </template>
