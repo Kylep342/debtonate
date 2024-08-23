@@ -1,35 +1,38 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  computed, inject, onMounted, onUpdated, ref,
+  computed, inject, onMounted, reactive, watch,
 } from 'vue';
 import constants from '../../constants/constants';
 
-const props = defineProps(['chartConfig', 'label']);
+const props = defineProps(['chartConfig']);
 const formatters = inject('formatters');
 const options = inject('options');
 
 const xScale = computed(() => (options.periodsAsDates ? d3.scaleTime : d3.scaleLinear));
 
-const chartConfig = ref(props.chartConfig);
+const chartConfig = reactive(props.chartConfig);
 
 const initializeChart = () => {
-  if (chartConfig.value) {
+  if (chartConfig) {
     const width = 800;
     const height = 500;
     const margin = 50;
-    const svg = d3.select(`#chart${props.label}`).attr('width', width).attr('height', height);
+    const svg = d3.select(`#chart${chartConfig.label}`).attr('width', width).attr('height', height);
+
+    // clear existing elements
+    svg.selectAll('*').remove();
 
     const x = xScale.value(
       [
         formatters.renderPeriod(0),
-        formatters.renderPeriod(chartConfig.value.config.maxX),
+        formatters.renderPeriod(chartConfig.config.maxX),
       ],
       [0, width - margin - margin],
     );
     const y = d3
       .scaleLinear(
-        [0, chartConfig.value.config.maxY],
+        [0, chartConfig.config.maxY],
         [height - margin, 0],
       );
 
@@ -55,7 +58,7 @@ const initializeChart = () => {
         .attr('text-anchor', 'start')
         .text('Principal Remaining ($)'));
 
-    chartConfig.value.lines.forEach((line, index) => {
+    chartConfig.lines.forEach((line, index) => {
       svg.append('path')
         .datum(line)
         .attr('fill', 'none')
@@ -66,23 +69,19 @@ const initializeChart = () => {
   }
 };
 
-// const updateChart = () => {
-//   const svg = d3.select(`#chart${props.label}`);
-// };
-
 onMounted(() => {
-  console.log(props);
   initializeChart();
 });
 
-// onUpdated(() => {
-//   initializeChart();
-// });
+watch(() => props.chartConfig, (newConfig) => {
+  Object.assign(chartConfig, newConfig);
+  initializeChart();
+});
 </script>
 
 <template>
   <div :class="['chartWrapper']">
     <h2>{{ chartConfig.config.header }}</h2>
-    <svg :id="'chart' + props.label"></svg>
+    <svg :id="'chart' + chartConfig.label"></svg>
   </div>
 </template>

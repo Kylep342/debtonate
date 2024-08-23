@@ -23,13 +23,10 @@ const setViewedLoanId = (value) => {
           :class="['join-item', 'w-full', { 'border-t-2': loan.id === viewedLoanId }]">
           <base-button :class="['btn-ghost', 'w-full']" @click=setViewedLoanId(loan.id)>{{
             loanPrimitives.getLoanName(loan.id)
-            }}</base-button>
+          }}</base-button>
         </div>
       </div>
-      <div v-for="loan in loansWithTotals" :key="loan.id" name="tabscontent" class="w-auto">
-        <base-chart v-show="loan.id === viewedLoanId" :chartConfig="graphsConfig[loan.id]"
-          :label="loan.id"></base-chart>
-      </div>
+      <base-chart :chartConfig="graphsConfig[viewedLoanId]" />
     </div>
   </div>
 </template>
