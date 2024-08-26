@@ -38,14 +38,15 @@ const snowballSort = ref(false);
 
 const baseDate = computed(() => Date.now());
 
-const renderPeriod = (period) => {
+const renderPeriod = (period, asStr = false) => {
   if (periodsAsDates.value) {
     const date = new Date(baseDate.value);
-    return new Date(
+    const relativeDate = new Date(
       date.getFullYear(),
       date.getMonth() + period,
       date.getDate(),
-    ).toLocaleDateString();
+    );
+    return asStr ? relativeDate.toLocaleDateString() : relativeDate;
   }
   return period;
 };

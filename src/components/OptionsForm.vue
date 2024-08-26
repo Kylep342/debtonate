@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref } from 'vue';
+import { inject, reactive } from 'vue';
 import constants from '../constants/constants';
 
 const props = defineProps(['id']);
@@ -14,10 +14,10 @@ const emits = defineEmits([
 ]);
 
 const options = inject('options');
-const periodsAsDates = ref(options.periodsAsDates);
-const reducePayments = ref(options.reducePayments);
-const roundUp = ref(options.roundUp);
-const snowballSort = ref(options.snowballSort);
+const periodsAsDates = reactive(options.periodsAsDates);
+const reducePayments = reactive(options.reducePayments);
+const roundUp = reactive(options.roundUp);
+const snowballSort = reactive(options.snowballSort);
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);

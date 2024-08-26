@@ -1,13 +1,13 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed, inject, reactive } from 'vue';
 
 defineProps(['paymentSummary', 'title', 'subtitle']);
 
 const formatters = inject('formatters');
 const options = inject('options');
-const periodsAsDates = ref(options.periodsAsDates);
+const periodsAsDates = reactive(options.periodsAsDates);
 
-const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed(() => (periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -32,7 +32,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
         <template #body>
           <tbody>
             <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="rowno">
-              <td :class="['text-center']">{{ formatters.renderPeriod(record.period) }}</td>
+              <td :class="['text-center']">{{ formatters.renderPeriod(record.period, true) }}</td>
               <td :class="['text-right']">
                 ${{ (record.principal + record.interest).toFixed(2) }}
               </td>

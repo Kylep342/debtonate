@@ -9,8 +9,8 @@
     </p>
     <br />
     <p>
-      To get started, add some loans or other vehicles of debt.
-      From there, add a budget, which represents additional payment per month over your minimum payment.
+      To get started, add some loans.
+      From there, add a few budgets, which represent additional payments per month over your minimum payment.
     </p>
   </div>
 </template>

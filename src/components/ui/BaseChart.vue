@@ -9,7 +9,7 @@ const props = defineProps(['chartConfig']);
 const formatters = inject('formatters');
 const options = inject('options');
 
-const xScale = computed(() => (options.periodsAsDates ? d3.scaleTime : d3.scaleLinear));
+const xScale = computed(() => (options.periodsAsDates ? d3.scaleTime() : d3.scaleLinear()));
 
 const chartConfig = reactive(props.chartConfig);
 
@@ -23,16 +23,18 @@ const initializeChart = () => {
     // clear existing elements
     svg.selectAll('*').remove();
 
-    const x = xScale.value(
+    const x = xScale.value.domain(
       [
         formatters.renderPeriod(0),
         formatters.renderPeriod(chartConfig.config.maxX),
       ],
+    ).range(
       [0, width - margin - margin],
     );
     const y = d3
-      .scaleLinear(
+      .scaleLinear().domain(
         [0, chartConfig.config.maxY],
+      ).range(
         [height - margin, 0],
       );
 
