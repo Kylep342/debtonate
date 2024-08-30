@@ -79,7 +79,6 @@ watch(
     Object.assign(chart, newConfig);
     initializeChart();
   },
-  { immediate: true },
 );
 </script>
 
