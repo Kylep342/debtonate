@@ -17,21 +17,21 @@ import SiteIntro from './components/SiteIntro.vue';
 import constants from './constants/constants';
 import keys from './constants/keys';
 
-// data
+// core state
 
+const budgetDetailsPanelActive = ref(false);
 const budgets = ref([]);
 const createBudgetFormActive = ref(false);
 const createLoanFormActive = ref(false);
 const currentBudgetId = ref(null);
 const currentLoanId = ref(null);
+const loanDetailsPanelActive = ref(false);
 const loans = ref([]);
 const optionsFormActive = ref(false);
 const periodsAsDates = ref(false);
 const reducePayments = ref(false);
 const roundingScale = ref(100);
 const roundUp = ref(false);
-const budgetDetailsPanelActive = ref(false);
-const loanDetailsPanelActive = ref(false);
 const snowballSort = ref(false);
 
 // independent computed values
