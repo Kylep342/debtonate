@@ -84,7 +84,6 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <h2>{{ chart.config.header }}</h2>
     <svg :id="'chart' + chartConfig.label"></svg>
   </div>
 </template>
