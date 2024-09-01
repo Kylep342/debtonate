@@ -5,7 +5,7 @@ import {
 } from 'vue';
 import constants from '../../constants/constants';
 
-const props = defineProps(['chartConfig']);
+const props = defineProps(['chartConfig', 'header']);
 const formatters = inject('formatters');
 const options = inject('options');
 
@@ -75,8 +75,8 @@ onMounted(() => {
 
 watch(
   () => props.chartConfig,
-  (newConfig) => {
-    Object.assign(chart, newConfig);
+  (value) => {
+    Object.assign(chart, value);
     initializeChart();
   },
 );
@@ -84,6 +84,6 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <svg :id="'chart' + chartConfig.label"></svg>
+    <svg v-if="chartConfig" :id="'chart' + chartConfig.label"></svg>
   </div>
 </template>
