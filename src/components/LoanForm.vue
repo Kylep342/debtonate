@@ -7,6 +7,7 @@ const emits = defineEmits(['create-loan', 'exit-create-loan']);
 const principal = ref(props.loan?.principal || 0);
 const interestRate = ref((props.loan?.annualRate || 0) * 100);
 const termInYears = ref(props.loan?.termInYears || 0);
+const name = ref(props.loan?.name || '');
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -21,6 +22,7 @@ watch(
       principal.value = newLoan.principal;
       interestRate.value = newLoan.annualRate * 100;
       termInYears.value = newLoan.termInYears;
+      name.value = newLoan.name || '';
     }
   },
   { immediate: true },
@@ -30,6 +32,7 @@ const clearCreate = () => {
   principal.value = null;
   interestRate.value = null;
   termInYears.value = null;
+  name.value = null;
 };
 
 const emitCreate = () => {
@@ -38,6 +41,7 @@ const emitCreate = () => {
     principal.value,
     interestRate.value / 100,
     termInYears.value,
+    name.value,
   );
   clearCreate();
 };
@@ -75,6 +79,11 @@ const emitExit = () => {
         </div>
         <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="termInYears"
           type="number" label="Term In Years" />
+        <div :class="['label']">
+          <span :class="['label-text']">Name (Optional)</span>
+        </div>
+        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model="name" type="string"
+          label="Name" />
       </div>
     </template>
     <template #actions>

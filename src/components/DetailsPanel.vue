@@ -74,7 +74,7 @@ const emitExit = () => {
             :class="['join-item', 'w-full', { 'border-t-2': isViewedItemId(item.id) }]">
             <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>{{
               getItemName(item.id)
-            }}</base-button>
+              }}</base-button>
           </div>
         </div>
         <AmortizationTable :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"

@@ -76,7 +76,7 @@ onMounted(() => {
 watch(
   () => props.chartConfig,
   (value) => {
-    Object.assign(chart, value);
+    Object.assign(chart, { ...value });
     initializeChart();
   },
 );

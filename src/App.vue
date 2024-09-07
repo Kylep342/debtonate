@@ -105,9 +105,12 @@ const totalsAsALoan = computed(() => ({
   periods: globalMaxPeriods.value,
   minPayment: globalMinPayment.value,
   totalInterest: globalLifetimeInterestPaid.value,
+  name: constants.NAME_TOTALS_AS_LOAN,
 }));
 
 const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
+
+const getLoan = (id) => loansWithTotals.value.find((loan) => loan.id === id);
 
 const minimumBudget = computed(() => ({
   id: constants.DEFAULT,
@@ -126,6 +129,8 @@ const monthlyBudgets = computed(() => {
 
   return budgetsArray;
 });
+
+const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
 
 // independent methods
 
@@ -176,9 +181,7 @@ const editLoan = (id) => {
 };
 const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
 const getLoanName = (id) => (
-  id === constants.TOTALS
-    ? constants.NAME_TOTALS_AS_LOAN
-    : `${constants.LOAN} ${getLoanIndex(id)}`
+  getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
 );
 const viewLoan = (id) => {
   currentLoanId.value = id;
@@ -199,7 +202,6 @@ const editBudget = (id) => {
   currentBudgetId.value = id;
   openCreateBudgetForm();
 };
-const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
 const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
 const getBudgetName = (id) => (
   id === constants.DEFAULT
@@ -231,7 +233,7 @@ const clearState = () => {
 const loadState = () => {
   budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS));
   loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)).map(
-    (loan) => new moneyfunx.Loan(loan.principal, loan.annualRate, 12, loan.termInYears),
+    (loan) => new moneyfunx.Loan(loan.principal, loan.annualRate, 12, loan.termInYears, loan.name),
   );
   periodsAsDates.value = JSON.parse(
     localStorage.getItem(keys.LS_PERIODS_AS_DATES),
@@ -334,7 +336,6 @@ const paymentSummaries = computed(() => {
 
 // dependent methods
 
-const getLoan = (id) => loansWithTotals.value.find((loan) => loan.id === id);
 const sortLoans = () => {
   loans.value = snowballSort.value === true ? snowball() : avalanche();
 };
@@ -355,8 +356,8 @@ const createBudget = (proposedBudget) => {
   budgets.value.sort((a, b) => b - a);
   exitCreateBudgetForm();
 };
-const createLoan = (principal, interestRate, termInYears) => {
-  const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears);
+const createLoan = (principal, interestRate, termInYears, name) => {
+  const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name);
   if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
     deleteLoan(currentLoanId.value);
     currentLoanId.value = null;
