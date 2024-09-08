@@ -403,7 +403,7 @@ const balanceOverTimeGraphs = computed(() => {
   Object.keys(configs).forEach((loanId) => {
     paymentSchedules.value.forEach((schedule) => {
       const line = [];
-      schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+      schedule.paymentSchedule[loanId]?.amortizationSchedule.forEach((record) => {
         line.push({ x: record.period, y: record.principalRemaining });
       });
       configs[loanId].lines.push(line);
