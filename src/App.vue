@@ -181,7 +181,7 @@ const editLoan = (id) => {
 };
 const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
 const getLoanName = (id) => (
-  getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
+  getLoan(id)?.name || `${constants.LOAN} ${getLoanIndex(id)}`
 );
 const viewLoan = (id) => {
   currentLoanId.value = id;
@@ -409,6 +409,7 @@ const balanceOverTimeGraphs = computed(() => {
       configs[loanId].lines.push(line);
     });
   });
+  console.log(configs);
   return configs;
 });
 

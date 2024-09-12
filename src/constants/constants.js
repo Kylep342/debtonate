@@ -1,3 +1,4 @@
+import { TOTALS } from 'moneyfunx';
 // file for constants
 
 const BTN_CREATE = 'Create';
@@ -19,7 +20,6 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
-const TOTALS = 'totals';
 
 export default Object.freeze({
   BTN_CREATE,

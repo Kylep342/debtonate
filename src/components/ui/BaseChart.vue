@@ -13,6 +13,7 @@ const chart = reactive(props.chartConfig);
 
 const initializeChart = () => {
   if (chart) {
+    console.log(chart);
     const width = 800;
     const height = 500;
     const margin = 50;
@@ -70,6 +71,8 @@ const initializeChart = () => {
 };
 
 onMounted(() => {
+  console.log(chart);
+  // console.log(props.chartConfig);
   initializeChart();
 });
 
@@ -84,7 +87,7 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <h2 :class="['text-center']">{{ chartConfig.config.header }}</h2>
-    <svg v-if="chartConfig" :id="'chart' + chartConfig.label"></svg>
+    <h2 :class="['text-center']">{{ chart.config.header }}</h2>
+    <svg v-if="chartConfig" :id="'chart' + chart.label"></svg>
   </div>
 </template>

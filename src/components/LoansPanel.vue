@@ -20,9 +20,11 @@ const loans = ref(loanPrimitives.loansWithTotals);
     <template #cardBody>
       <div :class="[
         'border-r-2',
-        'h-screen',
+        'max-h-[calc(100vh-160px)]',
         'overflow-y-auto',
-        'overscroll-y-contain',
+        'flex',
+        'flex-col',
+        'min-h-0'
       ]">
         <ul>
           <li v-for="(loan) in loans" :key="loan.id">

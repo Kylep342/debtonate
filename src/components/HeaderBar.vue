@@ -14,19 +14,14 @@ const classes = ['rounded-none btn-secondary'];
 </script>
 
 <template>
-  <header
-    :id="['header']"
-    :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']"
-  >
+  <header :id="['header']" :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']">
     <div :class="['flex-1']">
       <img src="/icon.png" />
       <h1>Debtonate</h1>
     </div>
     <ul :class="['menu menu-horizontal bg-secondary']">
       <li>
-        <base-button :class="classes" @click="emitOpenOptions"
-          >Options</base-button
-        >
+        <base-button :class="classes" @click="emitOpenOptions">Options</base-button>
       </li>
       <li>
         <base-button :class="classes" @click="emitLoadState">Load</base-button>
@@ -35,9 +30,7 @@ const classes = ['rounded-none btn-secondary'];
         <base-button :class="classes" @click="emitSaveState">Save</base-button>
       </li>
       <li>
-        <base-button :class="classes" @click="emitClearState"
-          >Clear</base-button
-        >
+        <base-button :class="classes" @click="emitClearState">Clear</base-button>
       </li>
     </ul>
   </header>
