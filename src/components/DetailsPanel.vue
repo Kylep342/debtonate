@@ -72,9 +72,9 @@ const emitExit = () => {
         <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
           <div v-for="item in pivot" :key="generateKey(anchor, item)"
             :class="['join-item', 'w-full', { 'border-t-2': isViewedItemId(item.id) }]">
-            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>{{
-              getItemName(item.id)
-              }}</base-button>
+            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>
+              {{ getItemName(item.id) }}
+            </base-button>
           </div>
         </div>
         <AmortizationTable :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
