@@ -1,14 +1,30 @@
 <script setup>
-import { inject, ref } from 'vue';
+import {
+  inject,
+  ref,
+  onBeforeUnmount,
+  onMounted,
+} from 'vue';
 
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
+import { heightRestOfViewport } from '../functions/viewport';
 
 const props = defineProps(['createFunction']);
 
 const loanPrimitives = inject('loanPrimitives');
 const loans = ref(loanPrimitives.loansWithTotals);
+const scrollContainer = ref(null);
+
+onMounted(() => {
+  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
+  window.addEventListener('resizeLoansPanel', heightRestOfViewport); // Adjust on resize
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resizeLoansPanel', heightRestOfViewport);
+});
 </script>
 
 <template>
@@ -18,9 +34,8 @@ const loans = ref(loanPrimitives.loansWithTotals);
         :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div :class="[
+      <div ref="scrollContainer" :class="[
         'border-r-2',
-        'max-h-[calc(100vh-160px)]',
         'overflow-y-auto',
         'flex',
         'flex-col',
