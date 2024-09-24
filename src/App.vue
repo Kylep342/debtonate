@@ -309,10 +309,8 @@ const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
   ),
   label:
     budget.id === constants.DEFAULT
-      ? `$${globalMinPayment.value.toFixed(2)}/month`
-      : `$${budget.absolute.toFixed(2)}/month (+$${budget.relative.toFixed(
-        2,
-      )}/month)`,
+      ? `${Money(globalMinPayment.value)}/month`
+      : `${Money(budget.absolute)}/month (+${Money(budget.relative)}/month)`,
 })));
 
 const totalsByBudget = computed(() => {
@@ -391,16 +389,16 @@ const getLifetimeInterest = (loanId, budgetId) => (
 // title building functions
 
 const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} `
-  + `$${monthlyBudget.absolute.toFixed(2)}/month `
-  + `(+$${monthlyBudget.relative.toFixed(2)}/month)`;
+  + `${Money(monthlyBudget.absolute)}/month `
+  + `(+${Money(monthlyBudget.relative)}/month)`;
 const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
-  + `($${loan.principal.toFixed(2)} `
+  + `(${Money(loan.principal)} `
   + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
 
 const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}% | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
 const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-const buildInterestTableSubtitle = (loan) => `(${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}%)`;
+const buildInterestTableSubtitle = (loan) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}%)`;
 
 // graph data
 

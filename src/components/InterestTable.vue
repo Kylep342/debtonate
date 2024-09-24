@@ -55,7 +55,7 @@ const content = (downId, acrossId) => {
         <template #header>
           <thead>
             <tr>
-              <th :class="['text-right']"><b>DOWN -> ACROSS</b></th>
+              <th :class="['text-right']"><b>DOWN → ACROSS</b></th>
               <th v-for="budget in monthlyBudgets" :key="budget.id"><b>{{
                 budgetPrimitives.getBudgetName(budget.id) }}</b></th>
             </tr>
@@ -69,7 +69,7 @@ const content = (downId, acrossId) => {
                 <ul>
                   <li v-for="(key, rownum) in Object.keys(content(down.id, across.id))" :key="rownum">{{
                     content(down.id,
-                    across.id)[key] }}</li>
+                      across.id)[key] }}</li>
                 </ul>
               </td>
             </tr>
