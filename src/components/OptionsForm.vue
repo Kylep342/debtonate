@@ -51,7 +51,7 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>Avalanche orders loans by descending interest rate</p>
-              <p>Snowball orders loans by ascending balance</p>
+              <p>Snowball orders loans by ascending principal</p>
             </div>
           </template>
           <template #cardActions>

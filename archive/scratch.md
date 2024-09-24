@@ -1,25 +1,6 @@
 Snippets to visit later
 
 
-// DetailsPanel.vue
-```vue
-<script>
-const amortizationSchedulesChart = computed(() => {
-  const currentLoanId = loanPrimitives.currentLoanId?.value;
-  return props.type === constants.LOAN && currentLoanId
-    ? visuals.amortizationSchedulesCharts.value[currentLoanId]
-    : visuals.amortizationSchedulesCharts.value.totals;
-});
-</script>
-
-<template>
-<base-chart
-    :chart="amortizationSchedulesChart"
-    :id="'amortizationSchedulesChart'"
-/>
-</template>
-```
-
 // App.vue
 
 ```vue
