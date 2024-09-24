@@ -38,12 +38,9 @@ const content = (downId, acrossId) => {
 
   const costText = `${formatters.Money(priceDelta)}`;
 
-  const timeText = `
-  ${relativeTime(timeDelta)}
-  ${timeDelta > 0 ? ' earlier' : ' later'}
-  `;
+  const timeText = `${relativeTime(timeDelta)} ${timeDelta > 0 ? ' earlier' : ' later'}`;
 
-  return `${costText}\n${timeText}`;
+  return { costText, timeText };
 };
 </script>
 
@@ -69,7 +66,10 @@ const content = (downId, acrossId) => {
             <tr v-for="(down) in monthlyBudgets" :key="down.id">
               <td :class="['text-center']">{{ budgetPrimitives.getBudgetName(down.id) }}</td>
               <td v-for="(across) in monthlyBudgets" :key="down.id + across.id">
-                {{ content(down.id, across.id) }}
+                <ul>
+                  <li v-for="(key, rownum) in Object.keys(content(down.id, across.id))" :key="rownum">{{ content(down.id,
+                    across.id)[key] }}</li>
+                </ul>
               </td>
             </tr>
           </tbody>
