@@ -59,7 +59,7 @@ const Money = (amount) => (
     language,
     {
       style: 'currency',
-      currency: currency.value,
+      currency: currency.value || 'USD',
     },
   ).format(amount)
 );
