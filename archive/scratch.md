@@ -1,4 +1,4 @@
-Snippes to visit later
+Snippets to visit later
 
 
 // DetailsPanel.vue

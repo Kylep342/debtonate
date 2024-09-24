@@ -5,11 +5,12 @@ import constants from '../constants/constants';
 const props = defineProps(['budget', 'budgetTotals']);
 
 const budgetPrimitives = inject('budgetPrimitives');
+const formatters = inject('formatters');
 
-const budgetAmount = computed(() => `$${props.budget.absolute.toFixed(2)}/month`);
-const budgetExtra = computed(() => `+$${props.budget.relative.toFixed(2)}/month`);
+const budgetAmount = computed(() => `${formatters.Money(props.budget.absolute)}/month`);
+const budgetExtra = computed(() => `+${formatters.Money(props.budget.relative)}/month`);
 const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
-const budgetTotalInterest = computed(() => `$${props.budgetTotals.lifetimeInterest.toFixed(2)}`);
+const budgetTotalInterest = computed(() => `${formatters.Money(props.budgetTotals.lifetimeInterest)}`);
 </script>
 
 <template>
