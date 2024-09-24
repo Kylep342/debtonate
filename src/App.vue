@@ -14,6 +14,7 @@ import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import SiteIntro from './components/SiteIntro.vue';
+import TablesPanel from './components/TablesPanel.vue';
 import constants from './constants/constants';
 import keys from './constants/keys';
 
@@ -23,8 +24,10 @@ const budgetDetailsPanelActive = ref(false);
 const budgets = ref([]);
 const createBudgetFormActive = ref(false);
 const createLoanFormActive = ref(false);
+const currency = ref(constants.LOCALE_CURRENY[navigator.language]);
 const currentBudgetId = ref(null);
 const currentLoanId = ref(null);
+const language = ref(navigator.language);
 const loanDetailsPanelActive = ref(false);
 const loans = ref([]);
 const optionsFormActive = ref(false);
@@ -38,7 +41,7 @@ const snowballSort = ref(false);
 
 const baseDate = computed(() => Date.now());
 
-const renderPeriod = (period, asStr = false) => {
+const formatPeriod = (period, asStr = false) => {
   if (periodsAsDates.value) {
     const date = new Date(baseDate.value);
     const relativeDate = new Date(
@@ -50,6 +53,16 @@ const renderPeriod = (period, asStr = false) => {
   }
   return period;
 };
+
+const Money = (amount) => (
+  Intl.NumberFormat(
+    language,
+    {
+      style: 'currency',
+      currency: currency.value,
+    },
+  ).format(amount)
+);
 
 const rawGlobalMinPayment = computed(
   () => loans.value.reduce(
@@ -221,8 +234,10 @@ const clearState = () => {
   budgets.value = [];
   createBudgetFormActive.value = false;
   createLoanFormActive.value = false;
+  currency.value = constants.LOCALE_CURRENY[navigator.language];
   currentBudgetId.value = null;
   currentLoanId.value = null;
+  language.value = navigator.language;
   loans.value = [];
   reducePayments.value = false;
   roundUp.value = false;
@@ -321,7 +336,6 @@ const paymentSummaries = computed(() => {
     paymentSchedules.value.forEach((schedule) => {
       summaries[loanId][schedule.budgetId] = {
         label: schedule.label,
-        totalPaymentAmount: schedule.paymentAmount,
         amortizationSchedule:
           schedule.paymentSchedule[loanId].amortizationSchedule,
         totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
@@ -370,6 +384,9 @@ const createLoan = (principal, interestRate, termInYears, name) => {
 const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
 
 const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId].totalPayments;
+const getLifetimeInterest = (loanId, budgetId) => (
+  paymentSummaries.value[loanId][budgetId].totalInterestPaid
+);
 
 // title building functions
 
@@ -382,6 +399,8 @@ const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} 
 
 const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
 const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `($${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}% | $${monthlyBudget.absolute.toFixed(2)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
+const buildInterestTableSubtitle = (loan) => `(${loan.principal} | ${(loan.annualRate * 100).toFixed(2)}%)`;
 
 // graph data
 
@@ -409,7 +428,6 @@ const balanceOverTimeGraphs = computed(() => {
       configs[loanId].lines.push(line);
     });
   });
-  console.log(configs);
   return configs;
 });
 
@@ -469,6 +487,8 @@ provide('builders', {
   buildAmortizationTableSubtitle,
   buildAmortizationTableTitle,
   buildBudgetDetailsTitle,
+  buildInterestTableSubtitle,
+  buildInterestTableTitle,
   buildLoanDetailsTitle,
 });
 
@@ -479,9 +499,13 @@ provide('budgetPrimitives', {
   getBudget,
   getBudgetIndex,
   getBudgetName,
-  getNumPayments,
   monthlyBudgets,
   viewBudget,
+});
+
+provide('getters', {
+  getLifetimeInterest,
+  getNumPayments,
 });
 
 provide('loanPrimitives', {
@@ -496,7 +520,8 @@ provide('loanPrimitives', {
 });
 
 provide('formatters', {
-  renderPeriod,
+  formatPeriod,
+  Money,
 });
 
 provide('visuals', {
@@ -534,7 +559,8 @@ provide('visuals', {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <GraphsPanel />
+            <!-- <GraphsPanel :graphs="balanceOverTimeGraphs" /> -->
+            <TablesPanel />
           </div>
           <div>
             <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="currentLoanId

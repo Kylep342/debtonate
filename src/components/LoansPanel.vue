@@ -19,7 +19,7 @@ const scrollContainer = ref(null);
 
 onMounted(() => {
   scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
-  window.addEventListener('resizeLoansPanel', heightRestOfViewport); // Adjust on resize
+  window.addEventListener('resizeLoansPanel', heightRestOfViewport);
 });
 
 onBeforeUnmount(() => {

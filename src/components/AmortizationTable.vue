@@ -1,13 +1,14 @@
 <script setup>
-import { computed, inject, reactive } from 'vue';
+import { computed, inject, ref } from 'vue';
 
 defineProps(['paymentSummary', 'title', 'subtitle']);
 
 const formatters = inject('formatters');
 const options = inject('options');
-const periodsAsDates = reactive(options.periodsAsDates);
 
-const paymentHeader = computed(() => (periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const periodsAsDates = ref(options.periodsAsDates);
+
+const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -32,14 +33,14 @@ const paymentHeader = computed(() => (periodsAsDates ? 'Payment Date' : 'Payment
         <template #body>
           <tbody>
             <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="rowno">
-              <td :class="['text-center']">{{ formatters.renderPeriod(record.period, true) }}</td>
+              <td :class="['text-center']">{{ formatters.formatPeriod(record.period, true) }}</td>
               <td :class="['text-right']">
-                ${{ (record.principal + record.interest).toFixed(2) }}
+                {{ formatters.Money(record.interest + record.principal) }}
               </td>
-              <td :class="['text-right']">${{ record.principal.toFixed(2) }}</td>
-              <td :class="['text-right']">${{ record.interest.toFixed(2) }}</td>
+              <td :class="['text-right']">{{ formatters.Money(record.principal) }}</td>
+              <td :class="['text-right']">{{ formatters.Money(record.interest) }}</td>
               <td :class="['text-right']">
-                ${{ record.principalRemaining.toFixed(2) }}
+                {{ formatters.Money(record.principalRemaining) }}
               </td>
             </tr>
           </tbody>
@@ -50,19 +51,19 @@ const paymentHeader = computed(() => (periodsAsDates ? 'Payment Date' : 'Payment
               <td :class="['textLeft']"><b>Totals:</b></td>
               <td :class="['text-right']">
                 <b>${{
-                  (
+                  formatters.Money(
                     paymentSummary.totalPrincipalPaid +
                     paymentSummary.totalInterestPaid
-                  ).toFixed(2)
+                  )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>${{ paymentSummary.totalPrincipalPaid.toFixed(2) }}</b>
+                <b>{{ formatters.Money(paymentSummary.totalPrincipalPaid) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>${{ paymentSummary.totalInterestPaid.toFixed(2) }}</b>
+                <b>{{ formatters.Money(paymentSummary.totalInterestPaid) }}</b>
               </td>
-              <td :class="['text-right']"><b>$0.00</b></td>
+              <td :class="['text-right']"><b>{{ formatters.Money(0) }}</b></td>
             </tr>
           </tfoot>
         </template>

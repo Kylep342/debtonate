@@ -4,11 +4,12 @@ import constants from '../constants/constants';
 
 const props = defineProps(['loan']);
 
+const formatters = inject('formatters');
 const loanPrimitives = inject('loanPrimitives');
 
 const loanInterestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
-const loanMinPayment = computed(() => `$${props.loan.minPayment.toFixed(2)}/month`);
-const loanPrincipal = computed(() => `$${props.loan.principal.toFixed(2)}`);
+const loanMinPayment = computed(() => `${formatters.Money(props.loan.minPayment)}/month`);
+const loanPrincipal = computed(() => `${formatters.Money(props.loan.principal)}`);
 
 </script>
 

@@ -1,10 +1,10 @@
 <script setup>
 import { inject, reactive, ref } from 'vue';
 
+import InterestTable from './InterestTable.vue';
 import constants from '../constants/constants';
 
-defineProps(['graphs']);
-
+const builders = inject('builders');
 const loanPrimitives = inject('loanPrimitives');
 
 const loansWithTotals = reactive(loanPrimitives.loansWithTotals);
@@ -28,7 +28,9 @@ const setViewedLoanId = (loanId) => {
           </base-button>
         </div>
       </div>
-      <base-chart v-if="graphs[viewedLoanId]" :chartConfig="graphs[viewedLoanId]" :key="viewedLoanId" />
+      <InterestTable :id="'interestTable'" :loanId="viewedLoanId"
+        :title="builders.buildInterestTableTitle(loanPrimitives.getLoan(viewedLoanId))"
+        :subtitle="builders.buildInterestTableSubtitle(loanPrimitives.getLoan(viewedLoanId))" />
     </div>
   </div>
 </template>

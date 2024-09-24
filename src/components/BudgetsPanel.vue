@@ -30,7 +30,7 @@ const scrollContainer = ref(null);
 
 onMounted(() => {
   scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
-  window.addEventListener('resizeBudgetsPanel', heightRestOfViewport); // Adjust on resize
+  window.addEventListener('resizeBudgetsPanel', heightRestOfViewport);
 });
 
 onBeforeUnmount(() => {
