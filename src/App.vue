@@ -49,7 +49,7 @@ const formatPeriod = (period, asStr = false) => {
       date.getMonth() + period,
       date.getDate(),
     );
-    return asStr ? relativeDate.toLocaleDateString() : relativeDate;
+    return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
   }
   return period;
 };
@@ -557,7 +557,7 @@ provide('visuals', {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <!-- <GraphsPanel :graphs="balanceOverTimeGraphs" /> -->
+            <GraphsPanel :graphs="balanceOverTimeGraphs" />
             <TablesPanel />
           </div>
           <div>
