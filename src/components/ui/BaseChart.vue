@@ -88,11 +88,8 @@ watch(
 </script>
 
 <template>
-  <div v-if="chartConfig && chartConfig.lines && chartConfig.lines.length" :class="['chartWrapper']">
+  <div :class="['chartWrapper']">
     <h2 :class="['text-center']">{{ chart.config.header }}</h2>
     <svg :id="'chart' + chart.label"></svg>
-  </div>
-  <div v-else>
-    <p>No chart data available.</p>
   </div>
 </template>

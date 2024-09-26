@@ -49,7 +49,7 @@ const formatPeriod = (period, asStr = false) => {
       date.getMonth() + period,
       date.getDate(),
     );
-    return asStr ? relativeDate.toLocaleDateString() : relativeDate;
+    return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
   }
   return period;
 };
