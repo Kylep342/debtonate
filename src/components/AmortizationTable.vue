@@ -50,7 +50,7 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
             <tr>
               <td :class="['textLeft']"><b>Totals:</b></td>
               <td :class="['text-right']">
-                <b>${{
+                <b>{{
                   formatters.Money(
                     paymentSummary.totalPrincipalPaid +
                     paymentSummary.totalInterestPaid

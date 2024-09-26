@@ -557,7 +557,7 @@ provide('visuals', {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <GraphsPanel :graphs="balanceOverTimeGraphs" />
+            <!-- <GraphsPanel :graphs="balanceOverTimeGraphs" /> -->
             <TablesPanel />
           </div>
           <div>
