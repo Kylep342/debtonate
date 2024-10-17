@@ -38,16 +38,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <base-card :class="['bg-base-100', 'w-90']"
-:id="'budgetManagementPanel'">
+  <base-card :class="['bg-base-100', 'w-90']" :id="'budgetManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction"
-:title="constants.BUDGETS"
+      <ManagementPanel :createFunction="createFunction" :title="constants.BUDGETS"
         :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div ref="scrollContainer"
-:class="[
+      <div ref="scrollContainer" :class="[
         'border-r-2',
         'overflow-y-auto',
         'flex',
@@ -55,10 +52,8 @@ onBeforeUnmount(() => {
         'min-h-0'
       ]">
         <ul>
-          <li v-for="(budget) in orderedBudgets"
-:key="budget.id">
-            <BudgetCard :budget="budget"
-:budgetTotals="props.budgetsTotals[budget.id]" />
+          <li v-for="(budget) in orderedBudgets" :key="budget.id">
+            <BudgetCard :budget="budget" :budgetTotals="props.budgetsTotals[budget.id]" />
           </li>
         </ul>
       </div>
