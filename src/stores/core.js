@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+
 import * as moneyfunx from 'moneyfunx';
+
 import constants from '../constants/constants';
 import keys from '../constants/keys';
 

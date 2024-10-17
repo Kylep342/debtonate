@@ -28,16 +28,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <base-card :class="['bg-base-100', 'w-90']"
-:id="'loanManagementPanel'">
+  <base-card :class="['bg-base-100', 'w-90']" :id="'loanManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel :createFunction="props.createFunction"
-:title="constants.LOANS"
+      <ManagementPanel :createFunction="props.createFunction" :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div ref="scrollContainer"
-:class="[
+      <div ref="scrollContainer" :class="[
         'border-r-2',
         'overflow-y-auto',
         'flex',
@@ -45,8 +42,7 @@ onBeforeUnmount(() => {
         'min-h-0'
       ]">
         <ul>
-          <li v-for="(loan) in state.loansWithTotals"
-:key="loan.id">
+          <li v-for="(loan) in state.loansWithTotals" :key="loan.id">
             <LoanCard :loan="loan" />
           </li>
         </ul>
