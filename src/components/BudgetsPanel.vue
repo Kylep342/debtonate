@@ -1,7 +1,6 @@
 <script setup>
 import {
   computed,
-  inject,
   ref,
   onBeforeUnmount,
   onMounted,
@@ -10,20 +9,20 @@ import {
 import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
 import { heightRestOfViewport } from '../functions/viewport';
 
 const props = defineProps(['budgetsTotals', 'createFunction']);
 
-const budgetPrimitives = inject('budgetPrimitives');
-const budgets = ref(budgetPrimitives.monthlyBudgets);
+const state = useCoreStore();
 
 const defaultBudgetIndex = computed(
-  () => budgets.value.findIndex((budget) => budget.id === constants.DEFAULT),
+  () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT),
 );
 const orderedBudgets = computed(() => [
-  budgets.value[defaultBudgetIndex.value],
-  ...budgets.value.slice(0, defaultBudgetIndex.value),
-  ...budgets.value.slice(defaultBudgetIndex.value + 1),
+  state.monthlyBudgets[defaultBudgetIndex.value],
+  ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
+  ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
 ]);
 
 const scrollContainer = ref(null);
@@ -39,13 +38,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <base-card :class="['bg-base-100', 'w-90']" :id="'budgetManagementPanel'">
+  <base-card :class="['bg-base-100', 'w-90']"
+:id="'budgetManagementPanel'">
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="constants.BUDGETS"
+      <ManagementPanel :createFunction="createFunction"
+:title="constants.BUDGETS"
         :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div ref="scrollContainer" :class="[
+      <div ref="scrollContainer"
+:class="[
         'border-r-2',
         'overflow-y-auto',
         'flex',
@@ -53,8 +55,10 @@ onBeforeUnmount(() => {
         'min-h-0'
       ]">
         <ul>
-          <li v-for="(budget) in orderedBudgets" :key="budget.id" :class="['']">
-            <BudgetCard :budget="budget" :budgetTotals="props.budgetsTotals[budget.id]" />
+          <li v-for="(budget) in orderedBudgets"
+:key="budget.id">
+            <BudgetCard :budget="budget"
+:budgetTotals="props.budgetsTotals[budget.id]" />
           </li>
         </ul>
       </div>

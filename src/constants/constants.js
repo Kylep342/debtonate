@@ -1,5 +1,4 @@
 import { TOTALS } from 'moneyfunx';
-// file for constants
 
 const BTN_CREATE = 'Create';
 const BTN_OFF = 'Off';

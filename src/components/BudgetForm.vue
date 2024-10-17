@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
+import emitters from '../constants/emitters';
+
 const props = defineProps(['budget', 'createButtonText', 'id', 'title']);
-const emits = defineEmits(['create-budget', 'exit-create-budget']);
+const emits = defineEmits([emitters.EMIT_CREATE_BUDGET, emitters.EMIT_EXIT_CREATE_BUDGET]);
 
 const amount = ref(props.budget?.relative);
 
@@ -25,12 +27,12 @@ const clearCreate = () => {
 };
 
 const emitCreate = () => {
-  emits('create-budget', amount.value);
+  emits(emitters.EMIT_CREATE_BUDGET, amount.value);
   clearCreate();
 };
 
 const emitExit = () => {
-  emits('exit-create-budget');
+  emits(emitters.EMIT_EXIT_CREATE_BUDGET);
   clearCreate();
 };
 </script>
@@ -41,7 +43,8 @@ const emitExit = () => {
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
+      <base-button @click="emitExit"
+:class="['btn btn-circle btn-ghost']">
         x
       </base-button>
     </template>
@@ -50,12 +53,16 @@ const emitExit = () => {
         <div :class="['label']">
           <span :class="['label-text']">Budget</span>
         </div>
-        <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="amount" type="number"
+        <input :class="['input input-bordered input-secondary w-full max-ws']"
+v-model.number="amount"
+type="number"
           label="Budget" />
       </div>
     </template>
     <template #actions>
-      <base-button @click="emitCreate" :disabled="!createButtonEnabled" :class="'btn-success'">
+      <base-button @click="emitCreate"
+:disabled="!createButtonEnabled"
+:class="'btn-success'">
         {{ createButtonText }}
       </base-button>
     </template>

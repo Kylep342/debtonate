@@ -1,17 +1,16 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  inject, onMounted, ref, shallowReactive, watch,
+  onMounted, shallowReactive, watch,
 } from 'vue';
 import constants from '../../constants/constants';
+import useCoreStore from '../../stores/core';
 
 const props = defineProps(['chartConfig', 'header']);
 
-const formatters = inject('formatters');
-const options = inject('options');
+const state = useCoreStore();
 
 const chart = shallowReactive({});
-const periodsAsDates = ref(options.periodsAsDates);
 
 const initializeChart = () => {
   // Guard: Ensure `chartConfig` and required properties are defined
@@ -26,8 +25,8 @@ const initializeChart = () => {
 
   svg.selectAll('*').remove();
 
-  const x = (periodsAsDates.value ? d3.scaleTime : d3.scaleLinear)()
-    .domain([formatters.formatPeriod(0), formatters.formatPeriod(chart.config.maxX)])
+  const x = (state.periodsAsDates ? d3.scaleTime : d3.scaleLinear)()
+    .domain([state.formatPeriod(0), state.formatPeriod(chart.config.maxX)])
     .range([0, width - margin * 2]);
 
   const y = d3.scaleLinear()
@@ -35,7 +34,7 @@ const initializeChart = () => {
     .range([height - margin, 0]);
 
   const draw = d3.line()
-    .x((point) => x(formatters.formatPeriod(point.x)))
+    .x((point) => x(state.formatPeriod(point.x)))
     .y((point) => y(point.y));
 
   svg.append('g')
@@ -66,7 +65,6 @@ const initializeChart = () => {
   });
 };
 
-// Initialize chart after component is mounted
 onMounted(() => {
   if (props.chartConfig) {
     Object.assign(chart, props.chartConfig);
@@ -74,7 +72,6 @@ onMounted(() => {
   }
 });
 
-// Watch for changes in chartConfig and re-initialize the chart
 watch(
   () => props.chartConfig,
   (value) => {
@@ -83,7 +80,7 @@ watch(
       initializeChart();
     }
   },
-  { immediate: true }, // Initialize immediately if chartConfig is already defined
+  { immediate: true },
 );
 </script>
 

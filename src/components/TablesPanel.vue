@@ -1,13 +1,12 @@
 <script setup>
-import { inject, reactive, ref } from 'vue';
+import { ref } from 'vue';
 
 import InterestTable from './InterestTable.vue';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
 
-const builders = inject('builders');
-const loanPrimitives = inject('loanPrimitives');
+const state = useCoreStore();
 
-const loansWithTotals = reactive(loanPrimitives.loansWithTotals);
 const viewedLoanId = ref(constants.TOTALS);
 
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
@@ -21,16 +20,19 @@ const setViewedLoanId = (loanId) => {
   <div>
     <div :class="['tabframe', 'w-fit']">
       <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
-        <div v-for="loan in loansWithTotals" :key="loan.id"
+        <div v-for="loan in state.loansWithTotals"
+:key="loan.id"
           :class="['join-item', 'w-full', { 'border-t-2': isViewedLoanId(loan.id) }]">
-          <base-button :class="['btn-ghost', 'w-full']" @click=setViewedLoanId(loan.id)>
-            {{ loanPrimitives.getLoanName(loan.id) }}
+          <base-button :class="['btn-ghost', 'w-full']"
+@click=setViewedLoanId(loan.id)>
+            {{ state.getLoanName(loan.id) }}
           </base-button>
         </div>
       </div>
-      <InterestTable :id="'interestTable'" :loanId="viewedLoanId"
-        :title="builders.buildInterestTableTitle(loanPrimitives.getLoan(viewedLoanId))"
-        :subtitle="builders.buildInterestTableSubtitle(loanPrimitives.getLoan(viewedLoanId))" />
+      <InterestTable :id="'interestTable'"
+:loanId="viewedLoanId"
+        :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
+        :subtitle="state.buildInterestTableSubtitle(state.getLoan(viewedLoanId))" />
     </div>
   </div>
 </template>

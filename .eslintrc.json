@@ -14,5 +14,12 @@
     "plugins": [
         "vue"
     ],
-    "rules": {}
+    "rules": {
+        "vue/max-attributes-per-line": ["error", {
+        "singleline": 1,
+        "multiline": {
+            "max": 1
+        }
+        }]
+    }
 }

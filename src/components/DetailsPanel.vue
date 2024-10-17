@@ -1,16 +1,15 @@
 <script setup>
-import { inject, ref } from 'vue';
+import { ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
+import emitters from '../constants/emitters';
+import useCoreStore from '../stores/core';
 
 const props = defineProps(['anchor', 'id', 'pivot', 'title', 'type']);
-const emits = defineEmits(['exit-details-panel']);
+const emits = defineEmits([emitters.EMIT_EXIT_DETAILS_PANEL]);
 
-const budgetPrimitives = inject('budgetPrimitives');
-const builders = inject('builders');
-const loanPrimitives = inject('loanPrimitives');
-const visuals = inject('visuals');
+const state = useCoreStore();
 
 const viewedItemId = ref(props.type === constants.LOAN ? constants.DEFAULT : constants.TOTALS);
 
@@ -22,38 +21,38 @@ const setViewedItemId = (itemId) => {
 
 const getItem = (itemId) => (
   props.type === constants.LOAN
-    ? budgetPrimitives.getBudget(itemId)
-    : loanPrimitives.getLoan(itemId)
+    ? state.getBudget(itemId)
+    : state.getLoan(itemId)
 );
 
 const getItemName = (itemId) => (
   props.type === constants.LOAN
-    ? budgetPrimitives.getBudgetName(itemId)
-    : loanPrimitives.getLoanName(itemId)
+    ? state.getBudgetName(itemId)
+    : state.getLoanName(itemId)
 );
 
 const getPaymentSummary = (anchorId, itemId) => (
   props.type === constants.LOAN
-    ? visuals.getPaymentSummary(anchorId, itemId)
-    : visuals.getPaymentSummary(itemId, anchorId)
+    ? state.getPaymentSummary(anchorId, itemId)
+    : state.getPaymentSummary(itemId, anchorId)
 );
 
 const buildAmortizationTableSubtitle = (anchor, item) => (
   props.type === constants.LOAN
-    ? builders.buildAmortizationTableSubtitle(anchor, item)
-    : builders.buildAmortizationTableSubtitle(item, anchor)
+    ? state.buildAmortizationTableSubtitle(anchor, item)
+    : state.buildAmortizationTableSubtitle(item, anchor)
 );
 
 const buildAmortizationTableTitle = (anchor, item) => (
   props.type === constants.LOAN
-    ? builders.buildAmortizationTableTitle(anchor, item)
-    : builders.buildAmortizationTableTitle(item, anchor)
+    ? state.buildAmortizationTableTitle(anchor, item)
+    : state.buildAmortizationTableTitle(item, anchor)
 );
 
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
 
 const emitExit = () => {
-  emits('exit-details-panel');
+  emits(emitters.EMIT_EXIT_DETAILS_PANEL);
 };
 </script>
 
@@ -63,26 +62,32 @@ const emitExit = () => {
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="emitExit">
+      <base-button :class="['btn btn-circle btn-ghost']"
+@click="emitExit">
         x
       </base-button>
     </template>
     <template #body>
-      <div v-if="anchor" :class="['tabframe', 'w-auto']">
+      <div v-if="anchor"
+:class="['tabframe', 'w-auto']">
         <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
-          <div v-for="item in pivot" :key="generateKey(anchor, item)"
+          <div v-for="item in pivot"
+:key="generateKey(anchor, item)"
             :class="['join-item', 'w-full', { 'border-t-2': isViewedItemId(item.id) }]">
-            <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>
+            <base-button :class="['btn-ghost', 'w-full']"
+@click=setViewedItemId(item.id)>
               {{ getItemName(item.id) }}
             </base-button>
           </div>
         </div>
         <AmortizationTable :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
-          :paymentSummary="getPaymentSummary(anchor.id, viewedItemId)" :title="buildAmortizationTableTitle(
+          :paymentSummary="getPaymentSummary(anchor.id, viewedItemId)"
+:title="buildAmortizationTableTitle(
             anchor,
             getItem(viewedItemId),
           )
-            " :subtitle="buildAmortizationTableSubtitle(
+            "
+:subtitle="buildAmortizationTableSubtitle(
               anchor,
               getItem(viewedItemId),
             )

@@ -1,16 +1,16 @@
 <script setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
 
 const props = defineProps(['budget', 'budgetTotals']);
 
-const budgetPrimitives = inject('budgetPrimitives');
-const formatters = inject('formatters');
+const state = useCoreStore();
 
-const budgetAmount = computed(() => `${formatters.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed(() => `+${formatters.Money(props.budget.relative)}/month`);
+const budgetAmount = computed(() => `${state.Money(props.budget.absolute)}/month`);
+const budgetExtra = computed(() => `+${state.Money(props.budget.relative)}/month`);
 const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
-const budgetTotalInterest = computed(() => `${formatters.Money(props.budgetTotals.lifetimeInterest)}`);
+const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lifetimeInterest)}`);
 </script>
 
 <template>
@@ -18,16 +18,18 @@ const budgetTotalInterest = computed(() => `${formatters.Money(props.budgetTotal
     <template #cardTitle>
       <div class="card-actions flow-root">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ budgetPrimitives.getBudgetName(budget.id) }}
+          {{ state.getBudgetName(budget.id) }}
         </h2>
-        <button v-if="budget.id !== constants.DEFAULT" :class="[
+        <button v-if="budget.id !== constants.DEFAULT"
+:class="[
           'exitButton',
           'bold',
           'btn',
           'btn-ghost',
           'btn-square',
           'float-right',
-        ]" @click="budgetPrimitives.deleteBudget(budget.id)">
+        ]"
+@click="state.deleteBudget(budget.id)">
           x
         </button>
       </div>
@@ -67,12 +69,14 @@ const budgetTotalInterest = computed(() => `${formatters.Money(props.budgetTotal
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="budget.id !== constants.DEFAULT">
-          <base-button :class="['btn-accent']" @click="budgetPrimitives.editBudget(budget.id)">
+          <base-button :class="['btn-accent']"
+@click="state.editBudget(budget.id)">
             Edit
           </base-button>
         </div>
         <div>
-          <base-button :class="['btn-accent']" @click="budgetPrimitives.viewBudget(budget.id)">
+          <base-button :class="['btn-accent']"
+@click="state.viewBudget(budget.id)">
             View
           </base-button>
         </div>

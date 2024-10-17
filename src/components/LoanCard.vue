@@ -1,15 +1,15 @@
 <script setup>
-import { computed, inject } from 'vue';
+import { computed } from 'vue';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
 
 const props = defineProps(['loan']);
 
-const formatters = inject('formatters');
-const loanPrimitives = inject('loanPrimitives');
+const state = useCoreStore();
 
 const loanInterestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
-const loanMinPayment = computed(() => `${formatters.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed(() => `${formatters.Money(props.loan.principal)}`);
+const loanMinPayment = computed(() => `${state.Money(props.loan.minPayment)}/month`);
+const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
 
 </script>
 
@@ -17,15 +17,17 @@ const loanPrincipal = computed(() => `${formatters.Money(props.loan.principal)}`
   <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
-        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ loanPrimitives.getLoanName(loan.id) }}</h2>
-        <button v-if="loan.id !== constants.TOTALS" :class="[
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ state.getLoanName(loan.id) }}</h2>
+        <button v-if="loan.id !== constants.TOTALS"
+:class="[
           'exitButton',
           'bold',
           'btn',
           'btn-ghost',
           'btn-square',
           'float-right',
-        ]" @click="loanPrimitives.deleteLoan(loan.id)">
+        ]"
+@click="state.deleteLoan(loan.id)">
           x
         </button>
       </div>
@@ -59,12 +61,14 @@ const loanPrincipal = computed(() => `${formatters.Money(props.loan.principal)}`
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="loan.id !== constants.TOTALS">
-          <base-button :class="['btn-accent']" @click="loanPrimitives.editLoan(loan.id)">
+          <base-button :class="['btn-accent']"
+@click="state.editLoan(loan.id)">
             Edit
           </base-button>
         </div>
         <div>
-          <base-button :class="['btn-accent']" @click="loanPrimitives.viewLoan(loan.id)">
+          <base-button :class="['btn-accent']"
+@click="state.viewLoan(loan.id)">
             View
           </base-button>
         </div>
