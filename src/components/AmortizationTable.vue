@@ -1,14 +1,12 @@
 <script setup>
-import { computed, inject, ref } from 'vue';
+import { computed } from 'vue';
+import useCoreStore from '../stores/core';
 
 defineProps(['paymentSummary', 'title', 'subtitle']);
 
-const formatters = inject('formatters');
-const options = inject('options');
+const state = useCoreStore();
 
-const periodsAsDates = ref(options.periodsAsDates);
-
-const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -32,15 +30,17 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
         </template>
         <template #body>
           <tbody>
-            <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="rowno">
-              <td :class="['text-center']">{{ formatters.formatPeriod(record.period, true) }}</td>
+            <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule"
+:key="rowno">
+              <!-- NOTE: move the old 'formatters' section to core functions and extract defaults into shared interface here -->
+              <td :class="['text-center']">{{ state.formatPeriod(record.period, true) }}</td>
               <td :class="['text-right']">
-                {{ formatters.Money(record.interest + record.principal) }}
+                {{ state.Money(record.interest + record.principal) }}
               </td>
-              <td :class="['text-right']">{{ formatters.Money(record.principal) }}</td>
-              <td :class="['text-right']">{{ formatters.Money(record.interest) }}</td>
+              <td :class="['text-right']">{{ state.Money(record.principal) }}</td>
+              <td :class="['text-right']">{{ state.Money(record.interest) }}</td>
               <td :class="['text-right']">
-                {{ formatters.Money(record.principalRemaining) }}
+                {{ state.Money(record.principalRemaining) }}
               </td>
             </tr>
           </tbody>
@@ -51,19 +51,19 @@ const paymentHeader = computed(() => (periodsAsDates.value ? 'Payment Date' : 'P
               <td :class="['textLeft']"><b>Totals:</b></td>
               <td :class="['text-right']">
                 <b>{{
-                  formatters.Money(
+                  state.Money(
                     paymentSummary.totalPrincipalPaid +
                     paymentSummary.totalInterestPaid
                   )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ formatters.Money(paymentSummary.totalPrincipalPaid) }}</b>
+                <b>{{ state.Money(paymentSummary.totalPrincipalPaid) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ formatters.Money(paymentSummary.totalInterestPaid) }}</b>
+                <b>{{ state.Money(paymentSummary.totalInterestPaid) }}</b>
               </td>
-              <td :class="['text-right']"><b>{{ formatters.Money(0) }}</b></td>
+              <td :class="['text-right']"><b>{{ state.Money(0) }}</b></td>
             </tr>
           </tfoot>
         </template>

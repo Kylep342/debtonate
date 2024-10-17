@@ -1,42 +1,41 @@
 <script setup>
-import { inject, reactive } from 'vue';
 import constants from '../constants/constants';
+import emitters from '../constants/emitters';
+import useCoreStore from '../stores/core';
 
 const props = defineProps(['id']);
 
 const emits = defineEmits([
-  'exit-options-form',
-  'toggle-avalanche-sort',
-  'toggle-periods-as-dates',
-  'toggle-reduce-payments',
-  'toggle-round-up',
-  'toggle-snowball-sort',
+  emitters.EMIT_EXIT_OPTIONS_FORM,
+  emitters.EMIT_TOGGLE_AVALANCHE_SORT,
+  emitters.EMIT_TOGGLE_PERIODS_AS_DATES,
+  emitters.EMIT_TOGGLE_REDUCE_PAYMENTS,
+  emitters.EMIT_TOGGLE_ROUND_UP,
+  emitters.EMIT_TOGGLE_SNOWBALL_SORT,
 ]);
 
-const options = inject('options');
-const periodsAsDates = reactive(options.periodsAsDates);
-const reducePayments = reactive(options.reducePayments);
-const roundUp = reactive(options.roundUp);
-const snowballSort = reactive(options.snowballSort);
+const state = useCoreStore();
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 
-const emitExit = () => emits('exit-options-form');
-const emitAvalancheSort = () => emits('toggle-avalanche-sort');
-const emitTogglePeriodsAsDates = () => emits('toggle-periods-as-dates');
-const emitToggleReducePayments = () => emits('toggle-reduce-payments');
-const emitToggleRoundUp = () => emits('toggle-round-up');
-const emitSnowballSort = () => emits('toggle-snowball-sort');
+const emitExit = () => emits(emitters.EMIT_EXIT_OPTIONS_FORM);
+const emitAvalancheSort = () => emits(emitters.EMIT_TOGGLE_AVALANCHE_SORT);
+const emitTogglePeriodsAsDates = () => emits(emitters.EMIT_TOGGLE_PERIODS_AS_DATES);
+const emitToggleReducePayments = () => emits(emitters.EMIT_TOGGLE_REDUCE_PAYMENTS);
+const emitToggleRoundUp = () => emits(emitters.EMIT_TOGGLE_ROUND_UP);
+const emitSnowballSort = () => emits(emitters.EMIT_TOGGLE_SNOWBALL_SORT);
 </script>
 
 <template>
-  <base-modal :id="props.id" :bodyClasses="['overflow-y-auto']">
+  <base-modal :id="props.id"
+:bodyClasses="['overflow-y-auto']">
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
+      <base-button @click="emitExit"
+:class="['btn btn-circle btn-ghost']">
         x
       </base-button>
     </template>
@@ -56,10 +55,12 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(!snowballSort)" @click="emitAvalancheSort">
+              <base-button :class="buttonStyle(!state.snowballSort)"
+@click="emitAvalancheSort">
                 Avalanche
               </base-button>
-              <base-button :class="buttonStyle(snowballSort)" @click="emitSnowballSort">
+              <base-button :class="buttonStyle(state.snowballSort)"
+@click="emitSnowballSort">
                 Snowball
               </base-button>
             </div>
@@ -81,8 +82,9 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(reducePayments)" @click="emitToggleReducePayments">
-                {{ buttonText(reducePayments) }}
+              <base-button :class="buttonStyle(state.reducePayments)"
+@click="emitToggleReducePayments">
+                {{ buttonText(state.reducePayments) }}
               </base-button>
             </div>
           </template>
@@ -101,8 +103,9 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(roundUp)" @click="emitToggleRoundUp">
-                {{ buttonText(roundUp) }}
+              <base-button :class="buttonStyle(state.roundUp)"
+@click="emitToggleRoundUp">
+                {{ buttonText(state.roundUp) }}
               </base-button>
             </div>
           </template>
@@ -123,8 +126,9 @@ const emitSnowballSort = () => emits('toggle-snowball-sort');
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(periodsAsDates)" @click="emitTogglePeriodsAsDates">
-                {{ buttonText(periodsAsDates) }}
+              <base-button :class="buttonStyle(state.periodsAsDates)"
+@click="emitTogglePeriodsAsDates">
+                {{ buttonText(state.periodsAsDates) }}
               </base-button>
             </div>
           </template>

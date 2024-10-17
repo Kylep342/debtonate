@@ -20,9 +20,11 @@ const setViewedItemId = (value) => {
 
 <template>
   <div>
-    <div v-for="item in pivot" :key="item.id"
+    <div v-for="item in pivot"
+:key="item.id"
       :class="['join-item', flexBasis, 'w-full', { 'border-t-2': item.id === viewedItemId }]">
-      <base-button :class="['btn-ghost', 'w-full']" @click=setViewedItemId(item.id)>
+      <base-button :class="['btn-ghost', 'w-full']"
+@click=setViewedItemId(item.id)>
         {{ buttonText(item.id) }}
       </base-button>
     </div>
