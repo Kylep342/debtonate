@@ -1,12 +1,14 @@
 <script setup>
+import { computed, ref, watch } from 'vue';
+
 import constants from '../constants/constants';
 import emitters from '../constants/emitters';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['id']);
-
 const emits = defineEmits([
   emitters.EMIT_EXIT_OPTIONS_FORM,
+  emitters.EMIT_SET_CURRENCY,
+  emitters.EMIT_SET_LANGUAGE,
   emitters.EMIT_TOGGLE_AVALANCHE_SORT,
   emitters.EMIT_TOGGLE_PERIODS_AS_DATES,
   emitters.EMIT_TOGGLE_REDUCE_PAYMENTS,
@@ -16,19 +18,41 @@ const emits = defineEmits([
 
 const state = useCoreStore();
 
+const _currency = ref(state.currency);
+const _language = ref(state.language);
+
+const roundingScale = ref(state.roundingScale);
+
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const reducePaymentsExample = computed(
+  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by: ${state.Money(state.loans[0].minPayment)})`) : ''),
+);
 
 const emitExit = () => emits(emitters.EMIT_EXIT_OPTIONS_FORM);
 const emitAvalancheSort = () => emits(emitters.EMIT_TOGGLE_AVALANCHE_SORT);
 const emitTogglePeriodsAsDates = () => emits(emitters.EMIT_TOGGLE_PERIODS_AS_DATES);
 const emitToggleReducePayments = () => emits(emitters.EMIT_TOGGLE_REDUCE_PAYMENTS);
-const emitToggleRoundUp = () => emits(emitters.EMIT_TOGGLE_ROUND_UP);
+const emitToggleRoundUp = () => emits(emitters.EMIT_TOGGLE_ROUND_UP, roundingScale.value);
 const emitSnowballSort = () => emits(emitters.EMIT_TOGGLE_SNOWBALL_SORT);
+
+watch(() => _currency.value, async (newValue) => {
+  state.setCurrency(newValue);
+}, { immediate: true });
+
+watch(() => _language.value, async (newValue) => {
+  state.setLanguage(newValue);
+}, { immediate: true });
+
+watch(() => roundingScale.value, async (newValue) => {
+  if (state.roundUp) {
+    state.setRoundingScale(newValue);
+  }
+}, { immediate: true });
 </script>
 
 <template>
-  <base-modal :id="props.id" :bodyClasses="['overflow-y-auto']">
+  <base-modal :id="constants.OPTIONS_FORM_ID" :bodyClasses="['overflow-y-auto']">
     <template #header>
       <h2>Options</h2>
     </template>
@@ -70,9 +94,11 @@ const emitSnowballSort = () => emits(emitters.EMIT_TOGGLE_SNOWBALL_SORT);
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
+              <p>When enabled this reduces your total minimum contribution each
+                time you pay off a loan</p>
+              <br />
               <p>
-                When enabled this reduces your total minimum contribution each
-                time you pay off a loan
+                {{ reducePaymentsExample }}
               </p>
             </div>
           </template>
@@ -86,12 +112,17 @@ const emitSnowballSort = () => emits(emitters.EMIT_TOGGLE_SNOWBALL_SORT);
         <base-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Rounding</h3>
+            <div :class="['label']">
+              <span :class="['label-text']">scale:</span>
+            </div>
+            <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="roundingScale"
+              type="number" step="0.01" label="scale" />
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
-                multiple of 100
+                multiple of {{ state.Money(roundingScale) }}
               </p>
             </div>
           </template>
@@ -123,6 +154,34 @@ const emitSnowballSort = () => emits(emitters.EMIT_TOGGLE_SNOWBALL_SORT);
                 {{ buttonText(state.periodsAsDates) }}
               </base-button>
             </div>
+          </template>
+        </base-card>
+        <base-card>
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Currency
+            </h3>
+          </template>
+          <template #cardBody>
+            <select v-model="_currency" class="select select-bordered w-full max-w-xs">
+              <option v-for="currency in state.currencies" :key="currency" :value="currency">
+                {{ currency }}
+              </option>
+            </select>
+          </template>
+        </base-card>
+        <base-card>
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Language
+            </h3>
+          </template>
+          <template #cardBody>
+            <select v-model="_language" class="select select-bordered w-full max-w-xs">
+              <option v-for="language in state.languages" :key="language" :value="language">
+                {{ language }}
+              </option>
+            </select>
           </template>
         </base-card>
       </div>
