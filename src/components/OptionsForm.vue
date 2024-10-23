@@ -52,12 +52,18 @@ watch(() => roundingScale.value, async (newValue) => {
 </script>
 
 <template>
-  <base-modal :id="constants.OPTIONS_FORM_ID" :bodyClasses="['overflow-y-auto']">
+  <base-modal
+    :id="constants.OPTIONS_FORM_ID"
+    :body-classes="['overflow-y-auto']"
+  >
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button @click="emitExit" :class="['btn btn-circle btn-ghost']">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="emitExit"
+      >
         x
       </base-button>
     </template>
@@ -77,10 +83,16 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(!state.snowballSort)" @click="emitAvalancheSort">
+              <base-button
+                :class="buttonStyle(!state.snowballSort)"
+                @click="emitAvalancheSort"
+              >
                 Avalanche
               </base-button>
-              <base-button :class="buttonStyle(state.snowballSort)" @click="emitSnowballSort">
+              <base-button
+                :class="buttonStyle(state.snowballSort)"
+                @click="emitSnowballSort"
+              >
                 Snowball
               </base-button>
             </div>
@@ -94,9 +106,11 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
-              <p>When enabled this reduces your total minimum contribution each
-                time you pay off a loan</p>
-              <br />
+              <p>
+                When enabled this reduces your total minimum contribution each
+                time you pay off a loan
+              </p>
+              <br>
               <p>
                 {{ reducePaymentsExample }}
               </p>
@@ -104,19 +118,31 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(state.reducePayments)" @click="emitToggleReducePayments">{{
-                buttonText(state.reducePayments) }}</base-button>
+              <base-button
+                :class="buttonStyle(state.reducePayments)"
+                @click="emitToggleReducePayments"
+              >
+                {{
+                  buttonText(state.reducePayments) }}
+              </base-button>
             </div>
           </template>
         </base-card>
         <base-card>
           <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">Rounding</h3>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Rounding
+            </h3>
             <div :class="['label']">
               <span :class="['label-text']">scale:</span>
             </div>
-            <input :class="['input input-bordered input-secondary w-full max-ws']" v-model.number="roundingScale"
-              type="number" step="0.01" label="scale" />
+            <input
+              v-model.number="roundingScale"
+              :class="['input input-bordered input-secondary w-full max-ws']"
+              type="number"
+              step="0.01"
+              label="scale"
+            >
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
@@ -128,7 +154,10 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(state.roundUp)" @click="emitToggleRoundUp">
+              <base-button
+                :class="buttonStyle(state.roundUp)"
+                @click="emitToggleRoundUp"
+              >
                 {{ buttonText(state.roundUp) }}
               </base-button>
             </div>
@@ -150,7 +179,10 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardActions>
             <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button :class="buttonStyle(state.periodsAsDates)" @click="emitTogglePeriodsAsDates">
+              <base-button
+                :class="buttonStyle(state.periodsAsDates)"
+                @click="emitTogglePeriodsAsDates"
+              >
                 {{ buttonText(state.periodsAsDates) }}
               </base-button>
             </div>
@@ -163,8 +195,15 @@ watch(() => roundingScale.value, async (newValue) => {
             </h3>
           </template>
           <template #cardBody>
-            <select v-model="_currency" class="select select-bordered w-full max-w-xs">
-              <option v-for="currency in state.currencies" :key="currency" :value="currency">
+            <select
+              v-model="_currency"
+              class="select select-bordered w-full max-w-xs"
+            >
+              <option
+                v-for="currency in state.currencies"
+                :key="currency"
+                :value="currency"
+              >
                 {{ currency }}
               </option>
             </select>
@@ -177,8 +216,15 @@ watch(() => roundingScale.value, async (newValue) => {
             </h3>
           </template>
           <template #cardBody>
-            <select v-model="_language" class="select select-bordered w-full max-w-xs">
-              <option v-for="language in state.languages" :key="language" :value="language">
+            <select
+              v-model="_language"
+              class="select select-bordered w-full max-w-xs"
+            >
+              <option
+                v-for="language in state.languages"
+                :key="language"
+                :value="language"
+              >
                 {{ language }}
               </option>
             </select>

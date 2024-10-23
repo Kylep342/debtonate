@@ -4,10 +4,10 @@ const props = defineProps(['bodyClasses']);
 
 <template>
   <div :class="['card']">
-    <slot name="cardTitle"></slot>
+    <slot name="cardTitle" />
     <div :class="['card-body', 'p-4', props.bodyClasses]">
-      <slot name="cardBody"></slot>
+      <slot name="cardBody" />
     </div>
-    <slot name="cardActions"></slot>
+    <slot name="cardActions" />
   </div>
 </template>

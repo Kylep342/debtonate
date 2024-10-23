@@ -1,11 +1,13 @@
 {
+    "root": true,
     "env": {
         "browser": true,
         "es2021": true
     },
+    "parser": "vue-eslint-parser",
     "extends": [
-        "plugin:vue/essential",
-        "airbnb-base"
+        "eslint:recommended",
+        "plugin:vue/vue3-recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -16,10 +18,12 @@
     ],
     "rules": {
         "vue/max-attributes-per-line": ["error", {
-        "singleline": 1,
-        "multiline": {
-            "max": 1
-        }
+            "singleline": {
+                "max": 1
+            },
+            "multiline": {
+                "max": 1
+            }
         }]
     }
 }

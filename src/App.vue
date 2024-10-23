@@ -62,31 +62,70 @@ watch(() => state.optionsFormActive, async (show) => {
 </script>
 
 <template>
-  <div id="debtonate" :class="['font-mono', 'h-screen', 'flex', 'flex-col']">
-    <HeaderBar :class="['flex-none']" @clear-app-state="state.clearState" @load-app-state="state.loadState"
-      @open-options-form="state.openOptionsForm" @save-app-state="state.saveState" />
-    <LoanForm :id="constants.LOAN_FORM_ID" :createButtonText="state.createLoanButtonText" :loan="state.currentLoanId ?
-      state.getLoan(state.currentLoanId) :
-      null" :title="state.createLoanFormTitle" @create-loan="state.createLoan"
-      @exit-create-loan="state.exitCreateLoanForm" />
-    <BudgetForm :id="constants.BUDGET_FORM_ID" :createButtonText="state.createBudgetButtonText" :budget="state.currentBudgetId ?
-      state.getBudget(state.currentBudgetId) :
-      null" :title="state.createBudgetFormTitle" @create-budget="state.createBudget"
-      @exit-create-budget="state.exitCreateBudgetForm" />
-    <OptionsForm @exit-options-form="state.exitOptionsForm" @toggle-avalanche-sort="state.toggleAvalancheSort"
-      @toggle-periods-as-dates="state.togglePeriodsAsDates" @toggle-reduce-payments="state.toggleReducePayments"
-      @toggle-round-up="state.toggleRounding" @toggle-snowball-sort="state.toggleSnowballSort" />
+  <div
+    id="debtonate"
+    :class="['font-mono', 'h-screen', 'flex', 'flex-col']"
+  >
+    <HeaderBar
+      :class="['flex-none']"
+      @clear-app-state="state.clearState"
+      @load-app-state="state.loadState"
+      @open-options-form="state.openOptionsForm"
+      @save-app-state="state.saveState"
+    />
+    <LoanForm
+      :create-button-text="state.createLoanButtonText"
+      :loan="state.currentLoanId ?
+        state.getLoan(state.currentLoanId) :
+        null"
+      :title="state.createLoanFormTitle"
+      @create-loan="state.createLoan"
+      @exit-create-loan="state.exitCreateLoanForm"
+    />
+    <BudgetForm
+      :create-button-text="state.createBudgetButtonText"
+      :budget="state.currentBudgetId ?
+        state.getBudget(state.currentBudgetId) :
+        null"
+      :title="state.createBudgetFormTitle"
+      @create-budget="state.createBudget"
+      @exit-create-budget="state.exitCreateBudgetForm"
+    />
+    <OptionsForm
+      @exit-options-form="state.exitOptionsForm"
+      @toggle-avalanche-sort="state.toggleAvalancheSort"
+      @toggle-periods-as-dates="state.togglePeriodsAsDates"
+      @toggle-reduce-payments="state.toggleReducePayments"
+      @toggle-round-up="state.toggleRounding"
+      @toggle-snowball-sort="state.toggleSnowballSort"
+    />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
-      <LoansPanel :class="['flex-none']" :createFunction="state.openCreateLoanForm" :deleteLoan="state.deleteLoan"
-        :editLoan="state.editLoan" :viewLoan="state.viewLoan" />
-      <BudgetsPanel :class="['flex-none']" :budgetsTotals="state.totalsByBudget"
-        :createFunction="state.openCreateBudgetForm" :deleteBudget="state.deleteBudget" :editBudget="state.editBudget"
-        :viewBudget="state.viewBudget" />
+      <LoansPanel
+        :class="['flex-none']"
+        :create-function="state.openCreateLoanForm"
+        :delete-loan="state.deleteLoan"
+        :edit-loan="state.editLoan"
+        :view-loan="state.viewLoan"
+      />
+      <BudgetsPanel
+        :class="['flex-none']"
+        :budgets-totals="state.totalsByBudget"
+        :create-function="state.openCreateBudgetForm"
+        :delete-budget="state.deleteBudget"
+        :edit-budget="state.editBudget"
+        :view-budget="state.viewBudget"
+      />
       <div :class="['m-4']">
-        <div v-if="!state.loans.length" :class="['text-wrap', 'text-pretty', 'w-30']">
+        <div
+          v-if="!state.loans.length"
+          :class="['text-wrap', 'text-pretty', 'w-30']"
+        >
           <SiteIntro />
         </div>
-        <div v-else :class="[]">
+        <div
+          v-else
+          :class="[]"
+        >
           <div :class="['flex-grow']">
             <div :class="['header']">
               <h2>Repayment Information</h2>
@@ -95,16 +134,28 @@ watch(() => state.optionsFormActive, async (show) => {
             <TablesPanel />
           </div>
           <div>
-            <DetailsPanel :id="constants.LOAN_DETAILS_ID" :title="state.currentLoanId
-              ? state.buildLoanDetailsTitle(state.getLoan(state.currentLoanId))
-              : constants.LOAN_DETAILS
-              " :type="constants.LOAN" :anchor="state.getLoan(state.currentLoanId)" :pivot="state.monthlyBudgets"
-              @exit-details-panel="state.unviewLoan" />
-            <DetailsPanel :id="constants.BUDGET_DETAILS_ID" :title="state.currentBudgetId
-              ? state.buildBudgetDetailsTitle(state.getBudget(state.currentBudgetId))
-              : constants.BUDGET_DETAILS
-              " :type="constants.BUDGET" :anchor="state.getBudget(state.currentBudgetId)"
-              :pivot="state.loansWithTotals" @exit-details-panel="state.unviewBudget" />
+            <DetailsPanel
+              :id="constants.LOAN_DETAILS_ID"
+              :title="state.currentLoanId
+                ? state.buildLoanDetailsTitle(state.getLoan(state.currentLoanId))
+                : constants.LOAN_DETAILS
+              "
+              :type="constants.LOAN"
+              :anchor="state.getLoan(state.currentLoanId)"
+              :pivot="state.monthlyBudgets"
+              @exit-details-panel="state.unviewLoan"
+            />
+            <DetailsPanel
+              :id="constants.BUDGET_DETAILS_ID"
+              :title="state.currentBudgetId
+                ? state.buildBudgetDetailsTitle(state.getBudget(state.currentBudgetId))
+                : constants.BUDGET_DETAILS
+              "
+              :type="constants.BUDGET"
+              :anchor="state.getBudget(state.currentBudgetId)"
+              :pivot="state.loansWithTotals"
+              @exit-details-panel="state.unviewBudget"
+            />
           </div>
         </div>
       </div>

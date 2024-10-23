@@ -38,22 +38,37 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <base-card :class="['bg-base-100', 'w-90']" :id="'budgetManagementPanel'">
+  <base-card
+    :id="'budgetManagementPanel'"
+    :class="['bg-base-100', 'w-90']"
+  >
     <template #cardTitle>
-      <ManagementPanel :createFunction="createFunction" :title="constants.BUDGETS"
-        :class="['sticky', 'fixed', 'border-b-2']" />
+      <ManagementPanel
+        :create-function="createFunction"
+        :title="constants.BUDGETS"
+        :class="['sticky', 'fixed', 'border-b-2']"
+      />
     </template>
     <template #cardBody>
-      <div ref="scrollContainer" :class="[
-        'border-r-2',
-        'overflow-y-auto',
-        'flex',
-        'flex-col',
-        'min-h-0'
-      ]">
+      <div
+        ref="scrollContainer"
+        :class="[
+          'border-r-2',
+          'overflow-y-auto',
+          'flex',
+          'flex-col',
+          'min-h-0'
+        ]"
+      >
         <ul>
-          <li v-for="(budget) in orderedBudgets" :key="budget.id">
-            <BudgetCard :budget="budget" :budgetTotals="props.budgetsTotals[budget.id]" />
+          <li
+            v-for="(budget) in orderedBudgets"
+            :key="budget.id"
+          >
+            <BudgetCard
+              :budget="budget"
+              :budget-totals="props.budgetsTotals[budget.id]"
+            />
           </li>
         </ul>
       </div>
