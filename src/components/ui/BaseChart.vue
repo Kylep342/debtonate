@@ -53,7 +53,7 @@ const initializeChart = () => {
       .attr('y', 10)
       .attr('fill', 'currentColor')
       .attr('text-anchor', 'start')
-      .text('Principal Remaining ($)'));
+      .text(`Principal Remaining (${state.currencySymbol})`));
 
   chart.lines.forEach((line, index) => {
     svg.append('path')

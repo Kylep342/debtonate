@@ -53,6 +53,8 @@ export default defineStore('core', () => {
     ).format(amount)
   );
 
+  const currencySymbol = computed(() => (Money(0)[0]));
+
   const rawGlobalMinPayment = computed(
     () => loans.value.reduce(
       (minPayment, loan) => minPayment + loan.minPayment,
@@ -463,6 +465,7 @@ export default defineStore('core', () => {
     createLoanFormTitle,
     currencies,
     currency,
+    currencySymbol,
     currentBudgetId,
     currentLoanId,
     deleteBudget,
