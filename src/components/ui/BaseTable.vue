@@ -1,7 +1,7 @@
 <template>
   <table :class="['table', 'table-pin-rows']">
-    <slot name="header"></slot>
-    <slot name="body"></slot>
-    <slot name="footer"></slot>
+    <slot name="header" />
+    <slot name="body" />
+    <slot name="footer" />
   </table>
 </template>

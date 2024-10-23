@@ -53,7 +53,7 @@ const initializeChart = () => {
       .attr('y', 10)
       .attr('fill', 'currentColor')
       .attr('text-anchor', 'start')
-      .text('Principal Remaining ($)'));
+      .text(`Principal Remaining (${state.currencySymbol})`));
 
   chart.lines.forEach((line, index) => {
     svg.append('path')
@@ -86,7 +86,9 @@ watch(
 
 <template>
   <div :class="['chartWrapper']">
-    <h2 :class="['text-center']">{{ chart.config.header }}</h2>
-    <svg :id="'chart' + chart.label"></svg>
+    <h2 :class="['text-center']">
+      {{ chart.config.header }}
+    </h2>
+    <svg :id="'chart' + chart.label" />
   </div>
 </template>

@@ -8,6 +8,9 @@ const EMIT_EXIT_OPTIONS_FORM = 'exit-options-form';
 const EMIT_LOAD_APP_STATE = 'load-app-state';
 const EMIT_OPEN_OPTIONS_FORM = 'open-options-form';
 const EMIT_SAVE_APP_STATE = 'save-app-state';
+const EMIT_SET_ROUNDING_SCALE = 'set-rounding-scale';
+const EMIT_SET_CURRENCY = 'set-currency';
+const EMIT_SET_LANGUAGE = 'set-language';
 const EMIT_TOGGLE_AVALANCHE_SORT = 'toggle-avalanche-sort';
 const EMIT_TOGGLE_PERIODS_AS_DATES = 'toggle-periods-as-dates';
 const EMIT_TOGGLE_REDUCE_PAYMENTS = 'toggle-reduce-payments';
@@ -25,6 +28,9 @@ export default Object.freeze({
   EMIT_LOAD_APP_STATE,
   EMIT_OPEN_OPTIONS_FORM,
   EMIT_SAVE_APP_STATE,
+  EMIT_SET_ROUNDING_SCALE,
+  EMIT_SET_CURRENCY,
+  EMIT_SET_LANGUAGE,
   EMIT_TOGGLE_AVALANCHE_SORT,
   EMIT_TOGGLE_PERIODS_AS_DATES,
   EMIT_TOGGLE_REDUCE_PAYMENTS,

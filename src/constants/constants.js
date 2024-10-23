@@ -20,7 +20,7 @@ const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
 
-const LOCALE_CURRENY = {
+const LOCALE_CURRENCY = {
   // North America
   'en-US': 'USD', // United States Dollar
   'en-CA': 'CAD', // Canadian Dollar
@@ -99,7 +99,7 @@ export default Object.freeze({
   LOAN_FORM_ID,
   LOAN,
   LOANS,
-  LOCALE_CURRENY,
+  LOCALE_CURRENCY,
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,

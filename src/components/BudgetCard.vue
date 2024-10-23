@@ -20,14 +20,18 @@ const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lif
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ state.getBudgetName(budget.id) }}
         </h2>
-        <button v-if="budget.id !== constants.DEFAULT" :class="[
-          'exitButton',
-          'bold',
-          'btn',
-          'btn-ghost',
-          'btn-square',
-          'float-right',
-        ]" @click="state.deleteBudget(budget.id)">
+        <button
+          v-if="budget.id !== constants.DEFAULT"
+          :class="[
+            'exitButton',
+            'bold',
+            'btn',
+            'btn-ghost',
+            'btn-square',
+            'float-right',
+          ]"
+          @click="state.deleteBudget(budget.id)"
+        >
           x
         </button>
       </div>
@@ -67,12 +71,18 @@ const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lif
     <template #cardActions>
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="budget.id !== constants.DEFAULT">
-          <base-button :class="['btn-accent']" @click="state.editBudget(budget.id)">
+          <base-button
+            :class="['btn-accent']"
+            @click="state.editBudget(budget.id)"
+          >
             Edit
           </base-button>
         </div>
         <div>
-          <base-button :class="['btn-accent']" @click="state.viewBudget(budget.id)">
+          <base-button
+            :class="['btn-accent']"
+            @click="state.viewBudget(budget.id)"
+          >
             View
           </base-button>
         </div>
