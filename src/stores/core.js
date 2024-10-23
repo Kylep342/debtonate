@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import * as moneyfunx from 'moneyfunx';
 
@@ -11,10 +11,12 @@ export default defineStore('core', () => {
   const budgets = ref([]);
   const createBudgetFormActive = ref(false);
   const createLoanFormActive = ref(false);
-  const currency = ref(constants.LOCALE_CURRENY[navigator.language]);
+  const currencies = ref([...new Set(Object.values(constants.LOCALE_CURRENCY))]);
+  const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref(null);
   const currentLoanId = ref(null);
   const language = ref(navigator.language);
+  const languages = ref([...new Set(Object.keys(constants.LOCALE_CURRENCY))]);
   const loanDetailsPanelActive = ref(false);
   const loans = ref([]);
   const optionsFormActive = ref(false);
@@ -43,10 +45,10 @@ export default defineStore('core', () => {
 
   const Money = (amount) => (
     Intl.NumberFormat(
-      language,
+      language.value,
       {
         style: 'currency',
-        currency: currency.value || 'USD',
+        currency: currency.value,
       },
     ).format(amount)
   );
@@ -154,14 +156,26 @@ export default defineStore('core', () => {
   const exitOptionsForm = () => {
     optionsFormActive.value = false;
   };
+  const setCurrency = (newValue) => {
+    currency.value = newValue;
+  };
+  const setLanguage = (newValue) => {
+    language.value = newValue;
+  };
+  const setRoundingScale = (newValue) => {
+    roundingScale.value = newValue;
+  };
   const togglePeriodsAsDates = () => {
     periodsAsDates.value = !periodsAsDates.value;
   };
   const toggleReducePayments = () => {
     reducePayments.value = !reducePayments.value;
   };
-  const toggleRounding = () => {
+  const toggleRounding = (scale) => {
     roundUp.value = !roundUp.value;
+    if (roundUp.value) {
+      setRoundingScale(scale);
+    }
   };
   const avalanche = () => moneyfunx.sortLoans(
     moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
@@ -221,7 +235,7 @@ export default defineStore('core', () => {
     budgets.value = [];
     createBudgetFormActive.value = false;
     createLoanFormActive.value = false;
-    currency.value = constants.LOCALE_CURRENY[navigator.language];
+    currency.value = constants.LOCALE_CURRENCY[navigator.language];
     currentBudgetId.value = null;
     currentLoanId.value = null;
     language.value = navigator.language;
@@ -234,8 +248,16 @@ export default defineStore('core', () => {
   };
   const loadState = () => {
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS));
+    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY));
+    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE));
     loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)).map(
-      (loan) => new moneyfunx.Loan(loan.principal, loan.annualRate, 12, loan.termInYears, loan.name),
+      (loan) => new moneyfunx.Loan(
+        loan.principal,
+        loan.annualRate,
+        12,
+        loan.termInYears,
+        loan.name,
+      ),
     );
     periodsAsDates.value = JSON.parse(
       localStorage.getItem(keys.LS_PERIODS_AS_DATES),
@@ -250,6 +272,8 @@ export default defineStore('core', () => {
   };
   const saveState = () => {
     localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
+    localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
+    localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
     localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
     localStorage.setItem(
       keys.LS_PERIODS_AS_DATES,
@@ -437,6 +461,7 @@ export default defineStore('core', () => {
     createLoanButtonText,
     createLoanFormActive,
     createLoanFormTitle,
+    currencies,
     currency,
     currentBudgetId,
     currentLoanId,
@@ -465,6 +490,7 @@ export default defineStore('core', () => {
     globalMinPayment,
     globalPrincipal,
     language,
+    languages,
     loadState,
     loanDetailsPanelActive,
     loans,
@@ -485,6 +511,8 @@ export default defineStore('core', () => {
     roundingScale,
     roundUp,
     saveState,
+    setCurrency,
+    setLanguage,
     snowball,
     snowballSort,
     sortLoans,

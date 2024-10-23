@@ -31,7 +31,6 @@ const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'P
         <template #body>
           <tbody>
             <tr v-for="(record, rowno) in paymentSummary.amortizationSchedule" :key="rowno">
-              <!-- NOTE: move the old 'formatters' section to core functions and extract defaults into shared interface here -->
               <td :class="['text-center']">{{ state.formatPeriod(record.period, true) }}</td>
               <td :class="['text-right']">
                 {{ state.Money(record.interest + record.principal) }}
