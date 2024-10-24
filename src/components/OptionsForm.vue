@@ -215,7 +215,7 @@ watch(() => roundingScale.value, async (newValue) => {
         <base-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Language
+              Locale
             </h3>
           </template>
           <template #cardBody>
