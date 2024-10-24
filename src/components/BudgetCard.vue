@@ -8,7 +8,7 @@ const props = defineProps(['budget', 'budgetTotals']);
 const state = useCoreStore();
 
 const budgetAmount = computed(() => `${state.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed(() => `+${state.Money(props.budget.relative)}/month`);
+const budgetExtra = computed(() => `${state.Money(props.budget.relative)}/month`);
 const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
 const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lifetimeInterest)}`);
 </script>

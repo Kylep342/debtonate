@@ -21,6 +21,9 @@ const state = useCoreStore();
 const _currency = ref(state.currency);
 const _language = ref(state.language);
 
+const sortedCurrencies = computed(() => state.currencies.toSorted());
+const sortedLanguages = computed(() => state.languages.toSorted());
+
 const roundingScale = ref(state.roundingScale);
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -200,7 +203,7 @@ watch(() => roundingScale.value, async (newValue) => {
               class="select select-bordered w-full max-w-xs"
             >
               <option
-                v-for="currency in state.currencies"
+                v-for="currency in sortedCurrencies"
                 :key="currency"
                 :value="currency"
               >
@@ -221,7 +224,7 @@ watch(() => roundingScale.value, async (newValue) => {
               class="select select-bordered w-full max-w-xs"
             >
               <option
-                v-for="language in state.languages"
+                v-for="language in sortedLanguages"
                 :key="language"
                 :value="language"
               >

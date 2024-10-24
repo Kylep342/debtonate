@@ -15,7 +15,7 @@ const cellContent = (downId, acrossId) => {
   if (downId === acrossId) {
     return '';
   }
-  const priceDelta = state.getLifetimeInterest(
+  const interestDelta = state.getLifetimeInterest(
     props.loanId,
     acrossId,
   ) - state.getLifetimeInterest(
@@ -31,7 +31,7 @@ const cellContent = (downId, acrossId) => {
     downId,
   );
 
-  const costText = `${state.Money(priceDelta)}`;
+  const costText = `${state.Money(interestDelta)}`;
 
   const timeText = `${relativeTime(timeDelta)} ${timeDelta > 0 ? ' earlier' : ' later'}`;
 

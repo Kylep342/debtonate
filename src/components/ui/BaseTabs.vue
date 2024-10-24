@@ -12,6 +12,8 @@ const flexBasis = `basis-1/${props.pivot.length}`;
 
 const buttonText = (itemId) => props.getItemName(itemId);
 
+const isViewedItemId = (itemId) => viewedItemId.value === itemId;
+
 const setViewedItemId = (value) => {
   viewedItemId.value = value;
 };
@@ -23,7 +25,7 @@ const setViewedItemId = (value) => {
     <div
       v-for="item in pivot"
       :key="item.id"
-      :class="['join-item', flexBasis, 'w-full', { 'border-t-2': item.id === viewedItemId }]"
+      :class="['join-item', flexBasis, 'w-full', { 'border-t-2': isViewedItemId(item.id) }]"
     >
       <base-button
         :class="['btn-ghost', 'w-full']"

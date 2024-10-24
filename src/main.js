@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+
 import App from './App.vue';
 import BaseButton from './components/ui/BaseButton.vue';
 import BaseCard from './components/ui/BaseCard.vue';
