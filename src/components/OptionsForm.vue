@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
+import CollapsibleCard from './ui/CollapsibleCard.vue';
 import constants from '../constants/constants';
 import emitters from '../constants/emitters';
 import useCoreStore from '../stores/core';
@@ -20,17 +21,16 @@ const state = useCoreStore();
 
 const _currency = ref(state.currency);
 const _language = ref(state.language);
+const roundingScale = ref(state.roundingScale);
 
 const sortedCurrencies = computed(() => state.currencies.toSorted());
 const sortedLanguages = computed(() => state.languages.toSorted());
-
-const roundingScale = ref(state.roundingScale);
-
-const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 const reducePaymentsExample = computed(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by: ${state.Money(state.loans[0].minPayment)})`) : ''),
 );
+
+const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 
 const emitExit = () => emits(emitters.EMIT_EXIT_OPTIONS_FORM);
 const emitAvalancheSort = () => emits(emitters.EMIT_TOGGLE_AVALANCHE_SORT);
@@ -48,9 +48,7 @@ watch(() => _language.value, async (newValue) => {
 }, { immediate: true });
 
 watch(() => roundingScale.value, async (newValue) => {
-  if (state.roundUp) {
-    state.setRoundingScale(newValue);
-  }
+  state.setRoundingScale(newValue);
 }, { immediate: true });
 </script>
 
@@ -72,7 +70,7 @@ watch(() => roundingScale.value, async (newValue) => {
     </template>
     <template #body>
       <div :class="['formInputs']">
-        <base-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Repayment Priority
@@ -100,8 +98,8 @@ watch(() => roundingScale.value, async (newValue) => {
               </base-button>
             </div>
           </template>
-        </base-card>
-        <base-card>
+        </collapsible-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Reduce Payments
@@ -130,12 +128,14 @@ watch(() => roundingScale.value, async (newValue) => {
               </base-button>
             </div>
           </template>
-        </base-card>
-        <base-card>
+        </collapsible-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Rounding
             </h3>
+          </template>
+          <template #cardBody>
             <div :class="['label']">
               <span :class="['label-text']">scale:</span>
             </div>
@@ -146,8 +146,6 @@ watch(() => roundingScale.value, async (newValue) => {
               step="0.01"
               label="scale"
             >
-          </template>
-          <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
@@ -165,8 +163,8 @@ watch(() => roundingScale.value, async (newValue) => {
               </base-button>
             </div>
           </template>
-        </base-card>
-        <base-card>
+        </collapsible-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Periods As Dates
@@ -190,8 +188,8 @@ watch(() => roundingScale.value, async (newValue) => {
               </base-button>
             </div>
           </template>
-        </base-card>
-        <base-card>
+        </collapsible-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Currency
@@ -211,8 +209,8 @@ watch(() => roundingScale.value, async (newValue) => {
               </option>
             </select>
           </template>
-        </base-card>
-        <base-card>
+        </collapsible-card>
+        <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Locale
@@ -232,7 +230,7 @@ watch(() => roundingScale.value, async (newValue) => {
               </option>
             </select>
           </template>
-        </base-card>
+        </collapsible-card>
       </div>
     </template>
   </base-modal>
