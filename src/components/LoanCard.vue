@@ -14,26 +14,12 @@ const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
 </script>
 
 <template>
-  <base-card :class="['w-75', 'bg-base-100']">
+  <collapsible-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ state.getLoanName(loan.id) }}
         </h2>
-        <button
-          v-if="loan.id !== constants.TOTALS"
-          :class="[
-            'exitButton',
-            'bold',
-            'btn',
-            'btn-ghost',
-            'btn-square',
-            'float-right',
-          ]"
-          @click="state.deleteLoan(loan.id)"
-        >
-          x
-        </button>
       </div>
     </template>
     <template #cardBody>
@@ -63,24 +49,35 @@ const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
       </base-table>
     </template>
     <template #cardActions>
-      <div :class="['card-actions', 'justify-end', 'p-4']">
-        <div v-if="loan.id !== constants.TOTALS">
-          <base-button
-            :class="['btn-accent']"
-            @click="state.editLoan(loan.id)"
-          >
-            Edit
-          </base-button>
-        </div>
-        <div>
-          <base-button
-            :class="['btn-accent']"
-            @click="state.viewLoan(loan.id)"
-          >
-            View
-          </base-button>
+      <div :class="['flex']">
+        <div :class="['card-actions', 'justify-end', 'p-4']">
+          <div v-if="loan.id !== constants.TOTALS">
+            <base-button
+              v-if="loan.id !== constants.TOTALS"
+              :class="['btn-error']"
+              @click="state.deleteLoan(loan.id)"
+            >
+              Delete
+            </base-button>
+          </div>
+          <div v-if="loan.id !== constants.TOTALS">
+            <base-button
+              :class="['btn-accent']"
+              @click="state.editLoan(loan.id)"
+            >
+              Edit
+            </base-button>
+          </div>
+          <div>
+            <base-button
+              :class="['btn-accent']"
+              @click="state.viewLoan(loan.id)"
+            >
+              View
+            </base-button>
+          </div>
         </div>
       </div>
     </template>
-  </base-card>
+  </collapsible-card>
 </template>

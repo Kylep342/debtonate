@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
-import CollapsibleCard from './ui/CollapsibleCard.vue';
 import constants from '../constants/constants';
 import emitters from '../constants/emitters';
 import useCoreStore from '../stores/core';
