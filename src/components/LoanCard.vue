@@ -49,33 +49,31 @@ const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
       </base-table>
     </template>
     <template #cardActions>
-      <div :class="['flex']">
-        <div :class="['card-actions', 'justify-end', 'p-4']">
-          <div v-if="loan.id !== constants.TOTALS">
-            <base-button
-              v-if="loan.id !== constants.TOTALS"
-              :class="['btn-error']"
-              @click="state.deleteLoan(loan.id)"
-            >
-              Delete
-            </base-button>
-          </div>
-          <div v-if="loan.id !== constants.TOTALS">
-            <base-button
-              :class="['btn-accent']"
-              @click="state.editLoan(loan.id)"
-            >
-              Edit
-            </base-button>
-          </div>
-          <div>
-            <base-button
-              :class="['btn-accent']"
-              @click="state.viewLoan(loan.id)"
-            >
-              View
-            </base-button>
-          </div>
+      <div :class="['card-actions', 'justify-end', 'p-4']">
+        <div v-if="loan.id !== constants.TOTALS">
+          <base-button
+            v-if="loan.id !== constants.TOTALS"
+            :class="['btn-error']"
+            @click="state.deleteLoan(loan.id)"
+          >
+            Delete
+          </base-button>
+        </div>
+        <div v-if="loan.id !== constants.TOTALS">
+          <base-button
+            :class="['btn-accent']"
+            @click="state.editLoan(loan.id)"
+          >
+            Edit
+          </base-button>
+        </div>
+        <div>
+          <base-button
+            :class="['btn-accent']"
+            @click="state.viewLoan(loan.id)"
+          >
+            View
+          </base-button>
         </div>
       </div>
     </template>
