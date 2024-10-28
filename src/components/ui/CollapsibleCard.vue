@@ -15,7 +15,7 @@ const toggleCollapse = () => {
     <template #cardTitle>
       <div class="flex items-center justify-between">
         <span><slot name="cardTitle" /></span>
-        <base-button @click="toggleCollapse" class="text-sm">
+        <base-button @click="toggleCollapse" :class="['btn-ghost']">
           {{ isCollapsed ? '+' : '-' }}
         </base-button>
       </div>
