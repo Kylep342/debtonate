@@ -3,9 +3,11 @@ import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
 import emitters from '../constants/emitters';
+import useCoreStore from '../stores/core';
+
+const state = useCoreStore();
 
 const props = defineProps(['createButtonText', 'loan', 'title']);
-const emits = defineEmits([emitters.EMIT_CREATE_LOAN, emitters.EMIT_EXIT_CREATE_LOAN]);
 
 const principal = ref(props.loan?.principal || 0);
 const interestRate = ref((props.loan?.annualRate || 0) * 100);
@@ -38,9 +40,8 @@ const clearCreate = () => {
   name.value = null;
 };
 
-const emitCreate = () => {
-  emits(
-    emitters.EMIT_CREATE_LOAN,
+const createLoan = () => {
+  state.createLoan(
     principal.value,
     interestRate.value / 100,
     termInYears.value,
@@ -49,8 +50,8 @@ const emitCreate = () => {
   clearCreate();
 };
 
-const emitExit = () => {
-  emits(emitters.EMIT_EXIT_CREATE_LOAN);
+const exit = () => {
+  state.exitCreateLoanForm();
   clearCreate();
 };
 </script>
@@ -63,7 +64,7 @@ const emitExit = () => {
     <template #headerActions>
       <base-button
         :class="['btn btn-circle btn-ghost']"
-        @click="emitExit"
+        @click="exit"
       >
         x
       </base-button>
@@ -114,7 +115,7 @@ const emitExit = () => {
       <base-button
         :disabled="!createButtonEnabled"
         :class="'btn-success'"
-        @click="emitCreate"
+        @click="createLoan"
       >
         {{ createButtonText }}
       </base-button>

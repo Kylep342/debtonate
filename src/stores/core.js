@@ -516,6 +516,7 @@ export default defineStore('core', () => {
     saveState,
     setCurrency,
     setLanguage,
+    setRoundingScale,
     snowball,
     snowballSort,
     sortLoans,
