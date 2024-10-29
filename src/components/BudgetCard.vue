@@ -58,7 +58,6 @@ const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lif
       <div :class="['card-actions', 'justify-end', 'p-4']">
         <div v-if="budget.id !== constants.DEFAULT">
           <base-button
-            v-if="budget.id !== constants.DEFAULT"
             :class="['btn-error']"
             @click="state.deleteBudget(budget.id)"
           >
