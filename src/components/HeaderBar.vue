@@ -19,11 +19,7 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
-<<<<<<< HEAD
-          @click="emitOpenOptions"
-=======
           @click="state.openOptionsForm"
->>>>>>> develop
         >
           Options
         </base-button>
@@ -31,11 +27,7 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
-<<<<<<< HEAD
-          @click="emitLoadState"
-=======
           @click="state.loadState"
->>>>>>> develop
         >
           Load
         </base-button>
@@ -43,11 +35,7 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
-<<<<<<< HEAD
-          @click="emitSaveState"
-=======
           @click="state.saveState"
->>>>>>> develop
         >
           Save
         </base-button>
@@ -55,11 +43,7 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
-<<<<<<< HEAD
-          @click="emitClearState"
-=======
           @click="state.clearState"
->>>>>>> develop
         >
           Clear
         </base-button>

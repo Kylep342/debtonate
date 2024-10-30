@@ -2,18 +2,11 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
-<<<<<<< HEAD
-import emitters from '../constants/emitters';
-
-const props = defineProps(['createButtonText', 'loan', 'title']);
-const emits = defineEmits([emitters.EMIT_CREATE_LOAN, emitters.EMIT_EXIT_CREATE_LOAN]);
-=======
 import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
 
 const props = defineProps(['createButtonText', 'loan', 'title']);
->>>>>>> develop
 
 const principal = ref(props.loan?.principal || 0);
 const interestRate = ref((props.loan?.annualRate || 0) * 100);

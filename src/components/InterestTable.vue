@@ -109,13 +109,7 @@ const relativeTime = (periods) => (
                     v-for="(key, rownum) in Object.keys(cellContent(down.id, across.id))"
                     :key="rownum"
                   >
-<<<<<<< HEAD
-                    {{
-                      cellContent(down.id,
-                                  across.id)[key] }}
-=======
                     {{ cellContent(down.id, across.id)[key] }}
->>>>>>> develop
                   </li>
                 </ul>
               </td>
