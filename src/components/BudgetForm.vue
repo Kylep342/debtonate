@@ -1,11 +1,12 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
-import emitters from '../constants/emitters';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
+
+const state = useCoreStore();
 
 const props = defineProps(['budget', 'createButtonText', 'title']);
-const emits = defineEmits([emitters.EMIT_CREATE_BUDGET, emitters.EMIT_EXIT_CREATE_BUDGET]);
 
 const amount = ref(props.budget?.relative);
 
@@ -27,14 +28,14 @@ const clearCreate = () => {
   amount.value = null;
 };
 
-const emitCreate = () => {
-  emits(emitters.EMIT_CREATE_BUDGET, amount.value);
+const createBudget = () => {
+  state.createBudget(amount.value);
   clearCreate();
-};
+}
 
-const emitExit = () => {
-  emits(emitters.EMIT_EXIT_CREATE_BUDGET);
+const exit = () => {
   clearCreate();
+  state.exitCreateBudgetForm();
 };
 </script>
 
@@ -46,7 +47,7 @@ const emitExit = () => {
     <template #headerActions>
       <base-button
         :class="['btn btn-circle btn-ghost']"
-        @click="emitExit"
+        @click="exit"
       >
         x
       </base-button>
@@ -68,7 +69,7 @@ const emitExit = () => {
       <base-button
         :disabled="!createButtonEnabled"
         :class="'btn-success'"
-        @click="emitCreate"
+        @click="createBudget"
       >
         {{ createButtonText }}
       </base-button>

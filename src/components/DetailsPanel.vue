@@ -74,6 +74,7 @@ const emitExit = () => {
         v-if="anchor"
         :class="['tabframe', 'w-auto']"
       >
+<<<<<<< HEAD
         <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
           <div
             v-for="(item) in pivot"
@@ -102,6 +103,31 @@ const emitExit = () => {
           )
           "
         />
+=======
+        <base-tabs
+          :get-item-name="getItemName"
+          :pivot="pivot"
+          :is-viewed-item-id="isViewedItemId"
+          :set-viewed-item-id="setViewedItemId"
+        >
+          <template #tabContent>
+            <AmortizationTable
+              :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
+              :payment-summary="getPaymentSummary(anchor.id, viewedItemId)"
+              :title="buildAmortizationTableTitle(
+                anchor,
+                getItem(viewedItemId),
+              )
+              "
+              :subtitle="buildAmortizationTableSubtitle(
+                anchor,
+                getItem(viewedItemId),
+              )
+              "
+            />
+          </template>
+        </base-tabs>
+>>>>>>> develop
       </div>
     </template>
   </base-modal>

@@ -5,17 +5,11 @@ const props = defineProps(['loanId', 'title', 'subtitle']);
 
 const state = useCoreStore();
 
-const relativeTime = (periods) => (
-  state.periodsAsDates ? (
-    `${Math.floor(periods / 12) ? `${Math.abs(Math.floor(periods / 12))} years, ` : ''}${periods % 12 ? `${Math.abs(periods % 12)} months` : ''}`
-  ) : `${Math.abs(periods)} periods`
-);
-
 const cellContent = (downId, acrossId) => {
   if (downId === acrossId) {
     return '';
   }
-  const priceDelta = state.getLifetimeInterest(
+  const interestDelta = state.getLifetimeInterest(
     props.loanId,
     acrossId,
   ) - state.getLifetimeInterest(
@@ -31,7 +25,37 @@ const cellContent = (downId, acrossId) => {
     downId,
   );
 
-  const costText = `${state.Money(priceDelta)}`;
+  const relativeYears = (timeDelta) => {
+    const years = Math.floor(Math.abs(timeDelta / 12))
+    switch(years) {
+      case 0:
+        return '';
+      case 1:
+        return `${years} year`;
+      default:
+        return `${years} years`;
+    }
+  };
+
+  const relativeMonths = (timeDelta) => {
+    const months = Math.floor(Math.abs(timeDelta % 12))
+    switch(months) {
+      case 0:
+        return '';
+      case 1:
+        return `${months} month`;
+      default:
+        return `${months} months`;
+    }
+  };
+
+const relativeTime = (periods) => (
+  state.periodsAsDates ? (
+    `${relativeYears(periods)} ${relativeMonths(periods)}`
+  ) : `${Math.abs(periods)} periods`
+);
+
+  const costText = `${state.Money(interestDelta)}`;
 
   const timeText = `${relativeTime(timeDelta)} ${timeDelta > 0 ? ' earlier' : ' later'}`;
 
@@ -85,9 +109,13 @@ const cellContent = (downId, acrossId) => {
                     v-for="(key, rownum) in Object.keys(cellContent(down.id, across.id))"
                     :key="rownum"
                   >
+<<<<<<< HEAD
                     {{
                       cellContent(down.id,
                                   across.id)[key] }}
+=======
+                    {{ cellContent(down.id, across.id)[key] }}
+>>>>>>> develop
                   </li>
                 </ul>
               </td>

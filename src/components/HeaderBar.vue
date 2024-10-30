@@ -1,17 +1,8 @@
 <script setup>
-import emitters from '../constants/emitters';
+import useCoreStore from '../stores/core';
 
-const emits = defineEmits([
-  emitters.EMIT_CLEAR_APP_STATE,
-  emitters.EMIT_LOAD_APP_STATE,
-  emitters.EMIT_OPEN_OPTIONS_FORM,
-  emitters.EMIT_SAVE_APP_STATE,
-]);
+const state = useCoreStore();
 
-const emitClearState = () => emits(emitters.EMIT_CLEAR_APP_STATE);
-const emitLoadState = () => emits(emitters.EMIT_LOAD_APP_STATE);
-const emitOpenOptions = () => emits(emitters.EMIT_OPEN_OPTIONS_FORM);
-const emitSaveState = () => emits(emitters.EMIT_SAVE_APP_STATE);
 const classes = ['rounded-none btn-secondary'];
 </script>
 
@@ -28,7 +19,11 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
+<<<<<<< HEAD
           @click="emitOpenOptions"
+=======
+          @click="state.openOptionsForm"
+>>>>>>> develop
         >
           Options
         </base-button>
@@ -36,7 +31,11 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
+<<<<<<< HEAD
           @click="emitLoadState"
+=======
+          @click="state.loadState"
+>>>>>>> develop
         >
           Load
         </base-button>
@@ -44,7 +43,11 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
+<<<<<<< HEAD
           @click="emitSaveState"
+=======
+          @click="state.saveState"
+>>>>>>> develop
         >
           Save
         </base-button>
@@ -52,7 +55,11 @@ const classes = ['rounded-none btn-secondary'];
       <li>
         <base-button
           :class="classes"
+<<<<<<< HEAD
           @click="emitClearState"
+=======
+          @click="state.clearState"
+>>>>>>> develop
         >
           Clear
         </base-button>
