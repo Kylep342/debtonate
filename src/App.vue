@@ -1,5 +1,5 @@
 <script setup>
-import {  watch } from 'vue';
+import { watch } from 'vue';
 
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';

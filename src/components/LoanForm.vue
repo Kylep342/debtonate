@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
-import emitters from '../constants/emitters';
 import useCoreStore from '../stores/core';
 
 const state = useCoreStore();

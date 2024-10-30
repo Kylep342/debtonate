@@ -28,6 +28,11 @@ const clearCreate = () => {
   amount.value = null;
 };
 
+const createBudget = () => {
+  state.createBudget(amount.value);
+  clearCreate();
+}
+
 const exit = () => {
   state.exitCreateBudgetForm();
   clearCreate();
@@ -64,7 +69,7 @@ const exit = () => {
       <base-button
         :disabled="!createButtonEnabled"
         :class="'btn-success'"
-        @click="state.createBudget(amount)"
+        @click="createBudget"
       >
         {{ createButtonText }}
       </base-button>
