@@ -7,8 +7,6 @@ const props = defineProps({
 });
 
 const flexBasis = `basis-1/${props.pivot.length}`;
-
-const buttonText = (itemId) => props.getItemName(itemId);
 </script>
 
 <template>
@@ -23,7 +21,7 @@ const buttonText = (itemId) => props.getItemName(itemId);
           :class="['btn-ghost', 'w-full']"
           @click="setViewedItemId(item.id)"
         >
-          {{ buttonText(item.id) }}
+          {{ getItemName(item.id) }}
         </base-button>
       </div>
     </div>
