@@ -1,6 +1,5 @@
 <script setup>
 const props = defineProps({
-  initialItemId: [String],
   getItemName: Function,
   pivot: Array,
   isViewedItemId: Function,

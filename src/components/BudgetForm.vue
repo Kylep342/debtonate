@@ -34,8 +34,8 @@ const createBudget = () => {
 }
 
 const exit = () => {
-  state.exitCreateBudgetForm();
   clearCreate();
+  state.exitCreateBudgetForm();
 };
 </script>
 

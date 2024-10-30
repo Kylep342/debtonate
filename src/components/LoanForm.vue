@@ -50,8 +50,8 @@ const createLoan = () => {
 };
 
 const exit = () => {
-  state.exitCreateLoanForm();
   clearCreate();
+  state.exitCreateLoanForm();
 };
 </script>
 
