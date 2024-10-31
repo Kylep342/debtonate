@@ -73,7 +73,7 @@ const initializeChart = () => {
             .style('opacity', 1)
             .style('left', `${event.pageX + 5}px`)
             .style('top', `${event.pageY - 28}px`)
-            .html(`${state.formatPeriod(point.x)}<br>${state.Money(point.y)}`);
+            .html(`${state.formatPeriod(point.x, true)}<br>${state.Money(point.y)}`);
         })
         .on('mouseout', () => {
           d3.select('#tooltip').style('opacity', 0);
