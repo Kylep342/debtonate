@@ -54,7 +54,7 @@ export default defineStore('core', () => {
   );
 
   const currencySymbol = computed(() => {
-      const formatted = new Intl.NumberFormat('en-us', {
+      const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency.value,
       }).format(1);
@@ -207,7 +207,7 @@ export default defineStore('core', () => {
   };
   const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
   const getLoanName = (id) => (
-    getLoan(id)?.name || `${constants.LOAN} ${getLoanIndex(id)}`
+    getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
   );
   const viewLoan = (id) => {
     currentLoanId.value = id;
