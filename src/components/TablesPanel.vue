@@ -19,26 +19,21 @@ const setViewedLoanId = (loanId) => {
 <template>
   <div>
     <div :class="['tabframe', 'w-fit']">
-      <div :class="['tabs', 'flex', 'flex-row', 'join', 'join-horizontal', 'w-full', 'flex-grow']">
-        <div
-          v-for="loan in state.loansWithTotals"
-          :key="loan.id"
-          :class="['join-item', 'w-full', { 'border-t-2': isViewedLoanId(loan.id) }]"
-        >
-          <base-button
-            :class="['btn-ghost', 'w-full']"
-            @click="setViewedLoanId(loan.id)"
-          >
-            {{ state.getLoanName(loan.id) }}
-          </base-button>
-        </div>
-      </div>
-      <InterestTable
-        :id="'interestTable'"
-        :loan-id="viewedLoanId"
-        :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
-        :subtitle="state.buildInterestTableSubtitle(state.getLoan(viewedLoanId))"
-      />
+      <base-tabs
+        :get-item-name="state.getLoanName"
+        :pivot="state.loansWithTotals"
+        :is-viewed-item-id="isViewedLoanId"
+        :set-viewed-item-id="setViewedLoanId"
+      >
+        <template #tabContent>
+          <InterestTable
+            :id="'interestTable'"
+            :loan-id="viewedLoanId"
+            :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
+            :subtitle="state.buildInterestTableSubtitle(state.getLoan(viewedLoanId))"
+          />
+        </template>
+      </base-tabs>
     </div>
   </div>
 </template>
