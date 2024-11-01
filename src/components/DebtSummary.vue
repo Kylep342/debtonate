@@ -10,6 +10,8 @@ const tabs = reactive({
   [constants.TABLES]: TablesPanel,
 });
 
+const flexBasis = `basis-1/${Object.keys(tabs).length}`;
+
 const viewedComponentId = ref(constants.GRAPHS);
 
 const isViewedComponentId = (value) => viewedComponentId.value === value;
@@ -35,6 +37,7 @@ const setViewedComponentId = (newValue) => {
         </base-button>
       </div>
     </div>
-    <component :is="tabs[viewedComponentId]" />
+    <GraphsPanel v-show="isViewedComponentId(constants.GRAPHS)" />
+    <TablesPanel v-show="isViewedComponentId(constants.TABLES)" />
   </div>
 </template>
