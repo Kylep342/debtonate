@@ -9,11 +9,9 @@ import useCoreStore from '../../stores/core';
 const props = defineProps(['chartConfig', 'header']);
 
 const state = useCoreStore();
-
 const chart = shallowReactive({});
 
 const initializeChart = () => {
-  // Guard: Ensure `chartConfig` and required properties are defined
   if (!chart.config || !chart.lines || chart.lines.length === 0) {
     return;
   }
@@ -62,6 +60,25 @@ const initializeChart = () => {
       .attr('stroke', constants.COLORS[index % constants.COLORS.length])
       .attr('stroke-width', 1.5)
       .attr('d', draw);
+
+    line.forEach(point => {
+      svg.append('circle')
+        .attr('cx', x(state.formatPeriod(point.x)))
+        .attr('cy', y(point.y))
+        .attr('r', 4)
+        .style('opacity', 0)
+        .attr('fill', constants.COLORS[index % constants.COLORS.length])
+        .on('mouseover', (event) => {
+          d3.select('#tooltip')
+            .style('opacity', 1)
+            .style('left', `${event.pageX + 5}px`)
+            .style('top', `${event.pageY - 28}px`)
+            .html(`${state.formatPeriod(point.x, true)}<br>${state.Money(point.y)}`);
+        })
+        .on('mouseout', () => {
+          d3.select('#tooltip').style('opacity', 0);
+        });
+    });
   });
 };
 
@@ -90,5 +107,19 @@ watch(
       {{ chart.config.header }}
     </h2>
     <svg :id="'chart' + chart.label" />
+    <div id="tooltip" style="position: absolute; opacity: 0; background: #fff; border: 1px solid #ccc; padding: 5px; pointer-events: none;"></div>
   </div>
 </template>
+
+<style>
+#tooltip {
+  position: absolute;
+  opacity: 0;
+  background: white;
+  border: 1px solid gray;
+  padding: 5px;
+  border-radius: 3px;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+</style>

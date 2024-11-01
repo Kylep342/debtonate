@@ -11,6 +11,7 @@ const BUDGET_FORM_ID = 'budgetForm';
 const BUDGETS = 'Budgets';
 const COLORS = ['#DAF7A6', '#900C3F', '#C70039', '#581845', '#FF5733', '#FFC300'];
 const DEFAULT = 'default';
+const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
 const LOAN_DETAILS = 'Loan Details';
@@ -19,6 +20,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
   // North America
@@ -94,6 +96,7 @@ export default Object.freeze({
   BUDGETS,
   COLORS,
   DEFAULT,
+  GRAPHS,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,
   LOAN_FORM_ID,
@@ -103,5 +106,6 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+  TABLES,
   TOTALS,
 });

@@ -3,14 +3,13 @@ import { watch } from 'vue';
 
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
+import DebtSummary from './components/DebtSummary.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
-import GraphsPanel from './components/GraphsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import SiteIntro from './components/SiteIntro.vue';
-import TablesPanel from './components/TablesPanel.vue';
 import constants from './constants/constants';
 import useCoreStore from './stores/core';
 
@@ -64,21 +63,13 @@ watch(() => state.optionsFormActive, async (show) => {
     id="debtonate"
     :class="['font-mono', 'h-screen', 'flex', 'flex-col']"
   >
-    <HeaderBar
-      :class="['flex-none']"
-      @clear-app-state="state.clearState"
-      @load-app-state="state.loadState"
-      @open-options-form="state.openOptionsForm"
-      @save-app-state="state.saveState"
-    />
+    <HeaderBar :class="['flex-none']" />
     <LoanForm
       :create-button-text="state.createLoanButtonText"
       :loan="state.currentLoanId ?
         state.getLoan(state.currentLoanId) :
         null"
       :title="state.createLoanFormTitle"
-      @create-loan="state.createLoan"
-      @exit-create-loan="state.exitCreateLoanForm"
     />
     <BudgetForm
       :create-button-text="state.createBudgetButtonText"
@@ -86,17 +77,8 @@ watch(() => state.optionsFormActive, async (show) => {
         state.getBudget(state.currentBudgetId) :
         null"
       :title="state.createBudgetFormTitle"
-      @create-budget="state.createBudget"
-      @exit-create-budget="state.exitCreateBudgetForm"
     />
-    <OptionsForm
-      @exit-options-form="state.exitOptionsForm"
-      @toggle-avalanche-sort="state.toggleAvalancheSort"
-      @toggle-periods-as-dates="state.togglePeriodsAsDates"
-      @toggle-reduce-payments="state.toggleReducePayments"
-      @toggle-round-up="state.toggleRounding"
-      @toggle-snowball-sort="state.toggleSnowballSort"
-    />
+    <OptionsForm />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <LoansPanel
         :class="['flex-none']"
@@ -128,8 +110,7 @@ watch(() => state.optionsFormActive, async (show) => {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <GraphsPanel :graphs="state.balanceOverTimeGraphs" />
-            <TablesPanel />
+            <DebtSummary />
           </div>
           <div>
             <DetailsPanel

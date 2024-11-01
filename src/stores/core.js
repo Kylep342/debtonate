@@ -53,7 +53,17 @@ export default defineStore('core', () => {
     ).format(amount)
   );
 
-  const currencySymbol = computed(() => (Money(0)[0]));
+  const currencySymbol = computed(() => {
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency.value,
+      }).format(1);
+
+      const match = formatted.match(/[\p{Sc}]+/u);
+
+      return match ? match[0] : null;
+    }
+  );
 
   const rawGlobalMinPayment = computed(
     () => loans.value.reduce(
@@ -197,7 +207,7 @@ export default defineStore('core', () => {
   };
   const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
   const getLoanName = (id) => (
-    getLoan(id)?.name || `${constants.LOAN} ${getLoanIndex(id)}`
+    getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
   );
   const viewLoan = (id) => {
     currentLoanId.value = id;
