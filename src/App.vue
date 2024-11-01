@@ -3,14 +3,13 @@ import { watch } from 'vue';
 
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
+import DebtSummary from './components/DebtSummary.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
-import GraphsPanel from './components/GraphsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
 import SiteIntro from './components/SiteIntro.vue';
-import TablesPanel from './components/TablesPanel.vue';
 import constants from './constants/constants';
 import useCoreStore from './stores/core';
 
@@ -111,8 +110,7 @@ watch(() => state.optionsFormActive, async (show) => {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <GraphsPanel :graphs="state.balanceOverTimeGraphs" />
-            <TablesPanel />
+            <DebtSummary />
           </div>
           <div>
             <DetailsPanel

@@ -27,7 +27,7 @@ const setViewedLoanId = (loanId) => {
       >
         <template #tabContent>
           <InterestTable
-            :id="'interestTable'"
+            id="interestTable"
             :loan-id="viewedLoanId"
             :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
             :subtitle="state.buildInterestTableSubtitle(state.getLoan(viewedLoanId))"

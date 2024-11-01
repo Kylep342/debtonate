@@ -4,8 +4,6 @@ import { ref } from 'vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-defineProps(['graphs']);
-
 const state = useCoreStore();
 
 const viewedLoanId = ref(constants.TOTALS);
@@ -28,9 +26,9 @@ const setViewedLoanId = (loanId) => {
       >
         <template #tabContent>
           <base-chart
-            v-if="graphs[viewedLoanId]"
+            v-if="state.balanceOverTimeGraphs[viewedLoanId]"
             :key="viewedLoanId"
-            :chart-config="graphs[viewedLoanId]"
+            :chart-config="state.balanceOverTimeGraphs[viewedLoanId]"
           />
         </template>
       </base-tabs>
