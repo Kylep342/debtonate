@@ -201,7 +201,7 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <span>Current Format: {{ state.Money(1000) }}</span>
+            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
           </template>
         </collapsible-card>
         <collapsible-card>
@@ -227,8 +227,8 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <span>Current Format: {{ state.Money(1000) }}</span>
-            <span>Current Format: {{ state.formatPeriod(0, true) }}</span>
+            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
+            <span>Next Payment: {{ state.formatPeriod(1, true) }}</span>
           </template>
         </collapsible-card>
       </div>
