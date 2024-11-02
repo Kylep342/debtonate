@@ -1,8 +1,11 @@
 import { TOTALS } from 'moneyfunx';
 
+const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
+const BTN_LOAD = 'Load';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
+const BTN_OPTIONS = 'Options';
 const BTN_SAVE = 'Save';
 const BUDGET = 'Budget';
 const BUDGET_DETAILS_ID = 'budgetDetails';
@@ -85,9 +88,12 @@ const LOCALE_CURRENCY = {
 };
 
 export default Object.freeze({
+  BTN_CLEAR,
   BTN_CREATE,
+  BTN_LOAD,
   BTN_OFF,
   BTN_ON,
+  BTN_OPTIONS,
   BTN_SAVE,
   BUDGET_DETAILS_ID,
   BUDGET_DETAILS,
