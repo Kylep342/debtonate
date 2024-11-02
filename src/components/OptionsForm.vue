@@ -13,7 +13,10 @@ const roundingScale = ref(state.roundingScale);
 const sortedCurrencies = computed(() => state.currencies.toSorted());
 const sortedLanguages = computed(() => state.languages.toSorted());
 const reducePaymentsExample = computed(
-  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by: ${state.Money(state.loans[0].minPayment)})`) : ''),
+  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${state.Money(state.loans[0].minPayment)})`) : ''),
+);
+const repaymentPriorityExample = computed(
+  () => ('Priority: ' + state.loans.map((loan) => state.getLoanName(loan.id)).join( ', '))
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -52,18 +55,14 @@ watch(() => roundingScale.value, async (newValue) => {
       <div :class="['formInputs']">
         <collapsible-card>
           <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Repayment Priority
-            </h3>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>Avalanche orders loans by descending interest rate</p>
-              <p>Snowball orders loans by ascending principal</p>
+            <div :class="['flex', 'flex-row']">
+              <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+                Repayment Priority
+              </h3>
             </div>
           </template>
-          <template #cardActions>
-            <div :class="['card-actions', 'justify-end', 'p-4']">
+          <template #cardTitleActions>
+            <div>
               <base-button
                 :class="buttonStyle(!state.snowballSort)"
                 @click="state.toggleAvalancheSort"
@@ -78,12 +77,33 @@ watch(() => roundingScale.value, async (newValue) => {
               </base-button>
             </div>
           </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>Avalanche prioritizes loans by descending interest rate</p>
+              <p>Snowball prioritizes loans by ascending principal</p>
+              <br>
+              <p>
+                {{ repaymentPriorityExample }}
+              </p>
+            </div>
+          </template>
         </collapsible-card>
         <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Reduce Payments
             </h3>
+          </template>
+          <template #cardTitleActions>
+            <div>
+              <base-button
+                :class="buttonStyle(state.reducePayments)"
+                @click="state.toggleReducePayments"
+              >
+                {{
+                  buttonText(state.reducePayments) }}
+              </base-button>
+            </div>
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
@@ -97,17 +117,6 @@ watch(() => roundingScale.value, async (newValue) => {
               </p>
             </div>
           </template>
-          <template #cardActions>
-            <div :class="['card-actions', 'justify-end', 'p-4']">
-              <base-button
-                :class="buttonStyle(state.reducePayments)"
-                @click="state.toggleReducePayments"
-              >
-                {{
-                  buttonText(state.reducePayments) }}
-              </base-button>
-            </div>
-          </template>
         </collapsible-card>
         <collapsible-card>
           <template #cardTitle>
@@ -115,32 +124,32 @@ watch(() => roundingScale.value, async (newValue) => {
               Rounding
             </h3>
           </template>
-          <template #cardBody>
-            <div :class="['label']">
-              <span :class="['label-text']">scale:</span>
-            </div>
-            <input
-              v-model.number="roundingScale"
-              :class="['input input-bordered input-secondary w-full max-ws']"
-              type="number"
-              step="0.01"
-              label="scale"
-            >
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this rounds your minimum contribution up to the next
-                multiple of {{ state.Money(roundingScale) }}
-              </p>
-            </div>
-          </template>
-          <template #cardActions>
-            <div :class="['card-actions', 'justify-end', 'p-4']">
+          <template #cardTitleActions>
+            <div :class="['flex', 'flex-row']">
+              <div :class="['label']">
+                <span :class="['label-text']">scale:</span>
+              </div>
+              <input
+                v-model.number="roundingScale"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="scale"
+              >
               <base-button
                 :class="buttonStyle(state.roundUp)"
                 @click="state.toggleRounding(roundingScale)"
               >
                 {{ buttonText(state.roundUp) }}
               </base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this rounds your minimum contribution up to the next
+                multiple of {{ state.Money(roundingScale) }}
+              </p>
             </div>
           </template>
         </collapsible-card>
@@ -150,22 +159,22 @@ watch(() => roundingScale.value, async (newValue) => {
               Periods As Dates
             </h3>
           </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this displays all period tags as dates (relative to
-                today)
-              </p>
-            </div>
-          </template>
-          <template #cardActions>
-            <div :class="['card-actions', 'justify-end', 'p-4']">
+          <template #cardTitleActions>
+            <div>
               <base-button
                 :class="buttonStyle(state.periodsAsDates)"
                 @click="state.togglePeriodsAsDates"
               >
                 {{ buttonText(state.periodsAsDates) }}
               </base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this displays all period tags as dates (relative to
+                today)
+              </p>
             </div>
           </template>
         </collapsible-card>
@@ -175,19 +184,24 @@ watch(() => roundingScale.value, async (newValue) => {
               Currency
             </h3>
           </template>
-          <template #cardBody>
-            <select
-              v-model="_currency"
-              class="select select-bordered w-full max-w-xs"
-            >
-              <option
-                v-for="currency in sortedCurrencies"
-                :key="currency"
-                :value="currency"
+          <template #cardTitleActions>
+            <div>
+              <select
+                v-model="_currency"
+                class="select select-bordered w-full max-w-xs"
               >
-                {{ currency }}
-              </option>
-            </select>
+                <option
+                  v-for="currency in sortedCurrencies"
+                  :key="currency"
+                  :value="currency"
+                >
+                  {{ currency }}
+                </option>
+              </select>
+            </div>
+          </template>
+          <template #cardBody>
+            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
           </template>
         </collapsible-card>
         <collapsible-card>
@@ -196,19 +210,25 @@ watch(() => roundingScale.value, async (newValue) => {
               Locale
             </h3>
           </template>
-          <template #cardBody>
-            <select
-              v-model="_language"
-              class="select select-bordered w-full max-w-xs"
-            >
-              <option
-                v-for="language in sortedLanguages"
-                :key="language"
-                :value="language"
+          <template #cardTitleActions>
+            <div>
+              <select
+                v-model="_language"
+                class="select select-bordered w-full max-w-xs"
               >
-                {{ language }}
-              </option>
-            </select>
+                <option
+                  v-for="language in sortedLanguages"
+                  :key="language"
+                  :value="language"
+                >
+                  {{ language }}
+                </option>
+              </select>
+            </div>
+          </template>
+          <template #cardBody>
+            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
+            <span>Next Payment: {{ state.formatPeriod(1, true) }}</span>
           </template>
         </collapsible-card>
       </div>

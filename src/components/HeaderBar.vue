@@ -1,8 +1,15 @@
 <script setup>
 import useCoreStore from '../stores/core';
+import constants from '../constants/constants';
 
 const state = useCoreStore();
 
+const buttons = [
+  {text: constants.BTN_OPTIONS, onClick: state.openOptionsForm},
+  {text: constants.BTN_LOAD, onClick: state.loadState},
+  {text: constants.BTN_SAVE, onClick: state.saveState},
+  {text: constants.BTN_CLEAR, onClick: state.clearState},
+]
 const classes = ['rounded-none btn-secondary'];
 </script>
 
@@ -16,36 +23,15 @@ const classes = ['rounded-none btn-secondary'];
       <h1>Debtonate</h1>
     </div>
     <ul :class="['menu menu-horizontal bg-secondary']">
-      <li>
+      <li
+        v-for="(button) in buttons"
+        :key="button.text"
+      >
         <base-button
           :class="classes"
-          @click="state.openOptionsForm"
+          @click="button.onClick"
         >
-          Options
-        </base-button>
-      </li>
-      <li>
-        <base-button
-          :class="classes"
-          @click="state.loadState"
-        >
-          Load
-        </base-button>
-      </li>
-      <li>
-        <base-button
-          :class="classes"
-          @click="state.saveState"
-        >
-          Save
-        </base-button>
-      </li>
-      <li>
-        <base-button
-          :class="classes"
-          @click="state.clearState"
-        >
-          Clear
+          {{ button.text }}
         </base-button>
       </li>
     </ul>
