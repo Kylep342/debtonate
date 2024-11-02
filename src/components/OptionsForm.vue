@@ -125,7 +125,17 @@ watch(() => roundingScale.value, async (newValue) => {
             </h3>
           </template>
           <template #cardTitleActions>
-            <div>
+            <div :class="['flex', 'flex-row']">
+              <div :class="['label']">
+                <span :class="['label-text']">scale:</span>
+              </div>
+              <input
+                v-model.number="roundingScale"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="scale"
+              >
               <base-button
                 :class="buttonStyle(state.roundUp)"
                 @click="state.toggleRounding(roundingScale)"
@@ -135,16 +145,6 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <div :class="['label']">
-              <span :class="['label-text']">scale:</span>
-            </div>
-            <input
-              v-model.number="roundingScale"
-              :class="['input input-bordered input-secondary w-full max-ws']"
-              type="number"
-              step="0.01"
-              label="scale"
-            >
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
