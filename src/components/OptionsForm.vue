@@ -16,7 +16,7 @@ const reducePaymentsExample = computed(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${state.Money(state.loans[0].minPayment)})`) : ''),
 );
 const repaymentPriorityExample = computed(
-  () => ('Priority: ' + state.loans.map((loan) => state.getLoanName(loan.id)).join( ', '))
+  () => (state.loans.length ? ('Priority: ' + state.loans.map((loan) => state.getLoanName(loan.id)).join( ', ')) : ''),
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -175,6 +175,8 @@ watch(() => roundingScale.value, async (newValue) => {
                 When enabled this displays all period tags as dates (relative to
                 today)
               </p>
+              <br>
+              <p>Next Payment: {{ state.formatPeriod(1, true) }}</p>
             </div>
           </template>
         </collapsible-card>
@@ -201,7 +203,7 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
+            <p>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</p>
           </template>
         </collapsible-card>
         <collapsible-card>
@@ -227,8 +229,10 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <span>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</span>
-            <span>Next Payment: {{ state.formatPeriod(1, true) }}</span>
+            <p>Localization setting for formatting numbers and dates</p>
+            <br>
+            <p>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</p>
+            <p>Next Payment: {{ state.formatPeriod(1, true) }}</p>
           </template>
         </collapsible-card>
       </div>
