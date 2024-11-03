@@ -27,10 +27,10 @@ const setViewedComponentId = (newValue) => {
       <div
         v-for="item in Object.keys(tabs)"
         :key="item"
-        :class="['join-item', flexBasis, 'w-full', { 'border-t-2': isViewedComponentId(item) }]"
+        :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full']"
+          :class="['btn-ghost', 'w-full', { 'shadow-lg': isViewedComponentId(item) }]"
           @click="setViewedComponentId(item)"
         >
           {{ item }}

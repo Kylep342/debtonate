@@ -15,10 +15,10 @@ const flexBasis = `basis-1/${props.pivot.length}`;
       <div
         v-for="item in pivot"
         :key="item.id"
-        :class="['join-item', flexBasis, 'w-full', { 'border-t-2': isViewedItemId(item.id) }]"
+        :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full']"
+          :class="['btn-ghost', 'w-full', { 'shadow-lg': isViewedItemId(item.id) }]"
           @click="setViewedItemId(item.id)"
         >
           {{ getItemName(item.id) }}

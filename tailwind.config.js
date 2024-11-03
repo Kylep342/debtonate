@@ -10,8 +10,8 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    themes: ['lemonade'],
-    darkTheme: 'dark',
+    themes: ['retro'],
+    darkTheme: 'synthwave',
     base: true,
     styled: true,
     utils: true,
