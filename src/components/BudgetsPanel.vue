@@ -42,7 +42,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="state.createBudget"
+        :create-function="state.openCreateBudgetForm"
         :title="constants.BUDGETS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />

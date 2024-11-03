@@ -32,7 +32,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="state.createLoan"
+        :create-function="state.openCreateBudgetForm"
         :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
