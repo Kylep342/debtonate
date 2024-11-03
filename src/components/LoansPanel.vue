@@ -11,14 +11,12 @@ import constants from '../constants/constants';
 import { heightRestOfViewport } from '../functions/viewport';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['createFunction']);
-
 const state = useCoreStore();
 
 const scrollContainer = ref(null);
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
+  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer, 26)}px`;
   window.addEventListener('resizeLoansPanel', heightRestOfViewport);
 });
 
@@ -34,7 +32,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="props.createFunction"
+        :create-function="state.createLoan"
         :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
