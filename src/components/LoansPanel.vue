@@ -3,6 +3,7 @@ import {
   ref,
   onBeforeUnmount,
   onMounted,
+  onUpdated,
 } from 'vue';
 
 import LoanCard from './LoanCard.vue';
@@ -20,6 +21,10 @@ onMounted(() => {
   window.addEventListener('resizeLoansPanel', heightRestOfViewport);
 });
 
+onUpdated(() => {
+  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer, 26)}px`;
+});
+
 onBeforeUnmount(() => {
   window.removeEventListener('resizeLoansPanel', heightRestOfViewport);
 });
@@ -32,7 +37,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="state.openCreateBudgetForm"
+        :create-function="state.openCreateLoanForm"
         :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
