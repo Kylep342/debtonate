@@ -18,7 +18,12 @@ const flexBasis = `basis-1/${props.pivot.length}`;
         :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full', { 'shadow-lg': isViewedItemId(item.id) }]"
+          :class="[
+            'w-full',
+            {'btn-ghost': !isViewedItemId(item.id)},
+            {'btn-secondary': isViewedItemId(item.id)},
+            {'shadow-lg': isViewedItemId(item.id)},
+          ]"
           @click="setViewedItemId(item.id)"
         >
           {{ getItemName(item.id) }}

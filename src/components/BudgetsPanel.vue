@@ -10,7 +10,7 @@ import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import { heightRestOfViewport } from '../functions/viewport';
+import { fillHeight } from '../functions/viewport';
 
 const state = useCoreStore();
 
@@ -26,12 +26,12 @@ const orderedBudgets = computed(() => [
 const scrollContainer = ref(null);
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer, 26)}px`;
-  window.addEventListener('resizeBudgetsPanel', heightRestOfViewport);
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+  window.addEventListener('resizeBudgetsPanel', fillHeight);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeBudgetsPanel', heightRestOfViewport);
+  window.removeEventListener('resizeBudgetsPanel', fillHeight);
 });
 </script>
 

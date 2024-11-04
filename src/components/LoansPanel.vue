@@ -9,7 +9,7 @@ import {
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
-import { heightRestOfViewport } from '../functions/viewport';
+import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
@@ -17,16 +17,16 @@ const state = useCoreStore();
 const scrollContainer = ref(null);
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer, 26)}px`;
-  window.addEventListener('resizeLoansPanel', heightRestOfViewport);
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+  window.addEventListener('resizeLoansPanel', fillHeight);
 });
 
 onUpdated(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer, 26)}px`;
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeLoansPanel', heightRestOfViewport);
+  window.removeEventListener('resizeLoansPanel', fillHeight);
 });
 </script>
 

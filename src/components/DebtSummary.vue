@@ -30,7 +30,12 @@ const setViewedComponentId = (newValue) => {
         :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full', { 'shadow-lg': isViewedComponentId(item) }]"
+          :class="[
+            'w-full',
+            {'btn-ghost': !isViewedComponentId(item)},
+            {'btn-secondary': isViewedComponentId(item)},
+            {'shadow-lg': isViewedComponentId(item)},
+          ]"
           @click="setViewedComponentId(item)"
         >
           {{ item }}
