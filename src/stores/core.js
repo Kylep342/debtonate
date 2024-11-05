@@ -193,7 +193,7 @@ export default defineStore('core', () => {
   };
   const toggleRounding = (scale) => {
     roundUp.value = !roundUp.value;
-    if (roundUp.value) {
+    if (roundUp.value && Number.isNaN(scale) && scale > 0) {
       setRoundingScale(scale);
     }
   };

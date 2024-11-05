@@ -31,7 +31,9 @@ watch(() => _language.value, async (newValue) => {
 }, { immediate: true });
 
 watch(() => roundingScale.value, async (newValue) => {
-  state.setRoundingScale(newValue);
+  if (Number.isNaN(newValue) && newValue > 0) {
+    state.setRoundingScale(newValue);
+  }
 }, { immediate: true });
 </script>
 
@@ -149,6 +151,10 @@ watch(() => roundingScale.value, async (newValue) => {
               <p>
                 When enabled this rounds your minimum contribution up to the next
                 multiple of {{ state.Money(roundingScale) }}
+              </p>
+              <br>
+              <p>
+                Minimum Monthly Payment: {{ state.Money(state.globalMinPayment) }}
               </p>
             </div>
           </template>
