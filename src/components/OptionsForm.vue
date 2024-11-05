@@ -176,7 +176,7 @@ watch(() => roundingScale.value, async (newValue) => {
                 today)
               </p>
               <br>
-              <p>Next Payment: {{ state.formatPeriod(1, true) }}</p>
+              <p>Next Period: {{ state.formatPeriod(1, true) }}</p>
             </div>
           </template>
         </collapsible-card>
@@ -203,7 +203,7 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <p>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</p>
+            <p>Money: {{ state.Money(state.globalMinPayment) }}</p>
           </template>
         </collapsible-card>
         <collapsible-card>
@@ -231,8 +231,9 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardBody>
             <p>Localization setting for formatting numbers and dates</p>
             <br>
-            <p>{{ state.getBudgetName(constants.DEFAULT) }}: {{ state.Money(state.globalMinPayment) }}</p>
-            <p>Next Payment: {{ state.formatPeriod(1, true) }}</p>
+            <p>Percent: {{ state.Percent(state.globalEffectiveInterestRate * 100) }}</p>
+            <p>Money: {{ state.Money(state.globalMinPayment) }}</p>
+            <p>Next Period: {{ state.formatPeriod(1, true) }}</p>
           </template>
         </collapsible-card>
       </div>

@@ -53,6 +53,16 @@ export default defineStore('core', () => {
     ).format(amount)
   );
 
+  const Percent = (value) => (
+    Intl.NumberFormat(
+      language.value,
+      {
+        style: 'unit',
+        unit: 'percent'
+      },
+    ).format(value)
+  );
+
   const currencySymbol = computed(() => {
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -414,12 +424,12 @@ export default defineStore('core', () => {
     + `(+${Money(monthlyBudget.relative)}/month)`;
   const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
     + `(${Money(loan.principal)} `
-    + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
+    + `@ ${Percent(loan.annualRate * 100)})`;
 
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}% | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.principal)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-  const buildInterestTableSubtitle = (loan) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}%)`;
+  const buildInterestTableSubtitle = (loan) => `(${Money(loan.principal)} | ${Percent(loan.annualRate * 100)})`;
 
   // graph data
 
@@ -516,6 +526,7 @@ export default defineStore('core', () => {
     optionsFormActive,
     paymentSchedules,
     paymentSummaries,
+    Percent,
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,

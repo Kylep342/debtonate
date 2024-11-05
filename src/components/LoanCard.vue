@@ -7,7 +7,7 @@ const props = defineProps(['loan']);
 
 const state = useCoreStore();
 
-const loanInterestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
+const loanInterestRate = computed(() => `${state.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed(() => `${state.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
 
