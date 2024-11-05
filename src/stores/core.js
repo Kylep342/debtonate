@@ -58,7 +58,8 @@ export default defineStore('core', () => {
       language.value,
       {
         style: 'unit',
-        unit: 'percent'
+        unit: 'percent',
+        maximumSignificantDigits: 2,
       },
     ).format(value)
   );
