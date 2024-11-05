@@ -59,7 +59,7 @@ export default defineStore('core', () => {
       {
         style: 'unit',
         unit: 'percent',
-        maximumSignificantDigits: 2,
+        maximumFractionDigits: 2,
       },
     ).format(value)
   );
