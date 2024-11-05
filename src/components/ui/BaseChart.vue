@@ -113,16 +113,3 @@ watch(
     <div id="tooltip" style="position: absolute; opacity: 0; background: oklch(100% 3.5594404384177905e-8 106.37411429114086); border: 1px solid oklch(84.52% 0 0); padding: 5px; pointer-events: none;"></div>
   </div>
 </template>
-
-<style>
-#tooltip {
-  position: absolute;
-  opacity: 0;
-  background: white;
-  border: 1px solid gray;
-  padding: 5px;
-  border-radius: 3px;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-</style>

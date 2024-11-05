@@ -12,7 +12,12 @@ const BUDGET_DETAILS_ID = 'budgetDetails';
 const BUDGET_DETAILS = 'Budget Details';
 const BUDGET_FORM_ID = 'budgetForm';
 const BUDGETS = 'Budgets';
-const COLORS = ['oklch(80.74% 0.0525 159.09)', 'oklch(76.87% 0.1041 22.66)', 'oklch(70.39% 0.1255 52.95)', 'oklch(28.42% 0.0095 355.53)'];
+const COLORS = [
+  'oklch(80.74% 0.0525 159.09)',
+  'oklch(76.87% 0.1041 22.66)',
+  'oklch(70.39% 0.1255 52.95)',
+  'oklch(28.42% 0.0095 355.53)'
+];
 const DEFAULT = 'default';
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
