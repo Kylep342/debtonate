@@ -110,7 +110,7 @@ watch(
       {{ chart.config.subheader }}
     </h2>
     <svg :id="'chart' + chart.label" />
-    <div id="tooltip" style="position: absolute; opacity: 0; background: #fff; border: 1px solid #ccc; padding: 5px; pointer-events: none;"></div>
+    <div id="tooltip" style="position: absolute; opacity: 0; background: oklch(100% 3.5594404384177905e-8 106.37411429114086); border: 1px solid oklch(84.52% 0 0); padding: 5px; pointer-events: none;"></div>
   </div>
 </template>
 
