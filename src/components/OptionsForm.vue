@@ -31,9 +31,7 @@ watch(() => _language.value, async (newValue) => {
 }, { immediate: true });
 
 watch(() => roundingScale.value, async (newValue) => {
-  if (Number.isNaN(newValue) && newValue > 0) {
-    state.setRoundingScale(newValue);
-  }
+  state.setRoundingScale(newValue);
 }, { immediate: true });
 </script>
 

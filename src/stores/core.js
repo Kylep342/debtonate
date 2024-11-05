@@ -183,7 +183,9 @@ export default defineStore('core', () => {
     language.value = newValue;
   };
   const setRoundingScale = (newValue) => {
-    roundingScale.value = newValue;
+    if (Number.isNaN(newValue) && newValue > 0) {
+      roundingScale.value = newValue;
+    }
   };
   const togglePeriodsAsDates = () => {
     periodsAsDates.value = !periodsAsDates.value;
@@ -193,7 +195,7 @@ export default defineStore('core', () => {
   };
   const toggleRounding = (scale) => {
     roundUp.value = !roundUp.value;
-    if (roundUp.value && Number.isNaN(scale) && scale > 0) {
+    if (roundUp.value) {
       setRoundingScale(scale);
     }
   };
