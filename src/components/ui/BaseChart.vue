@@ -106,6 +106,9 @@ watch(
     <h2 :class="['text-center']">
       {{ chart.config.header }}
     </h2>
+    <h2 :class="['text-center']">
+      {{ chart.config.subheader }}
+    </h2>
     <svg :id="'chart' + chart.label" />
     <div id="tooltip" style="position: absolute; opacity: 0; background: #fff; border: 1px solid #ccc; padding: 5px; pointer-events: none;"></div>
   </div>

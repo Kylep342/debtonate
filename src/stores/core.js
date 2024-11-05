@@ -26,7 +26,7 @@ export default defineStore('core', () => {
   const roundUp = ref(false);
   const snowballSort = ref(false);
 
-  // independent computed values
+  // primitive computed values/methods
 
   const baseDate = computed(() => Date.now());
 
@@ -145,8 +145,6 @@ export default defineStore('core', () => {
   });
 
   const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
-
-  // independent methods
 
   const openCreateBudgetForm = () => {
     createBudgetFormActive.value = true;
@@ -302,7 +300,7 @@ export default defineStore('core', () => {
     );
   };
 
-  // dependent computed values
+  // dependent computed values/methods
 
   const createLoanFormTitle = computed(() => (currentLoanId.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
@@ -435,6 +433,7 @@ export default defineStore('core', () => {
           maxY: getLoan(loan.id).principal,
           hovertemplate: 'Payment %{x}: %{y} Remaining',
           header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
+          subheader: buildInterestTableSubtitle(loan),
         },
         lines: [],
       };
