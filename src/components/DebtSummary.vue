@@ -12,37 +12,38 @@ const tabs = reactive({
 
 const flexBasis = `basis-1/${Object.keys(tabs).length}`;
 
-const viewedComponentId = ref(constants.GRAPHS);
+const viewedTabId = ref(constants.GRAPHS);
 
-const isViewedComponentId = (value) => viewedComponentId.value === value;
+const isViewedTabId = (value) => viewedTabId.value === value;
 
-const setViewedComponentId = (newValue) => {
-  viewedComponentId.value = newValue;
+const setViewedTabId = (newValue) => {
+  viewedTabId.value = newValue;
 };
+
+const tabStyle = (id) => isViewedTabId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 
 <template>
   <div>
     <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
       <div
-        v-for="item in Object.keys(tabs)"
-        :key="item"
+        v-for="tab in Object.keys(tabs)"
+        :key="tab"
         :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
           :class="[
             'w-full',
-            {'btn-ghost': !isViewedComponentId(item)},
-            {'btn-secondary': isViewedComponentId(item)},
-            {'shadow-lg': isViewedComponentId(item)},
+            tabStyle(tab),
+            {'shadow-lg': isViewedTabId(tab)},
           ]"
-          @click="setViewedComponentId(item)"
+          @click="setViewedTabId(tab)"
         >
-          {{ item }}
+          {{ tab }}
         </base-button>
       </div>
     </div>
-    <GraphsPanel v-show="isViewedComponentId(constants.GRAPHS)" />
-    <TablesPanel v-show="isViewedComponentId(constants.TABLES)" />
+    <GraphsPanel v-show="isViewedTabId(constants.GRAPHS)" />
+    <TablesPanel v-show="isViewedTabId(constants.TABLES)" />
   </div>
 </template>

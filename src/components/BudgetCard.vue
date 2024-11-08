@@ -28,25 +28,25 @@ const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lif
           <tbody>
             <tr>
               <td>Amount</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
             <tr v-if="budget.id !== constants.DEFAULT">
               <td>Extra</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetExtra }}</b>
               </td>
             </tr>
             <tr>
               <td>Interest Paid</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetTotalInterest }}</b>
               </td>
             </tr>
             <tr>
               <td>Payments</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetPayments }}</b>
               </td>
             </tr>

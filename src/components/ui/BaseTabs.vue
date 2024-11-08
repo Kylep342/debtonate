@@ -7,6 +7,7 @@ const props = defineProps({
 });
 
 const flexBasis = `basis-1/${props.pivot.length}`;
+const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 
 <template>
@@ -20,8 +21,7 @@ const flexBasis = `basis-1/${props.pivot.length}`;
         <base-button
           :class="[
             'w-full',
-            {'btn-ghost': !isViewedItemId(item.id)},
-            {'btn-secondary': isViewedItemId(item.id)},
+            tabStyle(item.id),
             {'shadow-lg': isViewedItemId(item.id)},
           ]"
           @click="setViewedItemId(item.id)"

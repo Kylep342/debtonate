@@ -33,7 +33,7 @@ onBeforeUnmount(() => {
 <template>
   <base-card
     :id="'loanManagementPanel'"
-    :class="['bg-base-100', 'w-90']"
+    :class="['bg-base-100', 'w-90', 'flex-none']"
   >
     <template #cardTitle>
       <ManagementPanel

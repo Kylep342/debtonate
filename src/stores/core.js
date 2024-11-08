@@ -88,11 +88,6 @@ export default defineStore('core', () => {
       + (roundingScale.value - (rawGlobalMinPayment.value % roundingScale.value)),
   );
 
-  const globalLifetimeInterestPaid = computed(() => loans.value.reduce(
-    (totalInterest, loan) => totalInterest + loan.totalInterest,
-    0,
-  ));
-
   const globalMaxPeriods = computed(() => loans.value.reduce(
     (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
     0,
@@ -115,8 +110,13 @@ export default defineStore('core', () => {
     0,
   ));
 
+  const globalCurrentBalance = computed(() => loans.value.reduce(
+    (totalBalance, loan) => totalBalance + loan.currentBalance,
+    0,
+  ));
+
   const globalEffectiveInterestRate = computed(() => loans.value.reduce(
-    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.principal / globalPrincipal.value),
+    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.currentBalance / globalCurrentBalance.value),
     0,
   ));
 
@@ -129,8 +129,8 @@ export default defineStore('core', () => {
     periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
     periods: globalMaxPeriods.value,
     minPayment: globalMinPayment.value,
-    totalInterest: globalLifetimeInterestPaid.value,
     name: constants.NAME_TOTALS_AS_LOAN,
+    currentBalance: globalCurrentBalance.value,
   }));
 
   const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
@@ -280,6 +280,7 @@ export default defineStore('core', () => {
         12,
         loan.termInYears,
         loan.name,
+        loan.currentBalance,
       ),
     );
     periodsAsDates.value = JSON.parse(
@@ -402,8 +403,8 @@ export default defineStore('core', () => {
     budgets.value.sort((a, b) => b - a);
     exitCreateBudgetForm();
   };
-  const createLoan = (principal, interestRate, termInYears, name) => {
-    const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name);
+  const createLoan = (principal, interestRate, termInYears, name, currentBalance) => {
+    const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
@@ -426,13 +427,13 @@ export default defineStore('core', () => {
     + `${Money(monthlyBudget.absolute)}/month `
     + `(+${Money(monthlyBudget.relative)}/month)`;
   const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
-    + `(${Money(loan.principal)} `
+    + `(${Money(loan.currentBalance)} `
     + `@ ${Percent(loan.annualRate * 100)})`;
 
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.principal)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-  const buildInterestTableSubtitle = (loan) => `(${Money(loan.principal)} | ${Percent(loan.annualRate * 100)})`;
+  const buildInterestTableSubtitle = (loan) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)})`;
 
   // graph data
 
@@ -507,8 +508,8 @@ export default defineStore('core', () => {
     getLoanName,
     getNumPayments,
     getPaymentSummary,
+    globalCurrentBalance,
     globalEffectiveInterestRate,
-    globalLifetimeInterestPaid,
     globalMaxPeriods,
     globalMaxPeriodsPerYear,
     globalMaxTermInYears,

@@ -81,21 +81,8 @@ watch(() => state.optionsFormActive, async (show) => {
     />
     <OptionsForm />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
-      <LoansPanel
-        :class="['flex-none']"
-        :create-function="state.openCreateLoanForm"
-        :delete-loan="state.deleteLoan"
-        :edit-loan="state.editLoan"
-        :view-loan="state.viewLoan"
-      />
-      <BudgetsPanel
-        :class="['flex-none']"
-        :budgets-totals="state.totalsByBudget"
-        :create-function="state.openCreateBudgetForm"
-        :delete-budget="state.deleteBudget"
-        :edit-budget="state.editBudget"
-        :view-budget="state.viewBudget"
-      />
+      <LoansPanel />
+      <BudgetsPanel />
       <div :class="['m-4']">
         <div
           v-if="!state.loans.length"

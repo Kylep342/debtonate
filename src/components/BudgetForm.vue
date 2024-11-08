@@ -6,19 +6,20 @@ import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
 
-const props = defineProps(['budget', 'createButtonText', 'title']);
+const currentBudget = ref(state.getBudget(state.currentBudgetId));
 
-const amount = ref(props.budget?.relative);
+const amount = ref(currentBudget.value?.relative);
 
 const createButtonEnabled = computed(
   () => !Number.isNaN(amount.value) && amount.value > 0,
 );
 
 watch(
-  () => props.budget,
-  (newBudget) => {
-    if (newBudget) {
-      amount.value = newBudget.relative;
+  () => state.currentBudgetId,
+  (newId) => {
+    if (newId) {
+      currentBudget.value = state.getBudget(newId);
+      amount.value = currentBudget.value.relative;
     }
   },
   { immediate: true },
@@ -42,7 +43,7 @@ const exit = () => {
 <template>
   <base-modal :id="constants.BUDGET_FORM_ID">
     <template #header>
-      <h2>{{ title }}</h2>
+      <h2>{{ state.createBudgetFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button
@@ -71,7 +72,7 @@ const exit = () => {
         :class="'btn-success'"
         @click="createBudget"
       >
-        {{ createButtonText }}
+        {{ state.createBudgetButtonText }}
       </base-button>
     </template>
   </base-modal>
