@@ -444,7 +444,7 @@ export default defineStore('core', () => {
       configs[loan.id] = {
         config: {
           maxX: globalMaxPeriods.value,
-          maxY: getLoan(loan.id).principal,
+          maxY: getLoan(loan.id).currentBalance,
           hovertemplate: 'Payment %{x}: %{y} Remaining',
           header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
           subheader: buildInterestTableSubtitle(loan),
