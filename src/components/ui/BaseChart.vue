@@ -59,11 +59,12 @@ const initializeChart = () => {
       .attr('fill', 'none')
       .attr('stroke', constants.COLORS[index % constants.COLORS.length])
       .attr('stroke-width', 1.5)
+      .attr('transform', `translate(${margin},0)`)
       .attr('d', draw);
 
     line.forEach(point => {
       svg.append('circle')
-        .attr('cx', x(state.formatPeriod(point.x)))
+        .attr('cx', x(state.formatPeriod(point.x)) + margin)
         .attr('cy', y(point.y))
         .attr('r', 4)
         .style('opacity', 0)

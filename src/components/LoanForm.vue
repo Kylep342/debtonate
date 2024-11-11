@@ -114,7 +114,7 @@ const exit = () => {
           label="Name"
         >
         <div :class="['label']">
-          <span :class="['label-text']">Current Balanec (Optional)</span>
+          <span :class="['label-text']">Current Balance (Optional)</span>
         </div>
         <input
           v-model.number="currentBalance"
