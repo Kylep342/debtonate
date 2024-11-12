@@ -65,15 +65,15 @@ export default defineStore('core', () => {
   );
 
   const currencySymbol = computed(() => {
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency.value,
-      }).format(1);
+    const formatted = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.value,
+    }).format(1);
 
-      const match = formatted.match(/[\p{Sc}]+/u);
+    const match = formatted.match(/[\p{Sc}]+/u);
 
-      return match ? match[0] : null;
-    }
+    return match ? match[0] : '$';
+  }
   );
 
   const rawGlobalMinPayment = computed(
