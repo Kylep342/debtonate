@@ -290,6 +290,7 @@ export default defineStore('core', () => {
       localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
     );
     roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
+    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
       localStorage.getItem(keys.LS_SNOWBALL_SORT),
     );
@@ -308,11 +309,31 @@ export default defineStore('core', () => {
       JSON.stringify(reducePayments.value),
     );
     localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
+    localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
       keys.LS_SNOWBALL_SORT,
       JSON.stringify(snowballSort.value),
     );
   };
+  const exportState = () => {
+    saveState();
+    navigator.clipboard
+      .writeText(
+        JSON.stringify(
+          {
+            [keys.LS_BUDGETS]: JSON.stringify(budgets.value),
+            [keys.LS_CURRENCY]: JSON.stringify(currency.value),
+            [keys.LS_LANGUAGE]: JSON.stringify(language.value),
+            [keys.LS_LOANS]: JSON.stringify(loans.value),
+            [keys.LS_PERIODS_AS_DATES]: JSON.stringify(periodsAsDates.value),
+            [keys.LS_REDUCE_PAYMENTS]: JSON.stringify(reducePayments.value),
+            [keys.LS_ROUND_UP]: JSON.stringify(roundUp.value),
+            [keys.LS_ROUNDING_SCALE]: JSON.stringify(roundingScale.value),
+            [keys.LS_SNOWBALL_SORT]: JSON.stringify(snowballSort.value),
+          }
+        )
+      )
+    }
 
   // dependent computed values/methods
 
@@ -423,10 +444,10 @@ export default defineStore('core', () => {
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} `
+  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
     + `${Money(monthlyBudget.absolute)}/month `
     + `(+${Money(monthlyBudget.relative)}/month)`;
-  const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
+  const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} | `
     + `(${Money(loan.currentBalance)} `
     + `@ ${Percent(loan.annualRate * 100)})`;
 
@@ -445,7 +466,6 @@ export default defineStore('core', () => {
         config: {
           maxX: globalMaxPeriods.value,
           maxY: getLoan(loan.id).currentBalance,
-          hovertemplate: 'Payment %{x}: %{y} Remaining',
           header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
           subheader: buildInterestTableSubtitle(loan),
         },
@@ -456,7 +476,7 @@ export default defineStore('core', () => {
     Object.keys(configs).forEach((loanId) => {
       paymentSchedules.value.forEach((schedule) => {
         const line = [];
-        schedule.paymentSchedule[loanId]?.amortizationSchedule.forEach((record) => {
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
         configs[loanId].lines.push(line);
@@ -498,6 +518,7 @@ export default defineStore('core', () => {
     exitCreateBudgetForm,
     exitCreateLoanForm,
     exitOptionsForm,
+    exportState,
     formatPeriod,
     getBudget,
     getBudgetIndex,

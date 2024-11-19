@@ -2,11 +2,13 @@ import { TOTALS } from 'moneyfunx';
 
 const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
+const BTN_EXPORT = 'Export';
 const BTN_LOAD = 'Load';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_SAVE = 'Save';
+const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 const BUDGET = 'Budget';
 const BUDGET_DETAILS_ID = 'budgetDetails';
 const BUDGET_DETAILS = 'Budget Details';
@@ -95,6 +97,7 @@ const LOCALE_CURRENCY = {
 export default Object.freeze({
   BTN_CLEAR,
   BTN_CREATE,
+  BTN_EXPORT,
   BTN_LOAD,
   BTN_OFF,
   BTN_ON,
@@ -105,6 +108,7 @@ export default Object.freeze({
   BUDGET_FORM_ID,
   BUDGET,
   BUDGETS,
+  BUG_FORM_LINK,
   COLORS,
   DEFAULT,
   GRAPHS,
