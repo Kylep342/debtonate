@@ -26,9 +26,9 @@ const setViewedLoanId = (loanId) => {
       >
         <template #tabContent>
           <base-chart
-            v-if="state.balanceOverTimeGraphs[viewedLoanId]"
+            v-if="state.balancesOverTimeGraphs[viewedLoanId]"
             :key="viewedLoanId"
-            :chart-config="state.balanceOverTimeGraphs[viewedLoanId]"
+            :chart-config="state.balancesOverTimeGraphs[viewedLoanId]"
           />
         </template>
       </base-tabs>

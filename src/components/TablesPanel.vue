@@ -30,7 +30,7 @@ const setViewedLoanId = (loanId) => {
             id="interestTable"
             :loan-id="viewedLoanId"
             :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
-            :subtitle="state.buildInterestTableSubtitle(state.getLoan(viewedLoanId))"
+            :subtitle="state.buildLoanSubtitle(state.getLoan(viewedLoanId))"
           />
         </template>
       </base-tabs>

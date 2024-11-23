@@ -322,15 +322,15 @@ export default defineStore('core', () => {
       .writeText(
         JSON.stringify(
           {
-            [keys.LS_BUDGETS]: JSON.stringify(budgets.value),
-            [keys.LS_CURRENCY]: JSON.stringify(currency.value),
-            [keys.LS_LANGUAGE]: JSON.stringify(language.value),
-            [keys.LS_LOANS]: JSON.stringify(loans.value),
-            [keys.LS_PERIODS_AS_DATES]: JSON.stringify(periodsAsDates.value),
-            [keys.LS_REDUCE_PAYMENTS]: JSON.stringify(reducePayments.value),
-            [keys.LS_ROUND_UP]: JSON.stringify(roundUp.value),
-            [keys.LS_ROUNDING_SCALE]: JSON.stringify(roundingScale.value),
-            [keys.LS_SNOWBALL_SORT]: JSON.stringify(snowballSort.value),
+            [keys.LS_BUDGETS]: budgets.value,
+            [keys.LS_CURRENCY]: currency.value,
+            [keys.LS_LANGUAGE]: language.value,
+            [keys.LS_LOANS]: loans.value,
+            [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+            [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
+            [keys.LS_ROUND_UP]: roundUp.value,
+            [keys.LS_ROUNDING_SCALE]: roundingScale.value,
+            [keys.LS_SNOWBALL_SORT]: snowballSort.value,
           }
         )
       )
@@ -459,7 +459,7 @@ export default defineStore('core', () => {
 
   // graph data
 
-  const balanceOverTimeGraphs = computed(() => {
+  const balancesOverTimeGraphs = computed(() => {
     const configs = {};
 
     loansWithTotals.value.forEach((loan) => {
@@ -488,7 +488,7 @@ export default defineStore('core', () => {
 
   return {
     avalanche,
-    balanceOverTimeGraphs,
+    balancesOverTimeGraphs,
     baseDate,
     budgetDetailsPanelActive,
     budgets,
