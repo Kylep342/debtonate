@@ -455,7 +455,7 @@ export default defineStore('core', () => {
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
   const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-  const buildInterestTableSubtitle = (loan) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)})`;
+  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)})`;
 
   // graph data
 
@@ -467,8 +467,8 @@ export default defineStore('core', () => {
         config: {
           maxX: globalMaxPeriods.value,
           maxY: getLoan(loan.id).currentBalance,
-          header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
-          subheader: buildInterestTableSubtitle(loan),
+          header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
+          subheader: buildLoanSubtitle(loan),
         },
         lines: [],
       };
@@ -486,6 +486,24 @@ export default defineStore('core', () => {
     return configs;
   });
 
+  const percentOfPaymentAsPrincaplGraphs = computed(() => {
+    const configs = {};
+
+    loansWithTotals.value.forEach((loan) => {
+      configs[loan.id] = {
+        config: {
+          maxX: globalMaxPeriods.value,
+          maxY: 100,
+          header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
+          subheader: buildLoanSubtitle(loan),
+        },
+        //TODO: is it 'lines' or some other key?
+        lines: [],
+      }
+    });
+    return configs;
+  })
+
   return {
     avalanche,
     balancesOverTimeGraphs,
@@ -495,7 +513,7 @@ export default defineStore('core', () => {
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
     buildBudgetDetailsTitle,
-    buildInterestTableSubtitle,
+    buildLoanSubtitle,
     buildInterestTableTitle,
     buildLoanDetailsTitle,
     clearState,
