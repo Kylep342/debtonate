@@ -263,6 +263,7 @@ export default defineStore('core', () => {
     currentLoanId.value = null;
     language.value = navigator.language;
     loans.value = [];
+    periodsAsDates.value = false;
     reducePayments.value = false;
     roundUp.value = false;
     budgetDetailsPanelActive.value = false;
