@@ -501,6 +501,16 @@ export default defineStore('core', () => {
         lines: [],
       }
     });
+
+    Object.keys(configs).forEach((loanId) => {
+      paymentSchedules.value.forEach((schedule) => {
+        const line = [];
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+          line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
+        });
+        configs[loanId].lines.push(line);
+      });
+    });
     return configs;
   })
 
@@ -571,6 +581,7 @@ export default defineStore('core', () => {
     paymentSchedules,
     paymentSummaries,
     Percent,
+    percentOfPaymentAsPrincaplGraphs,
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,

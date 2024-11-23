@@ -17,7 +17,7 @@ const setViewedLoanId = (loanId) => {
 
 <template>
   <div>
-    <div :class="['tabframe', 'w-fit']">
+    <!-- <div :class="['tabframe', 'w-fit']">
       <base-tabs
         :get-item-name="state.getLoanName"
         :pivot="state.loansWithTotals"
@@ -29,6 +29,22 @@ const setViewedLoanId = (loanId) => {
             v-if="state.balancesOverTimeGraphs[viewedLoanId]"
             :key="viewedLoanId"
             :chart-config="state.balancesOverTimeGraphs[viewedLoanId]"
+          />
+        </template>
+      </base-tabs>
+    </div> -->
+    <div :class="['tabframe', 'w-fit']">
+      <base-tabs
+        :get-item-name="state.getLoanName"
+        :pivot="state.loansWithTotals"
+        :is-viewed-item-id="isViewedLoanId"
+        :set-viewed-item-id="setViewedLoanId"
+      >
+        <template #tabContent>
+          <base-chart
+            v-if="state.percentOfPaymentAsPrincaplGraphs[viewedLoanId]"
+            :key="viewedLoanId"
+            :chart-config="state.percentOfPaymentAsPrincaplGraphs[viewedLoanId]"
           />
         </template>
       </base-tabs>
