@@ -21,6 +21,8 @@ const COLORS = [
   'oklch(28.42% 0.0095 355.53)'
 ];
 const DEFAULT = 'default';
+const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
+const GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL = 'Percent of Payment to Principal | Time'
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
@@ -111,6 +113,8 @@ export default Object.freeze({
   BUG_FORM_LINK,
   COLORS,
   DEFAULT,
+  GRAPH_BALANCES_OVER_TIME,
+  GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL,
   GRAPHS,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,

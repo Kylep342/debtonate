@@ -1,7 +1,7 @@
+import * as d3 from 'd3';
+import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-
-import * as moneyfunx from 'moneyfunx';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
@@ -460,10 +460,18 @@ export default defineStore('core', () => {
   // graph data
 
   const balancesOverTimeGraphs = computed(() => {
-    const configs = {};
+    const config = {
+      id: 'BalancesOverTime',
+      graphs: {},
+      x: formatPeriod,
+      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      y: y => y,
+      yScale: d3.scaleLinear,
+      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Money(point.y)}`,
+    };
 
     loansWithTotals.value.forEach((loan) => {
-      configs[loan.id] = {
+      config.graphs[loan.id] = {
         config: {
           maxX: globalMaxPeriods.value,
           maxY: getLoan(loan.id).currentBalance,
@@ -474,23 +482,31 @@ export default defineStore('core', () => {
       };
     });
 
-    Object.keys(configs).forEach((loanId) => {
+    Object.keys(config.graphs).forEach((loanId) => {
       paymentSchedules.value.forEach((schedule) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
-        configs[loanId].lines.push(line);
+        config.graphs[loanId].lines.push(line);
       });
     });
-    return configs;
+    return config;
   });
 
   const percentOfPaymentAsPrincaplGraphs = computed(() => {
-    const configs = {};
+    const config = {
+      id: 'PercentOfPaymentAsPrincipal',
+      graphs: {},
+      x: formatPeriod,
+      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      y: y => y,
+      yScale: d3.scaleLinear,
+      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Percent(point.y)}`,
+    };
 
     loansWithTotals.value.forEach((loan) => {
-      configs[loan.id] = {
+      config.graphs[loan.id] = {
         config: {
           maxX: globalMaxPeriods.value,
           maxY: 100,
@@ -502,16 +518,16 @@ export default defineStore('core', () => {
       }
     });
 
-    Object.keys(configs).forEach((loanId) => {
+    Object.keys(config.graphs).forEach((loanId) => {
       paymentSchedules.value.forEach((schedule) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
-        configs[loanId].lines.push(line);
+        config.graphs[loanId].lines.push(line);
       });
     });
-    return configs;
+    return config;
   })
 
   return {
