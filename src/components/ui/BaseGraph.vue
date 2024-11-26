@@ -4,11 +4,16 @@ import {
   onMounted, shallowReactive, watch,
 } from 'vue';
 import constants from '../../constants/constants';
-import useCoreStore from '../../stores/core';
 
-const props = defineProps(['chartConfig', 'header']);
+const props = defineProps([
+  'graph',
+  'x',
+  'xScale',
+  'y',
+  'yScale',
+  'hoverFormat',
+]);
 
-const state = useCoreStore();
 const chart = shallowReactive({});
 
 const initializeChart = () => {
@@ -19,21 +24,21 @@ const initializeChart = () => {
   const width = 800;
   const height = 500;
   const margin = 50;
-  const svg = d3.select(`#chart${chart.label}`).attr('width', width).attr('height', height);
+  const svg = d3.select(`#chart${props.id}`).attr('width', width).attr('height', height);
 
   svg.selectAll('*').remove();
 
-  const x = (state.periodsAsDates ? d3.scaleTime : d3.scaleLinear)()
-    .domain([state.formatPeriod(0), state.formatPeriod(chart.config.maxX)])
+  const x = props.xScale()
+    .domain([props.x(0), props.x(chart.config.maxX)])
     .range([0, width - margin * 2]);
 
-  const y = d3.scaleLinear()
-    .domain([0, chart.config.maxY * 1.1])
+  const y = props.yScale()
+    .domain([props.y(0), props.y(chart.config.maxY * 1.1)])
     .range([height - margin, 0]);
 
   const draw = d3.line()
-    .x((point) => x(state.formatPeriod(point.x)))
-    .y((point) => y(point.y));
+    .x((point) => x(props.x(point.x)))
+    .y((point) => y(props.y(point.y)));
 
   svg.append('g')
     .attr('transform', `translate(${margin},${height - margin})`)
@@ -46,12 +51,6 @@ const initializeChart = () => {
     .call((g) => g.selectAll('.tick line').clone()
       .attr('x2', width - margin * 2)
       .attr('stroke-opacity', 0.1))
-    .call((g) => g.append('text')
-      .attr('x', -margin)
-      .attr('y', 10)
-      .attr('fill', 'currentColor')
-      .attr('text-anchor', 'start')
-      .text(`Principal Remaining (${state.currencySymbol})`));
 
   chart.lines.forEach((line, index) => {
     svg.append('path')
@@ -64,8 +63,8 @@ const initializeChart = () => {
 
     line.forEach(point => {
       svg.append('circle')
-        .attr('cx', x(state.formatPeriod(point.x)) + margin)
-        .attr('cy', y(point.y))
+        .attr('cx', x(props.x(point.x)) + margin)
+        .attr('cy', y(props.y(point.y)))
         .attr('r', 4)
         .style('opacity', 0)
         .attr('fill', constants.COLORS[index % constants.COLORS.length])
@@ -74,7 +73,7 @@ const initializeChart = () => {
             .style('opacity', 1)
             .style('left', `${event.pageX + 5}px`)
             .style('top', `${event.pageY - 28}px`)
-            .html(`${state.formatPeriod(point.x, true)}<br>${state.Money(point.y)}`);
+            .html(props.hoverFormat(point));
         })
         .on('mouseout', () => {
           d3.select('#tooltip').style('opacity', 0);
@@ -84,14 +83,21 @@ const initializeChart = () => {
 };
 
 onMounted(() => {
-  if (props.chartConfig) {
-    Object.assign(chart, props.chartConfig);
+  if (props.graph) {
+    Object.assign(chart, props.graph);
     initializeChart();
   }
 });
 
+// onUpdated(() => {
+//   if (props.graph) {
+//     Object.assign(chart, props.graph);
+//     initializeChart();
+//   }
+// });
+
 watch(
-  () => props.chartConfig,
+  () => props.graph,
   (value) => {
     if (value) {
       Object.assign(chart, value);
@@ -110,7 +116,7 @@ watch(
     <h2 :class="['text-center']">
       {{ chart.config.subheader }}
     </h2>
-    <svg :id="'chart' + chart.label" />
+    <svg :id="'chart' + chart.id" />
     <div
       id="tooltip"
       style="position: absolute; opacity: 0; background: oklch(100% 3.5594404384177905e-8 106.37411429114086); border: 1px solid oklch(84.52% 0 0); padding: 5px; pointer-events: none;"
