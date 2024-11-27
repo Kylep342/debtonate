@@ -29,23 +29,25 @@ const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 <template>
   <div>
     <div :class="['card-actions', 'flow-root', 'p-0']">
-      <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-        Llamas are incredible (and inedible)
-      </h2>
-      <div className="dropdown dropdown-bottom">
-        <base-button>{{ constants.GRAPHS }}</base-button>
-        <ul
-          tabIndex="{0}"
-          className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-        >
-          <li
-            v-for="(graphId) in Object.keys(graphs)"
-            :key="graphId"
-            @click="setViewedGraphId(graphId)"
+      <div :class="['flex', 'justify-between', 'pr-4']">
+        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+          {{ constants.GRAPHS }} - {{ viewedGraphId }}
+        </h2>
+        <div className="dropdown dropdown-bottom dropdown-end">
+          <base-button>{{ constants.SELECT }}</base-button>
+          <ul
+            tabIndex="{0}"
+            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
           >
-            <a>{{ graphId }}</a>
-          </li>
-        </ul>
+            <li
+              v-for="(graphId) in Object.keys(graphs)"
+              :key="graphId"
+              @click="setViewedGraphId(graphId)"
+            >
+              <a>{{ graphId }}</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">

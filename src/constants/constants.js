@@ -32,6 +32,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+const SELECT = 'Select';
 const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
@@ -125,6 +126,7 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+  SELECT,
   TABLES,
   TOTALS,
 });

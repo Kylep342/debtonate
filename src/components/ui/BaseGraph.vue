@@ -1,7 +1,7 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  onMounted, onUpdated, shallowReactive, watch,
+  onMounted, shallowReactive, watch,
 } from 'vue';
 import constants from '../../constants/constants';
 
