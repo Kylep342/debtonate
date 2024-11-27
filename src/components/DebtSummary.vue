@@ -2,42 +2,51 @@
 import { ref, reactive } from 'vue';
 
 import GraphsPanel from './GraphsPanel.vue';
-import TablesPanel from './TablesPanel.vue';
 import constants from '../constants/constants';
+import useCoreStore from '../stores/core';
 
-const tabs = reactive({
-  [constants.GRAPHS]: GraphsPanel,
-  [constants.TABLES]: TablesPanel,
-});
+const state = useCoreStore();
 
-const flexBasis = `basis-1/${Object.keys(tabs).length}`;
 
-const viewedComponentId = ref(constants.GRAPHS);
+// const tabs = reactive({
+//   [constants.GRAPHS]: GraphsPanel,
+//   [constants.TABLES]: TablesPanel,
+// });
 
-const isViewedComponentId = (value) => viewedComponentId.value === value;
+// const flexBasis = `basis-1/${Object.keys(tabs).length}`;
 
-const setViewedComponentId = (newValue) => {
-  viewedComponentId.value = newValue;
-};
+// const viewedTabId = ref(constants.GRAPHS);
+
+// const isViewedTabId = (value) => viewedTabId.value === value;
+
+// const setViewedTabId = (newValue) => {
+//   viewedTabId.value = newValue;
+// };
+
+// const tabStyle = (id) => isViewedTabId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 
 <template>
   <div>
-    <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
+    <!-- <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
       <div
-        v-for="item in Object.keys(tabs)"
-        :key="item"
-        :class="['join-item', flexBasis, 'w-full', { 'border-t-2': isViewedComponentId(item) }]"
+        v-for="tab in Object.keys(tabs)"
+        :key="tab"
+        :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full']"
-          @click="setViewedComponentId(item)"
+          :class="[
+            'w-full',
+            tabStyle(tab),
+            {'shadow-lg': isViewedTabId(tab)},
+          ]"
+          @click="setViewedTabId(tab)"
         >
-          {{ item }}
+          {{ tab }}
         </base-button>
       </div>
-    </div>
-    <GraphsPanel v-show="isViewedComponentId(constants.GRAPHS)" />
-    <TablesPanel v-show="isViewedComponentId(constants.TABLES)" />
+    </div> -->
+    <GraphsPanel />
+    <!-- <TablesPanel v-show="isViewedTabId(constants.TABLES)" /> -->
   </div>
 </template>

@@ -1,7 +1,7 @@
+import * as d3 from 'd3';
+import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-
-import * as moneyfunx from 'moneyfunx';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
@@ -26,7 +26,7 @@ export default defineStore('core', () => {
   const roundUp = ref(false);
   const snowballSort = ref(false);
 
-  // independent computed values
+  // primitive computed values/methods
 
   const baseDate = computed(() => Date.now());
 
@@ -53,16 +53,27 @@ export default defineStore('core', () => {
     ).format(amount)
   );
 
+  const Percent = (value) => (
+    Intl.NumberFormat(
+      language.value,
+      {
+        style: 'unit',
+        unit: 'percent',
+        maximumFractionDigits: 2,
+      },
+    ).format(value)
+  );
+
   const currencySymbol = computed(() => {
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency.value,
-      }).format(1);
+    const formatted = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.value,
+    }).format(1);
 
-      const match = formatted.match(/[\p{Sc}]+/u);
+    const match = formatted.match(/[\p{Sc}]+/u);
 
-      return match ? match[0] : null;
-    }
+    return match ? match[0] : '$';
+  }
   );
 
   const rawGlobalMinPayment = computed(
@@ -76,11 +87,6 @@ export default defineStore('core', () => {
     () => rawGlobalMinPayment.value
       + (roundingScale.value - (rawGlobalMinPayment.value % roundingScale.value)),
   );
-
-  const globalLifetimeInterestPaid = computed(() => loans.value.reduce(
-    (totalInterest, loan) => totalInterest + loan.totalInterest,
-    0,
-  ));
 
   const globalMaxPeriods = computed(() => loans.value.reduce(
     (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
@@ -104,8 +110,13 @@ export default defineStore('core', () => {
     0,
   ));
 
+  const globalCurrentBalance = computed(() => loans.value.reduce(
+    (totalBalance, loan) => totalBalance + loan.currentBalance,
+    0,
+  ));
+
   const globalEffectiveInterestRate = computed(() => loans.value.reduce(
-    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.principal / globalPrincipal.value),
+    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.currentBalance / globalCurrentBalance.value),
     0,
   ));
 
@@ -118,8 +129,8 @@ export default defineStore('core', () => {
     periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
     periods: globalMaxPeriods.value,
     minPayment: globalMinPayment.value,
-    totalInterest: globalLifetimeInterestPaid.value,
     name: constants.NAME_TOTALS_AS_LOAN,
+    currentBalance: globalCurrentBalance.value,
   }));
 
   const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
@@ -145,8 +156,6 @@ export default defineStore('core', () => {
   });
 
   const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
-
-  // independent methods
 
   const openCreateBudgetForm = () => {
     createBudgetFormActive.value = true;
@@ -175,7 +184,9 @@ export default defineStore('core', () => {
     language.value = newValue;
   };
   const setRoundingScale = (newValue) => {
-    roundingScale.value = newValue;
+    if (Number.isNaN(newValue) && newValue > 0) {
+      roundingScale.value = newValue;
+    }
   };
   const togglePeriodsAsDates = () => {
     periodsAsDates.value = !periodsAsDates.value;
@@ -252,6 +263,7 @@ export default defineStore('core', () => {
     currentLoanId.value = null;
     language.value = navigator.language;
     loans.value = [];
+    periodsAsDates.value = false;
     reducePayments.value = false;
     roundUp.value = false;
     budgetDetailsPanelActive.value = false;
@@ -269,6 +281,7 @@ export default defineStore('core', () => {
         12,
         loan.termInYears,
         loan.name,
+        loan.currentBalance,
       ),
     );
     periodsAsDates.value = JSON.parse(
@@ -278,6 +291,7 @@ export default defineStore('core', () => {
       localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
     );
     roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
+    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
       localStorage.getItem(keys.LS_SNOWBALL_SORT),
     );
@@ -296,13 +310,33 @@ export default defineStore('core', () => {
       JSON.stringify(reducePayments.value),
     );
     localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
+    localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
       keys.LS_SNOWBALL_SORT,
       JSON.stringify(snowballSort.value),
     );
   };
+  const exportState = () => {
+    saveState();
+    navigator.clipboard
+      .writeText(
+        JSON.stringify(
+          {
+            [keys.LS_BUDGETS]: budgets.value,
+            [keys.LS_CURRENCY]: currency.value,
+            [keys.LS_LANGUAGE]: language.value,
+            [keys.LS_LOANS]: loans.value,
+            [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+            [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
+            [keys.LS_ROUND_UP]: roundUp.value,
+            [keys.LS_ROUNDING_SCALE]: roundingScale.value,
+            [keys.LS_SNOWBALL_SORT]: snowballSort.value,
+          }
+        )
+      )
+    }
 
-  // dependent computed values
+  // dependent computed values/methods
 
   const createLoanFormTitle = computed(() => (currentLoanId.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
@@ -391,8 +425,8 @@ export default defineStore('core', () => {
     budgets.value.sort((a, b) => b - a);
     exitCreateBudgetForm();
   };
-  const createLoan = (principal, interestRate, termInYears, name) => {
-    const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name);
+  const createLoan = (principal, interestRate, termInYears, name, currentBalance) => {
+    const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
@@ -411,57 +445,106 @@ export default defineStore('core', () => {
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} `
+  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
     + `${Money(monthlyBudget.absolute)}/month `
     + `(+${Money(monthlyBudget.relative)}/month)`;
-  const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} `
-    + `(${Money(loan.principal)} `
-    + `@ ${(loan.annualRate * 100).toFixed(2)}%)`;
+  const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} | `
+    + `(${Money(loan.currentBalance)} `
+    + `@ ${Percent(loan.annualRate * 100)})`;
 
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}% | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-  const buildInterestTableSubtitle = (loan) => `(${Money(loan.principal)} | ${(loan.annualRate * 100).toFixed(2)}%)`;
+  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)})`;
 
   // graph data
 
-  const balanceOverTimeGraphs = computed(() => {
-    const configs = {};
+  const balancesOverTimeGraphs = computed(() => {
+    const config = {
+      id: 'BalancesOverTime',
+      graphs: {},
+      x: formatPeriod,
+      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      y: y => y,
+      yScale: d3.scaleLinear,
+      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Money(point.y)}`,
+    };
 
     loansWithTotals.value.forEach((loan) => {
-      configs[loan.id] = {
+      config.graphs[loan.id] = {
         config: {
           maxX: globalMaxPeriods.value,
-          maxY: getLoan(loan.id).principal,
-          hovertemplate: 'Payment %{x}: %{y} Remaining',
-          header: `Balances Over Time By Budget | ${getLoanName(loan.id)}`,
+          maxY: getLoan(loan.id).currentBalance,
+          header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
+          subheader: buildLoanSubtitle(loan),
         },
         lines: [],
       };
     });
 
-    Object.keys(configs).forEach((loanId) => {
+    Object.keys(config.graphs).forEach((loanId) => {
       paymentSchedules.value.forEach((schedule) => {
         const line = [];
-        schedule.paymentSchedule[loanId]?.amortizationSchedule.forEach((record) => {
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
-        configs[loanId].lines.push(line);
+        config.graphs[loanId].lines.push(line);
       });
     });
-    return configs;
+    return config;
   });
+
+  const percentOfPaymentAsPrincaplGraphs = computed(() => {
+    const config = {
+      id: 'PercentOfPaymentAsPrincipal',
+      graphs: {},
+      x: formatPeriod,
+      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      y: y => y,
+      yScale: d3.scaleLinear,
+      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Percent(point.y)}`,
+    };
+
+    loansWithTotals.value.forEach((loan) => {
+      config.graphs[loan.id] = {
+        config: {
+          maxX: globalMaxPeriods.value,
+          maxY: 100,
+          header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
+          subheader: buildLoanSubtitle(loan),
+        },
+        //TODO: is it 'lines' or some other key?
+        lines: [],
+      }
+    });
+
+    Object.keys(config.graphs).forEach((loanId) => {
+      paymentSchedules.value.forEach((schedule) => {
+        const line = [];
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+          line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
+        });
+        config.graphs[loanId].lines.push(line);
+      });
+    });
+    return config;
+  })
+
+  const graphs = computed(() => ({
+    [constants.GRAPH_BALANCES_OVER_TIME]: balancesOverTimeGraphs.value,
+    [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
+  }));
 
   return {
     avalanche,
-    balanceOverTimeGraphs,
+    balancesOverTimeGraphs,
     baseDate,
     budgetDetailsPanelActive,
     budgets,
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
     buildBudgetDetailsTitle,
-    buildInterestTableSubtitle,
+    buildLoanSubtitle,
     buildInterestTableTitle,
     buildLoanDetailsTitle,
     clearState,
@@ -485,6 +568,7 @@ export default defineStore('core', () => {
     exitCreateBudgetForm,
     exitCreateLoanForm,
     exitOptionsForm,
+    exportState,
     formatPeriod,
     getBudget,
     getBudgetIndex,
@@ -495,13 +579,14 @@ export default defineStore('core', () => {
     getLoanName,
     getNumPayments,
     getPaymentSummary,
+    globalCurrentBalance,
     globalEffectiveInterestRate,
-    globalLifetimeInterestPaid,
     globalMaxPeriods,
     globalMaxPeriodsPerYear,
     globalMaxTermInYears,
     globalMinPayment,
     globalPrincipal,
+    graphs,
     language,
     languages,
     loadState,
@@ -517,6 +602,8 @@ export default defineStore('core', () => {
     optionsFormActive,
     paymentSchedules,
     paymentSummaries,
+    Percent,
+    percentOfPaymentAsPrincaplGraphs,
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,

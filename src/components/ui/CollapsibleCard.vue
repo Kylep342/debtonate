@@ -26,10 +26,16 @@ const toggleCollapse = () => {
         </div>
       </div>
     </template>
-    <template #cardBody v-if="!isCollapsed">
+    <template
+      v-if="!isCollapsed"
+      #cardBody
+    >
       <slot name="cardBody" />
     </template>
-    <template #cardActions v-if="!isCollapsed">
+    <template
+      v-if="!isCollapsed"
+      #cardActions
+    >
       <slot name="cardActions" />
     </template>
   </BaseCard>

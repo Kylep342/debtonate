@@ -2,18 +2,27 @@ import { TOTALS } from 'moneyfunx';
 
 const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
+const BTN_EXPORT = 'Export';
 const BTN_LOAD = 'Load';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_SAVE = 'Save';
+const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 const BUDGET = 'Budget';
 const BUDGET_DETAILS_ID = 'budgetDetails';
 const BUDGET_DETAILS = 'Budget Details';
 const BUDGET_FORM_ID = 'budgetForm';
 const BUDGETS = 'Budgets';
-const COLORS = ['#DAF7A6', '#900C3F', '#C70039', '#581845', '#FF5733', '#FFC300'];
+const COLORS = [
+  'oklch(80.74% 0.0525 159.09)',
+  'oklch(76.87% 0.1041 22.66)',
+  'oklch(70.39% 0.1255 52.95)',
+  'oklch(28.42% 0.0095 355.53)'
+];
 const DEFAULT = 'default';
+const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
+const GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL = 'Percent of Payment to Principal | Time'
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
@@ -23,6 +32,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+const SELECT = 'Select';
 const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
@@ -90,6 +100,7 @@ const LOCALE_CURRENCY = {
 export default Object.freeze({
   BTN_CLEAR,
   BTN_CREATE,
+  BTN_EXPORT,
   BTN_LOAD,
   BTN_OFF,
   BTN_ON,
@@ -100,8 +111,11 @@ export default Object.freeze({
   BUDGET_FORM_ID,
   BUDGET,
   BUDGETS,
+  BUG_FORM_LINK,
   COLORS,
   DEFAULT,
+  GRAPH_BALANCES_OVER_TIME,
+  GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL,
   GRAPHS,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,
@@ -112,6 +126,7 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+  SELECT,
   TABLES,
   TOTALS,
 });

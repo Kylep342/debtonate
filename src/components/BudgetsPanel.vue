@@ -10,9 +10,7 @@ import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import { heightRestOfViewport } from '../functions/viewport';
-
-const props = defineProps(['budgetsTotals', 'createFunction']);
+import { fillHeight } from '../functions/viewport';
 
 const state = useCoreStore();
 
@@ -28,23 +26,23 @@ const orderedBudgets = computed(() => [
 const scrollContainer = ref(null);
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
-  window.addEventListener('resizeBudgetsPanel', heightRestOfViewport);
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+  window.addEventListener('resizeBudgetsPanel', fillHeight);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeBudgetsPanel', heightRestOfViewport);
+  window.removeEventListener('resizeBudgetsPanel', fillHeight);
 });
 </script>
 
 <template>
   <base-card
     :id="'budgetManagementPanel'"
-    :class="['bg-base-100', 'w-90']"
+    :class="['bg-base-100', 'w-90', 'flex-none']"
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="createFunction"
+        :create-function="state.openCreateBudgetForm"
         :title="constants.BUDGETS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
@@ -67,7 +65,7 @@ onBeforeUnmount(() => {
           >
             <BudgetCard
               :budget="budget"
-              :budget-totals="props.budgetsTotals[budget.id]"
+              :budget-totals="state.totalsByBudget[budget.id]"
             />
           </li>
         </ul>

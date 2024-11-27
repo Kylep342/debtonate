@@ -9,8 +9,10 @@ const state = useCoreStore();
 
 const budgetAmount = computed(() => `${state.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed(() => `${state.Money(props.budget.relative)}/month`);
-const budgetPayments = computed(() => props.budgetTotals.amortizationSchedule.length);
+const budgetPayments = computed(() => state.formatPeriod(props.budgetTotals.amortizationSchedule.length, true));
 const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lifetimeInterest)}`);
+
+const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payments')
 </script>
 
 <template>
@@ -28,25 +30,25 @@ const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lif
           <tbody>
             <tr>
               <td>Amount</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
             <tr v-if="budget.id !== constants.DEFAULT">
               <td>Extra</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetExtra }}</b>
               </td>
             </tr>
             <tr>
               <td>Interest Paid</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ budgetTotalInterest }}</b>
               </td>
             </tr>
             <tr>
-              <td>Payments</td>
-              <td>
+              <td>{{ paymentsLabel }}</td>
+              <td :class="['text-right']">
                 <b>{{ budgetPayments }}</b>
               </td>
             </tr>

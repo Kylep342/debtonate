@@ -4,7 +4,7 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import BaseButton from './components/ui/BaseButton.vue';
 import BaseCard from './components/ui/BaseCard.vue';
-import BaseChart from './components/ui/BaseChart.vue';
+import BaseGraph from './components/ui/BaseGraph.vue';
 import BaseModal from './components/ui/BaseModal.vue';
 import BaseTable from './components/ui/BaseTable.vue';
 import BaseTabs from './components/ui/BaseTabs.vue';
@@ -18,7 +18,7 @@ const pinia = createPinia(app);
 
 app.component('BaseButton', BaseButton);
 app.component('BaseCard', BaseCard);
-app.component('BaseChart', BaseChart);
+app.component('BaseGraph', BaseGraph);
 app.component('BaseModal', BaseModal);
 app.component('BaseTable', BaseTable);
 app.component('BaseTabs', BaseTabs);

@@ -7,9 +7,10 @@ const props = defineProps(['loan']);
 
 const state = useCoreStore();
 
-const loanInterestRate = computed(() => `${(props.loan.annualRate * 100).toFixed(2)}%`);
+const loanInterestRate = computed(() => `${state.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed(() => `${state.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
+const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalance)}`);
 
 </script>
 
@@ -28,19 +29,25 @@ const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
           <tbody>
             <tr>
               <td>Principal</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ loanPrincipal }}</b>
+              </td>
+            </tr>
+            <tr v-if="loanPrincipal !== loanCurrentBalance">
+              <td>Current Balance</td>
+              <td :class="['text-right']">
+                <b>{{ loanCurrentBalance }}</b>
               </td>
             </tr>
             <tr>
               <td>Interest Rate</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ loanInterestRate }}</b>
               </td>
             </tr>
             <tr>
               <td>Minimum Payment</td>
-              <td>
+              <td :class="['text-right']">
                 <b>{{ loanMinPayment }}</b>
               </td>
             </tr>

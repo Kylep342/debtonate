@@ -7,6 +7,7 @@ const props = defineProps({
 });
 
 const flexBasis = `basis-1/${props.pivot.length}`;
+const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 
 <template>
@@ -15,10 +16,14 @@ const flexBasis = `basis-1/${props.pivot.length}`;
       <div
         v-for="item in pivot"
         :key="item.id"
-        :class="['join-item', flexBasis, 'w-full', { 'border-t-2': isViewedItemId(item.id) }]"
+        :class="['join-item', flexBasis, 'w-full']"
       >
         <base-button
-          :class="['btn-ghost', 'w-full']"
+          :class="[
+            'w-full',
+            tabStyle(item.id),
+            {'shadow-lg': isViewedItemId(item.id)},
+          ]"
           @click="setViewedItemId(item.id)"
         >
           {{ getItemName(item.id) }}

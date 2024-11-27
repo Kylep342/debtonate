@@ -6,12 +6,13 @@ import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
 
-const props = defineProps(['createButtonText', 'loan', 'title']);
+const currentLoan = ref(state.getLoan(state.currentLoanId));
 
-const principal = ref(props.loan?.principal || 0);
-const interestRate = ref((props.loan?.annualRate || 0) * 100);
-const termInYears = ref(props.loan?.termInYears || 0);
-const name = ref(props.loan?.name || '');
+const principal = ref(currentLoan.value?.principal || 0);
+const interestRate = ref((currentLoan.value?.annualRate || 0) * 100);
+const termInYears = ref(currentLoan.value?.termInYears || 0);
+const name = ref(currentLoan.value?.name || '');
+const currentBalance = ref(currentLoan.value?.currentBalance || null);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -20,13 +21,15 @@ const createButtonEnabled = computed(
 );
 
 watch(
-  () => props.loan,
-  (newLoan) => {
-    if (newLoan) {
-      principal.value = newLoan.principal;
-      interestRate.value = newLoan.annualRate * 100;
-      termInYears.value = newLoan.termInYears;
-      name.value = newLoan.name || '';
+  () => state.currentLoanId,
+  (newId) => {
+    if (newId && state.createLoanFormActive) {
+      currentLoan.value = state.getLoan(newId);
+      principal.value = currentLoan.value.principal;
+      interestRate.value = currentLoan.value.annualRate * 100;
+      termInYears.value = currentLoan.value.termInYears;
+      name.value = currentLoan.value.name;
+      currentBalance.value = currentLoan.value.currentBalance;
     }
   },
   { immediate: true },
@@ -37,6 +40,7 @@ const clearCreate = () => {
   interestRate.value = null;
   termInYears.value = null;
   name.value = null;
+  currentBalance.value = null;
 };
 
 const createLoan = () => {
@@ -45,6 +49,7 @@ const createLoan = () => {
     interestRate.value / 100,
     termInYears.value,
     name.value,
+    currentBalance.value,
   );
   clearCreate();
 };
@@ -58,7 +63,7 @@ const exit = () => {
 <template>
   <base-modal :id="constants.LOAN_FORM_ID">
     <template #header>
-      <h2>{{ title }}</h2>
+      <h2>{{ state.createLoanFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button
@@ -108,6 +113,16 @@ const exit = () => {
           type="string"
           label="Name"
         >
+        <div :class="['label']">
+          <span :class="['label-text']">Current Balance (Optional)</span>
+        </div>
+        <input
+          v-model.number="currentBalance"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          step="0.01"
+          label="Current Balance"
+        >
       </div>
     </template>
     <template #actions>
@@ -116,7 +131,7 @@ const exit = () => {
         :class="'btn-success'"
         @click="createLoan"
       >
-        {{ createButtonText }}
+        {{ state.createLoanButtonText }}
       </base-button>
     </template>
   </base-modal>

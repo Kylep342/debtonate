@@ -5,6 +5,7 @@ import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import DebtSummary from './components/DebtSummary.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
+import FooterBar from './components/FooterBar.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
@@ -80,21 +81,8 @@ watch(() => state.optionsFormActive, async (show) => {
     />
     <OptionsForm />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
-      <LoansPanel
-        :class="['flex-none']"
-        :create-function="state.openCreateLoanForm"
-        :delete-loan="state.deleteLoan"
-        :edit-loan="state.editLoan"
-        :view-loan="state.viewLoan"
-      />
-      <BudgetsPanel
-        :class="['flex-none']"
-        :budgets-totals="state.totalsByBudget"
-        :create-function="state.openCreateBudgetForm"
-        :delete-budget="state.deleteBudget"
-        :edit-budget="state.editBudget"
-        :view-budget="state.viewBudget"
-      />
+      <LoansPanel />
+      <BudgetsPanel />
       <div :class="['m-4']">
         <div
           v-if="!state.loans.length"
@@ -139,5 +127,6 @@ watch(() => state.optionsFormActive, async (show) => {
         </div>
       </div>
     </div>
+    <FooterBar />
   </div>
 </template>

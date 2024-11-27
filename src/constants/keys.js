@@ -6,6 +6,7 @@ const LS_LOANS = 'debtonate.loans';
 const LS_PERIODS_AS_DATES = 'debtonate.periodsAsDates';
 const LS_REDUCE_PAYMENTS = 'debtonate.reducePayments';
 const LS_ROUND_UP = 'debtonate.roundUp';
+const LS_ROUNDING_SCALE = 'debtonate.roundingScale';
 const LS_SNOWBALL_SORT = 'debtonate.snowballSort';
 
 export default Object.freeze({
@@ -16,5 +17,6 @@ export default Object.freeze({
   LS_PERIODS_AS_DATES,
   LS_REDUCE_PAYMENTS,
   LS_ROUND_UP,
+  LS_ROUNDING_SCALE,
   LS_SNOWBALL_SORT,
 });

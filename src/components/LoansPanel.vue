@@ -3,38 +3,41 @@ import {
   ref,
   onBeforeUnmount,
   onMounted,
+  onUpdated,
 } from 'vue';
 
 import LoanCard from './LoanCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
-import { heightRestOfViewport } from '../functions/viewport';
+import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
-
-const props = defineProps(['createFunction']);
 
 const state = useCoreStore();
 
 const scrollContainer = ref(null);
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${heightRestOfViewport(scrollContainer)}px`;
-  window.addEventListener('resizeLoansPanel', heightRestOfViewport);
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+  window.addEventListener('resizeLoansPanel', fillHeight);
+});
+
+onUpdated(() => {
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeLoansPanel', heightRestOfViewport);
+  window.removeEventListener('resizeLoansPanel', fillHeight);
 });
 </script>
 
 <template>
   <base-card
     :id="'loanManagementPanel'"
-    :class="['bg-base-100', 'w-90']"
+    :class="['bg-base-100', 'w-90', 'flex-none']"
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="props.createFunction"
+        :create-function="state.openCreateLoanForm"
         :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
