@@ -1,7 +1,7 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  onMounted, shallowReactive, watch,
+  onMounted, onUpdated, shallowReactive, watch,
 } from 'vue';
 import constants from '../../constants/constants';
 
@@ -88,13 +88,6 @@ onMounted(() => {
     initializeChart();
   }
 });
-
-// onUpdated(() => {
-//   if (props.graph) {
-//     Object.assign(chart, props.graph);
-//     initializeChart();
-//   }
-// });
 
 watch(
   () => props.graph,

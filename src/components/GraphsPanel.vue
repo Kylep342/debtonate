@@ -1,21 +1,21 @@
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
 
-const graphs = reactive({
+const graphs = computed(() => ({
   [constants.GRAPH_BALANCES_OVER_TIME]: state.balancesOverTimeGraphs,
   [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: state.percentOfPaymentAsPrincaplGraphs,
-});
+}));
 
 const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
 
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 
-const activeGraph = computed(() => graphs[viewedGraphId.value])
+const activeGraph = computed(() => graphs.value[viewedGraphId.value])
 
 const viewedLoanId = ref(constants.TOTALS);
 
