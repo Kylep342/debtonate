@@ -50,7 +50,7 @@ const initializeChart = () => {
     .call((g) => g.select('.domain').remove())
     .call((g) => g.selectAll('.tick line').clone()
       .attr('x2', width - margin * 2)
-      .attr('stroke-opacity', 0.1))
+      .attr('stroke-opacity', 0.1));
 
   chart.lines.forEach((line, index) => {
     svg.append('path')

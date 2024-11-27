@@ -12,7 +12,7 @@ const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost
 
 <template>
   <div>
-    <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow']">
+    <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow', 'px-4']">
       <div
         v-for="item in pivot"
         :key="item.id"
