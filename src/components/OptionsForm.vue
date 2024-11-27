@@ -180,7 +180,7 @@ watch(() => roundingScale.value, async (newValue) => {
                 today)
               </p>
               <br>
-              <p>Next Period: {{ state.formatPeriod(1, true) }}</p>
+              <p>Next Period: {{ state.Period(1, true) }}</p>
             </div>
           </template>
         </collapsible-card>
@@ -237,7 +237,7 @@ watch(() => roundingScale.value, async (newValue) => {
             <br>
             <p>Percent: {{ state.Percent(state.globalEffectiveInterestRate * 100) }}</p>
             <p>Money: {{ state.Money(state.globalMinPayment) }}</p>
-            <p>Next Period: {{ state.formatPeriod(1, true) }}</p>
+            <p>Next Period: {{ state.Period(1, true) }}</p>
           </template>
         </collapsible-card>
       </div>

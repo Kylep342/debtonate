@@ -30,19 +30,6 @@ export default defineStore('core', () => {
 
   const baseDate = computed(() => Date.now());
 
-  const formatPeriod = (period, asStr = false) => {
-    if (periodsAsDates.value) {
-      const date = new Date(baseDate.value);
-      const relativeDate = new Date(
-        date.getFullYear(),
-        date.getMonth() + period,
-        date.getDate(),
-      );
-      return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
-    }
-    return period;
-  };
-
   const Money = (amount) => (
     Intl.NumberFormat(
       language.value,
@@ -63,6 +50,19 @@ export default defineStore('core', () => {
       },
     ).format(value)
   );
+
+  const Period = (period, asStr = false) => {
+    if (periodsAsDates.value) {
+      const date = new Date(baseDate.value);
+      const relativeDate = new Date(
+        date.getFullYear(),
+        date.getMonth() + period,
+        date.getDate(),
+      );
+      return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
+    }
+    return period;
+  };
 
   const currencySymbol = computed(() => {
     const formatted = new Intl.NumberFormat('en-US', {
@@ -463,11 +463,11 @@ export default defineStore('core', () => {
     const config = {
       id: 'BalancesOverTime',
       graphs: {},
-      x: formatPeriod,
+      x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Money(point.y)}`,
+      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -498,11 +498,11 @@ export default defineStore('core', () => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
       graphs: {},
-      x: formatPeriod,
+      x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${formatPeriod(point.x, true)}<br>${Percent(point.y)}`,
+      hoverFormat: (point) => `${Period(point.x, true)}<br>${Percent(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -569,7 +569,7 @@ export default defineStore('core', () => {
     exitCreateLoanForm,
     exitOptionsForm,
     exportState,
-    formatPeriod,
+    Period,
     getBudget,
     getBudgetIndex,
     getBudgetName,

@@ -9,7 +9,7 @@ const state = useCoreStore();
 
 const budgetAmount = computed(() => `${state.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed(() => `${state.Money(props.budget.relative)}/month`);
-const budgetPayments = computed(() => state.formatPeriod(props.budgetTotals.amortizationSchedule.length, true));
+const budgetPayments = computed(() => state.Period(props.budgetTotals.amortizationSchedule.length, true));
 const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lifetimeInterest)}`);
 
 const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payments')

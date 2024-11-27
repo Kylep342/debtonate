@@ -49,7 +49,7 @@ const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'P
               :key="rowno"
             >
               <td :class="['text-center']">
-                {{ state.formatPeriod(record.period, true) }}
+                {{ state.Period(record.period, true) }}
               </td>
               <td :class="['text-right']">
                 {{ state.Money(record.interest + record.principal) }}

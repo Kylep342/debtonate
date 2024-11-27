@@ -18,3 +18,12 @@ I want to enhance the 'Repayment Information' window.
 
 Tasks to do:
  - <s>enhance the "table" view</s> replace with a true pivot interface that allows for comparison (could be good for "refinancing")
+
+#### Refinancing
+
+Design:
+
+Refinancing will encapsulated as 'scenarios'. A scenario will be as follows:
+ - A list of loan IDs (need to make sure deleting/loading/changing IDs does not impact [Weakness - this is the first external dependency on loan references])
+ - A 'shadow' Loan object computing the interest paid at new terms
+ - Any associated fees/premiums paid to refinance (optional)
