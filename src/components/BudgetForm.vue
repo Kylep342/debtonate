@@ -17,7 +17,7 @@ const createButtonEnabled = computed(
 watch(
   () => state.currentBudgetId,
   (newId) => {
-    if (newId) {
+    if (newId && state.createBudgetFormActive) {
       currentBudget.value = state.getBudget(newId);
       amount.value = currentBudget.value.relative;
     }

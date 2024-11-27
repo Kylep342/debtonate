@@ -23,7 +23,7 @@ const createButtonEnabled = computed(
 watch(
   () => state.currentLoanId,
   (newId) => {
-    if (newId) {
+    if (newId && state.createLoanFormActive) {
       currentLoan.value = state.getLoan(newId);
       principal.value = currentLoan.value.principal;
       interestRate.value = currentLoan.value.annualRate * 100;
