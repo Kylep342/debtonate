@@ -6,16 +6,11 @@ import useCoreStore from '../stores/core';
 
 const state = useCoreStore();
 
-const graphs = computed(() => ({
-  [constants.GRAPH_BALANCES_OVER_TIME]: state.balancesOverTimeGraphs,
-  [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: state.percentOfPaymentAsPrincaplGraphs,
-}));
-
 const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
 
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 
-const activeGraph = computed(() => graphs.value[viewedGraphId.value])
+const activeGraph = computed(() => state.graphs[viewedGraphId.value])
 
 const viewedLoanId = ref(constants.TOTALS);
 
@@ -40,7 +35,7 @@ const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
             className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
           >
             <li
-              v-for="(graphId) in Object.keys(graphs)"
+              v-for="(graphId) in Object.keys(state.graphs)"
               :key="graphId"
               @click="setViewedGraphId(graphId)"
             >

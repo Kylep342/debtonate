@@ -530,6 +530,11 @@ export default defineStore('core', () => {
     return config;
   })
 
+  const graphs = computed(() => ({
+    [constants.GRAPH_BALANCES_OVER_TIME]: balancesOverTimeGraphs.value,
+    [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
+  }));
+
   return {
     avalanche,
     balancesOverTimeGraphs,
@@ -581,6 +586,7 @@ export default defineStore('core', () => {
     globalMaxTermInYears,
     globalMinPayment,
     globalPrincipal,
+    graphs,
     language,
     languages,
     loadState,
