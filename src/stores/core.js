@@ -462,9 +462,9 @@ export default defineStore('core', () => {
 
   // graph data
 
-  const balancesOverTimeGraphs = computed(() => {
+  const balancesGraphs = computed(() => {
     const config = {
-      id: 'BalancesOverTime',
+      id: 'Balances',
       graphs: {},
       x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
@@ -570,14 +570,13 @@ export default defineStore('core', () => {
   });
 
   const graphs = computed(() => ({
-    [constants.GRAPH_BALANCES_OVER_TIME]: balancesOverTimeGraphs.value,
+    [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
     [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
   }));
 
   return {
     avalanche,
-    balancesOverTimeGraphs,
     baseDate,
     budgetDetailsPanelActive,
     budgets,
