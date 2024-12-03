@@ -437,11 +437,14 @@ export default defineStore('core', () => {
   };
 
   const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
-
   const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId].totalPayments;
   const getLifetimeInterest = (loanId, budgetId) => (
     paymentSummaries.value[loanId][budgetId].totalInterestPaid
   );
+  const getInterestUpToPeriod = (loanId, budgetId, period) => {
+    const paymentSummary = getPaymentSummary(loanId, budgetId);
+    return paymentSummary.amortizationSchedule.slice(0, period).reduce((acc, record) => acc + record.interest, 0)
+  };
 
   // title building functions
 
@@ -528,10 +531,47 @@ export default defineStore('core', () => {
       });
     });
     return config;
-  })
+  });
+
+  const interestSavedGraphs = computed(() => {
+    const config = {
+      id: 'InterestSaved',
+      graphs: {},
+      x: Period,
+      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      y: y => y,
+      yScale: d3.scaleLinear,
+      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
+    };
+
+    loansWithTotals.value.forEach((loan) => {
+      config.graphs[loan.id] = {
+        config: {
+          maxX: globalMaxPeriods.value,
+          maxY: getLifetimeInterest(constants.TOTALS, constants.DEFAULT),
+          header: `Interest Saved Over Time By Budget - ${getLoanName(loan.id)}`,
+          subheader: buildLoanSubtitle(loan),
+        },
+        //TODO: is it 'lines' or some other key?
+        lines: [],
+      }
+    });
+
+    Object.keys(config.graphs).forEach((loanId) => {
+      paymentSchedules.value.forEach((schedule) => {
+        const line = [];
+        getPaymentSummary(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
+          line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, schedule.budgetId, index) });
+        });
+        config.graphs[loanId].lines.push(line);
+      });
+    });
+    return config;
+  });
 
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesOverTimeGraphs.value,
+    [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
     [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
   }));
 
