@@ -356,26 +356,29 @@ export default defineStore('core', () => {
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
-  const paymentSchedules = computed(() => monthlyBudgets.value.map((budget) => ({
-    budgetId: budget.id,
-    paymentAmount: budget.relative,
-    paymentSchedule: moneyfunx.payLoans(
-      loans.value,
-      budget.absolute,
-      reducePayments.value,
-    ),
-    label:
-      budget.id === constants.DEFAULT
-        ? `${Money(globalMinPayment.value)}/month`
-        : `${Money(budget.absolute)}/month (+${Money(budget.relative)}/month)`,
-  })));
+  const paymentSchedules = computed(() => {
+    const schedules = {};
+    monthlyBudgets.value.forEach((budget) => {
+      schedules[budget.id] = {
+        paymentAmount: budget.relative,
+        paymentSchedule: moneyfunx.payLoans(
+          loans.value,
+          budget.absolute,
+          reducePayments.value,
+        ),
+        label:
+          budget.id === constants.DEFAULT
+            ? `${Money(globalMinPayment.value)}/month`
+            : `${Money(budget.absolute)}/month (+${Money(budget.relative)}/month)`,
+      }
+    });
+    return schedules;
+  });
 
   const totalsByBudget = computed(() => {
     const totals = {};
     monthlyBudgets.value.forEach((budget) => {
-      totals[budget.id] = paymentSchedules.value.find(
-        (schedule) => schedule.budgetId === budget.id,
-      ).paymentSchedule.totals;
+      totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
     });
     return totals;
   });
@@ -388,18 +391,17 @@ export default defineStore('core', () => {
     });
 
     Object.keys(summaries).forEach((loanId) => {
-      paymentSchedules.value.forEach((schedule) => {
-        summaries[loanId][schedule.budgetId] = {
+      Object.keys(paymentSchedules.value).forEach((budgetId) => {
+        const schedule = paymentSchedules.value[budgetId];
+        summaries[loanId][budgetId] = {
           label: schedule.label,
           amortizationSchedule:
             schedule.paymentSchedule[loanId].amortizationSchedule,
           totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
           totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
           totalPayments: schedule.paymentSchedule[loanId].amortizationSchedule.length,
-        };
+        }});
       });
-    });
-
     return summaries;
   });
 
@@ -437,14 +439,9 @@ export default defineStore('core', () => {
   };
 
   const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
-  const getNumPayments = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId].totalPayments;
-  const getLifetimeInterest = (loanId, budgetId) => (
-    paymentSummaries.value[loanId][budgetId].totalInterestPaid
-  );
-  const getInterestUpToPeriod = (loanId, budgetId, period) => {
-    const paymentSummary = getPaymentSummary(loanId, budgetId);
-    return paymentSummary.amortizationSchedule.slice(0, period).reduce((acc, record) => acc + record.interest, 0)
-  };
+  const getNumPayments = (loanId, budgetId) => getPaymentSummary(loanId, budgetId).totalPayments;
+  const getLifetimeInterest = (loanId, budgetId) => getPaymentSummary(loanId, budgetId).totalInterestPaid;
+  const getInterestUpToPeriod = (loanId, budgetId, period) => getPaymentSummary(loanId, budgetId).amortizationSchedule.slice(0, period).reduce((acc, record) => acc + record.interest, 0);
 
   // title building functions
 
@@ -476,7 +473,7 @@ export default defineStore('core', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = {
         config: {
-          maxX: globalMaxPeriods.value,
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id).currentBalance,
           header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
@@ -486,7 +483,7 @@ export default defineStore('core', () => {
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      paymentSchedules.value.forEach((schedule) => {
+      Object.values(paymentSchedules.value).forEach((schedule) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
@@ -511,18 +508,17 @@ export default defineStore('core', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = {
         config: {
-          maxX: globalMaxPeriods.value,
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
           header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
         },
-        //TODO: is it 'lines' or some other key?
         lines: [],
       }
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      paymentSchedules.value.forEach((schedule) => {
+      Object.values(paymentSchedules.value).forEach((schedule) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
@@ -547,21 +543,20 @@ export default defineStore('core', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = {
         config: {
-          maxX: globalMaxPeriods.value,
-          maxY: getLifetimeInterest(constants.TOTALS, constants.DEFAULT),
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
+          maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
           header: `Interest Saved Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
         },
-        //TODO: is it 'lines' or some other key?
         lines: [],
       }
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      paymentSchedules.value.forEach((schedule) => {
+      Object.keys(paymentSchedules.value).forEach((budgetId) => {
         const line = [];
         getPaymentSummary(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
-          line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, schedule.budgetId, index) });
+          line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, budgetId, index) });
         });
         config.graphs[loanId].lines.push(line);
       });

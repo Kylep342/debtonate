@@ -11,6 +11,7 @@ Debtonate is a simple, visual, data-rich financial calculator for budgeting repa
  - enhance the "table" view
     - either remove the dynamic sizing of tables
     - OR replace the table comparison with a more interactive one
+ - abstract BaseModal to take slot of contents instead of header/body/footer/actions setup (could simplify App.vue and enable escape modal closing)
 
 ### Brainstorm - 23/11/2024 | enhance the "table" view
 
