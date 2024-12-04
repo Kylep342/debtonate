@@ -22,6 +22,7 @@ const COLORS = [
 ];
 const DEFAULT = 'default';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
+const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
 const GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL = 'Percent of Payment to Principal | Time'
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
@@ -115,6 +116,7 @@ export default Object.freeze({
   COLORS,
   DEFAULT,
   GRAPH_BALANCES_OVER_TIME,
+  GRAPH_INTEREST_SAVED_OVER_TIME,
   GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL,
   GRAPHS,
   LOAN_DETAILS_ID,

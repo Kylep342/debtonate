@@ -10,7 +10,7 @@ const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
 
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 
-const activeGraph = computed(() => state.graphs[viewedGraphId.value])
+const activeGraph = computed(() => state.graphs[viewedGraphId.value]);
 
 const viewedLoanId = ref(constants.TOTALS);
 
