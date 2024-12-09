@@ -13,6 +13,7 @@ import OptionsForm from './components/OptionsForm.vue';
 import SiteIntro from './components/SiteIntro.vue';
 import constants from './constants/constants';
 import useCoreStore from './stores/core';
+import GraphsPanel from './components/GraphsPanel.vue';
 
 // core state
 
@@ -65,20 +66,8 @@ watch(() => state.optionsFormActive, async (show) => {
     :class="['font-mono', 'h-screen', 'flex', 'flex-col']"
   >
     <HeaderBar :class="['flex-none']" />
-    <LoanForm
-      :create-button-text="state.createLoanButtonText"
-      :loan="state.currentLoanId ?
-        state.getLoan(state.currentLoanId) :
-        null"
-      :title="state.createLoanFormTitle"
-    />
-    <BudgetForm
-      :create-button-text="state.createBudgetButtonText"
-      :budget="state.currentBudgetId ?
-        state.getBudget(state.currentBudgetId) :
-        null"
-      :title="state.createBudgetFormTitle"
-    />
+    <LoanForm />
+    <BudgetForm />
     <OptionsForm />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <LoansPanel />
