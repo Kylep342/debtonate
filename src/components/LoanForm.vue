@@ -8,11 +8,11 @@ const coreState = useCoreStore();
 
 const currentLoan = ref(null);
 
-const principal = ref(0);
-const interestRate = ref(0);
-const termInYears = ref(0);
-const name = ref('');
-const currentBalance = ref(0);
+const principal = ref(null);
+const interestRate = ref(null);
+const termInYears = ref(null);
+const name = ref(null);
+const currentBalance = ref(null);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(

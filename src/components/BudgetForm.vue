@@ -6,9 +6,8 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const currentBudget = ref(coreState.getBudget(coreState.currentBudgetId));
-
-const amount = ref(currentBudget.value?.relative);
+const currentBudget = ref(null);
+const amount = ref(null);
 
 const createButtonEnabled = computed(
   () => !Number.isNaN(amount.value) && amount.value > 0,
