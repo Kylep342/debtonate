@@ -9,7 +9,7 @@ import useCoreStore from '../stores/core';
 const props = defineProps(['anchor', 'id', 'pivot', 'title', 'type']);
 const emits = defineEmits([emitters.EMIT_EXIT_DETAILS_PANEL]);
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const viewedItemId = ref(props.type === constants.LOAN ? constants.DEFAULT : constants.TOTALS);
 
@@ -21,32 +21,32 @@ const setViewedItemId = (itemId) => {
 
 const getItem = (itemId) => (
   props.type === constants.LOAN
-    ? state.getBudget(itemId)
-    : state.getLoan(itemId)
+    ? coreState.getBudget(itemId)
+    : coreState.getLoan(itemId)
 );
 
 const getItemName = (itemId) => (
   props.type === constants.LOAN
-    ? state.getBudgetName(itemId)
-    : state.getLoanName(itemId)
+    ? coreState.getBudgetName(itemId)
+    : coreState.getLoanName(itemId)
 );
 
 const getPaymentSummary = (anchorId, itemId) => (
   props.type === constants.LOAN
-    ? state.getPaymentSummary(anchorId, itemId)
-    : state.getPaymentSummary(itemId, anchorId)
+    ? coreState.getPaymentSummary(anchorId, itemId)
+    : coreState.getPaymentSummary(itemId, anchorId)
 );
 
 const buildAmortizationTableSubtitle = (anchor, item) => (
   props.type === constants.LOAN
-    ? state.buildAmortizationTableSubtitle(anchor, item)
-    : state.buildAmortizationTableSubtitle(item, anchor)
+    ? coreState.buildAmortizationTableSubtitle(anchor, item)
+    : coreState.buildAmortizationTableSubtitle(item, anchor)
 );
 
 const buildAmortizationTableTitle = (anchor, item) => (
   props.type === constants.LOAN
-    ? state.buildAmortizationTableTitle(anchor, item)
-    : state.buildAmortizationTableTitle(item, anchor)
+    ? coreState.buildAmortizationTableTitle(anchor, item)
+    : coreState.buildAmortizationTableTitle(item, anchor)
 );
 
 const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');

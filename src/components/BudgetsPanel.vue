@@ -12,18 +12,22 @@ import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 import { fillHeight } from '../functions/viewport';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const defaultBudgetIndex = computed(
-  () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT),
+  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT),
 );
 const orderedBudgets = computed(() => [
-  state.monthlyBudgets[defaultBudgetIndex.value],
-  ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
-  ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
+  coreState.monthlyBudgets[defaultBudgetIndex.value],
+  ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
+  ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
 ]);
 
 const scrollContainer = ref(null);
+
+const buttons = [
+  {text: constants.BTN_CREATE, onClick: coreState.openBudgetForm},
+]
 
 onMounted(() => {
   scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
@@ -42,7 +46,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="state.openCreateBudgetForm"
+        :buttons="buttons"
         :title="constants.BUDGETS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
@@ -65,7 +69,7 @@ onBeforeUnmount(() => {
           >
             <BudgetCard
               :budget="budget"
-              :budget-totals="state.totalsByBudget[budget.id]"
+              :budget-totals="coreState.totalsByBudget[budget.id]"
             />
           </li>
         </ul>

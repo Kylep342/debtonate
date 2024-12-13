@@ -5,12 +5,18 @@ import useCoreStore from '../stores/core';
 
 const props = defineProps(['loan']);
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
-const loanInterestRate = computed(() => `${state.Percent(props.loan.annualRate * 100)}`);
-const loanMinPayment = computed(() => `${state.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed(() => `${state.Money(props.loan.principal)}`);
-const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalance)}`);
+const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
+const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
+const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
+const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
+
+const actions = {
+  [constants.BTN_DELETE]: coreState.deleteLoan,
+  [constants.BTN_EDIT]: coreState.editLoan,
+  [constants.BTN_VIEW]: coreState.viewLoan,
+}
 
 </script>
 
@@ -19,7 +25,7 @@ const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalan
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ state.getLoanName(loan.id) }}
+          {{ coreState.getLoanName(loan.id) }}
         </h2>
       </div>
     </template>
@@ -61,7 +67,7 @@ const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalan
           <base-button
             v-if="loan.id !== constants.TOTALS"
             :class="['btn-error']"
-            @click="state.deleteLoan(loan.id)"
+            @click="coreState.deleteLoan(loan.id)"
           >
             Delete
           </base-button>
@@ -69,7 +75,7 @@ const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalan
         <div v-if="loan.id !== constants.TOTALS">
           <base-button
             :class="['btn-accent']"
-            @click="state.editLoan(loan.id)"
+            @click="coreState.editLoan(loan.id)"
           >
             Edit
           </base-button>
@@ -77,7 +83,7 @@ const loanCurrentBalance = computed(() => `${state.Money(props.loan.currentBalan
         <div>
           <base-button
             :class="['btn-accent']"
-            @click="state.viewLoan(loan.id)"
+            @click="coreState.viewLoan(loan.id)"
           >
             View
           </base-button>

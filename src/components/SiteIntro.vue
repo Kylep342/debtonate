@@ -1,7 +1,7 @@
 <script setup>
 import useCoreStore from '../stores/core';
 
-const state = useCoreStore()
+const coreState = useCoreStore()
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const state = useCoreStore()
     <p>
       Debtonate is a financial calculator for analyzing debt.
       Specifically, it lives to answer the question:
-      What if I could put an extra {{ state.Money(50) }}/month towards my debt? Or {{ state.Money(100) }}...?
+      What if I could put an extra {{ coreState.Money(50) }}/month towards my debt? Or {{ coreState.Money(100) }}...?
       Debtonate empowers you to plan your finances with data-rich analysis.
     </p>
     <br>

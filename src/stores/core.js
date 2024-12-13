@@ -9,8 +9,8 @@ import keys from '../constants/keys';
 export default defineStore('core', () => {
   const budgetDetailsPanelActive = ref(false);
   const budgets = ref([]);
-  const createBudgetFormActive = ref(false);
-  const createLoanFormActive = ref(false);
+  const budgetFormActive = ref(false);
+  const loanFormActive = ref(false);
   const currencies = ref([...new Set(Object.values(constants.LOCALE_CURRENCY))]);
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref(null);
@@ -157,21 +157,21 @@ export default defineStore('core', () => {
 
   const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
 
-  const openCreateBudgetForm = () => {
-    createBudgetFormActive.value = true;
+  const openBudgetForm = () => {
+    budgetFormActive.value = true;
   };
-  const openCreateLoanForm = () => {
-    createLoanFormActive.value = true;
+  const openLoanForm = () => {
+    loanFormActive.value = true;
   };
   const openOptionsForm = () => {
     optionsFormActive.value = true;
   };
-  const exitCreateBudgetForm = () => {
-    createBudgetFormActive.value = false;
+  const exitBudgetForm = () => {
+    budgetFormActive.value = false;
     currentBudgetId.value = null;
   };
-  const exitCreateLoanForm = () => {
-    createLoanFormActive.value = false;
+  const exitLoanForm = () => {
+    loanFormActive.value = false;
     currentLoanId.value = null;
   };
   const exitOptionsForm = () => {
@@ -214,7 +214,7 @@ export default defineStore('core', () => {
   };
   const editLoan = (id) => {
     currentLoanId.value = id;
-    openCreateLoanForm();
+    openLoanForm();
   };
   const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
   const getLoanName = (id) => (
@@ -237,7 +237,7 @@ export default defineStore('core', () => {
   };
   const editBudget = (id) => {
     currentBudgetId.value = id;
-    openCreateBudgetForm();
+    openBudgetForm();
   };
   const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
   const getBudgetName = (id) => (
@@ -256,8 +256,8 @@ export default defineStore('core', () => {
 
   const clearState = () => {
     budgets.value = [];
-    createBudgetFormActive.value = false;
-    createLoanFormActive.value = false;
+    budgetFormActive.value = false;
+    loanFormActive.value = false;
     currency.value = constants.LOCALE_CURRENCY[navigator.language];
     currentBudgetId.value = null;
     currentLoanId.value = null;
@@ -338,7 +338,7 @@ export default defineStore('core', () => {
 
   // dependent computed values/methods
 
-  const createLoanFormTitle = computed(() => (currentLoanId.value
+  const loanFormTitle = computed(() => (currentLoanId.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
     : 'Creating a Loan'));
 
@@ -352,7 +352,7 @@ export default defineStore('core', () => {
     () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
   );
 
-  const createBudgetFormTitle = computed(() => (currentBudgetId.value
+  const budgetFormTitle = computed(() => (currentBudgetId.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
@@ -425,7 +425,7 @@ export default defineStore('core', () => {
     }
     budgets.value.push(proposedBudget);
     budgets.value.sort((a, b) => b - a);
-    exitCreateBudgetForm();
+    exitBudgetForm();
   };
   const createLoan = (principal, interestRate, termInYears, name, currentBalance) => {
     const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance);
@@ -435,7 +435,7 @@ export default defineStore('core', () => {
     }
     loans.value.push(newLoan);
     sortLoans();
-    exitCreateLoanForm();
+    exitLoanForm();
   };
 
   const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
@@ -584,12 +584,12 @@ export default defineStore('core', () => {
     clearState,
     createBudget,
     createBudgetButtonText,
-    createBudgetFormActive,
-    createBudgetFormTitle,
+    budgetFormActive,
+    budgetFormTitle,
     createLoan,
     createLoanButtonText,
-    createLoanFormActive,
-    createLoanFormTitle,
+    loanFormActive,
+    loanFormTitle,
     currencies,
     currency,
     currencySymbol,
@@ -599,8 +599,8 @@ export default defineStore('core', () => {
     deleteLoan,
     editBudget,
     editLoan,
-    exitCreateBudgetForm,
-    exitCreateLoanForm,
+    exitBudgetForm,
+    exitLoanForm,
     exitOptionsForm,
     exportState,
     Period,
@@ -630,8 +630,8 @@ export default defineStore('core', () => {
     minimumBudget,
     Money,
     monthlyBudgets,
-    openCreateBudgetForm,
-    openCreateLoanForm,
+    openBudgetForm,
+    openLoanForm,
     openOptionsForm,
     optionsFormActive,
     paymentSchedules,

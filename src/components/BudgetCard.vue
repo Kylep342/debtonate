@@ -5,14 +5,14 @@ import useCoreStore from '../stores/core';
 
 const props = defineProps(['budget', 'budgetTotals']);
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
-const budgetAmount = computed(() => `${state.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed(() => `${state.Money(props.budget.relative)}/month`);
-const budgetPayments = computed(() => state.Period(props.budgetTotals.amortizationSchedule.length, true));
-const budgetTotalInterest = computed(() => `${state.Money(props.budgetTotals.lifetimeInterest)}`);
+const budgetAmount = computed(() => `${coreState.Money(props.budget.absolute)}/month`);
+const budgetExtra = computed(() => `${coreState.Money(props.budget.relative)}/month`);
+const budgetPayments = computed(() => coreState.Period(props.budgetTotals.amortizationSchedule.length, true));
+const budgetTotalInterest = computed(() => `${coreState.Money(props.budgetTotals.lifetimeInterest)}`);
 
-const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payments')
+const paymentsLabel = computed(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 </script>
 
 <template>
@@ -20,7 +20,7 @@ const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payme
     <template #cardTitle>
       <div class="card-actions flow-root">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ state.getBudgetName(budget.id) }}
+          {{ coreState.getBudgetName(budget.id) }}
         </h2>
       </div>
     </template>
@@ -61,7 +61,7 @@ const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payme
         <div v-if="budget.id !== constants.DEFAULT">
           <base-button
             :class="['btn-error']"
-            @click="state.deleteBudget(budget.id)"
+            @click="coreState.deleteBudget(budget.id)"
           >
             Delete
           </base-button>
@@ -69,7 +69,7 @@ const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payme
         <div v-if="budget.id !== constants.DEFAULT">
           <base-button
             :class="['btn-accent']"
-            @click="state.editBudget(budget.id)"
+            @click="coreState.editBudget(budget.id)"
           >
             Edit
           </base-button>
@@ -77,7 +77,7 @@ const paymentsLabel = computed(() => state.periodsAsDates ? 'Debt Free' : 'Payme
         <div>
           <base-button
             :class="['btn-accent']"
-            @click="state.viewBudget(budget.id)"
+            @click="coreState.viewBudget(budget.id)"
           >
             View
           </base-button>

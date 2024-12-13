@@ -2,14 +2,14 @@
 import useCoreStore from '../stores/core';
 import constants from '../constants/constants';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const buttons = [
-  {text: constants.BTN_OPTIONS, onClick: state.openOptionsForm},
-  {text: constants.BTN_LOAD, onClick: state.loadState},
-  {text: constants.BTN_SAVE, onClick: state.saveState},
-  {text: constants.BTN_CLEAR, onClick: state.clearState},
-  // {text: constants.BTN_EXPORT, onClick: state.exportState},
+  {text: constants.BTN_OPTIONS, onClick: coreState.openOptionsForm},
+  {text: constants.BTN_LOAD, onClick: coreState.loadState},
+  {text: constants.BTN_SAVE, onClick: coreState.saveState},
+  {text: constants.BTN_CLEAR, onClick: coreState.clearState},
+  // {text: constants.BTN_EXPORT, onClick: coreState.exportState},
 ]
 const classes = ['rounded-none btn-secondary'];
 </script>

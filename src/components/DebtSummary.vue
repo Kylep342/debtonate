@@ -1,11 +1,12 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 
 import GraphsPanel from './GraphsPanel.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
+import useRefinancingStore from '../stores/refinancing';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 
 // const tabs = reactive({

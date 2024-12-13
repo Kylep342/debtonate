@@ -2,12 +2,17 @@ import { TOTALS } from 'moneyfunx';
 
 const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
+const BTN_DELETE = 'Delete';
+const BTN_EDIT = 'Edit';
 const BTN_EXPORT = 'Export';
 const BTN_LOAD = 'Load';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
+const BTN_REFINANCE = 'Refinance';
 const BTN_SAVE = 'Save';
+const BTN_SELECT = 'Select';
+const BTN_VIEW = 'View';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 const BUDGET = 'Budget';
 const BUDGET_DETAILS_ID = 'budgetDetails';
@@ -33,7 +38,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
-const SELECT = 'Select';
+const REFINANCE_FORM_ID = 'refinanceForm';
 const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
@@ -101,12 +106,17 @@ const LOCALE_CURRENCY = {
 export default Object.freeze({
   BTN_CLEAR,
   BTN_CREATE,
+  BTN_DELETE,
+  BTN_EDIT,
   BTN_EXPORT,
   BTN_LOAD,
   BTN_OFF,
   BTN_ON,
   BTN_OPTIONS,
+  BTN_REFINANCE,
   BTN_SAVE,
+  BTN_SELECT,
+  BTN_VIEW,
   BUDGET_DETAILS_ID,
   BUDGET_DETAILS,
   BUDGET_FORM_ID,
@@ -128,7 +138,7 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
-  SELECT,
+  REFINANCE_FORM_ID,
   TABLES,
   TOTALS,
 });

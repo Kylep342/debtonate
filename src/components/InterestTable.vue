@@ -3,24 +3,24 @@ import useCoreStore from '../stores/core';
 
 const props = defineProps(['loanId', 'title', 'subtitle']);
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const cellContent = (downId, acrossId) => {
   if (downId === acrossId) {
     return '';
   }
-  const interestDelta = state.getLifetimeInterest(
+  const interestDelta = coreState.getLifetimeInterest(
     props.loanId,
     acrossId,
-  ) - state.getLifetimeInterest(
+  ) - coreState.getLifetimeInterest(
     props.loanId,
     downId,
   );
 
-  const timeDelta = state.getNumPayments(
+  const timeDelta = coreState.getNumPayments(
     props.loanId,
     acrossId,
-  ) - state.getNumPayments(
+  ) - coreState.getNumPayments(
     props.loanId,
     downId,
   );
@@ -50,12 +50,12 @@ const cellContent = (downId, acrossId) => {
   };
 
 const relativeTime = (periods) => (
-  state.periodsAsDates ? (
+  coreState.periodsAsDates ? (
     `${relativeYears(periods)} ${relativeMonths(periods)}`
   ) : `${Math.abs(periods)} periods`
 );
 
-  const costText = `${state.Money(interestDelta)}`;
+  const costText = `${coreState.Money(interestDelta)}`;
 
   const timeText = `${relativeTime(timeDelta)} ${timeDelta > 0 ? ' earlier' : ' later'}`;
 
@@ -82,11 +82,11 @@ const relativeTime = (periods) => (
                 <b>DOWN → ACROSS</b>
               </th>
               <th
-                v-for="budget in state.monthlyBudgets"
+                v-for="budget in coreState.monthlyBudgets"
                 :key="budget.id"
               >
                 <b>{{
-                  state.getBudgetName(budget.id) }}</b>
+                  coreState.getBudgetName(budget.id) }}</b>
               </th>
             </tr>
           </thead>
@@ -94,14 +94,14 @@ const relativeTime = (periods) => (
         <template #body>
           <tbody>
             <tr
-              v-for="(down) in state.monthlyBudgets"
+              v-for="(down) in coreState.monthlyBudgets"
               :key="down.id"
             >
               <td :class="['text-center']">
-                {{ state.getBudgetName(down.id) }}
+                {{ coreState.getBudgetName(down.id) }}
               </td>
               <td
-                v-for="(across) in state.monthlyBudgets"
+                v-for="(across) in coreState.monthlyBudgets"
                 :key="down.id + across.id"
               >
                 <ul>
