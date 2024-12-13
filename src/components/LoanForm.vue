@@ -6,8 +6,6 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const currentLoan = ref(null);
-
 const principal = ref(null);
 const interestRate = ref(null);
 const termInYears = ref(null);
@@ -24,12 +22,12 @@ watch(
   () => coreState.currentLoanId,
   (newId) => {
     if (newId && coreState.loanFormActive) {
-      currentLoan.value = coreState.getLoan(newId);
-      principal.value = currentLoan.value.principal;
-      interestRate.value = currentLoan.value.annualRate * 100;
-      termInYears.value = currentLoan.value.termInYears;
-      name.value = currentLoan.value.name;
-      currentBalance.value = currentLoan.value.currentBalance;
+      const currentLoan = coreState.getLoan(newId);
+      principal.value = currentLoan.principal;
+      interestRate.value = currentLoan.annualRate * 100;
+      termInYears.value = currentLoan.termInYears;
+      name.value = currentLoan.name;
+      currentBalance.value = currentLoan.currentBalance;
     }
   },
   { immediate: true },

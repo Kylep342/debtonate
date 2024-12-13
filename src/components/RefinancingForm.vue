@@ -6,8 +6,7 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const currentLoan = ref(null);
-
+const loanId = ref(null);
 const currentBalance = ref(null);
 const interestRate = ref(null);
 const termInYears = ref(null);
@@ -24,11 +23,9 @@ watch(
   () => coreState.currentLoanId,
   (newId) => {
     if (newId && coreState.refinancingFormActive) {
-      currentLoan.value = coreState.getLoan(newId);
-      currentBalance.value = currentLoan.value.currentBalance;
-      interestRate.value = currentLoan.value.annualRate * 100;
-      termInYears.value = currentLoan.value.termInYears;
-      name.value = currentLoan.value.name;
+      loanId.value = newId;
+      const currentLoan = coreState.getLoan(loanId.value);
+      currentBalance.value = currentLoan.currentBalance;
     }
   },
   { immediate: true },
@@ -44,7 +41,7 @@ const clearForm = () => {
 
 const refinanceLoan = () => {
   coreState.refinanceLoan(
-    currentLoan.value.id,
+    loanId.value,
     currentBalance.value,
     interestRate.value,
     termInYears.value,
