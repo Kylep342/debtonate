@@ -3,17 +3,15 @@ import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import useRefinancingStore from '../stores/refinancing';
 
 const coreState = useCoreStore();
-const refi = useRefinancingStore();
 
-const currentLoan = ref(coreState.getLoan(coreState.currentLoanId));
+const currentLoan = ref(null);
 
-const currentBalance = ref(currentLoan.value?.currentBalance || 0);
-const interestRate = ref((currentLoan.value?.annualRate || 0) * 100);
-const termInYears = ref(currentLoan.value?.termInYears || 0);
-const name = ref(currentLoan.value?.name || '');
+const currentBalance = ref(0);
+const interestRate = ref(0);
+const termInYears = ref(0);
+const name = ref('');
 const fees = ref(0);
 
 const createButtonEnabled = computed(
@@ -25,19 +23,18 @@ const createButtonEnabled = computed(
 watch(
   () => coreState.currentLoanId,
   (newId) => {
-    if (newId && refi.refinancingFormActive.value) {
+    if (newId && coreState.refinancingFormActive) {
       currentLoan.value = coreState.getLoan(newId);
       currentBalance.value = currentLoan.value.currentBalance;
       interestRate.value = currentLoan.value.annualRate * 100;
       termInYears.value = currentLoan.value.termInYears;
       name.value = currentLoan.value.name;
-      
     }
   },
   { immediate: true },
 );
 
-const clearCreate = () => {
+const clearForm = () => {
   currentBalance.value = null;
   interestRate.value = null;
   termInYears.value = null;
@@ -46,26 +43,26 @@ const clearCreate = () => {
 };
 
 const refinanceLoan = () => {
-  refi.addScenario(
-    '12334',
+  coreState.refinanceLoan(
+    currentLoan.value.id,
     currentBalance.value,
     interestRate.value,
     termInYears.value,
     fees.value
   );
-  // clearCreate();
+  clearForm();
 };
 
 const exit = () => {
-  clearCreate();
-  refi.exitRefinancingForm();
+  clearForm();
+  coreState.exitRefinancingForm();
 };
 </script>
 
 <template>
-  <base-modal :id="constants.REFINANCE_FORM_ID">
+  <base-modal :id="constants.REFINANCING_FORM_ID">
     <template #header>
-      <h2>{{ refi.refinancingFormTitle }}</h2>
+      <h2>{{ coreState.refinancingFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button

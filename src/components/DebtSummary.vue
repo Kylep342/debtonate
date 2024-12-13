@@ -4,7 +4,6 @@ import { ref, reactive, watch } from 'vue';
 import GraphsPanel from './GraphsPanel.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import useRefinancingStore from '../stores/refinancing';
 
 const coreState = useCoreStore();
 

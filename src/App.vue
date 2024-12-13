@@ -14,12 +14,8 @@ import RefinancingForm from './components/RefinancingForm.vue';
 import SiteIntro from './components/SiteIntro.vue';
 import constants from './constants/constants';
 import useCoreStore from './stores/core';
-import useRefinancingStore from './stores/refinancing';
-
-// coreState state
 
 const coreState = useCoreStore();
-const refi = useRefinancingStore();
 
 watch(() => coreState.budgetDetailsPanelActive, async (show) => {
   if (show) {
@@ -61,11 +57,11 @@ watch(() => coreState.optionsFormActive, async (show) => {
   }
 });
 
-watch(() => refi.refinancingFormActive, async (show) => {
+watch(() => coreState.refinancingFormActive, async (show) => {
   if (show) {
-    document.getElementById(constants.REFINANCE_FORM_ID).showModal();
+    document.getElementById(constants.REFINANCING_FORM_ID).showModal();
   } else if (!show) {
-    document.getElementById(constants.REFINANCE_FORM_ID).close();
+    document.getElementById(constants.REFINANCING_FORM_ID).close();
   }
 });
 

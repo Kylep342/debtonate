@@ -1,9 +1,12 @@
 <script setup>
 import { computed } from 'vue';
+import * as moneyfunx from 'moneyfunx';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['loan']);
+const props = defineProps({
+  loan: moneyfunx.Loan
+});
 
 const coreState = useCoreStore();
 
@@ -12,21 +15,45 @@ const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}
 const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
 const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
 
-const actions = {
-  [constants.BTN_DELETE]: coreState.deleteLoan,
-  [constants.BTN_EDIT]: coreState.editLoan,
-  [constants.BTN_VIEW]: coreState.viewLoan,
+const baseButtons = {
+  [constants.BTN_DETAILS]: coreState.viewLoan,
+  // [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
 }
+
+const editButtons = {
+  ...baseButtons,
+  [constants.BTN_EDIT]: coreState.editLoan,
+  [constants.BTN_DELETE]: coreState.deleteLoan,
+}
+
+const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editButtons;
 
 </script>
 
 <template>
-  <collapsible-card :class="['w-75', 'bg-base-100']">
+  <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
-        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ coreState.getLoanName(loan.id) }}
-        </h2>
+        <div :class="['flex', 'justify-between', 'pr-4']">
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+            {{ coreState.getLoanName(loan.id) }}
+          </h2>
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <base-button>{{ constants.BTN_MENU }}</base-button>
+            <ul
+              tabIndex="{0}"
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li
+                v-for="(onClick, text) in getButtons(loan.id)"
+                :key="text"
+                @click="onClick(loan.id)"
+              >
+                <a>{{ text }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </template>
     <template #cardBody>
@@ -61,34 +88,5 @@ const actions = {
         </template>
       </base-table>
     </template>
-    <template #cardActions>
-      <div :class="['card-actions', 'justify-end', 'p-4']">
-        <div v-if="loan.id !== constants.TOTALS">
-          <base-button
-            v-if="loan.id !== constants.TOTALS"
-            :class="['btn-error']"
-            @click="coreState.deleteLoan(loan.id)"
-          >
-            Delete
-          </base-button>
-        </div>
-        <div v-if="loan.id !== constants.TOTALS">
-          <base-button
-            :class="['btn-accent']"
-            @click="coreState.editLoan(loan.id)"
-          >
-            Edit
-          </base-button>
-        </div>
-        <div>
-          <base-button
-            :class="['btn-accent']"
-            @click="coreState.viewLoan(loan.id)"
-          >
-            View
-          </base-button>
-        </div>
-      </div>
-    </template>
-  </collapsible-card>
+  </base-card>
 </template>

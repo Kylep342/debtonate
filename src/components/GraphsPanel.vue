@@ -7,18 +7,16 @@ import useCoreStore from '../stores/core';
 const coreState = useCoreStore();
 
 const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
-
-const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
+const viewedLoanId = ref(constants.TOTALS);
 
 const activeGraph = computed(() => coreState.graphs[viewedGraphId.value]);
 
-const viewedLoanId = ref(constants.TOTALS);
-
+const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
+const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => {
   viewedLoanId.value = loanId;
 };
 
-const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 </script>
 
 <template>

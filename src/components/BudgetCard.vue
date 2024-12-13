@@ -13,15 +13,45 @@ const budgetPayments = computed(() => coreState.Period(props.budgetTotals.amorti
 const budgetTotalInterest = computed(() => `${coreState.Money(props.budgetTotals.lifetimeInterest)}`);
 
 const paymentsLabel = computed(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
+
+const baseButtons = {
+  [constants.BTN_DETAILS]: coreState.viewBudget,
+}
+
+const editButtons = {
+  ...baseButtons,
+  [constants.BTN_EDIT]: coreState.editBudget,
+  [constants.BTN_DELETE]: coreState.deleteBudget,
+}
+
+const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : editButtons;
+
 </script>
 
 <template>
-  <collapsible-card :class="['w-75', 'bg-base-100']">
+  <base-card :class="['w-75', 'bg-base-100']">
     <template #cardTitle>
       <div class="card-actions flow-root">
-        <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ coreState.getBudgetName(budget.id) }}
-        </h2>
+        <div :class="['flex', 'justify-between', 'pr-4']">
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+            {{ coreState.getBudgetName(budget.id) }}
+          </h2>
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <base-button>{{ constants.BTN_MENU }}</base-button>
+            <ul
+              tabIndex="{0}"
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              <li
+                v-for="(onClick, text) in getButtons(budget.id)"
+                :key="text"
+                @click="onClick(budget.id)"
+              >
+                <a>{{ text }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </template>
     <template #cardBody>
@@ -56,33 +86,5 @@ const paymentsLabel = computed(() => coreState.periodsAsDates ? 'Debt Free' : 'P
         </template>
       </base-table>
     </template>
-    <template #cardActions>
-      <div :class="['card-actions', 'justify-end', 'p-4']">
-        <div v-if="budget.id !== constants.DEFAULT">
-          <base-button
-            :class="['btn-error']"
-            @click="coreState.deleteBudget(budget.id)"
-          >
-            Delete
-          </base-button>
-        </div>
-        <div v-if="budget.id !== constants.DEFAULT">
-          <base-button
-            :class="['btn-accent']"
-            @click="coreState.editBudget(budget.id)"
-          >
-            Edit
-          </base-button>
-        </div>
-        <div>
-          <base-button
-            :class="['btn-accent']"
-            @click="coreState.viewBudget(budget.id)"
-          >
-            View
-          </base-button>
-        </div>
-      </div>
-    </template>
-  </collapsible-card>
+  </base-card>
 </template>

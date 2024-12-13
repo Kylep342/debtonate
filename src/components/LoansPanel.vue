@@ -11,10 +11,8 @@ import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
-import useRefinancingStore from '../stores/refinancing';
 
 const coreState = useCoreStore();
-const refi = useRefinancingStore();
 
 const scrollContainer = ref(null);
 

@@ -6,13 +6,13 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const currentLoan = ref(coreState.getLoan(coreState.currentLoanId));
+const currentLoan = ref(null);
 
-const principal = ref(currentLoan.value?.principal || 0);
-const interestRate = ref((currentLoan.value?.annualRate || 0) * 100);
-const termInYears = ref(currentLoan.value?.termInYears || 0);
-const name = ref(currentLoan.value?.name || '');
-const currentBalance = ref(currentLoan.value?.currentBalance || null);
+const principal = ref(0);
+const interestRate = ref(0);
+const termInYears = ref(0);
+const name = ref('');
+const currentBalance = ref(0);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(

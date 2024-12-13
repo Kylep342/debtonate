@@ -22,6 +22,8 @@ export default defineStore('core', () => {
   const optionsFormActive = ref(false);
   const periodsAsDates = ref(false);
   const reducePayments = ref(false);
+  const refinancingFormActive = ref(false);
+  const refinancingScenarios = ref({});
   const roundingScale = ref(100);
   const roundUp = ref(false);
   const snowballSort = ref(false);
@@ -166,6 +168,10 @@ export default defineStore('core', () => {
   const openOptionsForm = () => {
     optionsFormActive.value = true;
   };
+  const openRefinancingForm = (id) => {
+    currentLoanId.value = id;
+    refinancingFormActive.value = true;
+  };
   const exitBudgetForm = () => {
     budgetFormActive.value = false;
     currentBudgetId.value = null;
@@ -176,6 +182,10 @@ export default defineStore('core', () => {
   };
   const exitOptionsForm = () => {
     optionsFormActive.value = false;
+  };
+  const exitRefinancingForm = () => {
+    refinancingFormActive.value = false;
+    currentLoanId.value = null;
   };
   const setCurrency = (newValue) => {
     currency.value = newValue;
@@ -220,9 +230,18 @@ export default defineStore('core', () => {
   const getLoanName = (id) => (
     getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
   );
+  const loanRefinanceScenarioName = (id) => `${getLoanName(id)} - Refinance Scenario ${refinancingScenarios[id]?.length + 1 || 1}`;
   const viewLoan = (id) => {
     currentLoanId.value = id;
     loanDetailsPanelActive.value = true;
+  };
+  const refinanceLoan = (loanId, principal, interestRate, termInYears, fees) => {
+    const refinancedLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, loanRefinanceScenarioName(loanId));
+    console.log(`${refinancedLoan}`);
+    if (fees) {
+      console.log(fees);
+    }
+    exitRefinancingForm();
   };
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
@@ -337,10 +356,17 @@ export default defineStore('core', () => {
     }
 
   // dependent computed values/methods
+  const budgetFormTitle = computed(() => (currentBudgetId.value
+    ? `Editing ${getBudgetName(currentBudgetId.value)}`
+    : 'Creating a Budget'));
 
   const loanFormTitle = computed(() => (currentLoanId.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
     : 'Creating a Loan'));
+
+  const refinancingFormTitle = computed(() => (currentLoanId.value
+    ? `Refinancing ${getLoanName(currentLoanId.value)}`
+    : 'Refinancing'));
 
   const createBudgetButtonText = computed(() => (
     currentBudgetId.value
@@ -352,9 +378,6 @@ export default defineStore('core', () => {
     () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
   );
 
-  const budgetFormTitle = computed(() => (currentBudgetId.value
-    ? `Editing ${getBudgetName(currentBudgetId.value)}`
-    : 'Creating a Budget'));
 
   const paymentSchedules = computed(() => {
     const schedules = {};
@@ -602,6 +625,7 @@ export default defineStore('core', () => {
     exitBudgetForm,
     exitLoanForm,
     exitOptionsForm,
+    exitRefinancingForm,
     exportState,
     Period,
     getBudget,
@@ -633,6 +657,7 @@ export default defineStore('core', () => {
     openBudgetForm,
     openLoanForm,
     openOptionsForm,
+    openRefinancingForm,
     optionsFormActive,
     paymentSchedules,
     paymentSummaries,
@@ -641,6 +666,10 @@ export default defineStore('core', () => {
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,
+    refinanceLoan,
+    refinancingFormActive,
+    refinancingFormTitle,
+    refinancingScenarios,
     roundedGlobalMinPayment,
     roundingScale,
     roundUp,
