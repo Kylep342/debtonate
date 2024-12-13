@@ -49,8 +49,6 @@ const buildAmortizationTableTitle = (anchor, item) => (
     : coreState.buildAmortizationTableTitle(item, anchor)
 );
 
-const generateKey = (...args) => args.map((arg) => arg.id || arg).join('');
-
 const emitExit = () => {
   emits(emitters.EMIT_EXIT_DETAILS_PANEL);
 };
@@ -82,7 +80,6 @@ const emitExit = () => {
         >
           <template #tabContent>
             <AmortizationTable
-              :id="'amortizationTable' + generateKey(anchor, getItem(viewedItemId))"
               :payment-summary="getPaymentSummary(anchor.id, viewedItemId)"
               :title="buildAmortizationTableTitle(
                 anchor,
