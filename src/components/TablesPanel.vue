@@ -5,7 +5,7 @@ import InterestTable from './InterestTable.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const viewedLoanId = ref(constants.TOTALS);
 
@@ -20,8 +20,8 @@ const setViewedLoanId = (loanId) => {
   <div>
     <div :class="['tabframe', 'w-fit']">
       <base-tabs
-        :get-item-name="state.getLoanName"
-        :pivot="state.loansWithTotals"
+        :get-item-name="coreState.getLoanName"
+        :pivot="coreState.loansWithTotals"
         :is-viewed-item-id="isViewedLoanId"
         :set-viewed-item-id="setViewedLoanId"
       >
@@ -29,8 +29,8 @@ const setViewedLoanId = (loanId) => {
           <InterestTable
             id="interestTable"
             :loan-id="viewedLoanId"
-            :title="state.buildInterestTableTitle(state.getLoan(viewedLoanId))"
-            :subtitle="state.buildLoanSubtitle(state.getLoan(viewedLoanId))"
+            :title="coreState.buildInterestTableTitle(coreState.getLoan(viewedLoanId))"
+            :subtitle="coreState.buildLoanSubtitle(coreState.getLoan(viewedLoanId))"
           />
         </template>
       </base-tabs>

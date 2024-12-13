@@ -8,14 +8,14 @@ const coreState = useCoreStore();
 
 const currentLoan = ref(null);
 
-const principal = ref(0);
+const currentBalance = ref(0);
 const interestRate = ref(0);
 const termInYears = ref(0);
 const name = ref('');
-const currentBalance = ref(0);
+const fees = ref(0);
 
 const createButtonEnabled = computed(
-  () => [principal.value, interestRate.value, termInYears.value].every(
+  () => [currentBalance.value, interestRate.value, termInYears.value].every(
     (input) => !Number.isNaN(input) && input > 0,
   ),
 );
@@ -23,47 +23,46 @@ const createButtonEnabled = computed(
 watch(
   () => coreState.currentLoanId,
   (newId) => {
-    if (newId && coreState.loanFormActive) {
+    if (newId && coreState.refinancingFormActive) {
       currentLoan.value = coreState.getLoan(newId);
-      principal.value = currentLoan.value.principal;
+      currentBalance.value = currentLoan.value.currentBalance;
       interestRate.value = currentLoan.value.annualRate * 100;
       termInYears.value = currentLoan.value.termInYears;
       name.value = currentLoan.value.name;
-      currentBalance.value = currentLoan.value.currentBalance;
     }
   },
   { immediate: true },
 );
 
 const clearForm = () => {
-  principal.value = null;
+  currentBalance.value = null;
   interestRate.value = null;
   termInYears.value = null;
   name.value = null;
-  currentBalance.value = null;
+  fees.value = null;
 };
 
-const createLoan = () => {
-  coreState.createLoan(
-    principal.value,
-    interestRate.value / 100,
-    termInYears.value,
-    name.value,
+const refinanceLoan = () => {
+  coreState.refinanceLoan(
+    currentLoan.value.id,
     currentBalance.value,
+    interestRate.value,
+    termInYears.value,
+    fees.value
   );
   clearForm();
 };
 
 const exit = () => {
   clearForm();
-  coreState.exitLoanForm();
+  coreState.exitRefinancingForm();
 };
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_FORM_ID">
+  <base-modal :id="constants.REFINANCING_FORM_ID">
     <template #header>
-      <h2>{{ coreState.loanFormTitle }}</h2>
+      <h2>{{ coreState.refinancingFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button
@@ -79,7 +78,7 @@ const exit = () => {
           <span :class="['label-text']">Principal</span>
         </div>
         <input
-          v-model.number="principal"
+          v-model.number="currentBalance"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
           step="0.01"
@@ -105,23 +104,14 @@ const exit = () => {
           label="Term In Years"
         >
         <div :class="['label']">
-          <span :class="['label-text']">Name (Optional)</span>
+          <span :class="['label-text']">Fees (Optional)</span>
         </div>
         <input
-          v-model="name"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="string"
-          label="Name"
-        >
-        <div :class="['label']">
-          <span :class="['label-text']">Current Balance (Optional)</span>
-        </div>
-        <input
-          v-model.number="currentBalance"
+          v-model.number="fees"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
           step="0.01"
-          label="Current Balance"
+          label="Fees"
         >
       </div>
     </template>
@@ -129,9 +119,9 @@ const exit = () => {
       <base-button
         :disabled="!createButtonEnabled"
         :class="'btn-success'"
-        @click="createLoan"
+        @click="refinanceLoan"
       >
-        {{ coreState.createLoanButtonText }}
+        {{ constants.BTN_REFINANCE }}
       </base-button>
     </template>
   </base-modal>

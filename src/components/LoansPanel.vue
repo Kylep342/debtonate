@@ -12,9 +12,13 @@ import constants from '../constants/constants';
 import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
 const scrollContainer = ref(null);
+
+const buttons = [
+  {classes: [], text: constants.BTN_CREATE, onClick: coreState.openLoanForm},
+]
 
 onMounted(() => {
   scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
@@ -37,7 +41,7 @@ onBeforeUnmount(() => {
   >
     <template #cardTitle>
       <ManagementPanel
-        :create-function="state.openCreateLoanForm"
+        :buttons="buttons"
         :title="constants.LOANS"
         :class="['sticky', 'fixed', 'border-b-2']"
       />
@@ -55,7 +59,7 @@ onBeforeUnmount(() => {
       >
         <ul>
           <li
-            v-for="(loan) in state.loansWithTotals"
+            v-for="(loan) in coreState.loansWithTotals"
             :key="loan.id"
           >
             <LoanCard :loan="loan" />

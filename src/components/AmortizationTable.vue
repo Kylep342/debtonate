@@ -4,9 +4,9 @@ import useCoreStore from '../stores/core';
 
 defineProps(['paymentSummary', 'title', 'subtitle']);
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
-const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -49,19 +49,19 @@ const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'P
               :key="rowno"
             >
               <td :class="['text-center']">
-                {{ state.Period(record.period, true) }}
+                {{ coreState.Period(record.period, true) }}
               </td>
               <td :class="['text-right']">
-                {{ state.Money(record.interest + record.principal) }}
+                {{ coreState.Money(record.interest + record.principal) }}
               </td>
               <td :class="['text-right']">
-                {{ state.Money(record.principal) }}
+                {{ coreState.Money(record.principal) }}
               </td>
               <td :class="['text-right']">
-                {{ state.Money(record.interest) }}
+                {{ coreState.Money(record.interest) }}
               </td>
               <td :class="['text-right']">
-                {{ state.Money(record.principalRemaining) }}
+                {{ coreState.Money(record.principalRemaining) }}
               </td>
             </tr>
           </tbody>
@@ -74,20 +74,20 @@ const paymentHeader = computed(() => (state.periodsAsDates ? 'Payment Date' : 'P
               </td>
               <td :class="['text-right']">
                 <b>{{
-                  state.Money(
+                  coreState.Money(
                     paymentSummary.totalPrincipalPaid +
                       paymentSummary.totalInterestPaid
                   )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ state.Money(paymentSummary.totalPrincipalPaid) }}</b>
+                <b>{{ coreState.Money(paymentSummary.totalPrincipalPaid) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ state.Money(paymentSummary.totalInterestPaid) }}</b>
+                <b>{{ coreState.Money(paymentSummary.totalInterestPaid) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ state.Money(0) }}</b>
+                <b>{{ coreState.Money(0) }}</b>
               </td>
             </tr>
           </tfoot>

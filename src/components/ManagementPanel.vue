@@ -1,5 +1,7 @@
 <script setup>
-const props = defineProps(['createFunction', 'title']);
+const props = defineProps(['buttons', 'title']);
+
+const classes = ['btn-success', 'text-center']
 </script>
 
 <template>
@@ -8,12 +10,17 @@ const props = defineProps(['createFunction', 'title']);
       <h2>{{ props.title }}</h2>
     </div>
     <div :class="['flex-none']">
-      <base-button
-        :class="['btn-success']"
-        @click="props.createFunction"
+      <div
+        v-for="(button) in buttons"
+        :key="button.text"
       >
-        Create
-      </base-button>
+        <base-button
+          :class="classes"
+          @click="button.onClick"
+        >
+          {{ button.text }}
+        </base-button>
+      </div>
     </div>
   </div>
 </template>

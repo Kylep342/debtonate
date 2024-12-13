@@ -4,34 +4,34 @@ import { computed, ref, watch } from 'vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
-const _currency = ref(state.currency);
-const _language = ref(state.language);
-const roundingScale = ref(state.roundingScale);
+const _currency = ref(coreState.currency);
+const _language = ref(coreState.language);
+const roundingScale = ref(coreState.roundingScale);
 
-const sortedCurrencies = computed(() => state.currencies.toSorted());
-const sortedLanguages = computed(() => state.languages.toSorted());
+const sortedCurrencies = computed(() => coreState.currencies.toSorted());
+const sortedLanguages = computed(() => coreState.languages.toSorted());
 const reducePaymentsExample = computed(
-  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${state.Money(state.loans[0].minPayment)})`) : ''),
+  () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
 );
 const repaymentPriorityExample = computed(
-  () => (state.loans.length ? ('Priority: ' + state.loans.map((loan) => state.getLoanName(loan.id)).join( ', ')) : ''),
+  () => (coreState.loans.length ? ('Priority: ' + coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')) : ''),
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 
 watch(() => _currency.value, async (newValue) => {
-  state.setCurrency(newValue);
+  coreState.setCurrency(newValue);
 }, { immediate: true });
 
 watch(() => _language.value, async (newValue) => {
-  state.setLanguage(newValue);
+  coreState.setLanguage(newValue);
 }, { immediate: true });
 
 watch(() => roundingScale.value, async (newValue) => {
-  state.setRoundingScale(newValue);
+  coreState.setRoundingScale(newValue);
 }, { immediate: true });
 </script>
 
@@ -46,7 +46,7 @@ watch(() => roundingScale.value, async (newValue) => {
     <template #headerActions>
       <base-button
         :class="['btn btn-circle btn-ghost']"
-        @click="state.exitOptionsForm"
+        @click="coreState.exitOptionsForm"
       >
         x
       </base-button>
@@ -64,14 +64,14 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardTitleActions>
             <div>
               <base-button
-                :class="buttonStyle(!state.snowballSort)"
-                @click="state.toggleAvalancheSort"
+                :class="buttonStyle(!coreState.snowballSort)"
+                @click="coreState.toggleAvalancheSort"
               >
                 Avalanche
               </base-button>
               <base-button
-                :class="buttonStyle(state.snowballSort)"
-                @click="state.toggleSnowballSort"
+                :class="buttonStyle(coreState.snowballSort)"
+                @click="coreState.toggleSnowballSort"
               >
                 Snowball
               </base-button>
@@ -97,11 +97,11 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardTitleActions>
             <div>
               <base-button
-                :class="buttonStyle(state.reducePayments)"
-                @click="state.toggleReducePayments"
+                :class="buttonStyle(coreState.reducePayments)"
+                @click="coreState.toggleReducePayments"
               >
                 {{
-                  buttonText(state.reducePayments) }}
+                  buttonText(coreState.reducePayments) }}
               </base-button>
             </div>
           </template>
@@ -137,10 +137,10 @@ watch(() => roundingScale.value, async (newValue) => {
                 label="scale"
               >
               <base-button
-                :class="buttonStyle(state.roundUp)"
-                @click="state.toggleRounding(roundingScale)"
+                :class="buttonStyle(coreState.roundUp)"
+                @click="coreState.toggleRounding(roundingScale)"
               >
-                {{ buttonText(state.roundUp) }}
+                {{ buttonText(coreState.roundUp) }}
               </base-button>
             </div>
           </template>
@@ -148,11 +148,11 @@ watch(() => roundingScale.value, async (newValue) => {
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
-                multiple of {{ state.Money(roundingScale) }}
+                multiple of {{ coreState.Money(roundingScale) }}
               </p>
               <br>
               <p>
-                Minimum Monthly Payment: {{ state.Money(state.globalMinPayment) }}
+                Minimum Monthly Payment: {{ coreState.Money(coreState.globalMinPayment) }}
               </p>
             </div>
           </template>
@@ -166,10 +166,10 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardTitleActions>
             <div>
               <base-button
-                :class="buttonStyle(state.periodsAsDates)"
-                @click="state.togglePeriodsAsDates"
+                :class="buttonStyle(coreState.periodsAsDates)"
+                @click="coreState.togglePeriodsAsDates"
               >
-                {{ buttonText(state.periodsAsDates) }}
+                {{ buttonText(coreState.periodsAsDates) }}
               </base-button>
             </div>
           </template>
@@ -180,7 +180,7 @@ watch(() => roundingScale.value, async (newValue) => {
                 today)
               </p>
               <br>
-              <p>Next Period: {{ state.Period(1, true) }}</p>
+              <p>Next Period: {{ coreState.Period(1, true) }}</p>
             </div>
           </template>
         </collapsible-card>
@@ -207,7 +207,7 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
           <template #cardBody>
-            <p>Money: {{ state.Money(state.globalMinPayment) }}</p>
+            <p>Money: {{ coreState.Money(coreState.globalMinPayment) }}</p>
           </template>
         </collapsible-card>
         <collapsible-card>
@@ -235,9 +235,9 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardBody>
             <p>Localization setting for formatting numbers and dates</p>
             <br>
-            <p>Percent: {{ state.Percent(state.globalEffectiveInterestRate * 100) }}</p>
-            <p>Money: {{ state.Money(state.globalMinPayment) }}</p>
-            <p>Next Period: {{ state.Period(1, true) }}</p>
+            <p>Percent: {{ coreState.Percent(coreState.globalEffectiveInterestRate * 100) }}</p>
+            <p>Money: {{ coreState.Money(coreState.globalMinPayment) }}</p>
+            <p>Next Period: {{ coreState.Period(1, true) }}</p>
           </template>
         </collapsible-card>
       </div>

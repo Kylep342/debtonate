@@ -4,9 +4,9 @@ import { computed, ref, watch } from 'vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const state = useCoreStore();
+const coreState = useCoreStore();
 
-const currentBudget = ref(state.getBudget(state.currentBudgetId));
+const currentBudget = ref(coreState.getBudget(coreState.currentBudgetId));
 
 const amount = ref(currentBudget.value?.relative);
 
@@ -15,35 +15,35 @@ const createButtonEnabled = computed(
 );
 
 watch(
-  () => state.currentBudgetId,
+  () => coreState.currentBudgetId,
   (newId) => {
-    if (newId && state.createBudgetFormActive) {
-      currentBudget.value = state.getBudget(newId);
+    if (newId && coreState.budgetFormActive) {
+      currentBudget.value = coreState.getBudget(newId);
       amount.value = currentBudget.value.relative;
     }
   },
   { immediate: true },
 );
 
-const clearCreate = () => {
+const clearForm = () => {
   amount.value = null;
 };
 
 const createBudget = () => {
-  state.createBudget(amount.value);
-  clearCreate();
+  coreState.createBudget(amount.value);
+  clearForm();
 }
 
 const exit = () => {
-  clearCreate();
-  state.exitCreateBudgetForm();
+  clearForm();
+  coreState.exitBudgetForm();
 };
 </script>
 
 <template>
   <base-modal :id="constants.BUDGET_FORM_ID">
     <template #header>
-      <h2>{{ state.createBudgetFormTitle }}</h2>
+      <h2>{{ coreState.budgetFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button
@@ -72,7 +72,7 @@ const exit = () => {
         :class="'btn-success'"
         @click="createBudget"
       >
-        {{ state.createBudgetButtonText }}
+        {{ coreState.createBudgetButtonText }}
       </base-button>
     </template>
   </base-modal>
