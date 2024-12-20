@@ -7,6 +7,7 @@ import DebtSummary from './components/DebtSummary.vue';
 import DetailsPanel from './components/DetailsPanel.vue';
 import FooterBar from './components/FooterBar.vue';
 import HeaderBar from './components/HeaderBar.vue';
+import LoanDetailsPanel from './components/LoanDetailsPanel.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
@@ -65,6 +66,8 @@ watch(() => coreState.refinancingFormActive, async (show) => {
   }
 });
 
+watch(() => coreState.refinancingScenarios, async (newValue) => console.log(newValue));
+
 </script>
 
 <template>
@@ -98,7 +101,12 @@ watch(() => coreState.refinancingFormActive, async (show) => {
             <DebtSummary />
           </div>
           <div>
-            <DetailsPanel
+            <LoanDetailsPanel
+              :id="constants.LOAN_DETAILS_ID"
+              :anchor="coreState.getLoan(coreState.currentLoanId)"
+              :pivot="coreState.monthlyBudgets"
+            />
+            <!-- <DetailsPanel
               :id="constants.LOAN_DETAILS_ID"
               :title="coreState.currentLoanId
                 ? coreState.buildLoanDetailsTitle(coreState.getLoan(coreState.currentLoanId))
@@ -108,7 +116,7 @@ watch(() => coreState.refinancingFormActive, async (show) => {
               :anchor="coreState.getLoan(coreState.currentLoanId)"
               :pivot="coreState.monthlyBudgets"
               @exit-details-panel="coreState.unviewLoan"
-            />
+            /> -->
             <DetailsPanel
               :id="constants.BUDGET_DETAILS_ID"
               :title="coreState.currentBudgetId

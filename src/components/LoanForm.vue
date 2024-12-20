@@ -61,7 +61,7 @@ const exit = () => {
 <template>
   <base-modal :id="constants.LOAN_FORM_ID">
     <template #header>
-      <h2>{{ coreState.loanFormTitle }}</h2>
+      <h2 :class="['pl-4']">{{ coreState.loanFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button

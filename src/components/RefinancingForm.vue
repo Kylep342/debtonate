@@ -40,11 +40,12 @@ const clearForm = () => {
 };
 
 const refinanceLoan = () => {
-  coreState.refinanceLoan(
+  coreState.createRefinanceScenario(
     loanId.value,
     currentBalance.value,
-    interestRate.value,
+    interestRate.value / 100,
     termInYears.value,
+    name.value,
     fees.value
   );
   clearForm();
@@ -99,6 +100,15 @@ const exit = () => {
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
           label="Term In Years"
+        >
+        <div :class="['label']">
+          <span :class="['label-text']">Name (Optional)</span>
+        </div>
+        <input
+          v-model="name"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="string"
+          label="Name"
         >
         <div :class="['label']">
           <span :class="['label-text']">Fees (Optional)</span>

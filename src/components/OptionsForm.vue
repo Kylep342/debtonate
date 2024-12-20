@@ -235,9 +235,9 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardBody>
             <p>Localization setting for formatting numbers and dates</p>
             <br>
-            <p>Percent: {{ coreState.Percent(coreState.globalEffectiveInterestRate * 100) }}</p>
             <p>Money: {{ coreState.Money(coreState.globalMinPayment) }}</p>
             <p>Next Period: {{ coreState.Period(1, true) }}</p>
+            <p>Percent: {{ coreState.Percent(coreState.globalEffectiveInterestRate * 100) }}</p>
           </template>
         </collapsible-card>
       </div>
