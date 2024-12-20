@@ -66,8 +66,6 @@ watch(() => coreState.refinancingFormActive, async (show) => {
   }
 });
 
-watch(() => coreState.refinancingScenarios, async (newValue) => console.log(newValue));
-
 </script>
 
 <template>
