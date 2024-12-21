@@ -58,6 +58,7 @@ const setViewedLoanId = (loanId) => {
             :x-scale="activeGraph.xScale"
             :y="activeGraph.y"
             :y-scale="activeGraph.yScale"
+            :line-name="activeGraph.lineName"
             :hover-format="activeGraph.hoverFormat"
           />
         </template>

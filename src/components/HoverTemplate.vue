@@ -26,3 +26,4 @@ const coreState = useCoreStore();
     </template>
   </base-table>
 </template>
+

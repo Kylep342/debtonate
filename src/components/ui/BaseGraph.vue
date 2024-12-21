@@ -1,10 +1,8 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  onMounted, render, shallowReactive, watch,
+  onMounted, shallowReactive, watch, ref, h,
 } from 'vue';
-
-import HoverTemplate from '../HoverTemplate.vue';
 import constants from '../../constants/constants';
 
 const props = defineProps([
@@ -13,10 +11,13 @@ const props = defineProps([
   'xScale',
   'y',
   'yScale',
+  'lineName',
   'hoverFormat',
 ]);
 
 const chart = shallowReactive({});
+const tooltipContent = ref(null); // Dynamic tooltip content
+const tooltipPosition = ref({ left: 0, top: 0 });
 
 const initializeChart = () => {
   if (!chart.config || !chart.lines || chart.lines.length === 0) {
@@ -55,6 +56,8 @@ const initializeChart = () => {
       .attr('stroke-opacity', 0.1));
 
   Object.entries(chart.lines).forEach(([id, line], index) => {
+    console.log(id)
+    console.log(line)
     svg.append('path')
       .datum(line)
       .attr('fill', 'none')
@@ -63,7 +66,7 @@ const initializeChart = () => {
       .attr('transform', `translate(${margin},0)`)
       .attr('d', draw);
 
-    line.forEach(point => {
+    line.forEach((point, pointIndex) => {
       svg.append('circle')
         .attr('cx', x(props.x(point.x)) + margin)
         .attr('cy', y(props.y(point.y)))
@@ -71,15 +74,45 @@ const initializeChart = () => {
         .style('opacity', 0)
         .attr('fill', constants.COLORS[index % constants.COLORS.length])
         .on('mouseover', (event) => {
-          d3.select('#tooltip')
-            .style('opacity', 1)
-            .style('left', `${event.pageX + 5}px`)
-            .style('top', `${event.pageY - 28}px`)
-            .html(props.hoverFormat(point, id));
-            // .html(render(HoverTemplate));
+          tooltipPosition.value = { left: event.pageX + 10, top: event.pageY - 10 };
+
+          tooltipContent.value = h(
+            'table',
+            { class: 'tooltip-table' },
+            [
+              h('thead', [
+                h('tr', [
+                  h('th', 'Line Color'),
+                  h('th', 'Line Name'),
+                  h('th', 'Y'),
+                ]),
+              ]),
+              h('tbody', Object.entries(chart.lines).map(([i, line]) => {
+                const hoveredPoint = line[Math.min(pointIndex, line.length)];
+                console.log(hoveredPoint)
+                return h('tr', { key: i }, [
+                  h('td', [
+                    h('svg', { width: 10, height: 10 }, [
+                      h('circle', {
+                        cx: 5,
+                        cy: 5,
+                        r: 5,
+                        fill: constants.COLORS[i % constants.COLORS.length],
+                      }),
+                    ]),
+                  ]),
+                  h('td', props.lineName(i)),
+                  h('td', props.hoverFormat(hoveredPoint)),
+                ]);
+              })),
+            ],
+          );
+
+          d3.select('#tooltip').style('opacity', 1);
         })
         .on('mouseout', () => {
           d3.select('#tooltip').style('opacity', 0);
+          tooltipContent.value = null;
         });
     });
   });
@@ -105,17 +138,32 @@ watch(
 </script>
 
 <template>
-  <div :class="['chartWrapper']">
-    <h2 :class="['text-center']">
-      {{ chart.config.header }}
-    </h2>
-    <h2 :class="['text-center']">
-      {{ chart.config.subheader }}
-    </h2>
+  <div class="chartWrapper">
+    <h2 class="text-center">{{ chart.config.header }}</h2>
+    <h2 class="text-center">{{ chart.config.subheader }}</h2>
     <svg :id="'chart' + chart.id" />
     <div
       id="tooltip"
-      style="position: absolute; opacity: 0; background: oklch(100% 3.5594404384177905e-8 106.37411429114086); border: 1px solid oklch(84.52% 0 0); padding: 5px; pointer-events: none;"
-    />
+      :style="{ left: tooltipPosition.left + 'px', top: tooltipPosition.top + 'px', position: 'absolute', opacity: tooltipContent ? 1 : 0 }"
+    >
+      <component :is="tooltipContent" />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.tooltip-table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.tooltip-table th,
+.tooltip-table td {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: left;
+}
+</style>
