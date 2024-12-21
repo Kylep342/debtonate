@@ -1,8 +1,10 @@
 <script setup>
 import * as d3 from 'd3';
 import {
-  onMounted, shallowReactive, watch,
+  onMounted, render, shallowReactive, watch,
 } from 'vue';
+
+import HoverTemplate from '../HoverTemplate.vue';
 import constants from '../../constants/constants';
 
 const props = defineProps([
@@ -52,7 +54,7 @@ const initializeChart = () => {
       .attr('x2', width - margin * 2)
       .attr('stroke-opacity', 0.1));
 
-  chart.lines.forEach((line, index) => {
+  Object.entries(chart.lines).forEach(([id, line], index) => {
     svg.append('path')
       .datum(line)
       .attr('fill', 'none')
@@ -73,7 +75,8 @@ const initializeChart = () => {
             .style('opacity', 1)
             .style('left', `${event.pageX + 5}px`)
             .style('top', `${event.pageY - 28}px`)
-            .html(props.hoverFormat(point));
+            .html(props.hoverFormat(point, id));
+            // .html(render(HoverTemplate));
         })
         .on('mouseout', () => {
           d3.select('#tooltip').style('opacity', 0);
