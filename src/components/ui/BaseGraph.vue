@@ -86,7 +86,7 @@ const initializeChart = () => {
                 h('tr', [
                   h('th', 'Color'),
                   h('th', props.xLabel.value),
-                  h('th', props.x(pointIndex, true)),
+                  h('th', props.x(point.x, true)),
                 ]),
               ]),
               h('tbody', Object.keys(chart.lines).map((i) => {
@@ -102,7 +102,7 @@ const initializeChart = () => {
                     ]),
                   ]),
                   h('td', props.lineName(i)),
-                  h('td', props.yFormat(chart.lines[i][pointIndex].y)),
+                  h('td', props.yFormat(chart.lines[i][Math.min(pointIndex, chart.lines[i].length - 1)].y)),
                 ]);
               })),
             ],
