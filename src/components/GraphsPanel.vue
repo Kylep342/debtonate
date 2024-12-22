@@ -57,9 +57,9 @@ const setViewedLoanId = (loanId) => {
             :x="activeGraph.x"
             :x-scale="activeGraph.xScale"
             :y="activeGraph.y"
+            :y-format="activeGraph.yFormat"
             :y-scale="activeGraph.yScale"
             :line-name="activeGraph.lineName"
-            :hover-format="activeGraph.hoverFormat"
           />
         </template>
       </base-tabs>

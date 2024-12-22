@@ -10,9 +10,11 @@ const props = defineProps([
   'x',
   'xScale',
   'y',
+  'yFormat',
+  'yLabel',
   'yScale',
+  'lineLabel',
   'lineName',
-  'hoverFormat',
 ]);
 
 const chart = shallowReactive({});
@@ -82,14 +84,12 @@ const initializeChart = () => {
             [
               h('thead', [
                 h('tr', [
-                  h('th', 'Line Color'),
-                  h('th', 'Line Name'),
-                  h('th', 'Y'),
+                  h('th', 'Color'),
+                  h('th', `${props.lineLabel}`),
+                  h('th', props.yLabel),
                 ]),
               ]),
-              h('tbody', Object.entries(chart.lines).map(([i, line]) => {
-                const hoveredPoint = line[Math.min(pointIndex, line.length)];
-                console.log(hoveredPoint)
+              h('tbody', Object.keys(chart.lines).map((i) => {
                 return h('tr', { key: i }, [
                   h('td', [
                     h('svg', { width: 10, height: 10 }, [
@@ -102,7 +102,7 @@ const initializeChart = () => {
                     ]),
                   ]),
                   h('td', props.lineName(i)),
-                  h('td', props.hoverFormat(hoveredPoint)),
+                  h('td', props.yFormat(chart.lines[i][pointIndex].y)),
                 ]);
               })),
             ],

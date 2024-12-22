@@ -487,9 +487,11 @@ export default defineStore('core', () => {
       x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: 'Balance',
       yScale: d3.scaleLinear,
+      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
-      hoverFormat: (point, budgetId) => `Period ${Period(point.x, true)}<br>${getBudgetName(budgetId)}:<br>${Money(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -525,9 +527,11 @@ export default defineStore('core', () => {
       x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yLabel: 'Percent to Principal',
+      yFormat: Percent,
       yScale: d3.scaleLinear,
+      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
-      hoverFormat: (point, budgetId) => `Period ${Period(point.x, true)}<br>${getBudgetName(budgetId)}<br>${Percent(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -561,9 +565,11 @@ export default defineStore('core', () => {
       x: Period,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: 'Interest Saved',
       yScale: d3.scaleLinear,
+      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
-      hoverFormat: (point, budgetId) => `Period ${Period(point.x, true)}<br>${getBudgetName(budgetId)}<br>${Money(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
