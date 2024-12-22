@@ -26,6 +26,7 @@ const COLORS = [
   'oklch(70.39% 0.1255 52.95)',
   'oklch(28.42% 0.0095 355.53)'
 ];
+const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
@@ -39,6 +40,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+const PERIOD = 'Period';
 const REFINANCING_FORM_ID = 'refinanceForm';
 const TABLES = 'Tables';
 
@@ -126,6 +128,7 @@ export default Object.freeze({
   BUDGETS,
   BUG_FORM_LINK,
   COLORS,
+  DATE,
   DEFAULT,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,
@@ -140,6 +143,7 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+  PERIOD,
   REFINANCING_FORM_ID,
   TABLES,
   TOTALS,

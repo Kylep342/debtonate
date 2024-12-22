@@ -67,6 +67,8 @@ export default defineStore('core', () => {
     return period;
   };
 
+  const Time = computed(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
+
   const currencySymbol = computed(() => {
     const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -271,6 +273,7 @@ export default defineStore('core', () => {
     openBudgetForm();
   };
   const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
+  const getBudgetColor = (id) => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
   const getBudgetName = (id) => (
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
@@ -500,11 +503,15 @@ export default defineStore('core', () => {
     const config = {
       id: 'Balances',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: 'Balance',
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
+      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -515,17 +522,19 @@ export default defineStore('core', () => {
           header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       };
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      Object.values(paymentSchedules.value).forEach((schedule) => {
+      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
+        console.log(`Budget ID ${budgetId}`);
+        console.log(`Schedule ${schedule}`);
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -535,11 +544,15 @@ export default defineStore('core', () => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yLabel: 'Percent to Principal',
+      yFormat: Percent,
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Percent(point.y)}`,
+      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -550,17 +563,17 @@ export default defineStore('core', () => {
           header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       }
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      Object.values(paymentSchedules.value).forEach((schedule) => {
+      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -570,11 +583,15 @@ export default defineStore('core', () => {
     const config = {
       id: 'InterestSaved',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: 'Interest Saved',
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
+      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -585,7 +602,7 @@ export default defineStore('core', () => {
           header: `Interest Saved Over Time By Budget - ${getLoanName(loan.id)}`,
           subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       }
     });
 
@@ -595,7 +612,7 @@ export default defineStore('core', () => {
         getPaymentSummary(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
           line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, budgetId, index) });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -644,6 +661,7 @@ export default defineStore('core', () => {
     exportState,
     Period,
     getBudget,
+    getBudgetColor,
     getBudgetIndex,
     getBudgetName,
     getLifetimeInterest,
@@ -695,6 +713,7 @@ export default defineStore('core', () => {
     snowball,
     snowballSort,
     sortLoans,
+    Time,
     toggleAvalancheSort,
     togglePeriodsAsDates,
     toggleReducePayments,
