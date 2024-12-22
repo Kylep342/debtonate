@@ -257,6 +257,7 @@ export default defineStore('core', () => {
     openBudgetForm();
   };
   const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
+  const getBudgetColor = (id) => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
   const getBudgetName = (id) => (
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
@@ -484,13 +485,14 @@ export default defineStore('core', () => {
     const config = {
       id: 'Balances',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
       yLabel: 'Balance',
       yScale: d3.scaleLinear,
-      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
     };
 
@@ -524,13 +526,14 @@ export default defineStore('core', () => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yLabel: 'Percent to Principal',
       yFormat: Percent,
       yScale: d3.scaleLinear,
-      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
     };
 
@@ -562,13 +565,14 @@ export default defineStore('core', () => {
     const config = {
       id: 'InterestSaved',
       graphs: {},
+      color: getBudgetColor,
       x: Period,
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
       yLabel: 'Interest Saved',
       yScale: d3.scaleLinear,
-      lineLabel: constants.BUDGET,
       lineName: getBudgetName,
     };
 
@@ -638,6 +642,7 @@ export default defineStore('core', () => {
     exportState,
     Period,
     getBudget,
+    getBudgetColor,
     getBudgetIndex,
     getBudgetName,
     getLifetimeInterest,

@@ -54,10 +54,13 @@ const setViewedLoanId = (loanId) => {
           <base-graph
             :key="viewedLoanId"
             :graph="activeGraph.graphs[viewedLoanId]"
+            :color="activeGraph.color"
             :x="activeGraph.x"
+            :x-label="activeGraph.xLabel"
             :x-scale="activeGraph.xScale"
             :y="activeGraph.y"
             :y-format="activeGraph.yFormat"
+            :y-label="activeGraph.yLabel"
             :y-scale="activeGraph.yScale"
             :line-name="activeGraph.lineName"
           />

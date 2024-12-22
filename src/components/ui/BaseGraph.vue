@@ -3,17 +3,17 @@ import * as d3 from 'd3';
 import {
   onMounted, shallowReactive, watch, ref, h,
 } from 'vue';
-import constants from '../../constants/constants';
 
 const props = defineProps([
   'graph',
+  'color',
   'x',
+  'xLabel',
   'xScale',
   'y',
   'yFormat',
   'yLabel',
   'yScale',
-  'lineLabel',
   'lineName',
 ]);
 
@@ -57,13 +57,13 @@ const initializeChart = () => {
       .attr('x2', width - margin * 2)
       .attr('stroke-opacity', 0.1));
 
-  Object.entries(chart.lines).forEach(([id, line], index) => {
+  Object.entries(chart.lines).forEach(([id, line]) => {
     console.log(id)
     console.log(line)
     svg.append('path')
       .datum(line)
       .attr('fill', 'none')
-      .attr('stroke', constants.COLORS[index % constants.COLORS.length])
+      .attr('stroke', props.color(id))
       .attr('stroke-width', 1.5)
       .attr('transform', `translate(${margin},0)`)
       .attr('d', draw);
@@ -74,7 +74,7 @@ const initializeChart = () => {
         .attr('cy', y(props.y(point.y)))
         .attr('r', 4)
         .style('opacity', 0)
-        .attr('fill', constants.COLORS[index % constants.COLORS.length])
+        .attr('fill', props.color(id))
         .on('mouseover', (event) => {
           tooltipPosition.value = { left: event.pageX + 10, top: event.pageY - 10 };
 
@@ -85,8 +85,8 @@ const initializeChart = () => {
               h('thead', [
                 h('tr', [
                   h('th', 'Color'),
-                  h('th', `${props.lineLabel}`),
-                  h('th', props.yLabel),
+                  h('th', props.xLabel.value),
+                  h('th', props.x(pointIndex, true)),
                 ]),
               ]),
               h('tbody', Object.keys(chart.lines).map((i) => {
@@ -97,7 +97,7 @@ const initializeChart = () => {
                         cx: 5,
                         cy: 5,
                         r: 5,
-                        fill: constants.COLORS[i % constants.COLORS.length],
+                        fill: props.color(i),
                       }),
                     ]),
                   ]),
@@ -139,8 +139,12 @@ watch(
 
 <template>
   <div class="chartWrapper">
-    <h2 class="text-center">{{ chart.config.header }}</h2>
-    <h2 class="text-center">{{ chart.config.subheader }}</h2>
+    <h2 class="text-center">
+      {{ chart.config.header }}
+    </h2>
+    <h2 class="text-center">
+      {{ chart.config.subheader }}
+    </h2>
     <svg :id="'chart' + chart.id" />
     <div
       id="tooltip"
