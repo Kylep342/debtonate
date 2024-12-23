@@ -76,7 +76,25 @@ const initializeChart = () => {
         .style('opacity', 0)
         .attr('fill', props.color(id))
         .on('mouseover', (event) => {
-          tooltipPosition.value = { left: event.pageX + 10, top: event.pageY - 10 };
+          const tooltipWidth = 200; // Approximate width of the tooltip
+          const tooltipHeight = 100; // Approximate height of the tooltip
+          const pageWidth = window.innerWidth;
+          const pageHeight = window.innerHeight;
+
+          let left = event.pageX + 10;
+          let top = event.pageY - 10;
+
+          // Check if the tooltip exceeds the viewport width
+          if (event.pageX + tooltipWidth > pageWidth) {
+            left = event.pageX - tooltipWidth - 10;
+          }
+
+          // Check if the tooltip exceeds the viewport height
+          if (event.pageY + tooltipHeight > pageHeight) {
+            top = event.pageY - tooltipHeight - 10;
+          }
+
+          tooltipPosition.value = { left, top };
 
           tooltipContent.value = h(
             'table',
