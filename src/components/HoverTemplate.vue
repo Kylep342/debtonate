@@ -21,11 +21,10 @@ const coreState = useCoreStore();
     </template>
     <template #body>
       <tr v-for="(id, line) in graph.lines">
-        <td />
+        <td {{ getColor(id) }}></td>
         <td>{{ lineName(id) }}</td>
-        <td>{{ }}</td>
+        <td>{{ yFormat(line[Math.min(index, line.length - 1)]) }}</td>
       </tr>
     </template>
   </base-table>
 </template>
-

@@ -13,9 +13,7 @@ const activeGraph = computed(() => coreState.graphs[viewedGraphId.value]);
 
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
-const setViewedLoanId = (loanId) => {
-  viewedLoanId.value = loanId;
-};
+const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
 
 </script>
 
@@ -53,16 +51,8 @@ const setViewedLoanId = (loanId) => {
         <template #tabContent>
           <base-graph
             :key="viewedLoanId"
-            :graph="activeGraph.graphs[viewedLoanId]"
-            :color="activeGraph.color"
-            :x="activeGraph.x"
-            :x-label="activeGraph.xLabel"
-            :x-scale="activeGraph.xScale"
-            :y="activeGraph.y"
-            :y-format="activeGraph.yFormat"
-            :y-label="activeGraph.yLabel"
-            :y-scale="activeGraph.yScale"
-            :line-name="activeGraph.lineName"
+            :graph="activeGraph"
+            :anchor-id="viewedLoanId"
           />
         </template>
       </base-tabs>
