@@ -487,6 +487,7 @@ export default defineStore('core', () => {
       color: getBudgetColor,
       header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xLabel: Time,
@@ -495,7 +496,6 @@ export default defineStore('core', () => {
       yFormat: Money,
       yLabel: 'Balance',
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -526,6 +526,7 @@ export default defineStore('core', () => {
       color: getBudgetColor,
       header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xLabel: Time,
@@ -534,7 +535,6 @@ export default defineStore('core', () => {
       yLabel: 'Percent to Principal',
       yFormat: Percent,
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -565,6 +565,7 @@ export default defineStore('core', () => {
       color: getBudgetColor,
       header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xLabel: Time,
@@ -573,7 +574,6 @@ export default defineStore('core', () => {
       yFormat: Money,
       yLabel: 'Interest Saved',
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
