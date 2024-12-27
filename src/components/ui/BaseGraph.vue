@@ -4,6 +4,8 @@ import {
   onMounted, shallowReactive, watch, ref, h,
 } from 'vue';
 
+import HoverTemplate from '../HoverTemplate.vue'
+
 const props = defineProps([
   'graph',
   'anchorId'
@@ -88,14 +90,13 @@ const initializeChart = () => {
           tooltipPosition.value = { left, top };
 
           tooltipContent.value = h(
-            'table',
-            { class: 'tooltip-table' },
+            'base-table',
             [
               h('thead', [
                 h('tr', [
-                  h('th', 'Color'),
-                  h('th', chart.xLabel.value),
-                  h('th', chart.x(point.x, true)),
+                  h('th', { class: 'text-left' }, 'Color'),
+                  h('th', { class: 'text-left' }, chart.xLabel.value),
+                  h('th', { class: 'text-right' }, chart.x(point.x, true)),
                 ]),
               ]),
               h('tbody', Object.keys(graph.lines).map((i) => {
@@ -110,8 +111,8 @@ const initializeChart = () => {
                       }),
                     ]),
                   ]),
-                  h('td', chart.lineName(i)),
-                  h('td', chart.yFormat(graph.lines[i][Math.min(pointIndex, graph.lines[i].length - 1)].y)),
+                  h('td', { class: 'text-left' }, chart.lineName(i)),
+                  h('td', { class: 'text-right' }, chart.yFormat(graph.lines[i][Math.min(pointIndex, graph.lines[i].length - 1)].y)),
                 ]);
               })),
             ],
@@ -163,20 +164,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style scoped>
-.tooltip-table {
-  border-collapse: collapse;
-  width: 100%;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 5px;
-}
-
-.tooltip-table th,
-.tooltip-table td {
-  border: 1px solid #ccc;
-  padding: 5px;
-  text-align: left;
-}
-</style>

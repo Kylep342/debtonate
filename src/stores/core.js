@@ -485,8 +485,8 @@ export default defineStore('core', () => {
     const config = {
       id: 'Balances',
       color: getBudgetColor,
-      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
@@ -494,7 +494,7 @@ export default defineStore('core', () => {
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
-      yLabel: 'Balance',
+      yLabel: () => 'Balance',
       yScale: d3.scaleLinear,
     };
 
@@ -524,15 +524,15 @@ export default defineStore('core', () => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
-      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
-      yLabel: 'Percent to Principal',
+      yLabel: () => 'Percent to Principal',
       yFormat: Percent,
       yScale: d3.scaleLinear,
     };
@@ -563,8 +563,8 @@ export default defineStore('core', () => {
     const config = {
       id: 'InterestSaved',
       color: getBudgetColor,
-      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
       graphs: {},
+      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
@@ -572,7 +572,7 @@ export default defineStore('core', () => {
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
-      yLabel: 'Interest Saved',
+      yLabel: () => 'Interest Saved',
       yScale: d3.scaleLinear,
     };
 
