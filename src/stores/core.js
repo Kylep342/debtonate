@@ -502,16 +502,19 @@ export default defineStore('core', () => {
   const balancesGraphs = computed(() => {
     const config = {
       id: 'Balances',
-      graphs: {},
       color: getBudgetColor,
+      graphs: {},
+      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
       xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
-      yLabel: 'Balance',
+      yLabel: () => 'Balance',
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -519,8 +522,6 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id).currentBalance,
-          header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
         lines: {},
       };
@@ -528,8 +529,6 @@ export default defineStore('core', () => {
 
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
-        console.log(`Budget ID ${budgetId}`);
-        console.log(`Schedule ${schedule}`);
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
@@ -543,16 +542,19 @@ export default defineStore('core', () => {
   const percentOfPaymentAsPrincaplGraphs = computed(() => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
-      graphs: {},
       color: getBudgetColor,
+      graphs: {},
+      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
       xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
-      yLabel: 'Percent to Principal',
+      yLabel: () => 'Percent to Principal',
       yFormat: Percent,
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -560,8 +562,6 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
-          header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
         lines: {},
       }
@@ -582,16 +582,19 @@ export default defineStore('core', () => {
   const interestSavedGraphs = computed(() => {
     const config = {
       id: 'InterestSaved',
-      graphs: {},
       color: getBudgetColor,
+      graphs: {},
+      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
       xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
       yFormat: Money,
-      yLabel: 'Interest Saved',
+      yLabel: () => 'Interest Saved',
       yScale: d3.scaleLinear,
-      lineName: getBudgetName,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -599,8 +602,6 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
-          header: `Interest Saved Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
         lines: {},
       }

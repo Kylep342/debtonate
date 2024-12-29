@@ -1,31 +1,74 @@
 <script setup>
-import useCoreStore from '../stores/core';
+import { onUpdated, ref } from 'vue';
 
-defineProps(['anchor', 'lineName', 'graph'])
+const props = defineProps({
+  graphConfig: {
+    type: Object,
+    required: true,
+  },
+  index: {
+    type: Number,
+    required: true,
+  },
+  updateTooltipSize: {
+    type: Object,
+    required: true,
+  }
+})
 
-const coreState = useCoreStore();
+const templateRef = ref(null);
+
+onUpdated(() => {
+  const rect = templateRef.value.getBoundingClientRect();
+  props.updateTooltipSize({ width: rect.width, height: rect.height });
+})
 </script>
 
 <template>
-  <base-table>
+  <base-table
+    ref="templateRef"
+    :class="['table-xs']"
+  >
     <template #header>
       <thead>
-        <tr>
-          <td />
-          <td>{{ coreState.Time }}</td>
-          <td :class="['text-right']">
-            {{ coreState.Period(anchor, true) }}
-          </td>
+        <tr :class="['bg-transparent']">
+          <th>Color</th>
+          <th>{{ graphConfig.xLabel }}</th>
+          <th :class="['text-right']">
+            {{ graphConfig.xFormat(index) }}
+          </th>
         </tr>
       </thead>
     </template>
     <template #body>
-      <tr v-for="(id, line) in graph.lines">
-        <td />
-        <td>{{ lineName(id) }}</td>
-        <td>{{ }}</td>
-      </tr>
+      <tbody>
+        <tr
+          v-for="(line, id) in graphConfig.lines"
+          :key="id"
+        >
+          <td>
+            <svg
+              width="10"
+              height="10"
+            >
+              <circle
+                cx="5"
+                cy="5"
+                r="5"
+                :fill="graphConfig.color(id)"
+              />
+            </svg>
+          </td>
+          <td>{{ graphConfig.lineName(id) }}</td>
+          <td :class="['text-right']">
+            {{
+              graphConfig.yFormat(
+                line[Math.min(index - 1, line.length - 1)].y
+              )
+            }}
+          </td>
+        </tr>
+      </tbody>
     </template>
   </base-table>
 </template>
-
