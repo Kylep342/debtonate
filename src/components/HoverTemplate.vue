@@ -1,5 +1,7 @@
 <script setup>
-defineProps({
+import { onUpdated, ref } from 'vue';
+
+const props = defineProps({
   graphConfig: {
     type: Object,
     required: true,
@@ -8,11 +10,25 @@ defineProps({
     type: Number,
     required: true,
   },
-});
+  updateTooltipSize: {
+    type: Object,
+    required: true,
+  }
+})
+
+const templateRef = ref(null);
+
+onUpdated(() => {
+  const rect = templateRef.value.getBoundingClientRect();
+  props.updateTooltipSize({ width: rect.width, height: rect.height });
+})
 </script>
 
 <template>
-  <base-table :class="['table-xs']">
+  <base-table
+    ref="templateRef"
+    :class="['table-xs']"
+  >
     <template #header>
       <thead>
         <tr :class="['bg-transparent']">
