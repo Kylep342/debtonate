@@ -6,12 +6,22 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
+<<<<<<< HEAD
 const loanId = ref(null);
 const currentBalance = ref(null);
 const interestRate = ref(null);
 const termInYears = ref(null);
 const name = ref(null);
 const fees = ref(null);
+=======
+const currentLoan = ref(null);
+
+const currentBalance = ref(0);
+const interestRate = ref(0);
+const termInYears = ref(0);
+const name = ref('');
+const fees = ref(0);
+>>>>>>> main
 
 const createButtonEnabled = computed(
   () => [currentBalance.value, interestRate.value, termInYears.value].every(
@@ -23,9 +33,17 @@ watch(
   () => coreState.currentLoanId,
   (newId) => {
     if (newId && coreState.refinancingFormActive) {
+<<<<<<< HEAD
       loanId.value = newId;
       const currentLoan = coreState.getLoan(loanId.value);
       currentBalance.value = currentLoan.currentBalance;
+=======
+      currentLoan.value = coreState.getLoan(newId);
+      currentBalance.value = currentLoan.value.currentBalance;
+      interestRate.value = currentLoan.value.annualRate * 100;
+      termInYears.value = currentLoan.value.termInYears;
+      name.value = currentLoan.value.name;
+>>>>>>> main
     }
   },
   { immediate: true },
@@ -40,12 +58,20 @@ const clearForm = () => {
 };
 
 const refinanceLoan = () => {
+<<<<<<< HEAD
   coreState.createRefinanceScenario(
     loanId.value,
     currentBalance.value,
     interestRate.value / 100,
     termInYears.value,
     name.value,
+=======
+  coreState.refinanceLoan(
+    currentLoan.value.id,
+    currentBalance.value,
+    interestRate.value,
+    termInYears.value,
+>>>>>>> main
     fees.value
   );
   clearForm();
@@ -102,6 +128,7 @@ const exit = () => {
           label="Term In Years"
         >
         <div :class="['label']">
+<<<<<<< HEAD
           <span :class="['label-text']">Name (Optional)</span>
         </div>
         <input
@@ -111,6 +138,8 @@ const exit = () => {
           label="Name"
         >
         <div :class="['label']">
+=======
+>>>>>>> main
           <span :class="['label-text']">Fees (Optional)</span>
         </div>
         <input

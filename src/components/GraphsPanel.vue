@@ -10,11 +10,21 @@ const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
 const viewedLoanId = ref(constants.TOTALS);
 
 const activeGraph = computed(() => coreState.graphs[viewedGraphId.value]);
+<<<<<<< HEAD
 
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
 
+=======
+
+const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
+const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
+const setViewedLoanId = (loanId) => {
+  viewedLoanId.value = loanId;
+};
+
+>>>>>>> main
 </script>
 
 <template>

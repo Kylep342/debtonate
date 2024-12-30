@@ -40,7 +40,11 @@ const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : 
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
+<<<<<<< HEAD
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+=======
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+>>>>>>> main
             >
               <li
                 v-for="(onClick, text) in getButtons(budget.id)"

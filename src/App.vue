@@ -99,8 +99,33 @@ watch(() => coreState.refinancingFormActive, async (show) => {
             <GraphsPanel />
           </div>
           <div>
+<<<<<<< HEAD
             <BudgetDetailsPanel />
             <LoanDetailsPanel />
+=======
+            <DetailsPanel
+              :id="constants.LOAN_DETAILS_ID"
+              :title="coreState.currentLoanId
+                ? coreState.buildLoanDetailsTitle(coreState.getLoan(coreState.currentLoanId))
+                : constants.LOAN_DETAILS
+              "
+              :type="constants.LOAN"
+              :anchor="coreState.getLoan(coreState.currentLoanId)"
+              :pivot="coreState.monthlyBudgets"
+              @exit-details-panel="coreState.unviewLoan"
+            />
+            <DetailsPanel
+              :id="constants.BUDGET_DETAILS_ID"
+              :title="coreState.currentBudgetId
+                ? coreState.buildBudgetDetailsTitle(coreState.getBudget(coreState.currentBudgetId))
+                : constants.BUDGET_DETAILS
+              "
+              :type="constants.BUDGET"
+              :anchor="coreState.getBudget(coreState.currentBudgetId)"
+              :pivot="coreState.loansWithTotals"
+              @exit-details-panel="coreState.unviewBudget"
+            />
+>>>>>>> main
           </div>
         </div>
       </div>

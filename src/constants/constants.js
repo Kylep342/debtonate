@@ -13,7 +13,10 @@ const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_REFINANCE = 'Refinance';
+<<<<<<< HEAD
 const BTN_REFINANCING_SUMMARY = "Refinancing Summary";
+=======
+>>>>>>> main
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
@@ -42,7 +45,10 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+<<<<<<< HEAD
 const PERIOD = 'Period';
+=======
+>>>>>>> main
 const REFINANCING_FORM_ID = 'refinanceForm';
 const TABLES = 'Tables';
 
@@ -122,7 +128,10 @@ export default Object.freeze({
   BTN_ON,
   BTN_OPTIONS,
   BTN_REFINANCE,
+<<<<<<< HEAD
   BTN_REFINANCING_SUMMARY,
+=======
+>>>>>>> main
   BTN_SAVE,
   BTN_SELECT,
   BUDGET_DETAILS_ID,
@@ -147,7 +156,10 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+<<<<<<< HEAD
   PERIOD,
+=======
+>>>>>>> main
   REFINANCING_FORM_ID,
   TABLES,
   TOTALS,
