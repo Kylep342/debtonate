@@ -10,7 +10,6 @@ const props = defineProps({
 
 const coreState = useCoreStore();
 
-<<<<<<< HEAD
 const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
@@ -20,16 +19,6 @@ const loanTermInYears = computed(() => `${props.loan.termInYears}`);
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewLoan,
   [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
-=======
-const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
-const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
-const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
-
-const baseButtons = {
-  [constants.BTN_DETAILS]: coreState.viewLoan,
-  // [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
->>>>>>> main
 }
 
 const editButtons = {
@@ -54,11 +43,7 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
-<<<<<<< HEAD
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
-=======
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
->>>>>>> main
             >
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"

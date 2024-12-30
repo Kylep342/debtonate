@@ -23,10 +23,7 @@ export default defineStore('core', () => {
   const periodsAsDates = ref(false);
   const reducePayments = ref(false);
   const refinancingFormActive = ref(false);
-<<<<<<< HEAD
   const refinancingUseHighestPayment = ref(false);
-=======
->>>>>>> main
   const refinancingScenarios = ref({});
   const roundingScale = ref(100);
   const roundUp = ref(false);
@@ -239,18 +236,9 @@ export default defineStore('core', () => {
   const getLoanName = (id) => (
     getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
   );
-  const loanRefinanceScenarioName = (id) => `${getLoanName(id)} - Refinance Scenario ${refinancingScenarios[id]?.length + 1 || 1}`;
   const viewLoan = (id) => {
     currentLoanId.value = id;
     loanDetailsPanelActive.value = true;
-  };
-  const refinanceLoan = (loanId, principal, interestRate, termInYears, fees) => {
-    const refinancedLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, loanRefinanceScenarioName(loanId));
-    console.log(`${refinancedLoan}`);
-    if (fees) {
-      console.log(fees);
-    }
-    exitRefinancingForm();
   };
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
@@ -670,10 +658,7 @@ export default defineStore('core', () => {
     budgetFormTitle,
     createLoan,
     createLoanButtonText,
-<<<<<<< HEAD
     loanDetailsPanelActive,
-=======
->>>>>>> main
     loanFormActive,
     loanFormTitle,
     currencies,
@@ -731,18 +716,11 @@ export default defineStore('core', () => {
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,
-<<<<<<< HEAD
     createRefinanceScenario,
     refinancingFormActive,
     refinancingFormTitle,
     refinancingScenarios,
     refinancingUseHighestPayment,
-=======
-    refinanceLoan,
-    refinancingFormActive,
-    refinancingFormTitle,
-    refinancingScenarios,
->>>>>>> main
     roundedGlobalMinPayment,
     roundingScale,
     roundUp,

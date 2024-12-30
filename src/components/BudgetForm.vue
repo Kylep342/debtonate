@@ -6,13 +6,7 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-<<<<<<< HEAD
 const amount = ref(null);
-=======
-const currentBudget = ref(coreState.getBudget(coreState.currentBudgetId));
-
-const amount = ref(currentBudget.value?.relative);
->>>>>>> main
 
 const createButtonEnabled = computed(
   () => !Number.isNaN(amount.value) && amount.value > 0,
@@ -22,13 +16,8 @@ watch(
   () => coreState.currentBudgetId,
   (newId) => {
     if (newId && coreState.budgetFormActive) {
-<<<<<<< HEAD
       const currentBudget = coreState.getBudget(newId);
       amount.value = currentBudget.relative;
-=======
-      currentBudget.value = coreState.getBudget(newId);
-      amount.value = currentBudget.value.relative;
->>>>>>> main
     }
   },
   { immediate: true },

@@ -6,21 +6,11 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-<<<<<<< HEAD
 const principal = ref(null);
 const interestRate = ref(null);
 const termInYears = ref(null);
 const name = ref(null);
 const currentBalance = ref(null);
-=======
-const currentLoan = ref(null);
-
-const principal = ref(0);
-const interestRate = ref(0);
-const termInYears = ref(0);
-const name = ref('');
-const currentBalance = ref(0);
->>>>>>> main
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -32,21 +22,12 @@ watch(
   () => coreState.currentLoanId,
   (newId) => {
     if (newId && coreState.loanFormActive) {
-<<<<<<< HEAD
       const currentLoan = coreState.getLoan(newId);
       principal.value = currentLoan.principal;
       interestRate.value = currentLoan.annualRate * 100;
       termInYears.value = currentLoan.termInYears;
       name.value = currentLoan.name;
       currentBalance.value = currentLoan.currentBalance;
-=======
-      currentLoan.value = coreState.getLoan(newId);
-      principal.value = currentLoan.value.principal;
-      interestRate.value = currentLoan.value.annualRate * 100;
-      termInYears.value = currentLoan.value.termInYears;
-      name.value = currentLoan.value.name;
-      currentBalance.value = currentLoan.value.currentBalance;
->>>>>>> main
     }
   },
   { immediate: true },
@@ -80,11 +61,7 @@ const exit = () => {
 <template>
   <base-modal :id="constants.LOAN_FORM_ID">
     <template #header>
-<<<<<<< HEAD
       <h2 :class="['pl-4']">{{ coreState.loanFormTitle }}</h2>
-=======
-      <h2>{{ coreState.loanFormTitle }}</h2>
->>>>>>> main
     </template>
     <template #headerActions>
       <base-button
