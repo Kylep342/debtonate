@@ -20,7 +20,7 @@ const refinancingUseHighestPaymentExample = computed(() => {
       const firstLoan = coreState.loans[0]
       const basePayment = firstLoan.minPayment;
       const hypotheticalPayment = firstLoan.minPayment - (firstLoan.minPayment % 100);
-      const usedPayment = coreState.refinancingUseHighestPayment ? basePayment : hypotheticalPayment;
+      const usedPayment = coreState.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
       return `(A scenario for ${coreState.getLoanName(firstLoan.id)} [${coreState.Money(basePayment)}] with a minimum payment of ${coreState.Money(hypotheticalPayment)} uses ${coreState.Money(usedPayment)})`;
     }
     return '';
