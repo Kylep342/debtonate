@@ -23,6 +23,7 @@ export default defineStore('core', () => {
   const periodsAsDates = ref(false);
   const reducePayments = ref(false);
   const refinancingFormActive = ref(false);
+  const refinancingUseHighestPayment = ref(false);
   const refinancingScenarios = ref({});
   const roundingScale = ref(100);
   const roundUp = ref(false);
@@ -65,6 +66,8 @@ export default defineStore('core', () => {
     }
     return period;
   };
+
+  const Time = computed(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
 
   const currencySymbol = computed(() => {
     const formatted = new Intl.NumberFormat('en-US', {
@@ -204,6 +207,9 @@ export default defineStore('core', () => {
   const toggleReducePayments = () => {
     reducePayments.value = !reducePayments.value;
   };
+  const toggleRefinancingUseHighestPayment = () => {
+    refinancingUseHighestPayment.value = !refinancingUseHighestPayment.value;
+  };
   const toggleRounding = (scale) => {
     roundUp.value = !roundUp.value;
     if (roundUp.value) {
@@ -230,22 +236,32 @@ export default defineStore('core', () => {
   const getLoanName = (id) => (
     getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
   );
-  const loanRefinanceScenarioName = (id) => `${getLoanName(id)} - Refinance Scenario ${refinancingScenarios[id]?.length + 1 || 1}`;
   const viewLoan = (id) => {
     currentLoanId.value = id;
     loanDetailsPanelActive.value = true;
   };
-  const refinanceLoan = (loanId, principal, interestRate, termInYears, fees) => {
-    const refinancedLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, loanRefinanceScenarioName(loanId));
-    console.log(`${refinancedLoan}`);
-    if (fees) {
-      console.log(fees);
-    }
-    exitRefinancingForm();
-  };
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
     currentLoanId.value = null;
+  };
+
+  const loanRefinanceScenarioName = (parentId, name) => name || `Scenario ${refinancingScenarios.value[parentId]?.length + 1 || 1}`;
+  const createRefinanceScenario = (parentId, principal, interestRate, termInYears, name, fees) => {
+    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, loanRefinanceScenarioName(parentId, name));
+    const paymentSchedule = moneyfunx.payLoans(
+      [loan],
+      refinancingUseHighestPayment.value ? Math.max(loan.minPayment, getLoan(parentId).minPayment): loan.minPayment,
+      false,
+    )
+    if (refinancingScenarios.value[parentId]) {
+      refinancingScenarios.value[parentId].push({loan, paymentSchedule, fees});
+    } else {
+      refinancingScenarios.value[parentId] = [{loan, paymentSchedule, fees}];
+    }
+    exitRefinancingForm();
+  };
+  const deleteRefinancingScenario = (parentId, scenarioId) => {
+    refinancingScenarios.value[parentId] = refinancingScenarios.value[parentId].filter((scenario) => scenario.loan.id !== scenarioId)
   };
 
   const deleteBudget = (id) => {
@@ -259,6 +275,7 @@ export default defineStore('core', () => {
     openBudgetForm();
   };
   const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
+  const getBudgetColor = (id) => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
   const getBudgetName = (id) => (
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
@@ -283,6 +300,7 @@ export default defineStore('core', () => {
     language.value = navigator.language;
     loans.value = [];
     periodsAsDates.value = false;
+    refinancingUseHighestPayment.value = false;
     reducePayments.value = false;
     roundUp.value = false;
     budgetDetailsPanelActive.value = false;
@@ -309,6 +327,9 @@ export default defineStore('core', () => {
     reducePayments.value = JSON.parse(
       localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
     );
+    refinancingUseHighestPayment.value = JSON.parse(
+      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT),
+    );
     roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
     roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
@@ -328,6 +349,10 @@ export default defineStore('core', () => {
       keys.LS_REDUCE_PAYMENTS,
       JSON.stringify(reducePayments.value),
     );
+    localStorage.setItem(
+      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
+      JSON.stringify(refinancingUseHighestPayment.value),
+    );
     localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
     localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
@@ -346,14 +371,15 @@ export default defineStore('core', () => {
             [keys.LS_LANGUAGE]: language.value,
             [keys.LS_LOANS]: loans.value,
             [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+            [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
             [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
             [keys.LS_ROUND_UP]: roundUp.value,
             [keys.LS_ROUNDING_SCALE]: roundingScale.value,
             [keys.LS_SNOWBALL_SORT]: snowballSort.value,
           }
         )
-      )
-    }
+      );
+    };
 
   // dependent computed values/methods
   const budgetFormTitle = computed(() => (currentBudgetId.value
@@ -374,9 +400,11 @@ export default defineStore('core', () => {
       : constants.BTN_CREATE
   ));
 
-  const createLoanButtonText = computed(
-    () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
-  );
+  const createLoanButtonText = computed(() => (
+    currentLoanId.value
+      ? constants.BTN_SAVE
+      : constants.BTN_CREATE
+  ));
 
 
   const paymentSchedules = computed(() => {
@@ -468,29 +496,40 @@ export default defineStore('core', () => {
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
-    + `${Money(monthlyBudget.absolute)}/month `
-    + `(+${Money(monthlyBudget.relative)}/month)`;
-  const buildLoanDetailsTitle = (loan) => `Loan Details - ${getLoanName(loan.id)} | `
-    + `(${Money(loan.currentBalance)} `
-    + `@ ${Percent(loan.annualRate * 100)})`;
+  const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
+    ? `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
+      + `${Money(monthlyBudget.absolute)}/month `
+      + `(+${Money(monthlyBudget.relative)}/month)`
+    : constants.BUDGET_DETAILS;
+  const buildLoanDetailsTitle = (loan) => loan
+    ? `Loan Details - ${getLoanName(loan.id)} | `
+      + `(${Money(loan.currentBalance)} `
+      + `@ ${Percent(loan.annualRate * 100)})`
+    : constants.LOAN_DETAILS;
 
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
   const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
-  const buildInterestTableTitle = (loan) => `Interest Table - ${getLoanName(loan.id)}`;
-  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)})`;
+  const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${getLoanName(loan.id)}`;
+  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} @ ${Percent(loan.annualRate * 100)} | ${loan.termInYears * 12} Payments)`;
 
   // graph data
 
   const balancesGraphs = computed(() => {
     const config = {
       id: 'Balances',
+      color: getBudgetColor,
       graphs: {},
+      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: () => 'Balance',
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -498,20 +537,18 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id).currentBalance,
-          header: `Balances Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       };
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      Object.values(paymentSchedules.value).forEach((schedule) => {
+      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -520,12 +557,19 @@ export default defineStore('core', () => {
   const percentOfPaymentAsPrincaplGraphs = computed(() => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
+      color: getBudgetColor,
       graphs: {},
+      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yLabel: () => 'Percent to Principal',
+      yFormat: Percent,
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Percent(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -533,20 +577,18 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
-          header: `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       }
     });
 
     Object.keys(config.graphs).forEach((loanId) => {
-      Object.values(paymentSchedules.value).forEach((schedule) => {
+      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
         const line = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -555,12 +597,19 @@ export default defineStore('core', () => {
   const interestSavedGraphs = computed(() => {
     const config = {
       id: 'InterestSaved',
+      color: getBudgetColor,
       graphs: {},
+      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
+      xFormat: (x) => Period(x, true),
+      xLabel: Time,
       xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
       y: y => y,
+      yFormat: Money,
+      yLabel: () => 'Interest Saved',
       yScale: d3.scaleLinear,
-      hoverFormat: (point) => `${Period(point.x, true)}<br>${Money(point.y)}`,
     };
 
     loansWithTotals.value.forEach((loan) => {
@@ -568,10 +617,8 @@ export default defineStore('core', () => {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
-          header: `Interest Saved Over Time By Budget - ${getLoanName(loan.id)}`,
-          subheader: buildLoanSubtitle(loan),
         },
-        lines: [],
+        lines: {},
       }
     });
 
@@ -581,7 +628,7 @@ export default defineStore('core', () => {
         getPaymentSummary(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
           line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, budgetId, index) });
         });
-        config.graphs[loanId].lines.push(line);
+        config.graphs[loanId].lines[budgetId] = line;
       });
     });
     return config;
@@ -602,8 +649,8 @@ export default defineStore('core', () => {
     buildAmortizationTableTitle,
     buildBudgetDetailsTitle,
     buildLoanSubtitle,
-    buildInterestTableTitle,
     buildLoanDetailsTitle,
+    buildRefinancingTableTitle,
     clearState,
     createBudget,
     createBudgetButtonText,
@@ -611,6 +658,7 @@ export default defineStore('core', () => {
     budgetFormTitle,
     createLoan,
     createLoanButtonText,
+    loanDetailsPanelActive,
     loanFormActive,
     loanFormTitle,
     currencies,
@@ -620,6 +668,7 @@ export default defineStore('core', () => {
     currentLoanId,
     deleteBudget,
     deleteLoan,
+    deleteRefinancingScenario,
     editBudget,
     editLoan,
     exitBudgetForm,
@@ -629,6 +678,7 @@ export default defineStore('core', () => {
     exportState,
     Period,
     getBudget,
+    getBudgetColor,
     getBudgetIndex,
     getBudgetName,
     getLifetimeInterest,
@@ -666,10 +716,11 @@ export default defineStore('core', () => {
     periodsAsDates,
     rawGlobalMinPayment,
     reducePayments,
-    refinanceLoan,
+    createRefinanceScenario,
     refinancingFormActive,
     refinancingFormTitle,
     refinancingScenarios,
+    refinancingUseHighestPayment,
     roundedGlobalMinPayment,
     roundingScale,
     roundUp,
@@ -680,9 +731,11 @@ export default defineStore('core', () => {
     snowball,
     snowballSort,
     sortLoans,
+    Time,
     toggleAvalancheSort,
     togglePeriodsAsDates,
     toggleReducePayments,
+    toggleRefinancingUseHighestPayment,
     toggleRounding,
     toggleSnowballSort,
     totalsAsALoan,

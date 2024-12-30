@@ -10,14 +10,15 @@ const props = defineProps({
 
 const coreState = useCoreStore();
 
+const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
-const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
+const loanTermInYears = computed(() => `${props.loan.termInYears}`);
 
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewLoan,
-  // [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
+  [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
 }
 
 const editButtons = {
@@ -42,7 +43,7 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
             >
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"
@@ -66,12 +67,6 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
                 <b>{{ loanPrincipal }}</b>
               </td>
             </tr>
-            <tr v-if="loanPrincipal !== loanCurrentBalance">
-              <td>Current Balance</td>
-              <td :class="['text-right']">
-                <b>{{ loanCurrentBalance }}</b>
-              </td>
-            </tr>
             <tr>
               <td>Interest Rate</td>
               <td :class="['text-right']">
@@ -79,9 +74,21 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
               </td>
             </tr>
             <tr>
+              <td>Term</td>
+              <td :class="['text-right']">
+                <b>{{ loanTermInYears }} years</b>
+              </td>
+            </tr>
+            <tr>
               <td>Minimum Payment</td>
               <td :class="['text-right']">
                 <b>{{ loanMinPayment }}</b>
+              </td>
+            </tr>
+            <tr v-if="loanPrincipal !== loanCurrentBalance">
+              <td>Current Balance</td>
+              <td :class="['text-right']">
+                <b>{{ loanCurrentBalance }}</b>
               </td>
             </tr>
           </tbody>

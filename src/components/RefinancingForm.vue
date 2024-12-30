@@ -6,13 +6,12 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const currentLoan = ref(null);
-
-const currentBalance = ref(0);
-const interestRate = ref(0);
-const termInYears = ref(0);
-const name = ref('');
-const fees = ref(0);
+const loanId = ref(null);
+const currentBalance = ref(null);
+const interestRate = ref(null);
+const termInYears = ref(null);
+const name = ref(null);
+const fees = ref(null);
 
 const createButtonEnabled = computed(
   () => [currentBalance.value, interestRate.value, termInYears.value].every(
@@ -24,11 +23,9 @@ watch(
   () => coreState.currentLoanId,
   (newId) => {
     if (newId && coreState.refinancingFormActive) {
-      currentLoan.value = coreState.getLoan(newId);
-      currentBalance.value = currentLoan.value.currentBalance;
-      interestRate.value = currentLoan.value.annualRate * 100;
-      termInYears.value = currentLoan.value.termInYears;
-      name.value = currentLoan.value.name;
+      loanId.value = newId;
+      const currentLoan = coreState.getLoan(loanId.value);
+      currentBalance.value = currentLoan.currentBalance;
     }
   },
   { immediate: true },
@@ -43,11 +40,12 @@ const clearForm = () => {
 };
 
 const refinanceLoan = () => {
-  coreState.refinanceLoan(
-    currentLoan.value.id,
+  coreState.createRefinanceScenario(
+    loanId.value,
     currentBalance.value,
-    interestRate.value,
+    interestRate.value / 100,
     termInYears.value,
+    name.value,
     fees.value
   );
   clearForm();
@@ -102,6 +100,15 @@ const exit = () => {
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
           label="Term In Years"
+        >
+        <div :class="['label']">
+          <span :class="['label-text']">Name (Optional)</span>
+        </div>
+        <input
+          v-model="name"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="string"
+          label="Name"
         >
         <div :class="['label']">
           <span :class="['label-text']">Fees (Optional)</span>

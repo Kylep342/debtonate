@@ -1,12 +1,13 @@
 <script setup>
 import { watch } from 'vue';
 
+import BudgetDetailsPanel from './components/BudgetDetailsPanel.vue';
 import BudgetForm from './components/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
-import DebtSummary from './components/DebtSummary.vue';
-import DetailsPanel from './components/DetailsPanel.vue';
 import FooterBar from './components/FooterBar.vue';
+import GraphsPanel from './components/GraphsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
+import LoanDetailsPanel from './components/LoanDetailsPanel.vue';
 import LoanForm from './components/LoanForm.vue';
 import LoansPanel from './components/LoansPanel.vue';
 import OptionsForm from './components/OptionsForm.vue';
@@ -95,31 +96,11 @@ watch(() => coreState.refinancingFormActive, async (show) => {
             <div :class="['header']">
               <h2>Repayment Information</h2>
             </div>
-            <DebtSummary />
+            <GraphsPanel />
           </div>
           <div>
-            <DetailsPanel
-              :id="constants.LOAN_DETAILS_ID"
-              :title="coreState.currentLoanId
-                ? coreState.buildLoanDetailsTitle(coreState.getLoan(coreState.currentLoanId))
-                : constants.LOAN_DETAILS
-              "
-              :type="constants.LOAN"
-              :anchor="coreState.getLoan(coreState.currentLoanId)"
-              :pivot="coreState.monthlyBudgets"
-              @exit-details-panel="coreState.unviewLoan"
-            />
-            <DetailsPanel
-              :id="constants.BUDGET_DETAILS_ID"
-              :title="coreState.currentBudgetId
-                ? coreState.buildBudgetDetailsTitle(coreState.getBudget(coreState.currentBudgetId))
-                : constants.BUDGET_DETAILS
-              "
-              :type="constants.BUDGET"
-              :anchor="coreState.getBudget(coreState.currentBudgetId)"
-              :pivot="coreState.loansWithTotals"
-              @exit-details-panel="coreState.unviewBudget"
-            />
+            <BudgetDetailsPanel />
+            <LoanDetailsPanel />
           </div>
         </div>
       </div>

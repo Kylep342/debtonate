@@ -1,5 +1,6 @@
 import { TOTALS } from 'moneyfunx';
 
+const BTN_AMORTIZATION_TABLES = "Amortization Tables";
 const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
 const BTN_DELETE = 'Delete';
@@ -12,6 +13,7 @@ const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_REFINANCE = 'Refinance';
+const BTN_REFINANCING_SUMMARY = "Refinancing Summary";
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
@@ -26,6 +28,7 @@ const COLORS = [
   'oklch(70.39% 0.1255 52.95)',
   'oklch(28.42% 0.0095 355.53)'
 ];
+const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
@@ -39,6 +42,7 @@ const LOANS = 'Loans';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
+const PERIOD = 'Period';
 const REFINANCING_FORM_ID = 'refinanceForm';
 const TABLES = 'Tables';
 
@@ -105,6 +109,7 @@ const LOCALE_CURRENCY = {
 };
 
 export default Object.freeze({
+  BTN_AMORTIZATION_TABLES,
   BTN_CLEAR,
   BTN_CREATE,
   BTN_DELETE,
@@ -117,6 +122,7 @@ export default Object.freeze({
   BTN_ON,
   BTN_OPTIONS,
   BTN_REFINANCE,
+  BTN_REFINANCING_SUMMARY,
   BTN_SAVE,
   BTN_SELECT,
   BUDGET_DETAILS_ID,
@@ -126,6 +132,7 @@ export default Object.freeze({
   BUDGETS,
   BUG_FORM_LINK,
   COLORS,
+  DATE,
   DEFAULT,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,
@@ -140,6 +147,7 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
+  PERIOD,
   REFINANCING_FORM_ID,
   TABLES,
   TOTALS,
