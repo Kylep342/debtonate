@@ -496,9 +496,11 @@ export default defineStore('core', () => {
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
-    + `${Money(monthlyBudget.absolute)}/month `
-    + `(+${Money(monthlyBudget.relative)}/month)`;
+  const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
+    ? `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
+      + `${Money(monthlyBudget.absolute)}/month `
+      + `(+${Money(monthlyBudget.relative)}/month)`
+    : constants.BUDGET_DETAILS;
   const buildLoanDetailsTitle = (loan) => loan
     ? `Loan Details - ${getLoanName(loan.id)} | `
       + `(${Money(loan.currentBalance)} `
@@ -656,6 +658,7 @@ export default defineStore('core', () => {
     budgetFormTitle,
     createLoan,
     createLoanButtonText,
+    loanDetailsPanelActive,
     loanFormActive,
     loanFormTitle,
     currencies,

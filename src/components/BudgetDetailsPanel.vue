@@ -1,25 +1,30 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['anchor', 'pivot']);
 const coreState = useCoreStore();
+const currentBudget = ref(null);
+const viewedLoanId = ref(constants.TOTALS);
 
-const title = computed(() => props.anchor ? coreState.buildBudgetDetailsTitle(props.anchor) : constants.BUDGET_DETAILS);
-const viewedItemId = ref(props.type === constants.LOAN ? constants.DEFAULT : constants.TOTALS);
-const isViewedItemId = (itemId) => viewedItemId.value === itemId;
-const setViewedItemId = (itemId) => {
-  viewedItemId.value = itemId;
+const title = computed(() => coreState.buildBudgetDetailsTitle(currentBudget.value));
+
+const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
+const setViewedLoanId = (itemId) => {
+  viewedLoanId.value = itemId;
 };
 
-const getItem = (itemId) => coreState.getLoan(itemId);
-const getItemName = (itemId) => coreState.getLoanName(itemId);
-const getPaymentSummary = (anchorId, itemId) => coreState.getPaymentSummary(itemId, anchorId);
-const buildAmortizationTableSubtitle = (anchor, item) => coreState.buildAmortizationTableSubtitle(item, anchor);
-const buildAmortizationTableTitle = (anchor, item) => coreState.buildAmortizationTableTitle(item, anchor);
+watch(
+  () => coreState.currentBudgetId,
+  (newId) => {
+    if (newId && coreState.budgetDetailsPanelActive) {
+      currentBudget.value = coreState.getBudget(newId);
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -37,28 +42,26 @@ const buildAmortizationTableTitle = (anchor, item) => coreState.buildAmortizatio
     </template>
     <template #body>
       <div
-        v-if="anchor"
+        v-if="currentBudget"
         :class="['tabframe', 'w-auto']"
       >
         <base-tabs
-          :get-item-name="getItemName"
-          :pivot="pivot"
-          :is-viewed-item-id="isViewedItemId"
-          :set-viewed-item-id="setViewedItemId"
+          :get-item-name="coreState.getLoanName"
+          :pivot="coreState.loansWithTotals"
+          :is-viewed-item-id="isViewedLoanId"
+          :set-viewed-item-id="setViewedLoanId"
         >
           <template #tabContent>
             <AmortizationTable
-              :payment-summary="getPaymentSummary(anchor.id, viewedItemId)"
-              :title="buildAmortizationTableTitle(
-                anchor,
-                getItem(viewedItemId),
-              )
-              "
-              :subtitle="buildAmortizationTableSubtitle(
-                anchor,
-                getItem(viewedItemId),
-              )
-              "
+              :payment-summary="coreState.getPaymentSummary(viewedLoanId, currentBudget.id)"
+              :title="coreState.buildAmortizationTableTitle(
+                coreState.getLoan(viewedLoanId),
+                currentBudget,
+              )"
+              :subtitle="coreState.buildAmortizationTableSubtitle(
+                coreState.getLoan(viewedLoanId),
+                currentBudget,
+              )"
             />
           </template>
         </base-tabs>

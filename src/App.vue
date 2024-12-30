@@ -99,14 +99,8 @@ watch(() => coreState.refinancingFormActive, async (show) => {
             <GraphsPanel />
           </div>
           <div>
-            <LoanDetailsPanel
-              :anchor="coreState.getLoan(coreState.currentLoanId)"
-              :pivot="coreState.monthlyBudgets"
-            />
-            <BudgetDetailsPanel
-              :anchor="coreState.getBudget(coreState.currentBudgetId)"
-              :pivot="coreState.loansWithTotals"
-            />
+            <BudgetDetailsPanel />
+            <LoanDetailsPanel />
           </div>
         </div>
       </div>
