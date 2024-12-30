@@ -15,8 +15,18 @@ const sortedLanguages = computed(() => coreState.languages.toSorted());
 const reducePaymentsExample = computed(
   () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
 );
+const refinancingUseHighestPaymentExample = computed(() => {
+    if (coreState.loans.length) {
+      const firstLoan = coreState.loans[0]
+      const basePayment = firstLoan.minPayment;
+      const hypotheticalPayment = firstLoan.minPayment - (firstLoan.minPayment % 100);
+      const usedPayment = coreState.refinancingUseHighestPayment ? basePayment : hypotheticalPayment;
+      return `(A scenario for ${coreState.getLoanName(firstLoan.id)} [${coreState.Money(basePayment)}] with a minimum payment of ${coreState.Money(hypotheticalPayment)} uses ${coreState.Money(usedPayment)})`;
+    }
+    return '';
+});
 const repaymentPriorityExample = computed(
-  () => (coreState.loans.length ? ('Priority: ' + coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')) : ''),
+  () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')})`) : ''),
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -114,6 +124,38 @@ watch(() => roundingScale.value, async (newValue) => {
               <br>
               <p>
                 {{ reducePaymentsExample }}
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
+        <collapsible-card>
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Refinancing - Use Highest Payment
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div>
+              <base-button
+                :class="buttonStyle(coreState.refinancingUseHighestPayment)"
+                @click="coreState.toggleRefinancingUseHighestPayment"
+              >
+                {{
+                  buttonText(coreState.refinancingUseHighestPayment) }}
+              </base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                When enabled this uses the higher value between
+                a refinanced loan's minimum payment
+                and its base loan's minimum payment
+                for calculating totals for refinancing scenarios
+              </p>
+              <br>
+              <p>
+                {{ refinancingUseHighestPaymentExample }}
               </p>
             </div>
           </template>

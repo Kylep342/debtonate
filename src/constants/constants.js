@@ -1,5 +1,6 @@
 import { TOTALS } from 'moneyfunx';
 
+const BTN_AMORTIZATION_TABLES = "Amortization Tables";
 const BTN_CLEAR = 'Clear';
 const BTN_CREATE = 'Create';
 const BTN_DELETE = 'Delete';
@@ -12,6 +13,7 @@ const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_REFINANCE = 'Refinance';
+const BTN_REFINANCING_SUMMARY = "Refinancing Summary";
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
@@ -107,6 +109,7 @@ const LOCALE_CURRENCY = {
 };
 
 export default Object.freeze({
+  BTN_AMORTIZATION_TABLES,
   BTN_CLEAR,
   BTN_CREATE,
   BTN_DELETE,
@@ -119,6 +122,7 @@ export default Object.freeze({
   BTN_ON,
   BTN_OPTIONS,
   BTN_REFINANCE,
+  BTN_REFINANCING_SUMMARY,
   BTN_SAVE,
   BTN_SELECT,
   BUDGET_DETAILS_ID,

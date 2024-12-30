@@ -2,38 +2,30 @@
 import { computed, ref } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
-import RefinancingSummary from './RefinancingSummary.vue';
+// import RefinancingSummary from './RefinancingSummary.vue';
+import RefinancingTable from './RefinancingTable.vue';
 import constants from '../constants/constants';
-import emitters from '../constants/emitters';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['anchor', 'id']);
-
+const props = defineProps(['anchor', 'pivot']);
 const coreState = useCoreStore();
 
-const viewedItemId = ref(constants.DEFAULT);
-
 const title = computed(() => props.anchor ? coreState.buildLoanDetailsTitle(props.anchor) : constants.LOAN_DETAILS);
-
+const viewedItemId = ref(constants.DEFAULT);
 const isViewedItemId = (itemId) => viewedItemId.value === itemId;
-
 const setViewedItemId = (itemId) => {
   viewedItemId.value = itemId;
 };
 
 const getItem = (itemId) => coreState.getBudget(itemId);
-
 const getItemName = (itemId) => coreState.getBudgetName(itemId);
-
 const getPaymentSummary = (anchorId, itemId) => coreState.getPaymentSummary(anchorId, itemId);
-
 const buildAmortizationTableSubtitle = (anchor, item) => coreState.buildAmortizationTableSubtitle(anchor, item);
-
 const buildAmortizationTableTitle = (anchor, item) => coreState.buildAmortizationTableTitle(anchor, item)
 </script>
 
 <template>
-  <base-modal :id="props.id">
+  <base-modal :id="constants.LOAN_DETAILS_ID">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
@@ -50,18 +42,19 @@ const buildAmortizationTableTitle = (anchor, item) => coreState.buildAmortizatio
         v-if="anchor"
         :class="['tabframe', 'w-auto']"
       >
-        <!-- <base-tabs
+        <RefinancingTable
+          v-if="coreState.refinancingScenarios[anchor.id]?.length"
+          :parent-id="anchor.id"
+          :scenarios="coreState.refinancingScenarios[anchor.id]"
+        />
+        <base-tabs
           :get-item-name="getItemName"
           :pivot="pivot"
           :is-viewed-item-id="isViewedItemId"
           :set-viewed-item-id="setViewedItemId"
         >
-          <template #tabContent> -->
-        <RefinancingSummary
-          v-if="coreState.refinancingScenarios[anchor.id]?.length"
-          :parent-id="anchor.id"
-        />
-            <!-- <AmortizationTable
+          <template #tabContent>
+            <AmortizationTable
               :payment-summary="getPaymentSummary(anchor.id, viewedItemId)"
               :title="buildAmortizationTableTitle(
                 anchor,
@@ -73,9 +66,9 @@ const buildAmortizationTableTitle = (anchor, item) => coreState.buildAmortizatio
                 getItem(viewedItemId),
               )
               "
-            /> -->
-          <!-- </template>
-        </base-tabs> -->
+            />
+          </template>
+        </base-tabs>
       </div>
     </template>
   </base-modal>

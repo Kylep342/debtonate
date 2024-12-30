@@ -23,7 +23,7 @@ export default defineStore('core', () => {
   const periodsAsDates = ref(false);
   const reducePayments = ref(false);
   const refinancingFormActive = ref(false);
-  // Note: LINEAGE!!!
+  const refinancingUseHighestPayment = ref(false);
   const refinancingScenarios = ref({});
   const roundingScale = ref(100);
   const roundUp = ref(false);
@@ -207,6 +207,9 @@ export default defineStore('core', () => {
   const toggleReducePayments = () => {
     reducePayments.value = !reducePayments.value;
   };
+  const toggleRefinancingUseHighestPayment = () => {
+    refinancingUseHighestPayment.value = !refinancingUseHighestPayment.value;
+  };
   const toggleRounding = (scale) => {
     roundUp.value = !roundUp.value;
     if (roundUp.value) {
@@ -247,8 +250,7 @@ export default defineStore('core', () => {
     const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, loanRefinanceScenarioName(parentId, name));
     const paymentSchedule = moneyfunx.payLoans(
       [loan],
-      // TODO: Expand on options here
-      Math.max(loan.minPayment, getLoan(parentId).minPayment),
+      refinancingUseHighestPayment.value ? Math.max(loan.minPayment, getLoan(parentId).minPayment): loan.minPayment,
       false,
     )
     if (refinancingScenarios.value[parentId]) {
@@ -298,6 +300,7 @@ export default defineStore('core', () => {
     language.value = navigator.language;
     loans.value = [];
     periodsAsDates.value = false;
+    refinancingUseHighestPayment.value = false;
     reducePayments.value = false;
     roundUp.value = false;
     budgetDetailsPanelActive.value = false;
@@ -324,6 +327,9 @@ export default defineStore('core', () => {
     reducePayments.value = JSON.parse(
       localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
     );
+    refinancingUseHighestPayment.value = JSON.parse(
+      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT),
+    );
     roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
     roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
@@ -343,6 +349,10 @@ export default defineStore('core', () => {
       keys.LS_REDUCE_PAYMENTS,
       JSON.stringify(reducePayments.value),
     );
+    localStorage.setItem(
+      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
+      JSON.stringify(refinancingUseHighestPayment.value),
+    );
     localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
     localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
@@ -361,14 +371,15 @@ export default defineStore('core', () => {
             [keys.LS_LANGUAGE]: language.value,
             [keys.LS_LOANS]: loans.value,
             [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+            [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
             [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
             [keys.LS_ROUND_UP]: roundUp.value,
             [keys.LS_ROUNDING_SCALE]: roundingScale.value,
             [keys.LS_SNOWBALL_SORT]: snowballSort.value,
           }
         )
-      )
-    }
+      );
+    };
 
   // dependent computed values/methods
   const budgetFormTitle = computed(() => (currentBudgetId.value
@@ -389,9 +400,11 @@ export default defineStore('core', () => {
       : constants.BTN_CREATE
   ));
 
-  const createLoanButtonText = computed(
-    () => (currentLoanId.value ? constants.BTN_SAVE : constants.BTN_CREATE),
-  );
+  const createLoanButtonText = computed(() => (
+    currentLoanId.value
+      ? constants.BTN_SAVE
+      : constants.BTN_CREATE
+  ));
 
 
   const paymentSchedules = computed(() => {
@@ -704,6 +717,7 @@ export default defineStore('core', () => {
     refinancingFormActive,
     refinancingFormTitle,
     refinancingScenarios,
+    refinancingUseHighestPayment,
     roundedGlobalMinPayment,
     roundingScale,
     roundUp,
@@ -718,6 +732,7 @@ export default defineStore('core', () => {
     toggleAvalancheSort,
     togglePeriodsAsDates,
     toggleReducePayments,
+    toggleRefinancingUseHighestPayment,
     toggleRounding,
     toggleSnowballSort,
     totalsAsALoan,

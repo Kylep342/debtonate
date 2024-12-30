@@ -10,10 +10,11 @@ const props = defineProps({
 
 const coreState = useCoreStore();
 
+const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
-const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
+const loanTermInYears = computed(() => `${props.loan.termInYears}`);
 
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewLoan,
@@ -66,12 +67,6 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
                 <b>{{ loanPrincipal }}</b>
               </td>
             </tr>
-            <tr v-if="loanPrincipal !== loanCurrentBalance">
-              <td>Current Balance</td>
-              <td :class="['text-right']">
-                <b>{{ loanCurrentBalance }}</b>
-              </td>
-            </tr>
             <tr>
               <td>Interest Rate</td>
               <td :class="['text-right']">
@@ -79,9 +74,21 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
               </td>
             </tr>
             <tr>
+              <td>Term</td>
+              <td :class="['text-right']">
+                <b>{{ loanTermInYears }} years</b>
+              </td>
+            </tr>
+            <tr>
               <td>Minimum Payment</td>
               <td :class="['text-right']">
                 <b>{{ loanMinPayment }}</b>
+              </td>
+            </tr>
+            <tr v-if="loanPrincipal !== loanCurrentBalance">
+              <td>Current Balance</td>
+              <td :class="['text-right']">
+                <b>{{ loanCurrentBalance }}</b>
               </td>
             </tr>
           </tbody>

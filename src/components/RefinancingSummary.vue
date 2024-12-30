@@ -1,6 +1,4 @@
 <script setup>
-// import { ref } from 'vue';
-
 import RefinancingTable from './RefinancingTable.vue';
 import useCoreStore from '../stores/core';
 
