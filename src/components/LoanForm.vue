@@ -11,6 +11,7 @@ const interestRate = ref(null);
 const termInYears = ref(null);
 const name = ref(null);
 const currentBalance = ref(null);
+const fees = ref(null);
 
 const createButtonEnabled = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -28,6 +29,7 @@ watch(
       termInYears.value = currentLoan.termInYears;
       name.value = currentLoan.name;
       currentBalance.value = currentLoan.currentBalance;
+      fees.value = currentLoan.fees;
     }
   },
   { immediate: true },
@@ -39,6 +41,7 @@ const clearForm = () => {
   termInYears.value = null;
   name.value = null;
   currentBalance.value = null;
+  fees.value = null;
 };
 
 const createLoan = () => {
@@ -48,6 +51,7 @@ const createLoan = () => {
     termInYears.value,
     name.value,
     currentBalance.value,
+    fees.value,
   );
   clearForm();
 };
@@ -120,6 +124,16 @@ const exit = () => {
           type="number"
           step="0.01"
           label="Current Balance"
+        >
+        <div :class="['label']">
+          <span :class="['label-text']">Fees (Optional)</span>
+        </div>
+        <input
+          v-model.number="fees"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          step="0.01"
+          label="Fees"
         >
       </div>
     </template>

@@ -50,6 +50,7 @@ watch(
           v-if="coreState.refinancingScenarios[currentLoan.id]?.length"
           :parent-id="currentLoan.id"
           :scenarios="coreState.refinancingScenarios[currentLoan.id]"
+          :schedules="coreState.refinancingSchedules[currentLoan.id]"
         />
         <base-tabs
           :get-item-name="coreState.getBudgetName"

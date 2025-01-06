@@ -49,7 +49,7 @@ const paymentHeader = computed(() => (coreState.periodsAsDates ? 'Payment Date' 
               :key="rowno"
             >
               <td :class="['text-center']">
-                {{ coreState.Period(record.period, true) }}
+                {{ coreState.Period(record.period, asStr=true) }}
               </td>
               <td :class="['text-right']">
                 {{ coreState.Money(record.interest + record.principal) }}

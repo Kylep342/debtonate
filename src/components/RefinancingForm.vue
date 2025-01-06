@@ -46,7 +46,7 @@ const refinanceLoan = () => {
     interestRate.value / 100,
     termInYears.value,
     name.value,
-    fees.value
+    fees.value,
   );
   clearForm();
 };

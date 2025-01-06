@@ -15,6 +15,7 @@ const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRa
 const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
 const loanTermInYears = computed(() => `${props.loan.termInYears}`);
+const loanFees = computed(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : undefined);
 
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewLoan,
@@ -89,6 +90,12 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
               <td>Current Balance</td>
               <td :class="['text-right']">
                 <b>{{ loanCurrentBalance }}</b>
+              </td>
+            </tr>
+            <tr v-if="loanFees">
+              <td>Fees</td>
+              <td :class="['text-right']">
+                <b>{{ loanFees }}</b>
               </td>
             </tr>
           </tbody>

@@ -4,14 +4,14 @@ import { computed } from 'vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['parentId', 'scenarios']);
+const props = defineProps(['parentId', 'scenarios', 'schedules']);
 
 const coreState = useCoreStore();
 
 const parentLoan = computed(() => coreState.getLoan(props.parentId))
 const title = computed(() => coreState.buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
 
-const interest = (scenario) => scenario.paymentSchedule[scenario.loan.id].lifetimeInterest
+const interest = (scenarioId) => props.schedules[scenarioId].lifetimeInterest
 
 </script>
 
@@ -63,18 +63,18 @@ const interest = (scenario) => scenario.paymentSchedule[scenario.loan.id].lifeti
             </tr>
             <tr
               v-for="(scenario) in scenarios"
-              :key="scenario.loan.id"
+              :key="scenario.id"
             >
-              <td> {{ scenario.loan.name }}</td>
-              <td>{{ coreState.buildLoanSubtitle(scenario.loan) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(interest(scenario)) }}</td>
+              <td> {{ scenario.name }}</td>
+              <td>{{ coreState.buildLoanSubtitle(scenario) }}</td>
+              <td :class="['text-right']">{{ coreState.Money(interest(scenario.id)) }}</td>
               <td :class="['text-right']">{{ coreState.Money(scenario.fees) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(interest(scenario) + scenario.fees) }}</td>
-              <td :class="['text-right']">{{ scenario.paymentSchedule[scenario.loan.id].amortizationSchedule.length }}</td>
+              <td :class="['text-right']">{{ coreState.Money(interest(scenario.id) + scenario.fees) }}</td>
+              <td :class="['text-right']">{{ schedules[scenario.id].amortizationSchedule.length }}</td>
               <td>
                 <base-button
                   :class="['btn-error']"
-                  @click="coreState.deleteRefinancingScenario(parentId, scenario.loan.id)"
+                  @click="coreState.deleteRefinancingScenario(parentId, scenario.id)"
                 >
                   {{ constants.BTN_DELETE }}
                 </base-button>
