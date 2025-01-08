@@ -11,7 +11,7 @@ const coreState = useCoreStore();
 const parentLoan = computed(() => coreState.getLoan(props.parentId))
 const title = computed(() => coreState.buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
 
-const interest = (scenarioId) => props.schedules[scenarioId].lifetimeInterest
+const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lifetimeInterest
 
 </script>
 
@@ -31,7 +31,13 @@ const interest = (scenarioId) => props.schedules[scenarioId].lifetimeInterest
                 <b>Scenario Name</b>
               </th>
               <th>
-                <b>Scenario Summary</b>
+                <b>Interest Rate</b>
+              </th>
+              <th>
+                <b>Term</b>
+              </th>
+              <th>
+                <b>Monthly Payment</b>
               </th>
               <th :class="['text-right']">
                 <b>Lifetime Interest</b>
@@ -55,22 +61,43 @@ const interest = (scenarioId) => props.schedules[scenarioId].lifetimeInterest
           <tbody>
             <tr>
               <td> {{ coreState.getLoanName(parentLoan.id) }}</td>
-              <td>{{ coreState.buildLoanSubtitle(parentLoan) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(0) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}</td>
-              <td :class="['text-right']">{{ coreState.getNumPayments(parentLoan.id, constants.DEFAULT) }}</td>
+              <td>{{ coreState.Percent(parentLoan.annualRate * 100) }}</td>
+              <td>{{ parentLoan.termInYears }}</td>
+              <td>{{ coreState.Money(parentLoan.minPayment) }}</td>
+              <td :class="['text-right']">
+                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
+              </td>
+              <td :class="['text-right']">
+                {{ coreState.Money(0) }}
+              </td>
+              <td :class="['text-right']">
+                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
+              </td>
+              <td :class="['text-right']">
+                {{ coreState.getNumPayments(parentLoan.id, constants.DEFAULT) }}
+              </td>
             </tr>
             <tr
               v-for="(scenario) in scenarios"
               :key="scenario.id"
             >
               <td> {{ scenario.name }}</td>
-              <td>{{ coreState.buildLoanSubtitle(scenario) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(interest(scenario.id)) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(scenario.fees) }}</td>
-              <td :class="['text-right']">{{ coreState.Money(interest(scenario.id) + scenario.fees) }}</td>
-              <td :class="['text-right']">{{ schedules[scenario.id].amortizationSchedule.length }}</td>
+              <td>{{ coreState.Percent(scenario.annualRate * 100) }}</td>
+              <td>{{ scenario.termInYears }}</td>
+              <td>{{ coreState.Money(schedules[scenario.id].paymentAmount) }}</td>
+              <td :class="['text-right']">
+                {{ coreState.Money(interest(scenario.id)) }}
+              </td>
+              <td :class="['text-right']">
+                {{ coreState.Money(scenario.fees) }}
+              </td>
+              <td :class="['text-right']">
+                {{ coreState.Money(interest(scenario.id) + scenario.fees) }}
+              </td>
+              <td :class="['text-right']">
+                {{ schedules[scenario.id].paymentSchedule.amortizationSchedule.length }}
+              </td>
+              <!-- <td :class="['text-right']">11</td> -->
               <td>
                 <base-button
                   :class="['btn-error']"

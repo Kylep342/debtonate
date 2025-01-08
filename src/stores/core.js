@@ -263,13 +263,13 @@ export default defineStore('core', () => {
     exitRefinancingForm();
   };
   const deleteRefinancingScenario = (parentId, scenarioId) => {
-    refinancingScenarios.value[parentId] = refinancingScenarios.value[parentId].filter((scenario) => scenario.loan.id !== scenarioId)
+    refinancingScenarios.value[parentId] = refinancingScenarios.value[parentId].filter((scenario) => scenario.id !== scenarioId)
   };
   const refinancingSchedules = computed(() => {
     const schedules = {}
     Object.entries(refinancingScenarios.value).forEach(([parentLoanId, scenarios]) => {
       const parentLoan = getLoan(parentLoanId);
-      schedules[parentLoanId] = [];
+      schedules[parentLoanId] = {};
       scenarios.forEach((scenario) => {
         const payment = refinancingScenarioPayment(parentLoan, scenario)
         const paymentSchedule = moneyfunx.payLoans(
@@ -277,9 +277,9 @@ export default defineStore('core', () => {
           payment,
           false,
         );
-        schedules[parentLoanId].push({
-          paymentAmount: payment, paymentSchedule: paymentSchedule, label: `${Money(payment)}/month` 
-        });
+        schedules[parentLoanId][scenario.id] = {
+          paymentAmount: payment, paymentSchedule: paymentSchedule[scenario.id],
+        };
       });
     });
     return schedules
