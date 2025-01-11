@@ -203,7 +203,7 @@ export default defineStore('core', () => {
     language.value = newValue;
   };
   const setRoundingScale = (newValue) => {
-    if (Number.isNaN(newValue) && newValue > 0) {
+    if (!Number.isNaN(newValue) && newValue > 0) {
       roundingScale.value = newValue;
     }
   };
