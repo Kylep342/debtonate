@@ -1,11 +1,13 @@
 <script setup>
 import { computed } from 'vue';
-import * as moneyfunx from 'moneyfunx';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
 const props = defineProps({
-  loan: moneyfunx.Loan
+  loan: {
+    type: Object,
+    required: true,
+  },
 });
 
 const coreState = useCoreStore();
