@@ -40,24 +40,32 @@ describe('Core Store', () => {
 
   it('toggles dates', () => {
     const coreState = useCoreStore();
+    expect(coreState.periodsAsDates).toBe(false);
     expect(coreState.Time).toBe(constants.PERIOD);
-    coreState.periodsAsDates = true;
+
+    coreState.togglePeriodsAsDates();
+    expect(coreState.periodsAsDates).toBe(true);
     expect(coreState.Time).toBe(constants.DATE);
   });
 
   it('sets rounding scale', () => {
     const coreState = useCoreStore();
+    coreState.loans = Loans();
     expect(coreState.roundUp).toBe(false);
     expect(coreState.roundingScale).toBe(100);
-    coreState.toggleRounding(200);
+    expect(coreState.globalMinPayment.toFixed(2)).toBe('3307.71');
+
+    coreState.toggleRounding(300);
     expect(coreState.roundUp).toBe(true);
-    expect(coreState.roundingScale).toBe(200);
+    expect(coreState.roundingScale).toBe(300);
+    expect(coreState.globalMinPayment.toFixed(2)).toBe('3600.00');
   });
 
   it('preserves rounding scale', () => {
     const coreState = useCoreStore();
     expect(coreState.roundUp).toBe(false);
     expect(coreState.roundingScale).toBe(100);
+
     coreState.toggleRounding('fish');
     expect(coreState.roundUp).toBe(true);
     expect(coreState.roundingScale).toBe(100);
@@ -123,7 +131,6 @@ describe('Core Store', () => {
     expect(coreState.loans.length).toBe(3);
 
     coreState.deleteLoan(firstLoanId);
-
     expect(coreState.loans.length).toBe(2);
     expect(coreState.loans.map((loan) => loan.name)).toStrictEqual(["e-car", "tau"]);
   })
@@ -169,4 +176,17 @@ describe('Core Store', () => {
       coreState.monthlyBudgets.map((budget) => budget.relative)
     ).toStrictEqual([555, 200, 0]);
   });
-})
+
+  it('sorts budgets', () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    expect(
+      coreState.monthlyBudgets.map((budget) => budget.relative)
+    ).toStrictEqual([1200, 555, 200, 0]);
+
+    coreState.createBudget(350);
+    expect(
+      coreState.monthlyBudgets.map((budget) => budget.relative)
+    ).toStrictEqual([1200, 555, 350, 200, 0]);
+  });
+});
