@@ -116,7 +116,7 @@ describe('Core Store', () => {
     ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, "house"]);
     expect(coreState.totalsAsALoan.principal).toBe(firstLoan.principal);
     expect(coreState.totalsAsALoan.annualRate).toBe(firstLoan.annualRate);
-    expect(coreState.totalsAsALoan.globalMaxPeriodsPerYear).toBe(firstLoan.globalMaxPeriodsPerYear);
+    expect(coreState.totalsAsALoan.periodsPerYear).toBe(firstLoan.periodsPerYear);
     expect(coreState.totalsAsALoan.termInYears).toBe(firstLoan.termInYears);
     expect(coreState.totalsAsALoan.periods).toBe(firstLoan.periods);
     expect(coreState.totalsAsALoan.minPayment).toBe(firstLoan.minPayment);
@@ -133,7 +133,7 @@ describe('Core Store', () => {
     coreState.deleteLoan(firstLoanId);
     expect(coreState.loans.length).toBe(2);
     expect(coreState.loans.map((loan) => loan.name)).toStrictEqual(["e-car", "tau"]);
-  })
+  });
 
   it('sorts loans', () => {
     const coreState = useCoreStore();
