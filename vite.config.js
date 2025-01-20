@@ -11,5 +11,12 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+    extensions: ['.js', '.ts', '.json'], // Ensure file extensions are resolved
+  },
+  test: {
+    deps: {
+      inline: ['moneyfunx'], // Ensure moneyfunx is processed correctly
+    },
+    exclude: ['node_modules'],
   },
 });

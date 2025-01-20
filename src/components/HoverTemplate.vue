@@ -11,7 +11,7 @@ const props = defineProps({
     required: true,
   },
   updateTooltipSize: {
-    type: Object,
+    type: Function,
     required: true,
   }
 })

@@ -31,7 +31,7 @@ export default defineStore('core', () => {
 
   // primitive computed values/methods
 
-  const baseDate = computed(() => Date.now());
+  const baseDate = ref(Date.now());
 
   const Money = (amount) => (
     Intl.NumberFormat(
@@ -203,7 +203,7 @@ export default defineStore('core', () => {
     language.value = newValue;
   };
   const setRoundingScale = (newValue) => {
-    if (Number.isNaN(newValue) && newValue > 0) {
+    if (!Number.isNaN(newValue) && newValue > 0) {
       roundingScale.value = newValue;
     }
   };
@@ -286,7 +286,7 @@ export default defineStore('core', () => {
   });
 
   const deleteBudget = (id) => {
-    const monthlyBudget = monthlyBudgets.value.find((budget) => budget.id === id);
+    const monthlyBudget = getBudget(id);
     budgets.value = budgets.value.filter(
       (budget) => budget !== monthlyBudget.relative,
     );
@@ -708,6 +708,7 @@ export default defineStore('core', () => {
     getPaymentSummary,
     globalCurrentBalance,
     globalEffectiveInterestRate,
+    globalFees,
     globalMaxPeriods,
     globalMaxPeriodsPerYear,
     globalMaxTermInYears,
