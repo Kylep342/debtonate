@@ -541,7 +541,7 @@ export default defineStore('core', () => {
       id: 'Balances',
       color: getBudgetColor,
       graphs: {},
-      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Balances over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
@@ -581,7 +581,7 @@ export default defineStore('core', () => {
       id: 'PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
       graphs: {},
-      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
@@ -621,7 +621,7 @@ export default defineStore('core', () => {
       id: 'InterestSaved',
       color: getBudgetColor,
       graphs: {},
-      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
@@ -659,7 +659,7 @@ export default defineStore('core', () => {
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
-    [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
+    [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
   }));
 
   return {

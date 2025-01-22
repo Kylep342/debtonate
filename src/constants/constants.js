@@ -32,7 +32,7 @@ const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
-const GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL = 'Percent of Payment to Principal | Time'
+const GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL = 'Percent of Payment as Principal | Time'
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
@@ -136,7 +136,7 @@ export default Object.freeze({
   DEFAULT,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,
-  GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL,
+  GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
   GRAPHS,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,
