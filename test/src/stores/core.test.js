@@ -176,6 +176,15 @@ describe('Core Store', () => {
         coreState.monthlyBudgets.map((budget) => budget.relative)
       ).toStrictEqual([1200, 555, 350, 200, 0]);
     });
+
+    it('gets budget attributes', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      const firstBudgetId = coreState.monthlyBudgets[0].id;
+      expect(coreState.getBudgetIndex(firstBudgetId)).toBe(1);
+      expect(coreState.getBudgetColor(firstBudgetId)).toBe(constants.COLORS[1]);
+      expect(coreState.getBudgetName(firstBudgetId)).toBe("Budget 1");
+    });
   });
 
   describe('with loans', () => {
@@ -256,6 +265,18 @@ describe('Core Store', () => {
   it('handles internal state', async () => {
     const coreState = useCoreStore();
     const initialState = coreState.exportState();
+    expect(Object.keys(initialState)).toStrictEqual([
+      keys.LS_BUDGETS,
+      keys.LS_CURRENCY,
+      keys.LS_LANGUAGE,
+      keys.LS_LOANS,
+      keys.LS_PERIODS_AS_DATES,
+      keys.LS_REDUCE_PAYMENTS,
+      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
+      keys.LS_ROUNDING_ENABLED,
+      keys.LS_ROUNDING_SCALE,
+      keys.LS_SNOWBALL_SORT,
+    ]);
     coreState.budgets = Budgets();
     coreState.loans = Loans();
     coreState.toggleRounding(200);
@@ -354,6 +375,66 @@ describe('Core Store', () => {
       expect(coreState.refinancingFormActive).toBe(true);
       coreState.exitRefinancingForm();
       expect(coreState.refinancingFormActive).toBe(false);
+    });
+  });
+  describe('builder functions', () => {
+    it('builds titiles', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
+      const firstBudgetId = coreState.monthlyBudgets[0].id;
+      const firstLoanId = coreState.loans[0].id;
+
+      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+      expect(coreState.loanFormTitle).toBe('Creating a Loan');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+      coreState.editBudget(firstBudgetId);
+      expect(coreState.budgetFormTitle).toBe('Editing Budget 1');
+      expect(coreState.loanFormTitle).toBe('Creating a Loan');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+      coreState.exitBudgetForm();
+
+      coreState.editLoan(firstLoanId);
+      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+      expect(coreState.loanFormTitle).toBe('Editing house');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+      coreState.exitLoanForm();
+      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+      expect(coreState.loanFormTitle).toBe('Creating a Loan');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+
+      coreState.openRefinancingForm(firstLoanId);
+      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+      expect(coreState.loanFormTitle).toBe('Creating a Loan');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing house');
+      coreState.exitRefinancingForm();
+      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+      expect(coreState.loanFormTitle).toBe('Creating a Loan');
+      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+    });
+
+    it('builds button text', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
+      const firstBudgetId = coreState.monthlyBudgets[0].id;
+      const firstLoanId = coreState.loans[0].id;
+
+      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
+      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
+      // coreState.editBudget(firstBudgetId);
+      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_SAVE);
+      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
+      // coreState.exitBudgetForm();
+      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
+      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
+
+      // coreState.editLoan(firstLoanId);
+      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
+      // expect(coreState.createLoanButtonText).toBe(constants.BTN_SAVE);
+      // coreState.exitLoanForm();
+      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
+      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
     });
   });
 });

@@ -397,29 +397,17 @@ export default defineStore('core', () => {
   });
 
   // dependent computed values/methods
-  const budgetFormTitle = computed(() => (currentBudgetId.value
+  const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
-  const loanFormTitle = computed(() => (currentLoanId.value
+  const loanFormTitle = computed(() => (currentLoanId.value && loanFormActive.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
     : 'Creating a Loan'));
 
-  const refinancingFormTitle = computed(() => (currentLoanId.value
+  const refinancingFormTitle = computed(() => (currentLoanId.value && refinancingFormActive.value
     ? `Refinancing ${getLoanName(currentLoanId.value)}`
     : 'Refinancing'));
-
-  const createBudgetButtonText = computed(() => (
-    currentBudgetId.value
-      ? constants.BTN_SAVE
-      : constants.BTN_CREATE
-  ));
-
-  const createLoanButtonText = computed(() => (
-    currentLoanId.value
-      ? constants.BTN_SAVE
-      : constants.BTN_CREATE
-  ));
 
   const paymentSchedules = computed(() => {
     const schedules = {};
@@ -664,9 +652,7 @@ export default defineStore('core', () => {
     buildRefinancingTableTitle,
     clearState,
     createBudget,
-    createBudgetButtonText,
     createLoan,
-    createLoanButtonText,
     createRefinanceScenario,
     currencies,
     currency,

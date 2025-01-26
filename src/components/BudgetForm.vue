@@ -12,6 +12,12 @@ const createButtonEnabled = computed(
   () => !Number.isNaN(amount.value) && amount.value > 0,
 );
 
+const createBudgetButtonText = computed(() => (
+  coreState.currentBudgetId
+    ? constants.BTN_SAVE
+    : constants.BTN_CREATE
+));
+
 watch(
   () => coreState.currentBudgetId,
   (newId) => {
@@ -70,7 +76,7 @@ const exit = () => {
         :class="'btn-success'"
         @click="createBudget"
       >
-        {{ coreState.createBudgetButtonText }}
+        {{ createBudgetButtonText }}
       </base-button>
     </template>
   </base-modal>
