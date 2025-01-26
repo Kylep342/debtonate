@@ -26,7 +26,7 @@ export default defineStore('core', () => {
   const refinancingUseHighestPayment = ref(false);
   const refinancingScenarios = ref({});
   const roundingScale = ref(100);
-  const roundUp = ref(false);
+  const roundingEnabled = ref(false);
   const snowballSort = ref(false);
 
   // primitive computed values/methods
@@ -107,7 +107,7 @@ export default defineStore('core', () => {
   );
 
   const globalMinPayment = computed(
-    () => (roundUp.value ? roundedGlobalMinPayment.value : rawGlobalMinPayment.value),
+    () => (roundingEnabled.value ? roundedGlobalMinPayment.value : rawGlobalMinPayment.value),
   );
 
   const globalPrincipal = computed(() => loans.value.reduce(
@@ -180,7 +180,7 @@ export default defineStore('core', () => {
   const openRefinancingForm = (id) => {
     currentLoanId.value = id;
     refinancingFormActive.value = true;
-  };
+  }
   const exitBudgetForm = () => {
     budgetFormActive.value = false;
     currentBudgetId.value = null;
@@ -217,8 +217,8 @@ export default defineStore('core', () => {
     refinancingUseHighestPayment.value = !refinancingUseHighestPayment.value;
   };
   const toggleRounding = (scale) => {
-    roundUp.value = !roundUp.value;
-    if (roundUp.value) {
+    roundingEnabled.value = !roundingEnabled.value;
+    if (roundingEnabled.value) {
       setRoundingScale(scale);
     }
   };
@@ -323,7 +323,8 @@ export default defineStore('core', () => {
     periodsAsDates.value = false;
     refinancingUseHighestPayment.value = false;
     reducePayments.value = false;
-    roundUp.value = false;
+    roundingEnabled.value = false;
+    roundingScale.value = 100;
     budgetDetailsPanelActive.value = false;
     loanDetailsPanelActive.value = false;
     snowballSort.value = true;
@@ -352,7 +353,7 @@ export default defineStore('core', () => {
     refinancingUseHighestPayment.value = JSON.parse(
       localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT),
     );
-    roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
+    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED));
     roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
       localStorage.getItem(keys.LS_SNOWBALL_SORT),
@@ -375,33 +376,25 @@ export default defineStore('core', () => {
       keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
       JSON.stringify(refinancingUseHighestPayment.value),
     );
-    localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
+    localStorage.setItem(keys.LS_ROUNDING_ENABLED, JSON.stringify(roundingEnabled.value));
     localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
       keys.LS_SNOWBALL_SORT,
       JSON.stringify(snowballSort.value),
     );
   };
-  const exportState = () => {
-    saveState();
-    navigator.clipboard
-      .writeText(
-        JSON.stringify(
-          {
-            [keys.LS_BUDGETS]: budgets.value,
-            [keys.LS_CURRENCY]: currency.value,
-            [keys.LS_LANGUAGE]: language.value,
-            [keys.LS_LOANS]: loans.value,
-            [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
-            [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
-            [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-            [keys.LS_ROUND_UP]: roundUp.value,
-            [keys.LS_ROUNDING_SCALE]: roundingScale.value,
-            [keys.LS_SNOWBALL_SORT]: snowballSort.value,
-          }
-        )
-      );
-    };
+  const exportState = () => ({
+    [keys.LS_BUDGETS]: budgets.value,
+    [keys.LS_CURRENCY]: currency.value,
+    [keys.LS_LANGUAGE]: language.value,
+    [keys.LS_LOANS]: loans.value,
+    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+    [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
+    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
+    [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
+    [keys.LS_ROUNDING_SCALE]: roundingScale.value,
+    [keys.LS_SNOWBALL_SORT]: snowballSort.value,
+  });
 
   // dependent computed values/methods
   const budgetFormTitle = computed(() => (currentBudgetId.value
@@ -428,7 +421,6 @@ export default defineStore('core', () => {
       : constants.BTN_CREATE
   ));
 
-
   const paymentSchedules = computed(() => {
     const schedules = {};
     monthlyBudgets.value.forEach((budget) => {
@@ -439,10 +431,6 @@ export default defineStore('core', () => {
           budget.absolute,
           reducePayments.value,
         ),
-        label:
-          budget.id === constants.DEFAULT
-            ? `${Money(globalMinPayment.value)}/month`
-            : `${Money(budget.absolute)}/month (+${Money(budget.relative)}/month)`,
       }
     });
     return schedules;
@@ -467,7 +455,6 @@ export default defineStore('core', () => {
       Object.keys(paymentSchedules.value).forEach((budgetId) => {
         const schedule = paymentSchedules.value[budgetId];
         summaries[loanId][budgetId] = {
-          label: schedule.label,
           amortizationSchedule:
             schedule.paymentSchedule[loanId].amortizationSchedule,
           totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
@@ -746,7 +733,7 @@ export default defineStore('core', () => {
     refinancingUseHighestPayment,
     roundedGlobalMinPayment,
     roundingScale,
-    roundUp,
+    roundingEnabled,
     saveState,
     setCurrency,
     setLanguage,
