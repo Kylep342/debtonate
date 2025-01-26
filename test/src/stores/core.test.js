@@ -140,13 +140,20 @@ describe('Core Store', () => {
   describe('with budgets', () => {
     it('creates a budget', () => {
       const coreState = useCoreStore();
+      expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('0.00');
+
+      coreState.createBudget(100);
+      expect(
+        coreState.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
+      ).toStrictEqual(['100.00', '0.00']);
+
       coreState.loans = Loans();
       expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('3307.71');
 
       coreState.createBudget(200);
       expect(
         coreState.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
-      ).toStrictEqual(['3507.71', '3307.71']);
+      ).toStrictEqual(['3507.71', '3407.71', '3307.71']);
     });
 
     it('deletes a budget', () => {
@@ -413,28 +420,54 @@ describe('Core Store', () => {
       expect(coreState.refinancingFormTitle).toBe('Refinancing');
     });
 
-    it('builds button text', () => {
+    it('computes payment schedules', () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       coreState.loans = Loans();
-      const firstBudgetId = coreState.monthlyBudgets[0].id;
-      const firstLoanId = coreState.loans[0].id;
 
-      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
-      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
-      // coreState.editBudget(firstBudgetId);
-      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_SAVE);
-      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
-      // coreState.exitBudgetForm();
-      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
-      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
+      expect(
+        Object.keys(coreState.paymentSchedules)
+      ).toStrictEqual(
+        coreState.monthlyBudgets.map((budget) => budget.id)
+      );
+      coreState.monthlyBudgets.forEach((budget) => {
+        expect(
+          Object.keys(coreState.paymentSchedules[budget.id].paymentSchedule)
+        ).toStrictEqual(
+          [...coreState.loans.map((loan) => loan.id), constants.TOTALS]
+        );
+      });
+      coreState.monthlyBudgets.forEach((budget) => {
+        expect(
+          coreState.paymentSchedules[budget.id].paymentAmount
+        ).toBe(
+          budget.relative
+        );
+      });
+    });
 
-      // coreState.editLoan(firstLoanId);
-      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
-      // expect(coreState.createLoanButtonText).toBe(constants.BTN_SAVE);
-      // coreState.exitLoanForm();
-      // expect(coreState.createBudgetButtonText).toBe(constants.BTN_CREATE);
-      // expect(coreState.createLoanButtonText).toBe(constants.BTN_CREATE);
+    it('collects budget totals', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
+
+      expect(
+        Object.keys(coreState.totalsByBudget)
+      ).toStrictEqual(
+        coreState.monthlyBudgets.map((budget) => budget.id)
+      );
+
+      expect(
+        coreState.totalsByBudget[constants.DEFAULT].lifetimeInterest
+      ).toBe(
+        coreState.getLifetimeInterest(constants.TOTALS, constants.DEFAULT)
+      );
+    });
+
+    it('computes payment summaries', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
     });
   });
 });
