@@ -1,3 +1,4 @@
+import { scaleLinear, scaleTime } from "d3";
 import { Loan } from "moneyfunx";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -33,28 +34,44 @@ const Loans = () => [
   ),
 ];
 const Budgets = () => [1200, 555, 200];
+const RefinancingScenarios = (loan) => [
+  new Loan(
+    loan.currentBalance,
+    loan.annualRate - 0.0075,
+    12,
+    loan.termInYears + 1,
+  ),
+  new Loan(
+    loan.currentBalance,
+    loan.annualRate + 0.0150,
+    12,
+    Math.max(loan.termInYears - 2, 2),
+  ),
+];
 
 describe('Core Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });
   describe('user options', () => {
-    it('styles currency', () => {
+    it('styles currency', async () => {
       const coreState = useCoreStore();
       coreState.setLanguage('en-US');
       coreState.setCurrency('USD');
       expect(coreState.language).toBe('en-US');
       expect(coreState.currency).toBe('USD');
+      expect(coreState.currencySymbol).toBe('$');
       expect(coreState.Money(100)).toBe('$100.00');
 
       coreState.setLanguage('de-DE');
       coreState.setCurrency('EUR');
       expect(coreState.language).toBe('de-DE');
       expect(coreState.currency).toBe('EUR');
+      expect(coreState.currencySymbol).toBe('€');
       // not testing other currencies as they format with nasty space characters
     });
 
-    it('styles percentages', () => {
+    it('styles percentages', async () => {
       const coreState = useCoreStore();
       coreState.setLanguage('en-US');
       expect(coreState.language).toBe('en-US');
@@ -63,11 +80,12 @@ describe('Core Store', () => {
       expect(coreState.Percent(40.23)).toBe('40.23%')
     });
 
-    it('styles dates', () => {
+    it('styles dates', async () => {
       const coreState = useCoreStore();
       const baseDate = new Date(coreState.baseDate)
       coreState.setLanguage('en-US');
       expect(coreState.periodsAsDates).toBe(false);
+      expect(coreState.graphXScale).toBe(scaleLinear);
       expect(coreState.Time).toBe(constants.PERIOD);
       expect(coreState.Period(1, true)).toBe(1);
       expect(coreState.Period(1)).toBe(1);
@@ -75,6 +93,7 @@ describe('Core Store', () => {
       coreState.togglePeriodsAsDates();
       expect(coreState.periodsAsDates).toBe(true);
       expect(coreState.Time).toBe(constants.DATE);
+      expect(coreState.graphXScale).toBe(scaleTime);
       expect(coreState.Period(1, true)).toBe(new Date(
         baseDate.getFullYear(),
         baseDate.getMonth() + 1,
@@ -87,7 +106,7 @@ describe('Core Store', () => {
       ));
     });
 
-    it('sets rounding scale', () => {
+    it('sets rounding scale', async () => {
       const coreState = useCoreStore();
       coreState.loans = Loans();
       expect(coreState.roundingEnabled).toBe(false);
@@ -100,7 +119,7 @@ describe('Core Store', () => {
       expect(coreState.globalMinPayment.toFixed(2)).toBe('3600.00');
     });
 
-    it('preserves rounding scale', () => {
+    it('preserves rounding scale', async () => {
       const coreState = useCoreStore();
       expect(coreState.roundingEnabled).toBe(false);
       expect(coreState.roundingScale).toBe(100);
@@ -109,9 +128,17 @@ describe('Core Store', () => {
       expect(coreState.roundingEnabled).toBe(true);
       expect(coreState.roundingScale).toBe(100);
     });
+
+    it('reduces payments', async () => {
+      const coreState = useCoreStore();
+      expect(coreState.reducePayments).toBe(false);
+
+      coreState.toggleReducePayments();
+      expect(coreState.reducePayments).toBe(true);
+    })
   });
 
-  it('has correct global values', () => {
+  it('has correct global values', async () => {
     const coreState = useCoreStore();
     coreState.budgets = Budgets();
     coreState.loans = Loans();
@@ -137,8 +164,8 @@ describe('Core Store', () => {
     expect(coreState.globalFees).toBe(200);
   });
 
-  describe('with budgets', () => {
-    it('creates a budget', () => {
+  describe('with budgets', async () => {
+    it('creates a budget', async () => {
       const coreState = useCoreStore();
       expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('0.00');
 
@@ -156,7 +183,7 @@ describe('Core Store', () => {
       ).toStrictEqual(['3507.71', '3407.71', '3307.71']);
     });
 
-    it('deletes a budget', () => {
+    it('deletes a budget', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       expect(
@@ -171,7 +198,25 @@ describe('Core Store', () => {
       ).toStrictEqual([555, 200, 0]);
     });
 
-    it('sorts budgets', () => {
+    it('edits a budget', async () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      const firstBudgetId = coreState.monthlyBudgets[0].id;
+      const firstBudget = coreState.getBudget(firstBudgetId);
+      expect(coreState.currentBudgetId).toBe(null);
+      expect(coreState.budgetFormActive).toBe(false);
+
+      coreState.editBudget(firstBudgetId);
+      expect(coreState.currentBudgetId).toBe(firstBudgetId);
+      expect(coreState.budgetFormActive).toBe(true);
+
+      coreState.createBudget(firstBudget.relative + 100);
+      expect(coreState.currentBudgetId).toBe(null);
+      expect(coreState.budgetFormActive).toBe(false);
+      expect(coreState.getBudget(firstBudgetId)).toBe(undefined);
+    });
+
+    it('sorts budgets', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       expect(
@@ -184,45 +229,46 @@ describe('Core Store', () => {
       ).toStrictEqual([1200, 555, 350, 200, 0]);
     });
 
-    it('gets budget attributes', () => {
+    it('gets budget attributes', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       const firstBudgetId = coreState.monthlyBudgets[0].id;
+      expect(coreState.getBudgetIndex(constants.DEFAULT)).toBe(4);
+      expect(coreState.getBudgetColor(constants.DEFAULT)).toBe(constants.COLORS[4 % constants.COLORS.length]);
+      expect(coreState.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
       expect(coreState.getBudgetIndex(firstBudgetId)).toBe(1);
       expect(coreState.getBudgetColor(firstBudgetId)).toBe(constants.COLORS[1]);
       expect(coreState.getBudgetName(firstBudgetId)).toBe("Budget 1");
     });
   });
 
-  describe('with loans', () => {
-    it('creates a loan', () => {
+  describe('with loans', async () => {
+    it('creates a loan', async () => {
       const coreState = useCoreStore();
-      const loanDummy = Loans()[0];
+      const [firstLoanDummy, secondLoanDummy] = Loans().slice(0, 2);
       coreState.createLoan(
-        loanDummy.principal,
-        loanDummy.annualRate,
-        loanDummy.termInYears,
-        loanDummy.name,
-        loanDummy.currentBalance,
-        loanDummy.fees
+        firstLoanDummy.principal,
+        firstLoanDummy.annualRate,
+        firstLoanDummy.termInYears,
+        firstLoanDummy.name,
+        firstLoanDummy.currentBalance,
+        firstLoanDummy.fees
       );
 
-      const firstLoanId = coreState.loans[0].id;
-      const firstLoan = coreState.getLoan(firstLoanId);
+      expect(
+        coreState.loans.map((loan) => loan.name)
+      ).toStrictEqual(
+        ["house"]
+      );
+
       expect(
         coreState.loansWithTotals.map((loan) => loan.name)
-      ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, "house"]);
-      expect(coreState.totalsAsALoan.principal).toBe(firstLoan.principal);
-      expect(coreState.totalsAsALoan.annualRate).toBe(firstLoan.annualRate);
-      expect(coreState.totalsAsALoan.periodsPerYear).toBe(firstLoan.periodsPerYear);
-      expect(coreState.totalsAsALoan.termInYears).toBe(firstLoan.termInYears);
-      expect(coreState.totalsAsALoan.periods).toBe(firstLoan.periods);
-      expect(coreState.totalsAsALoan.minPayment).toBe(firstLoan.minPayment);
-      expect(coreState.totalsAsALoan.currentBalance).toBe(firstLoan.currentBalance);
-      expect(coreState.totalsAsALoan.fees).toBe(firstLoan.fees);
+      ).toStrictEqual(
+        [constants.NAME_TOTALS_AS_LOAN, "house"]
+      );
     });
 
-    it('deletes a loan', () => {
+    it('deletes a loan', async () => {
       const coreState = useCoreStore();
       coreState.loans = Loans();
       const firstLoanId = coreState.loans[0].id;
@@ -233,7 +279,30 @@ describe('Core Store', () => {
       expect(coreState.loans.map((loan) => loan.name)).toStrictEqual(["e-car", "tau"]);
     });
 
-    it('sorts loans', () => {
+    it('edits a loan', async () => {
+      const coreState = useCoreStore();
+      coreState.loans = Loans();
+      const firstLoanId = coreState.loans[0].id;
+      const firstLoan = coreState.getLoan(firstLoanId);
+      expect(coreState.currentLoanId).toBe(null);
+      expect(coreState.loanFormActive).toBe(false);
+
+      coreState.editLoan(firstLoanId);
+      expect(coreState.currentLoanId).toBe(firstLoanId);
+      expect(coreState.loanFormActive).toBe(true);
+      const editedLoanId = coreState.createLoan(
+        firstLoan.currentBalance,
+        firstLoan.annualRate * 1.1,
+        firstLoan.termInYears + 1,
+        'bananas'
+      );
+      expect(coreState.currentLoanId).toBe(null);
+      expect(coreState.loanFormActive).toBe(false);
+      expect(coreState.getLoan(firstLoanId)).toBe(undefined);
+      expect(coreState.getLoan(editedLoanId).name).toBe('bananas');
+    });
+
+    it('sorts loans', async () => {
       const coreState = useCoreStore();
       coreState.loans = Loans();
       expect(coreState.snowballSort).toBe(false);
@@ -256,10 +325,12 @@ describe('Core Store', () => {
       ).toStrictEqual(["e-car", "house", "tau"]);
     });
 
-    it('gets loan attributes', () => {
+    it('gets loan attributes', async () => {
       const coreState = useCoreStore();
       coreState.loans = Loans();
       const firstLoanId = coreState.loans[0].id;
+      expect(coreState.getLoanIndex(constants.TOTALS)).toBe(0);
+      expect(coreState.getLoanName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_LOAN);
       expect(coreState.getLoanIndex(firstLoanId)).toBe(1);
       expect(coreState.getLoanName(firstLoanId)).toBe("house");
       coreState.sortLoans();
@@ -267,12 +338,61 @@ describe('Core Store', () => {
     });
   });
 
-  describe('with refinancing', () => {
-    it('refinances a loan', () => {
+  describe('with refinancing', async () => {
+    it('refinances a loan', async () => {
       const coreState = useCoreStore();
       coreState.loans = Loans();
-      expect().toBe();
-    })
+      const firstLoanId = coreState.loans[0].id;
+      const firstLoan = coreState.getLoan(firstLoanId);
+      expect(Object.keys(coreState.refinancingScenarios)).toStrictEqual([]);
+      expect(Object.keys(coreState.refinancingSchedules)).toStrictEqual([]);
+      expect(coreState.refinancingUseHighestPayment).toBe(false);
+
+      const [ firstDummy, secondDummy ] = RefinancingScenarios(firstLoan);
+
+      const firstScenarioId = coreState.createRefinanceScenario(
+        firstLoanId,
+        firstDummy.currentBalance,
+        firstDummy.annualRate,
+        firstDummy.termInYears,
+        'Lower Rate Longer Term',
+        200
+      );
+      expect(Object.keys(coreState.refinancingScenarios)).toStrictEqual([firstLoanId]);
+      expect(Object.keys(coreState.refinancingSchedules)).toStrictEqual([firstLoanId]);
+      const firstRefinanceScenario = coreState.refinancingScenarios[firstLoanId].find((scenario) => scenario.id === firstScenarioId);
+      expect(firstRefinanceScenario.name).toBe('Lower Rate Longer Term');
+      expect(
+        coreState.refinancingSchedules[firstLoanId][firstScenarioId].paymentAmount
+      ).toBe(
+        firstRefinanceScenario.minPayment
+      );
+      coreState.toggleRefinancingUseHighestPayment();
+      expect(coreState.refinancingUseHighestPayment).toBe(true);
+      expect(
+        coreState.refinancingSchedules[firstLoanId][firstScenarioId].paymentAmount
+      ).toBe(
+        firstLoan.minPayment
+      );
+
+      const secondScenarioId = coreState.createRefinanceScenario(
+        firstLoanId,
+        secondDummy.currentBalance,
+        secondDummy.annualRate,
+        secondDummy.termInYears,
+        null,
+        150
+      );
+      expect(Object.keys(coreState.refinancingScenarios)).toStrictEqual([firstLoanId]);
+      expect(Object.keys(coreState.refinancingSchedules)).toStrictEqual([firstLoanId]);
+      expect(coreState.refinancingScenarios[firstLoanId].map((scenario) => scenario.id)).toStrictEqual([firstScenarioId, secondScenarioId]);
+      const secondRefinanceScenario = coreState.refinancingScenarios[firstLoanId].find((scenario) => scenario.id === secondScenarioId);
+      expect(secondRefinanceScenario.name).toBe('Scenario 2');
+
+      coreState.deleteRefinancingScenario(firstLoanId, firstScenarioId);
+      expect(Object.keys(coreState.refinancingScenarios)).toStrictEqual([firstLoanId]);
+      expect(coreState.refinancingScenarios[firstLoanId].map((scenario) => scenario.id)).toStrictEqual([secondScenarioId]);
+    });
   });
 
   it('handles internal state', async () => {
@@ -320,181 +440,222 @@ describe('Core Store', () => {
     expect(coreState.language).toBe(changedState[keys.LS_LANGUAGE]);
   });
 
-  describe('component lifecycles', () => {
-    it('manages component states', () => {
-      const coreState = useCoreStore();
-      coreState.budgets = Budgets();
-      // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
-      const firstBudgetId = coreState.monthlyBudgets[1].id;
-      coreState.loans = Loans();
-      const firstLoanId = coreState.loans[0].id;
+  it('manages component states', async () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
+    const firstBudgetId = coreState.monthlyBudgets[1].id;
+    coreState.loans = Loans();
+    const firstLoanId = coreState.loans[0].id;
 
-      // budgetDetailsFormActive
-      expect(coreState.budgetDetailsPanelActive).toBe(false);
-      coreState.viewBudget(firstBudgetId);
-      expect(coreState.budgetDetailsPanelActive).toBe(true);
-      expect(coreState.currentBudgetId).toBe(firstBudgetId);
-      coreState.unviewBudget();
-      expect(coreState.budgetDetailsPanelActive).toBe(false);
-      expect(coreState.currentBudgetId).toBe(null);
+    // budgetDetailsFormActive
+    expect(coreState.budgetDetailsPanelActive).toBe(false);
+    coreState.viewBudget(firstBudgetId);
+    expect(coreState.budgetDetailsPanelActive).toBe(true);
+    expect(coreState.currentBudgetId).toBe(firstBudgetId);
+    coreState.unviewBudget();
+    expect(coreState.budgetDetailsPanelActive).toBe(false);
+    expect(coreState.currentBudgetId).toBe(null);
 
-      // budgetFormActive
-      expect(coreState.budgetFormActive).toBe(false);
-      coreState.openBudgetForm();
-      expect(coreState.budgetFormActive).toBe(true);
-      coreState.exitBudgetForm();
-      expect(coreState.currentBudgetId).toBe(null);
-      expect(coreState.budgetFormActive).toBe(false);
-      coreState.editBudget(firstBudgetId);
-      expect(coreState.currentBudgetId).toBe(firstBudgetId);
-      expect(coreState.budgetFormActive).toBe(true);
-      coreState.exitBudgetForm();
-      expect(coreState.budgetFormActive).toBe(false);
-      expect(coreState.currentBudgetId).toBe(null);
+    // budgetFormActive
+    expect(coreState.budgetFormActive).toBe(false);
+    coreState.openBudgetForm();
+    expect(coreState.budgetFormActive).toBe(true);
+    coreState.exitBudgetForm();
+    expect(coreState.currentBudgetId).toBe(null);
+    expect(coreState.budgetFormActive).toBe(false);
+    coreState.editBudget(firstBudgetId);
+    expect(coreState.currentBudgetId).toBe(firstBudgetId);
+    expect(coreState.budgetFormActive).toBe(true);
+    coreState.exitBudgetForm();
+    expect(coreState.budgetFormActive).toBe(false);
+    expect(coreState.currentBudgetId).toBe(null);
 
-      // optionsFormActive
-      expect(coreState.optionsFormActive).toBe(false);
-      coreState.openOptionsForm();
-      expect(coreState.optionsFormActive).toBe(true);
-      coreState.exitOptionsForm();
-      expect(coreState.optionsFormActive).toBe(false);
+    // optionsFormActive
+    expect(coreState.optionsFormActive).toBe(false);
+    coreState.openOptionsForm();
+    expect(coreState.optionsFormActive).toBe(true);
+    coreState.exitOptionsForm();
+    expect(coreState.optionsFormActive).toBe(false);
 
-      // loanDetailsFormActive
-      expect(coreState.loanDetailsPanelActive).toBe(false);
-      coreState.viewLoan(firstLoanId);
-      expect(coreState.loanDetailsPanelActive).toBe(true);
-      expect(coreState.currentLoanId).toBe(firstLoanId);
-      coreState.unviewLoan();
-      expect(coreState.loanDetailsPanelActive).toBe(false);
-      expect(coreState.currentLoanId).toBe(null);
+    // loanDetailsFormActive
+    expect(coreState.loanDetailsPanelActive).toBe(false);
+    coreState.viewLoan(firstLoanId);
+    expect(coreState.loanDetailsPanelActive).toBe(true);
+    expect(coreState.currentLoanId).toBe(firstLoanId);
+    coreState.unviewLoan();
+    expect(coreState.loanDetailsPanelActive).toBe(false);
+    expect(coreState.currentLoanId).toBe(null);
 
-      // loanFormActive
-      expect(coreState.loanFormActive).toBe(false);
-      coreState.openLoanForm();
-      expect(coreState.loanFormActive).toBe(true);
-      coreState.exitLoanForm();
-      expect(coreState.currentLoanId).toBe(null);
-      expect(coreState.loanFormActive).toBe(false);
-      coreState.editLoan(firstLoanId);
-      expect(coreState.currentLoanId).toBe(firstLoanId);
-      expect(coreState.loanFormActive).toBe(true);
-      coreState.exitLoanForm();
-      expect(coreState.loanFormActive).toBe(false);
-      expect(coreState.currentLoanId).toBe(null);
+    // loanFormActive
+    expect(coreState.loanFormActive).toBe(false);
+    coreState.openLoanForm();
+    expect(coreState.loanFormActive).toBe(true);
+    coreState.exitLoanForm();
+    expect(coreState.currentLoanId).toBe(null);
+    expect(coreState.loanFormActive).toBe(false);
+    coreState.editLoan(firstLoanId);
+    expect(coreState.currentLoanId).toBe(firstLoanId);
+    expect(coreState.loanFormActive).toBe(true);
+    coreState.exitLoanForm();
+    expect(coreState.loanFormActive).toBe(false);
+    expect(coreState.currentLoanId).toBe(null);
 
-      // refinancingFormActive
-      expect(coreState.refinancingFormActive).toBe(false);
-      coreState.openRefinancingForm();
-      expect(coreState.refinancingFormActive).toBe(true);
-      coreState.exitRefinancingForm();
-      expect(coreState.refinancingFormActive).toBe(false);
+    // refinancingFormActive
+    expect(coreState.refinancingFormActive).toBe(false);
+    coreState.openRefinancingForm();
+    expect(coreState.refinancingFormActive).toBe(true);
+    coreState.exitRefinancingForm();
+    expect(coreState.refinancingFormActive).toBe(false);
+  });
+
+  it('builds tiles', async () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    coreState.loans = Loans();
+    const firstBudgetId = coreState.monthlyBudgets[0].id;
+    const firstLoanId = coreState.loans[0].id;
+
+    expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+    expect(coreState.loanFormTitle).toBe('Creating a Loan');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing');
+    coreState.editBudget(firstBudgetId);
+    expect(coreState.budgetFormTitle).toBe('Editing Budget 1');
+    expect(coreState.loanFormTitle).toBe('Creating a Loan');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing');
+    coreState.exitBudgetForm();
+
+    coreState.editLoan(firstLoanId);
+    expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+    expect(coreState.loanFormTitle).toBe('Editing house');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing');
+    coreState.exitLoanForm();
+    expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+    expect(coreState.loanFormTitle).toBe('Creating a Loan');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing');
+
+    coreState.openRefinancingForm(firstLoanId);
+    expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+    expect(coreState.loanFormTitle).toBe('Creating a Loan');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing house');
+    coreState.exitRefinancingForm();
+    expect(coreState.budgetFormTitle).toBe('Creating a Budget');
+    expect(coreState.loanFormTitle).toBe('Creating a Loan');
+    expect(coreState.refinancingFormTitle).toBe('Refinancing');
+  });
+
+  it('computes payment schedules', async () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    coreState.loans = Loans();
+
+    expect(
+      Object.keys(coreState.paymentSchedules)
+    ).toStrictEqual(
+      coreState.monthlyBudgets.map((budget) => budget.id)
+    );
+
+    coreState.monthlyBudgets.forEach((budget) => {
+      expect(
+        Object.keys(coreState.paymentSchedules[budget.id].paymentSchedule)
+      ).toStrictEqual(
+        [...coreState.loans.map((loan) => loan.id), constants.TOTALS]
+      );
+      expect(
+        coreState.paymentSchedules[budget.id].paymentAmount
+      ).toBe(
+        budget.relative
+      );
     });
   });
-  describe('builder functions', () => {
-    it('builds titiles', () => {
-      const coreState = useCoreStore();
-      coreState.budgets = Budgets();
-      coreState.loans = Loans();
-      const firstBudgetId = coreState.monthlyBudgets[0].id;
-      const firstLoanId = coreState.loans[0].id;
 
-      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
-      expect(coreState.loanFormTitle).toBe('Creating a Loan');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing');
-      coreState.editBudget(firstBudgetId);
-      expect(coreState.budgetFormTitle).toBe('Editing Budget 1');
-      expect(coreState.loanFormTitle).toBe('Creating a Loan');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing');
-      coreState.exitBudgetForm();
+  it('collects budget totals', async () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    coreState.loans = Loans();
 
-      coreState.editLoan(firstLoanId);
-      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
-      expect(coreState.loanFormTitle).toBe('Editing house');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing');
-      coreState.exitLoanForm();
-      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
-      expect(coreState.loanFormTitle).toBe('Creating a Loan');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing');
+    expect(
+      Object.keys(coreState.totalsByBudget)
+    ).toStrictEqual(
+      coreState.monthlyBudgets.map((budget) => budget.id)
+    );
 
-      coreState.openRefinancingForm(firstLoanId);
-      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
-      expect(coreState.loanFormTitle).toBe('Creating a Loan');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing house');
-      coreState.exitRefinancingForm();
-      expect(coreState.budgetFormTitle).toBe('Creating a Budget');
-      expect(coreState.loanFormTitle).toBe('Creating a Loan');
-      expect(coreState.refinancingFormTitle).toBe('Refinancing');
-    });
+    expect(
+      coreState.totalsByBudget[constants.DEFAULT].lifetimeInterest
+    ).toBe(
+      coreState.getLifetimeInterest(constants.TOTALS, constants.DEFAULT)
+    );
+  });
 
-    it('computes payment schedules', () => {
-      const coreState = useCoreStore();
-      coreState.budgets = Budgets();
-      coreState.loans = Loans();
+  it('computes payment summaries', async () => {
+    const coreState = useCoreStore();
+    coreState.budgets = Budgets();
+    coreState.loans = Loans();
 
+    expect(
+      Object.keys(coreState.paymentSummaries)
+    ).toStrictEqual(
+      coreState.loansWithTotals.map((loan) => loan.id)
+    );
+
+    Object.keys(coreState.paymentSummaries).forEach((loanId) => {
       expect(
-        Object.keys(coreState.paymentSchedules)
+        Object.keys(coreState.paymentSummaries[loanId])
       ).toStrictEqual(
         coreState.monthlyBudgets.map((budget) => budget.id)
       );
-
-      coreState.monthlyBudgets.forEach((budget) => {
-        expect(
-          Object.keys(coreState.paymentSchedules[budget.id].paymentSchedule)
-        ).toStrictEqual(
-          [...coreState.loans.map((loan) => loan.id), constants.TOTALS]
-        );
-        expect(
-          coreState.paymentSchedules[budget.id].paymentAmount
-        ).toBe(
-          budget.relative
-        );
-      });
     });
+  });
 
-    it('collects budget totals', () => {
+  describe('with graphing', () => {
+    it('configures graphs', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       coreState.loans = Loans();
 
       expect(
-        Object.keys(coreState.totalsByBudget)
-      ).toStrictEqual(
-        coreState.monthlyBudgets.map((budget) => budget.id)
-      );
-
-      expect(
-        coreState.totalsByBudget[constants.DEFAULT].lifetimeInterest
-      ).toBe(
-        coreState.getLifetimeInterest(constants.TOTALS, constants.DEFAULT)
-      );
+        Object.keys(coreState.graphs)
+      ).toStrictEqual([
+        constants.GRAPH_BALANCES_OVER_TIME,
+        constants.GRAPH_INTEREST_SAVED_OVER_TIME,
+        constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
+      ]);
     });
 
-    it('computes payment summaries', () => {
+    it('computes balances over time graph inputs', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       coreState.loans = Loans();
 
       expect(
-        Object.keys(coreState.paymentSummaries)
+        Object.keys(coreState.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
       ).toStrictEqual(
         coreState.loansWithTotals.map((loan) => loan.id)
       );
-
-      Object.keys(coreState.paymentSummaries).forEach((loanId) => {
-        expect(
-          Object.keys(coreState.paymentSummaries[loanId])
-        ).toStrictEqual(
-          coreState.monthlyBudgets.map((budget) => budget.id)
-        );
-      });
     });
 
-    it('configures graphs', () => {
+    it('computes interest saved over time graph inputs', async () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       coreState.loans = Loans();
 
+      expect(
+        Object.keys(coreState.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs)
+      ).toStrictEqual(
+        coreState.loansWithTotals.map((loan) => loan.id)
+      );
     });
 
+    it('computes percent of payment as principal over time graph inputs', async () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
+
+      expect(
+        Object.keys(coreState.graphs[constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL].graphs)
+      ).toStrictEqual(
+        coreState.loansWithTotals.map((loan) => loan.id)
+      );
+    });
   });
 });
