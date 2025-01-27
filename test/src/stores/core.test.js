@@ -248,6 +248,12 @@ describe('Core Store', () => {
       expect(
         coreState.loans.map((loan) => loan.name)
       ).toStrictEqual(["tau", "e-car", "house"]);
+
+      coreState.toggleAvalancheSort();
+      expect(coreState.snowballSort).toBe(false);
+      expect(
+        coreState.loans.map((loan) => loan.name)
+      ).toStrictEqual(["e-car", "house", "tau"]);
     });
 
     it('gets loan attributes', () => {
@@ -430,14 +436,13 @@ describe('Core Store', () => {
       ).toStrictEqual(
         coreState.monthlyBudgets.map((budget) => budget.id)
       );
+
       coreState.monthlyBudgets.forEach((budget) => {
         expect(
           Object.keys(coreState.paymentSchedules[budget.id].paymentSchedule)
         ).toStrictEqual(
           [...coreState.loans.map((loan) => loan.id), constants.TOTALS]
         );
-      });
-      coreState.monthlyBudgets.forEach((budget) => {
         expect(
           coreState.paymentSchedules[budget.id].paymentAmount
         ).toBe(
@@ -468,6 +473,28 @@ describe('Core Store', () => {
       const coreState = useCoreStore();
       coreState.budgets = Budgets();
       coreState.loans = Loans();
+
+      expect(
+        Object.keys(coreState.paymentSummaries)
+      ).toStrictEqual(
+        coreState.loansWithTotals.map((loan) => loan.id)
+      );
+
+      Object.keys(coreState.paymentSummaries).forEach((loanId) => {
+        expect(
+          Object.keys(coreState.paymentSummaries[loanId])
+        ).toStrictEqual(
+          coreState.monthlyBudgets.map((budget) => budget.id)
+        );
+      });
     });
+
+    it('configures graphs', () => {
+      const coreState = useCoreStore();
+      coreState.budgets = Budgets();
+      coreState.loans = Loans();
+
+    });
+
   });
 });

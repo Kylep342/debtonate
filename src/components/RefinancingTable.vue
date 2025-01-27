@@ -7,9 +7,10 @@ import useCoreStore from '../stores/core';
 const props = defineProps(['parentId', 'scenarios', 'schedules']);
 
 const coreState = useCoreStore();
-
 const parentLoan = computed(() => coreState.getLoan(props.parentId))
-const title = computed(() => coreState.buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
+
+const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${coreState.getLoanName(loan.id)}`;
+const title = computed(() => buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
 
 const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lifetimeInterest
 

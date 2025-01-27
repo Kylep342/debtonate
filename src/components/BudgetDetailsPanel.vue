@@ -9,7 +9,13 @@ const coreState = useCoreStore();
 const currentBudget = ref(null);
 const viewedLoanId = ref(constants.TOTALS);
 
-const title = computed(() => coreState.buildBudgetDetailsTitle(currentBudget.value));
+const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
+    ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
+      + `${coreState.Money(monthlyBudget.absolute)}/month `
+      + `(+${coreState.Money(monthlyBudget.relative)}/month)`
+    : constants.BUDGET_DETAILS;
+
+const title = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
 
 const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
 const setViewedLoanId = (itemId) => {

@@ -10,7 +10,12 @@ const coreState = useCoreStore();
 const currentLoan = ref(null);
 const viewedBudgetId = ref(constants.DEFAULT);
 
-const title = computed(() => coreState.buildLoanDetailsTitle(currentLoan.value));
+const buildLoanDetailsTitle = (loan) => loan
+  ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
+    + `${coreState.buildLoanSubtitle(loan)}`
+  : constants.LOAN_DETAILS;
+
+const title = computed(() => buildLoanDetailsTitle(currentLoan.value));
 
 const isViewedBudgetId = (itemId) => viewedBudgetId.value === itemId;
 const setViewedBudgetId = (itemId) => {

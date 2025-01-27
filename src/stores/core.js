@@ -493,21 +493,9 @@ export default defineStore('core', () => {
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
-    ? `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
-      + `${Money(monthlyBudget.absolute)}/month `
-      + `(+${Money(monthlyBudget.relative)}/month)`
-    : constants.BUDGET_DETAILS;
-  const buildLoanDetailsTitle = (loan) => loan
-    ? `Loan Details - ${getLoanName(loan.id)} | `
-      + `(${Money(loan.currentBalance)} `
-      + `@ ${Percent(loan.annualRate * 100)})`
-    : constants.LOAN_DETAILS;
-
   const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
   const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
-  const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${getLoanName(loan.id)}`;
-  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} @ ${Percent(loan.annualRate * 100)} | ${loan.termInYears * 12} Payments)`;
+  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} - ${Percent(loan.annualRate * 100)} - ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
   // graph data
 
@@ -646,10 +634,7 @@ export default defineStore('core', () => {
     budgets,
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
-    buildBudgetDetailsTitle,
-    buildLoanDetailsTitle,
     buildLoanSubtitle,
-    buildRefinancingTableTitle,
     clearState,
     createBudget,
     createLoan,
