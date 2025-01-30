@@ -3,9 +3,9 @@ import { Loan } from "moneyfunx";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import useCoreStore from '../../../src/stores/core';
 import constants from '../../../src/constants/constants';
 import keys from '../../../src/constants/keys';
+import useCoreStore from '../../../src/stores/core';
 
 const Loans = () => [
   new Loan(
@@ -245,7 +245,7 @@ describe('Core Store', () => {
   describe('with loans', async () => {
     it('creates a loan', async () => {
       const coreState = useCoreStore();
-      const [firstLoanDummy, secondLoanDummy] = Loans().slice(0, 2);
+      const firstLoanDummy = Loans()[0];
       coreState.createLoan(
         firstLoanDummy.principal,
         firstLoanDummy.annualRate,

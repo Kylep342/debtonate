@@ -4,13 +4,13 @@ import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { fillHeight, fillWidth, smartPosition } from '../../../src/functions/viewport';
-// import LoansPanel from '../../../src/components/LoansPanel.vue';
+import LoansPanel from '../../../src/components/LoansPanel.vue';
 
 
 describe('viewport module', () => {
-  // beforeEach(() => {
-  //   setActivePinia(createPinia());
-  // });
+  beforeEach(() => {
+    setActivePinia(createPinia());
+  });
 
   // const componentRef = ref(null);
   // mount(LoansPanel, {

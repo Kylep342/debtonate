@@ -14,7 +14,6 @@ const activeGraph = computed(() => coreState.graphs[viewedGraphId.value]);
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
-
 </script>
 
 <template>

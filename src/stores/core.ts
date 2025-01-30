@@ -5,35 +5,37 @@ import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
+import { monthlyBudget } from '../types/core';
+import { Graph, GraphConfig, Graphs, Point } from '../types/graph';
 
 export default defineStore('core', () => {
-  const budgetDetailsPanelActive = ref(false);
-  const budgets = ref([]);
-  const budgetFormActive = ref(false);
-  const loanFormActive = ref(false);
+  const budgetDetailsPanelActive = ref<boolean>(false);
+  const budgets = ref<Array<number>>([]);
+  const budgetFormActive = ref<boolean>(false);
+  const loanFormActive = ref<boolean>(false);
   const currencies = ref([...new Set(Object.values(constants.LOCALE_CURRENCY))]);
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
-  const currentBudgetId = ref(null);
-  const currentLoanId = ref(null);
+  const currentBudgetId = ref<string|null>(null);
+  const currentLoanId = ref<string|null>(null);
   const language = ref(navigator.language);
   const languages = ref([...new Set(Object.keys(constants.LOCALE_CURRENCY))]);
   const loanDetailsPanelActive = ref(false);
-  const loans = ref([]);
-  const optionsFormActive = ref(false);
-  const periodsAsDates = ref(false);
-  const reducePayments = ref(false);
-  const refinancingFormActive = ref(false);
-  const refinancingUseHighestPayment = ref(false);
+  const loans = ref<Array<moneyfunx.ILoan>>([]);
+  const optionsFormActive = ref<boolean>(false);
+  const periodsAsDates = ref<boolean>(false);
+  const reducePayments = ref<boolean>(false);
+  const refinancingFormActive = ref<boolean>(false);
+  const refinancingUseHighestPayment = ref<boolean>(false);
   const refinancingScenarios = ref({});
-  const roundingScale = ref(100);
-  const roundingEnabled = ref(false);
-  const snowballSort = ref(false);
+  const roundingScale = ref<number>(100);
+  const roundingEnabled = ref<boolean>(false);
+  const snowballSort = ref<boolean>(false);
 
   // primitive computed values/methods
 
   const baseDate = ref(Date.now());
 
-  const Money = (amount) => (
+  const Money = (amount: number): string => (
     Intl.NumberFormat(
       language.value,
       {
