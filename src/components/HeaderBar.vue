@@ -20,7 +20,7 @@ const classes = ['rounded-none btn-secondary'];
 
 <template>
   <header
-    :id="['header']"
+    id="headerBar"
     :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']"
   >
     <div :class="['flex-1']">
