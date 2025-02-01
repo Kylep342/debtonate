@@ -10,10 +10,10 @@ const currentBudget = ref(null);
 const viewedLoanId = ref(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
-    ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
-      + `${coreState.Money(monthlyBudget.absolute)}/month `
-      + `(+${coreState.Money(monthlyBudget.relative)}/month)`
-    : constants.BUDGET_DETAILS;
+  ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
+    + `${coreState.Money(monthlyBudget.absolute)}/month `
+    + `(+${coreState.Money(monthlyBudget.relative)}/month)`
+  : constants.BUDGET_DETAILS;
 
 const title = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
 

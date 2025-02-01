@@ -1,14 +1,13 @@
-<script setup>
+<script setup lang=ts>
 import { computed } from 'vue';
+import { ILoan } from 'moneyfunx';
+
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const props = defineProps({
-  loan: {
-    type: Object,
-    required: true,
-  },
-});
+const props = defineProps<{
+  loan: ILoan
+}>();
 
 const coreState = useCoreStore();
 

@@ -5,7 +5,7 @@ import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
-import { monthlyBudget } from '../types/core';
+import { MonthlyBudget } from '../types/core';
 import { Graph, GraphConfig, Graphs, Point } from '../types/graph';
 
 export default defineStore('core', () => {
@@ -150,13 +150,13 @@ export default defineStore('core', () => {
 
   const getLoan = (id: string): moneyfunx.ILoan|undefined => loansWithTotals.value.find((loan) => loan.id === id);
 
-  const minimumBudget = computed<monthlyBudget>(() => ({
+  const minimumBudget = computed<MonthlyBudget>(() => ({
     id: constants.DEFAULT,
     relative: 0,
     absolute: globalMinPayment.value,
   }));
 
-  const monthlyBudgets = computed<Array<monthlyBudget>>(() => {
+  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => {
     const budgetsArray = budgets.value.map((budget) => ({
       id: String(Math.floor(Math.random() * Date.now())),
       relative: budget,
@@ -168,7 +168,7 @@ export default defineStore('core', () => {
     return budgetsArray;
   });
 
-  const getBudget = (id: string): monthlyBudget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
+  const getBudget = (id: string): MonthlyBudget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
   const openBudgetForm = () => {
     budgetFormActive.value = true;
@@ -440,7 +440,7 @@ export default defineStore('core', () => {
     return schedules;
   });
 
-  const totalsByBudget = computed(() => {
+  const totalsByBudget = computed<moneyfunx.LoansPaymentSummary>(() => {
     const totals = {};
     monthlyBudgets.value.forEach((budget) => {
       totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
@@ -459,11 +459,9 @@ export default defineStore('core', () => {
       Object.keys(paymentSchedules.value).forEach((budgetId) => {
         const schedule = paymentSchedules.value[budgetId];
         summaries[loanId][budgetId] = {
-          amortizationSchedule:
-            schedule.paymentSchedule[loanId].amortizationSchedule,
-          totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
-          totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
-          totalPayments: schedule.paymentSchedule[loanId].amortizationSchedule.length,
+          amortizationSchedule: schedule.paymentSchedule[loanId].amortizationSchedule,
+          lifetimePrincipal: schedule.paymentSchedule[loanId].lifetimePrincipal,
+          lifetimeInterest: schedule.paymentSchedule[loanId].lifetimeInterest,
         }});
       });
     return summaries;
@@ -514,11 +512,11 @@ export default defineStore('core', () => {
   const getNumPayments = (
     loanId: string,
     budgetId: string
-  ): number => getPaymentSummary(loanId, budgetId).totalPayments;
+  ): number => getPaymentSummary(loanId, budgetId).amortizationSchedule.length;
   const getLifetimeInterest = (
     loanId: string,
     budgetId: string
-  ): number => getPaymentSummary(loanId, budgetId).totalInterestPaid;
+  ): number => getPaymentSummary(loanId, budgetId).lifetimeInterest;
   const getInterestUpToPeriod = (
     loanId: string,
     budgetId: string,
@@ -538,11 +536,11 @@ export default defineStore('core', () => {
 
   const buildAmortizationTableTitle = (
     loan: moneyfunx.ILoan,
-    monthlyBudget: monthlyBudget
+    monthlyBudget: MonthlyBudget
   ): string => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
   const buildAmortizationTableSubtitle = (
     loan: moneyfunx.ILoan,
-    monthlyBudget: monthlyBudget
+    monthlyBudget: MonthlyBudget
   ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildLoanSubtitle = (
     loan: moneyfunx.ILoan

@@ -9,8 +9,8 @@ import {
 import BudgetCard from './BudgetCard.vue';
 import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
 import { fillHeight } from '../functions/viewport';
+import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
@@ -26,7 +26,11 @@ const orderedBudgets = computed(() => [
 const scrollContainer = ref(null);
 
 const buttons = [
-  {text: constants.BTN_CREATE, onClick: coreState.openBudgetForm},
+  {
+    text: constants.BTN_CREATE,
+    onClick: coreState.openBudgetForm,
+    classes: ['btn-success', 'text-center'],
+  },
 ]
 
 onMounted(() => {
@@ -69,7 +73,7 @@ onBeforeUnmount(() => {
           >
             <BudgetCard
               :budget="budget"
-              :budget-totals="coreState.totalsByBudget[budget.id]"
+              :totals-as-a-loan-payment-summary-for-budget="coreState.totalsByBudget[budget.id]"
             />
           </li>
         </ul>

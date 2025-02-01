@@ -1,20 +1,13 @@
-<script setup>
+<script setup lang=ts>
 import { onUpdated, ref } from 'vue';
 
-const props = defineProps({
-  graphConfig: {
-    type: Object,
-    required: true,
-  },
-  index: {
-    type: Number,
-    required: true,
-  },
-  updateTooltipSize: {
-    type: Function,
-    required: true,
-  }
-})
+import { GraphConfig } from '../types/graph';
+
+const props = defineProps<{
+  graphConfig: GraphConfig,
+  index: number,
+  updateTooltipSize: Function,
+}>();
 
 const templateRef = ref(null);
 

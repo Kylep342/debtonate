@@ -1,9 +1,9 @@
-export interface Point {
+export type Point = {
   x: number;
   y: number;
 };
 
-export interface Graph {
+export type Graph = {
   config: {
     maxX: number;
     maxY: number
@@ -13,7 +13,7 @@ export interface Graph {
 
 export type Graphs = Record<string, Graph>;
 
-export interface GraphConfig {
+export type GraphConfig = {
   id: string;
   color: Function;
   graphs: Graphs;
