@@ -1,16 +1,22 @@
-<script setup>
+<script setup lang=ts>
 import { computed } from 'vue';
+import { PaymentSummary } from 'moneyfunx';
+
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
+import { monthlyBudget } from '../types/core';
 
-const props = defineProps(['budget', 'budgetTotals']);
+const props = defineProps<{
+  budget: monthlyBudget,
+  totalsAsALoanPaymentSummaryForBudget: PaymentSummary,
+}>();
 
 const coreState = useCoreStore();
 
 const budgetAmount = computed(() => `${coreState.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed(() => `${coreState.Money(props.budget.relative)}/month`);
-const budgetPayments = computed(() => coreState.Period(props.budgetTotals.amortizationSchedule.length, true));
-const budgetTotalInterest = computed(() => `${coreState.Money(props.budgetTotals.lifetimeInterest)}`);
+const budgetPayments = computed(() => coreState.Period(props.totalsAsALoanPaymentSummaryForBudget.amortizationSchedule.length, true));
+const budgetTotalInterest = computed(() => `${coreState.Money(props.totalsAsALoanPaymentSummaryForBudget.lifetimeInterest)}`);
 
 const paymentsLabel = computed(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 

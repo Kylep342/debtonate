@@ -11,12 +11,18 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    extensions: ['.js', '.ts', '.json'], // Ensure file extensions are resolved
+    extensions: ['.js', '.ts', '.json'],
   },
   test: {
-    deps: {
-      inline: ['moneyfunx'], // Ensure moneyfunx is processed correctly
+    coverage: {
+      provider: 'v8',
+      include: ['src'],
     },
-    exclude: ['node_modules'],
+    deps: {
+      inline: ['moneyfunx'],
+    },
+    environment: 'jsdom',
+    exclude: ['build', 'node_modules'],
+    root: '.',
   },
 });

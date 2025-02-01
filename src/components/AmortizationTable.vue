@@ -1,8 +1,14 @@
-<script setup>
+<script setup lang=ts>
 import { computed } from 'vue';
+import { PaymentSummary } from 'moneyfunx';
+
 import useCoreStore from '../stores/core';
 
-defineProps(['paymentSummary', 'title', 'subtitle']);
+defineProps<{
+  paymentSummary: PaymentSummary,
+  title: string,
+  subtitle: string,
+}>();
 
 const coreState = useCoreStore();
 
@@ -49,7 +55,7 @@ const paymentHeader = computed(() => (coreState.periodsAsDates ? 'Payment Date' 
               :key="rowno"
             >
               <td :class="['text-center']">
-                {{ coreState.Period(record.period, asStr=true) }}
+                {{ coreState.Period(record.period, true) }}
               </td>
               <td :class="['text-right']">
                 {{ coreState.Money(record.interest + record.principal) }}
@@ -75,16 +81,16 @@ const paymentHeader = computed(() => (coreState.periodsAsDates ? 'Payment Date' 
               <td :class="['text-right']">
                 <b>{{
                   coreState.Money(
-                    paymentSummary.totalPrincipalPaid +
-                      paymentSummary.totalInterestPaid
+                    paymentSummary.lifetimePrincipal +
+                      paymentSummary.lifetimeInterest
                   )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSummary.totalPrincipalPaid) }}</b>
+                <b>{{ coreState.Money(paymentSummary.lifetimePrincipal) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSummary.totalInterestPaid) }}</b>
+                <b>{{ coreState.Money(paymentSummary.lifetimeInterest) }}</b>
               </td>
               <td :class="['text-right']">
                 <b>{{ coreState.Money(0) }}</b>

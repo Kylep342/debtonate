@@ -1,17 +1,22 @@
-name: Deploy
+name: Deploy to github.io
 
 on:
   push:
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+    branches:
+      - "main"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
+      packages: write
       contents: read
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm run test
+        with:
+          node-version: 21
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run test run
       - run: npm run deploy

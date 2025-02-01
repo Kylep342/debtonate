@@ -17,7 +17,11 @@ const coreState = useCoreStore();
 const scrollContainer = ref(null);
 
 const buttons = [
-  {classes: [], text: constants.BTN_CREATE, onClick: coreState.openLoanForm},
+  {
+    text: constants.BTN_CREATE,
+    onClick: coreState.openLoanForm,
+    classes: ['btn-success', 'text-center'],
+  },
 ]
 
 onMounted(() => {

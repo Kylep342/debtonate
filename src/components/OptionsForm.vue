@@ -179,10 +179,10 @@ watch(() => roundingScale.value, async (newValue) => {
                 label="scale"
               >
               <base-button
-                :class="buttonStyle(coreState.roundUp)"
+                :class="buttonStyle(coreState.roundingEnabled)"
                 @click="coreState.toggleRounding(roundingScale)"
               >
-                {{ buttonText(coreState.roundUp) }}
+                {{ buttonText(coreState.roundingEnabled) }}
               </base-button>
             </div>
           </template>

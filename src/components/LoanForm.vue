@@ -19,6 +19,12 @@ const createButtonEnabled = computed(
   ),
 );
 
+const createLoanButtonText = computed(() => (
+  coreState.currentLoanId
+    ? constants.BTN_SAVE
+    : constants.BTN_CREATE
+));
+
 watch(
   () => coreState.currentLoanId,
   (newId) => {
@@ -145,7 +151,7 @@ const exit = () => {
         :class="'btn-success'"
         @click="createLoan"
       >
-        {{ coreState.createLoanButtonText }}
+        {{ createLoanButtonText }}
       </base-button>
     </template>
   </base-modal>

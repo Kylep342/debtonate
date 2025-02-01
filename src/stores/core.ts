@@ -5,35 +5,37 @@ import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
+import { MonthlyBudget } from '../types/core';
+import { Graph, GraphConfig, Graphs, Point } from '../types/graph';
 
 export default defineStore('core', () => {
-  const budgetDetailsPanelActive = ref(false);
-  const budgets = ref([]);
-  const budgetFormActive = ref(false);
-  const loanFormActive = ref(false);
+  const budgetDetailsPanelActive = ref<boolean>(false);
+  const budgets = ref<Array<number>>([]);
+  const budgetFormActive = ref<boolean>(false);
+  const loanFormActive = ref<boolean>(false);
   const currencies = ref([...new Set(Object.values(constants.LOCALE_CURRENCY))]);
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
-  const currentBudgetId = ref(null);
-  const currentLoanId = ref(null);
+  const currentBudgetId = ref<string|null>(null);
+  const currentLoanId = ref<string|null>(null);
   const language = ref(navigator.language);
   const languages = ref([...new Set(Object.keys(constants.LOCALE_CURRENCY))]);
   const loanDetailsPanelActive = ref(false);
-  const loans = ref([]);
-  const optionsFormActive = ref(false);
-  const periodsAsDates = ref(false);
-  const reducePayments = ref(false);
-  const refinancingFormActive = ref(false);
-  const refinancingUseHighestPayment = ref(false);
+  const loans = ref<Array<moneyfunx.Loan>>([]);
+  const optionsFormActive = ref<boolean>(false);
+  const periodsAsDates = ref<boolean>(false);
+  const reducePayments = ref<boolean>(false);
+  const refinancingFormActive = ref<boolean>(false);
+  const refinancingUseHighestPayment = ref<boolean>(false);
   const refinancingScenarios = ref({});
-  const roundingScale = ref(100);
-  const roundUp = ref(false);
-  const snowballSort = ref(false);
+  const roundingScale = ref<number>(100);
+  const roundingEnabled = ref<boolean>(false);
+  const snowballSort = ref<boolean>(false);
 
   // primitive computed values/methods
 
   const baseDate = ref(Date.now());
 
-  const Money = (amount) => (
+  const Money = (amount: number): string => (
     Intl.NumberFormat(
       language.value,
       {
@@ -43,7 +45,7 @@ export default defineStore('core', () => {
     ).format(amount)
   );
 
-  const Percent = (value) => (
+  const Percent = (amount: number): string => (
     Intl.NumberFormat(
       language.value,
       {
@@ -51,10 +53,10 @@ export default defineStore('core', () => {
         unit: 'percent',
         maximumFractionDigits: 2,
       },
-    ).format(value)
+    ).format(amount)
   );
 
-  const Period = (period, asStr = false) => {
+  const Period = (period: number, asStr: boolean=false) => {
     if (periodsAsDates.value) {
       const date = new Date(baseDate.value);
       const relativeDate = new Date(
@@ -107,7 +109,7 @@ export default defineStore('core', () => {
   );
 
   const globalMinPayment = computed(
-    () => (roundUp.value ? roundedGlobalMinPayment.value : rawGlobalMinPayment.value),
+    () => (roundingEnabled.value ? roundedGlobalMinPayment.value : rawGlobalMinPayment.value),
   );
 
   const globalPrincipal = computed(() => loans.value.reduce(
@@ -130,13 +132,13 @@ export default defineStore('core', () => {
     0,
   ));
 
-  const totalsAsALoan = computed(() => ({
+  const totalsAsALoan = computed<moneyfunx.ILoan>(() => ({
     id: constants.TOTALS,
     principal: globalPrincipal.value,
     annualRate: globalEffectiveInterestRate.value,
     periodsPerYear: globalMaxPeriodsPerYear.value,
     termInYears: globalMaxTermInYears.value,
-    periodicRate: null, // not implemented for Totals as a Loan (see notes.ts)
+    periodicRate: globalEffectiveInterestRate.value / 12, // not implemented for Totals as a Loan (see notes.ts)
     periods: globalMaxPeriods.value,
     minPayment: globalMinPayment.value,
     name: constants.NAME_TOTALS_AS_LOAN,
@@ -144,17 +146,17 @@ export default defineStore('core', () => {
     fees: globalFees.value,
   }));
 
-  const loansWithTotals = computed(() => [totalsAsALoan.value, ...loans.value]);
+  const loansWithTotals = computed<Array<moneyfunx.ILoan>>(() => [totalsAsALoan.value, ...loans.value]);
 
-  const getLoan = (id) => loansWithTotals.value.find((loan) => loan.id === id);
+  const getLoan = (id: string): moneyfunx.ILoan|undefined => loansWithTotals.value.find((loan) => loan.id === id);
 
-  const minimumBudget = computed(() => ({
+  const minimumBudget = computed<MonthlyBudget>(() => ({
     id: constants.DEFAULT,
     relative: 0,
     absolute: globalMinPayment.value,
   }));
 
-  const monthlyBudgets = computed(() => {
+  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => {
     const budgetsArray = budgets.value.map((budget) => ({
       id: String(Math.floor(Math.random() * Date.now())),
       relative: budget,
@@ -166,7 +168,7 @@ export default defineStore('core', () => {
     return budgetsArray;
   });
 
-  const getBudget = (id) => monthlyBudgets.value.find((budget) => budget.id === id);
+  const getBudget = (id: string): MonthlyBudget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
   const openBudgetForm = () => {
     budgetFormActive.value = true;
@@ -177,10 +179,10 @@ export default defineStore('core', () => {
   const openOptionsForm = () => {
     optionsFormActive.value = true;
   };
-  const openRefinancingForm = (id) => {
+  const openRefinancingForm = (id: string) => {
     currentLoanId.value = id;
     refinancingFormActive.value = true;
-  };
+  }
   const exitBudgetForm = () => {
     budgetFormActive.value = false;
     currentBudgetId.value = null;
@@ -196,15 +198,15 @@ export default defineStore('core', () => {
     refinancingFormActive.value = false;
     currentLoanId.value = null;
   };
-  const setCurrency = (newValue) => {
-    currency.value = newValue;
+  const setCurrency = (newCurrency: string) => {
+    currency.value = newCurrency;
   };
-  const setLanguage = (newValue) => {
-    language.value = newValue;
+  const setLanguage = (newLanguage: string) => {
+    language.value = newLanguage;
   };
-  const setRoundingScale = (newValue) => {
-    if (!Number.isNaN(newValue) && newValue > 0) {
-      roundingScale.value = newValue;
+  const setRoundingScale = (newScale: number) => {
+    if (!Number.isNaN(newScale) && newScale > 0) {
+      roundingScale.value = newScale;
     }
   };
   const togglePeriodsAsDates = () => {
@@ -216,9 +218,9 @@ export default defineStore('core', () => {
   const toggleRefinancingUseHighestPayment = () => {
     refinancingUseHighestPayment.value = !refinancingUseHighestPayment.value;
   };
-  const toggleRounding = (scale) => {
-    roundUp.value = !roundUp.value;
-    if (roundUp.value) {
+  const toggleRounding = (scale: number) => {
+    roundingEnabled.value = !roundingEnabled.value;
+    if (roundingEnabled.value) {
       setRoundingScale(scale);
     }
   };
@@ -231,39 +233,53 @@ export default defineStore('core', () => {
     moneyfunx.snowball,
   );
 
-  const deleteLoan = (id) => {
+  const deleteLoan = (id: string) => {
     loans.value = loans.value.filter((loan) => loan.id !== id);
   };
-  const editLoan = (id) => {
+  const editLoan = (id: string) => {
     currentLoanId.value = id;
     openLoanForm();
   };
-  const getLoanIndex = (id) => loansWithTotals.value.findIndex((loan) => loan.id === id);
-  const getLoanName = (id) => (
-    getLoan(id).name || `${constants.LOAN} ${getLoanIndex(id)}`
-  );
+  const getLoanIndex = (id: string): number => loansWithTotals.value.findIndex((loan) => loan.id === id);
+  const getLoanName = (id: string): string => getLoan(id).name
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
     currentLoanId.value = null;
   };
-  const viewLoan = (id) => {
+  const viewLoan = (id: string) => {
     currentLoanId.value = id;
     loanDetailsPanelActive.value = true;
   };
 
-  const refinancingScenarioPayment = (parentLoan, loan) => refinancingUseHighestPayment.value ? Math.max(loan.minPayment, parentLoan.minPayment) : loan.minPayment;
-  const refinancingScenarioName = (parentLoanId, name) => name || `Scenario ${refinancingScenarios.value[parentLoanId]?.length + 1}`;
-  const createRefinanceScenario = (parentLoanId, principal, interestRate, termInYears, name, fees) => {
-    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, refinancingScenarioName(parentLoanId, name), null, fees);
+  const refinancingScenarioPayment = (
+    parentLoan: moneyfunx.ILoan,
+    loan: moneyfunx.ILoan
+  ): number => refinancingUseHighestPayment.value ? Math.max(loan.minPayment, parentLoan.minPayment) : loan.minPayment;
+
+  const refinancingScenarioName = (
+    parentLoanId: string,
+    name: string
+  ): string => name || `Scenario ${refinancingScenarios.value[parentLoanId]?.length + 1 || 1}`;
+
+  const createRefinanceScenario = (
+    parentLoanId: string,
+    principal: number,
+    interestRate: number,
+    termInYears: number,
+    name: string,
+    fees: number
+  ): string => {
+    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, refinancingScenarioName(parentLoanId, name), undefined, fees);
     if (refinancingScenarios.value[parentLoanId]) {
       refinancingScenarios.value[parentLoanId].push(loan);
     } else {
       refinancingScenarios.value[parentLoanId] = [loan];
     }
     exitRefinancingForm();
+    return loan.id;
   };
-  const deleteRefinancingScenario = (parentId, scenarioId) => {
-    refinancingScenarios.value[parentId] = refinancingScenarios.value[parentId].filter((scenario) => scenario.id !== scenarioId)
+  const deleteRefinancingScenario = (parentLoanId: string, scenarioId: string) => {
+    refinancingScenarios.value[parentLoanId] = refinancingScenarios.value[parentLoanId].filter((scenario) => scenario.id !== scenarioId)
   };
   const refinancingSchedules = computed(() => {
     const schedules = {}
@@ -285,19 +301,19 @@ export default defineStore('core', () => {
     return schedules
   });
 
-  const deleteBudget = (id) => {
+  const deleteBudget = (id: string) => {
     const monthlyBudget = getBudget(id);
     budgets.value = budgets.value.filter(
       (budget) => budget !== monthlyBudget.relative,
     );
   };
-  const editBudget = (id) => {
+  const editBudget = (id: string) => {
     currentBudgetId.value = id;
     openBudgetForm();
   };
-  const getBudgetColor = (id) => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
-  const getBudgetIndex = (id) => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
-  const getBudgetName = (id) => (
+  const getBudgetColor = (id: string): string => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
+  const getBudgetIndex = (id: string): number => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
+  const getBudgetName = (id: string): string => (
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
       : `${constants.BUDGET} ${getBudgetIndex(id)}`
@@ -306,7 +322,7 @@ export default defineStore('core', () => {
     budgetDetailsPanelActive.value = false;
     currentBudgetId.value = null;
   };
-  const viewBudget = (id) => {
+  const viewBudget = (id: string) => {
     currentBudgetId.value = id;
     budgetDetailsPanelActive.value = true;
   };
@@ -323,7 +339,8 @@ export default defineStore('core', () => {
     periodsAsDates.value = false;
     refinancingUseHighestPayment.value = false;
     reducePayments.value = false;
-    roundUp.value = false;
+    roundingEnabled.value = false;
+    roundingScale.value = 100;
     budgetDetailsPanelActive.value = false;
     loanDetailsPanelActive.value = false;
     snowballSort.value = true;
@@ -352,7 +369,7 @@ export default defineStore('core', () => {
     refinancingUseHighestPayment.value = JSON.parse(
       localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT),
     );
-    roundUp.value = JSON.parse(localStorage.getItem(keys.LS_ROUND_UP));
+    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED));
     roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
     snowballSort.value = JSON.parse(
       localStorage.getItem(keys.LS_SNOWBALL_SORT),
@@ -375,59 +392,38 @@ export default defineStore('core', () => {
       keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
       JSON.stringify(refinancingUseHighestPayment.value),
     );
-    localStorage.setItem(keys.LS_ROUND_UP, JSON.stringify(roundUp.value));
+    localStorage.setItem(keys.LS_ROUNDING_ENABLED, JSON.stringify(roundingEnabled.value));
     localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
     localStorage.setItem(
       keys.LS_SNOWBALL_SORT,
       JSON.stringify(snowballSort.value),
     );
   };
-  const exportState = () => {
-    saveState();
-    navigator.clipboard
-      .writeText(
-        JSON.stringify(
-          {
-            [keys.LS_BUDGETS]: budgets.value,
-            [keys.LS_CURRENCY]: currency.value,
-            [keys.LS_LANGUAGE]: language.value,
-            [keys.LS_LOANS]: loans.value,
-            [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
-            [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
-            [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-            [keys.LS_ROUND_UP]: roundUp.value,
-            [keys.LS_ROUNDING_SCALE]: roundingScale.value,
-            [keys.LS_SNOWBALL_SORT]: snowballSort.value,
-          }
-        )
-      );
-    };
+  const exportState = () => ({
+    [keys.LS_BUDGETS]: budgets.value,
+    [keys.LS_CURRENCY]: currency.value,
+    [keys.LS_LANGUAGE]: language.value,
+    [keys.LS_LOANS]: loans.value,
+    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+    [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
+    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
+    [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
+    [keys.LS_ROUNDING_SCALE]: roundingScale.value,
+    [keys.LS_SNOWBALL_SORT]: snowballSort.value,
+  });
 
   // dependent computed values/methods
-  const budgetFormTitle = computed(() => (currentBudgetId.value
+  const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
-  const loanFormTitle = computed(() => (currentLoanId.value
+  const loanFormTitle = computed(() => (currentLoanId.value && loanFormActive.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
     : 'Creating a Loan'));
 
-  const refinancingFormTitle = computed(() => (currentLoanId.value
+  const refinancingFormTitle = computed(() => (currentLoanId.value && refinancingFormActive.value
     ? `Refinancing ${getLoanName(currentLoanId.value)}`
     : 'Refinancing'));
-
-  const createBudgetButtonText = computed(() => (
-    currentBudgetId.value
-      ? constants.BTN_SAVE
-      : constants.BTN_CREATE
-  ));
-
-  const createLoanButtonText = computed(() => (
-    currentLoanId.value
-      ? constants.BTN_SAVE
-      : constants.BTN_CREATE
-  ));
-
 
   const paymentSchedules = computed(() => {
     const schedules = {};
@@ -439,16 +435,12 @@ export default defineStore('core', () => {
           budget.absolute,
           reducePayments.value,
         ),
-        label:
-          budget.id === constants.DEFAULT
-            ? `${Money(globalMinPayment.value)}/month`
-            : `${Money(budget.absolute)}/month (+${Money(budget.relative)}/month)`,
       }
     });
     return schedules;
   });
 
-  const totalsByBudget = computed(() => {
+  const totalsByBudget = computed<moneyfunx.LoansPaymentSummary>(() => {
     const totals = {};
     monthlyBudgets.value.forEach((budget) => {
       totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
@@ -467,12 +459,9 @@ export default defineStore('core', () => {
       Object.keys(paymentSchedules.value).forEach((budgetId) => {
         const schedule = paymentSchedules.value[budgetId];
         summaries[loanId][budgetId] = {
-          label: schedule.label,
-          amortizationSchedule:
-            schedule.paymentSchedule[loanId].amortizationSchedule,
-          totalPrincipalPaid: schedule.paymentSchedule[loanId].lifetimePrincipal,
-          totalInterestPaid: schedule.paymentSchedule[loanId].lifetimeInterest,
-          totalPayments: schedule.paymentSchedule[loanId].amortizationSchedule.length,
+          amortizationSchedule: schedule.paymentSchedule[loanId].amortizationSchedule,
+          lifetimePrincipal: schedule.paymentSchedule[loanId].lifetimePrincipal,
+          lifetimeInterest: schedule.paymentSchedule[loanId].lifetimeInterest,
         }});
       });
     return summaries;
@@ -491,7 +480,7 @@ export default defineStore('core', () => {
     snowballSort.value = true;
     sortLoans();
   };
-  const createBudget = (proposedBudget) => {
+  const createBudget = (proposedBudget: number) => {
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
       deleteBudget(currentBudgetId.value);
       currentBudgetId.value = null;
@@ -500,54 +489,79 @@ export default defineStore('core', () => {
     budgets.value.sort((a, b) => b - a);
     exitBudgetForm();
   };
-  const createLoan = (principal, interestRate, termInYears, name, currentBalance, fees) => {
-    const newLoan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance, fees);
+  const createLoan = (
+    principal: number,
+    interestRate: number,
+    termInYears: number,
+    name: string,
+    currentBalance: number,
+    fees: number
+  ): string => {
+    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance, fees);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
     }
-    loans.value.push(newLoan);
+    loans.value.push(loan);
     sortLoans();
     exitLoanForm();
+    return loan.id;
   };
 
-  const getPaymentSummary = (loanId, budgetId) => paymentSummaries.value[loanId][budgetId];
-  const getNumPayments = (loanId, budgetId) => getPaymentSummary(loanId, budgetId).totalPayments;
-  const getLifetimeInterest = (loanId, budgetId) => getPaymentSummary(loanId, budgetId).totalInterestPaid;
-  const getInterestUpToPeriod = (loanId, budgetId, period) => getPaymentSummary(loanId, budgetId).amortizationSchedule.slice(0, period).reduce((acc, record) => acc + record.interest, 0);
+  const getPaymentSummary = (loanId: string, budgetId: string) => paymentSummaries.value[loanId][budgetId];
+  const getNumPayments = (
+    loanId: string,
+    budgetId: string
+  ): number => getPaymentSummary(loanId, budgetId).amortizationSchedule.length;
+  const getLifetimeInterest = (
+    loanId: string,
+    budgetId: string
+  ): number => getPaymentSummary(loanId, budgetId).lifetimeInterest;
+  const getInterestUpToPeriod = (
+    loanId: string,
+    budgetId: string,
+    period: number
+  ): number => getPaymentSummary(
+    loanId,
+    budgetId
+  ).amortizationSchedule.slice(
+    0,
+    period
+  ).reduce(
+    (acc, record) => acc + record.interest,
+    0
+  );
 
   // title building functions
 
-  const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
-    ? `Budget Details - ${getBudgetName(monthlyBudget.id)} | `
-      + `${Money(monthlyBudget.absolute)}/month `
-      + `(+${Money(monthlyBudget.relative)}/month)`
-    : constants.BUDGET_DETAILS;
-  const buildLoanDetailsTitle = (loan) => loan
-    ? `Loan Details - ${getLoanName(loan.id)} | `
-      + `(${Money(loan.currentBalance)} `
-      + `@ ${Percent(loan.annualRate * 100)})`
-    : constants.LOAN_DETAILS;
-
-  const buildAmortizationTableTitle = (loan, monthlyBudget) => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
-  const buildAmortizationTableSubtitle = (loan, monthlyBudget) => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
-  const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${getLoanName(loan.id)}`;
-  const buildLoanSubtitle = (loan) => `(${Money(loan.currentBalance)} @ ${Percent(loan.annualRate * 100)} | ${loan.termInYears * 12} Payments)`;
+  const buildAmortizationTableTitle = (
+    loan: moneyfunx.ILoan,
+    monthlyBudget: MonthlyBudget
+  ): string => `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(monthlyBudget.id)}`;
+  const buildAmortizationTableSubtitle = (
+    loan: moneyfunx.ILoan,
+    monthlyBudget: MonthlyBudget
+  ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+  const buildLoanSubtitle = (
+    loan: moneyfunx.ILoan
+  ): string => `(${Money(loan.currentBalance)} - ${Percent(loan.annualRate * 100)} - ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
   // graph data
+
+  const graphXScale = computed(() => periodsAsDates.value ? d3.scaleTime : d3.scaleLinear);
 
   const balancesGraphs = computed(() => {
     const config = {
       id: 'Balances',
       color: getBudgetColor,
       graphs: {},
-      header: loanId => `Balances Over Time By Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Balances over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xFormat: (x) => Period(x, true),
       xLabel: Time,
-      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      xScale: graphXScale.value,
       y: y => y,
       yFormat: Money,
       yLabel: () => 'Balance',
@@ -567,48 +581,8 @@ export default defineStore('core', () => {
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
         const line = [];
-        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
-        });
-        config.graphs[loanId].lines[budgetId] = line;
-      });
-    });
-    return config;
-  });
-
-  const percentOfPaymentAsPrincaplGraphs = computed(() => {
-    const config = {
-      id: 'PercentOfPaymentAsPrincipal',
-      color: getBudgetColor,
-      graphs: {},
-      header: loanId => `Percent of Payment As Principal Over Time By Budget - ${getLoanName(loanId)}`,
-      lineName: getBudgetName,
-      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
-      x: Period,
-      xFormat: (x) => Period(x, true),
-      xLabel: Time,
-      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
-      y: y => y,
-      yLabel: () => 'Percent to Principal',
-      yFormat: Percent,
-      yScale: d3.scaleLinear,
-    };
-
-    loansWithTotals.value.forEach((loan) => {
-      config.graphs[loan.id] = {
-        config: {
-          maxX: getNumPayments(loan.id, constants.DEFAULT),
-          maxY: 100,
-        },
-        lines: {},
-      }
-    });
-
-    Object.keys(config.graphs).forEach((loanId) => {
-      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
-        const line = [];
-        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
-          line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
         config.graphs[loanId].lines[budgetId] = line;
       });
@@ -621,13 +595,13 @@ export default defineStore('core', () => {
       id: 'InterestSaved',
       color: getBudgetColor,
       graphs: {},
-      header: loanId => `Interest Saved Over Time By Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
       x: Period,
       xFormat: (x) => Period(x, true),
       xLabel: Time,
-      xScale: periodsAsDates.value ? d3.scaleTime : d3.scaleLinear,
+      xScale: graphXScale.value,
       y: y => y,
       yFormat: Money,
       yLabel: () => 'Interest Saved',
@@ -656,10 +630,50 @@ export default defineStore('core', () => {
     return config;
   });
 
+  const percentOfPaymentAsPrincaplGraphs = computed(() => {
+    const config = {
+      id: 'PercentOfPaymentAsPrincipal',
+      color: getBudgetColor,
+      graphs: {},
+      header: loanId => `Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
+      lineName: getBudgetName,
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
+      x: Period,
+      xFormat: (x) => Period(x, true),
+      xLabel: Time,
+      xScale: graphXScale.value,
+      y: y => y,
+      yLabel: () => 'Percent to Principal',
+      yFormat: Percent,
+      yScale: d3.scaleLinear,
+    };
+
+    loansWithTotals.value.forEach((loan) => {
+      config.graphs[loan.id] = {
+        config: {
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
+          maxY: 100,
+        },
+        lines: {},
+      }
+    });
+
+    Object.keys(config.graphs).forEach((loanId) => {
+      Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
+        const line = [];
+        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+          line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
+        });
+        config.graphs[loanId].lines[budgetId] = line;
+      });
+    });
+    return config;
+  });
+
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
-    [constants.GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
+    [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
   }));
 
   return {
@@ -671,15 +685,10 @@ export default defineStore('core', () => {
     budgets,
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
-    buildBudgetDetailsTitle,
-    buildLoanDetailsTitle,
     buildLoanSubtitle,
-    buildRefinancingTableTitle,
     clearState,
     createBudget,
-    createBudgetButtonText,
     createLoan,
-    createLoanButtonText,
     createRefinanceScenario,
     currencies,
     currency,
@@ -715,6 +724,7 @@ export default defineStore('core', () => {
     globalMinPayment,
     globalPrincipal,
     graphs,
+    graphXScale,
     language,
     languages,
     loadState,
@@ -745,8 +755,8 @@ export default defineStore('core', () => {
     refinancingSchedules,
     refinancingUseHighestPayment,
     roundedGlobalMinPayment,
+    roundingEnabled,
     roundingScale,
-    roundUp,
     saveState,
     setCurrency,
     setLanguage,

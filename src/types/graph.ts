@@ -1,12 +1,22 @@
+export type Point = {
+  x: number;
+  y: number;
+};
 
-export interface Graph {
-  lines: Array<Object>;
-}
+export type Graph = {
+  config: {
+    maxX: number;
+    maxY: number
+  },
+  lines: Record<string, Point[]>
+};
 
-export interface GraphConfig {
+export type Graphs = Record<string, Graph>;
+
+export type GraphConfig = {
   id: string;
   color: Function;
-  graphs: Object;
+  graphs: Graphs;
   header: Function;
   lineName: Function;
   subheader: Function;
@@ -18,5 +28,4 @@ export interface GraphConfig {
   yFormat?: Function;
   yLabel?: Function;
   yScale: Function;
-}
-
+};

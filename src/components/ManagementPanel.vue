@@ -1,7 +1,10 @@
-<script setup>
-const props = defineProps(['buttons', 'title']);
+<script setup lang=ts>
+import { Button } from '../types/app';
 
-const classes = ['btn-success', 'text-center']
+const props = defineProps<{
+  buttons: Array<Button>,
+  title: string,
+}>();
 </script>
 
 <template>
@@ -15,7 +18,7 @@ const classes = ['btn-success', 'text-center']
         :key="button.text"
       >
         <base-button
-          :class="classes"
+          :class="button.classes"
           @click="button.onClick"
         >
           {{ button.text }}

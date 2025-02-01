@@ -32,7 +32,7 @@ const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
-const GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL = 'Percent of Payment to Principal | Time'
+const GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL = 'Percent of Payment as Principal | Time'
 const GRAPHS = 'Graphs';
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
@@ -47,65 +47,54 @@ const REFINANCING_FORM_ID = 'refinanceForm';
 const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
-  // North America
-  'en-US': 'USD', // United States Dollar
-  'en-CA': 'CAD', // Canadian Dollar
-  'fr-CA': 'CAD', // Canadian Dollar (French)
-  'es-MX': 'MXN', // Mexican Peso
-
-  // Europe
-  'en-GB': 'GBP', // British Pound Sterling
-  'fr-FR': 'EUR', // Euro (France)
-  'de-DE': 'EUR', // Euro (Germany)
-  'it-IT': 'EUR', // Euro (Italy)
-  'es-ES': 'EUR', // Euro (Spain)
-  'pt-PT': 'EUR', // Euro (Portugal)
-  'nl-NL': 'EUR', // Euro (Netherlands)
-  'pl-PL': 'PLN', // Polish Złoty
-  'sv-SE': 'SEK', // Swedish Krona
-  'da-DK': 'DKK', // Danish Krone
-  'fi-FI': 'EUR', // Euro (Finland)
-  'no-NO': 'NOK', // Norwegian Krone
-  'cs-CZ': 'CZK', // Czech Koruna
-  'hu-HU': 'HUF', // Hungarian Forint
-  'ro-RO': 'RON', // Romanian Leu
-  'bg-BG': 'BGN', // Bulgarian Lev
-  'ru-RU': 'RUB', // Russian Ruble
-  'uk-UA': 'UAH', // Ukrainian Hryvnia
-
-  // Middle East & Africa
+  'ar-AE': 'AED', // UAE Dirham
   'ar-EG': 'EGP', // Egyptian Pound
   'ar-SA': 'SAR', // Saudi Riyal
-  'he-IL': 'ILS', // Israeli New Shekel
-  'ar-AE': 'AED', // UAE Dirham
-  'en-ZA': 'ZAR', // South African Rand
-  'en-NG': 'NGN', // Nigerian Naira
-
-  // Asia
-  'ja-JP': 'JPY', // Japanese Yen
-  'zh-CN': 'CNY', // Chinese Yuan
-  'zh-HK': 'HKD', // Hong Kong Dollar
-  'zh-TW': 'TWD', // New Taiwan Dollar
-  'ko-KR': 'KRW', // South Korean Won
-  'hi-IN': 'INR', // Indian Rupee
-  'th-TH': 'THB', // Thai Baht
-  'vi-VN': 'VND', // Vietnamese Dong
-  'id-ID': 'IDR', // Indonesian Rupiah
-  'ms-MY': 'MYR', // Malaysian Ringgit
-  'en-SG': 'SGD', // Singapore Dollar
-
-  // Oceania
+  'bg-BG': 'BGN', // Bulgarian Lev
+  'cs-CZ': 'CZK', // Czech Koruna
+  'da-DK': 'DKK', // Danish Krone
+  'de-DE': 'EUR', // Euro (Germany)
   'en-AU': 'AUD', // Australian Dollar
+  'en-CA': 'CAD', // Canadian Dollar
+  'en-GB': 'GBP', // British Pound Sterling
+  'en-NG': 'NGN', // Nigerian Naira
   'en-NZ': 'NZD', // New Zealand Dollar
-
-  // South America
-  'pt-BR': 'BRL', // Brazilian Real
+  'en-SG': 'SGD', // Singapore Dollar
+  'en-US': 'USD', // United States Dollar
+  'en-ZA': 'ZAR', // South African Rand
   'es-AR': 'ARS', // Argentine Peso
   'es-CL': 'CLP', // Chilean Peso
   'es-CO': 'COP', // Colombian Peso
+  'es-ES': 'EUR', // Euro (Spain)
+  'es-MX': 'MXN', // Mexican Peso
   'es-PE': 'PEN', // Peruvian Sol
-  'es-VE': 'VES', // Venezuelan Bolívar
   'es-UY': 'UYU', // Uruguayan Peso
+  'es-VE': 'VES', // Venezuelan Bolívar
+  'fi-FI': 'EUR', // Euro (Finland)
+  'fr-CA': 'CAD', // Canadian Dollar (French)
+  'fr-FR': 'EUR', // Euro (France)
+  'he-IL': 'ILS', // Israeli New Shekel
+  'hi-IN': 'INR', // Indian Rupee
+  'hu-HU': 'HUF', // Hungarian Forint
+  'id-ID': 'IDR', // Indonesian Rupiah
+  'it-IT': 'EUR', // Euro (Italy)
+  'ja-JP': 'JPY', // Japanese Yen
+  'ko-KR': 'KRW', // South Korean Won
+  'ms-MY': 'MYR', // Malaysian Ringgit
+  'nl-NL': 'EUR', // Euro (Netherlands)
+  'no-NO': 'NOK', // Norwegian Krone
+  'pl-PL': 'PLN', // Polish Złoty
+  'pt-BR': 'BRL', // Brazilian Real
+  'pt-PT': 'EUR', // Euro (Portugal)
+  'ro-RO': 'RON', // Romanian Leu
+  'ru-RU': 'RUB', // Russian Ruble
+  'sv-SE': 'SEK', // Swedish Krona
+  'th-TH': 'THB', // Thai Baht
+  'uk-UA': 'UAH', // Ukrainian Hryvnia
+  'vi-VN': 'VND', // Vietnamese Dong
+  'zh-CN': 'CNY', // Chinese Yuan
+  'zh-HK': 'HKD', // Hong Kong Dollar
+  'zh-TW': 'TWD', // New Taiwan Dollar
 };
 
 export default Object.freeze({
@@ -136,7 +125,7 @@ export default Object.freeze({
   DEFAULT,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,
-  GRAPH_PERCENT_OF_PAYMENT_TO_PRINCIPAL,
+  GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
   GRAPHS,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,
