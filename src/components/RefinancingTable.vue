@@ -1,10 +1,20 @@
-<script setup>
+<script setup lang=ts>
 import { computed } from 'vue';
+import { ILoan, LoansPaymentSummary } from 'moneyfunx';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
-const props = defineProps(['parentId', 'scenarios', 'schedules']);
+const props = defineProps<{
+  parentId: string,
+  scenarios: Array<ILoan>,
+  schedules: Record<
+  string,
+  {
+    paymentAmount: number,
+    paymentSchedule: LoansPaymentSummary,
+  }>,
+}>();
 
 const coreState = useCoreStore();
 const parentLoan = computed(() => coreState.getLoan(props.parentId))
@@ -98,7 +108,6 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
               <td :class="['text-right']">
                 {{ schedules[scenario.id].paymentSchedule.amortizationSchedule.length }}
               </td>
-              <!-- <td :class="['text-right']">11</td> -->
               <td>
                 <base-button
                   :class="['btn-error']"

@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang=ts>
 import RefinancingTable from './RefinancingTable.vue';
 import useCoreStore from '../stores/core';
 
-defineProps(['parentId']);
+defineProps<{ parentId: string, }>();
 
 const coreState = useCoreStore();
 
@@ -13,6 +13,7 @@ const coreState = useCoreStore();
     <RefinancingTable
       :parent-id="parentId"
       :scenarios="coreState.refinancingScenarios[parentId]"
+      :schedules="coreState.refinancingSchedules[parentId]"
     />
   </div>
 </template>
