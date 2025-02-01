@@ -19,5 +19,5 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: npm run test run
-      - run: npm run build
+      - run: npm run css
       - run: npm run deploy
