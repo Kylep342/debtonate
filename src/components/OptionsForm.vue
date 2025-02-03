@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
@@ -6,16 +6,16 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const _currency = ref(coreState.currency);
-const _language = ref(coreState.language);
-const roundingScale = ref(coreState.roundingScale);
+const _currency = ref<String>(coreState.currency);
+const _language = ref<String>(coreState.language);
+const roundingScale = ref<Number>(coreState.roundingScale);
 
-const sortedCurrencies = computed(() => coreState.currencies.toSorted());
-const sortedLanguages = computed(() => coreState.languages.toSorted());
-const reducePaymentsExample = computed(
+const sortedCurrencies = computed<Array<String>>(() => coreState.currencies.toSorted());
+const sortedLanguages = computed<Array<String>>(() => coreState.languages.toSorted());
+const reducePaymentsExample = computed<String>(
   () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
 );
-const refinancingUseHighestPaymentExample = computed(() => {
+const refinancingUseHighestPaymentExample = computed<String>(() => {
     if (coreState.loans.length) {
       const firstLoan = coreState.loans[0]
       const basePayment = firstLoan.minPayment;
@@ -25,7 +25,7 @@ const refinancingUseHighestPaymentExample = computed(() => {
     }
     return '';
 });
-const repaymentPriorityExample = computed(
+const repaymentPriorityExample = computed<String>(
   () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')})`) : ''),
 );
 

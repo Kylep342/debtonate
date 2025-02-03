@@ -1,4 +1,4 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import { Button } from '../types/app';
 
 const props = defineProps<{

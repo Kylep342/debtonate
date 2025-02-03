@@ -1,4 +1,4 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import useCoreStore from '../stores/core';
 import constants from '../constants/constants';
 
