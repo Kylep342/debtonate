@@ -1,4 +1,4 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import { computed } from 'vue';
 import { PaymentSummary } from 'moneyfunx';
 
@@ -12,7 +12,7 @@ defineProps<{
 
 const coreState = useCoreStore();
 
-const paymentHeader = computed(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>

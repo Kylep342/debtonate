@@ -1,19 +1,15 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import { computed } from 'vue';
-import { ILoan, LoansPaymentSummary } from 'moneyfunx';
+import { Loan, LoansPaymentSummary } from 'moneyfunx';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
+import { PaymentSchedule } from '../types/core';
 
 const props = defineProps<{
   parentId: string,
-  scenarios: Array<ILoan>,
-  schedules: Record<
-  string,
-  {
-    paymentAmount: number,
-    paymentSchedule: LoansPaymentSummary,
-  }>,
+  scenarios: Array<Loan>,
+  schedules: Record<string, PaymentSchedule>,
 }>();
 
 const coreState = useCoreStore();

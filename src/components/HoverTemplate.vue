@@ -1,4 +1,4 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import { onUpdated, ref } from 'vue';
 
 import { GraphConfig } from '../types/graph';

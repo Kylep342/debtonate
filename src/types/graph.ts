@@ -21,11 +21,11 @@ export type GraphConfig = {
   lineName: Function;
   subheader: Function;
   x: Function;
-  xLabel?: Function;
-  xFormat?: Function;
+  xLabel: Function;
+  xFormat: Function;
   xScale: Function;
   y: Function;
-  yFormat?: Function;
-  yLabel?: Function;
+  yFormat: Function;
+  yLabel: Function;
   yScale: Function;
 };

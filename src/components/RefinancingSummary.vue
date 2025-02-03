@@ -1,8 +1,8 @@
-<script setup lang=ts>
+<script setup lang="ts">
 import RefinancingTable from './RefinancingTable.vue';
 import useCoreStore from '../stores/core';
 
-defineProps<{ parentId: string, }>();
+defineProps<{ parentId: string }>();
 
 const coreState = useCoreStore();
 

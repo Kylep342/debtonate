@@ -5,20 +5,28 @@ import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import keys from '../constants/keys';
-import { MonthlyBudget } from '../types/core';
-import { Graph, GraphConfig, Graphs, Point } from '../types/graph';
+import {
+  MonthlyBudget,
+  PaymentSchedule,
+} from '../types/core';
+import {
+  Graph,
+  GraphConfig,
+  Graphs,
+  Point,
+} from '../types/graph';
 
 export default defineStore('core', () => {
   const budgetDetailsPanelActive = ref<boolean>(false);
   const budgets = ref<Array<number>>([]);
   const budgetFormActive = ref<boolean>(false);
   const loanFormActive = ref<boolean>(false);
-  const currencies = ref([...new Set(Object.values(constants.LOCALE_CURRENCY))]);
+  const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref<string|null>(null);
   const currentLoanId = ref<string|null>(null);
   const language = ref(navigator.language);
-  const languages = ref([...new Set(Object.keys(constants.LOCALE_CURRENCY))]);
+  const languages = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const loanDetailsPanelActive = ref(false);
   const loans = ref<Array<moneyfunx.Loan>>([]);
   const optionsFormActive = ref<boolean>(false);
@@ -26,7 +34,7 @@ export default defineStore('core', () => {
   const reducePayments = ref<boolean>(false);
   const refinancingFormActive = ref<boolean>(false);
   const refinancingUseHighestPayment = ref<boolean>(false);
-  const refinancingScenarios = ref({});
+  const refinancingScenarios = ref<Record<string, moneyfunx.Loan[]>>({});
   const roundingScale = ref<number>(100);
   const roundingEnabled = ref<boolean>(false);
   const snowballSort = ref<boolean>(false);
@@ -224,11 +232,11 @@ export default defineStore('core', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = () => moneyfunx.sortLoans(
+  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
     moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
-  const snowball = () => moneyfunx.sortLoans(
+  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
     moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
     moneyfunx.snowball,
   );
@@ -241,7 +249,7 @@ export default defineStore('core', () => {
     openLoanForm();
   };
   const getLoanIndex = (id: string): number => loansWithTotals.value.findIndex((loan) => loan.id === id);
-  const getLoanName = (id: string): string => getLoan(id).name
+  const getLoanName = (id: string): string => getLoan(id)!.name
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
     currentLoanId.value = null;
@@ -284,7 +292,7 @@ export default defineStore('core', () => {
   const refinancingSchedules = computed(() => {
     const schedules = {}
     Object.entries(refinancingScenarios.value).forEach(([parentLoanId, scenarios]) => {
-      const parentLoan = getLoan(parentLoanId);
+      const parentLoan = getLoan(parentLoanId)!;
       schedules[parentLoanId] = {};
       scenarios.forEach((scenario) => {
         const payment = refinancingScenarioPayment(parentLoan, scenario)
@@ -302,7 +310,7 @@ export default defineStore('core', () => {
   });
 
   const deleteBudget = (id: string) => {
-    const monthlyBudget = getBudget(id);
+    const monthlyBudget = getBudget(id)!;
     budgets.value = budgets.value.filter(
       (budget) => budget !== monthlyBudget.relative,
     );
@@ -346,10 +354,10 @@ export default defineStore('core', () => {
     snowballSort.value = true;
   };
   const loadState = () => {
-    budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS));
-    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY));
-    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE));
-    loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)).map(
+    budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
+    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
+    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
+    loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)!).map(
       (loan) => new moneyfunx.Loan(
         loan.principal,
         loan.annualRate,
@@ -361,18 +369,18 @@ export default defineStore('core', () => {
       ),
     );
     periodsAsDates.value = JSON.parse(
-      localStorage.getItem(keys.LS_PERIODS_AS_DATES),
+      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
     );
     reducePayments.value = JSON.parse(
-      localStorage.getItem(keys.LS_REDUCE_PAYMENTS),
+      localStorage.getItem(keys.LS_REDUCE_PAYMENTS)!,
     );
     refinancingUseHighestPayment.value = JSON.parse(
-      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT),
+      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT)!,
     );
-    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED));
-    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE));
+    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED)!);
+    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE)!);
     snowballSort.value = JSON.parse(
-      localStorage.getItem(keys.LS_SNOWBALL_SORT),
+      localStorage.getItem(keys.LS_SNOWBALL_SORT)!,
     );
   };
   const saveState = () => {
@@ -425,7 +433,7 @@ export default defineStore('core', () => {
     ? `Refinancing ${getLoanName(currentLoanId.value)}`
     : 'Refinancing'));
 
-  const paymentSchedules = computed(() => {
+  const paymentSchedules = computed<Record<string, PaymentSchedule>>(() => {
     const schedules = {};
     monthlyBudgets.value.forEach((budget) => {
       schedules[budget.id] = {
@@ -440,7 +448,7 @@ export default defineStore('core', () => {
     return schedules;
   });
 
-  const totalsByBudget = computed<moneyfunx.LoansPaymentSummary>(() => {
+  const totalsByBudget = computed<Record<string, moneyfunx.LoansPaymentSchedule>>(() => {
     const totals = {};
     monthlyBudgets.value.forEach((budget) => {
       totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
@@ -544,23 +552,23 @@ export default defineStore('core', () => {
   ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildLoanSubtitle = (
     loan: moneyfunx.ILoan
-  ): string => `(${Money(loan.currentBalance)} - ${Percent(loan.annualRate * 100)} - ${loan.termInYears * loan.periodsPerYear} Payments)`;
+  ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
   // graph data
 
   const graphXScale = computed(() => periodsAsDates.value ? d3.scaleTime : d3.scaleLinear);
 
-  const balancesGraphs = computed(() => {
+  const balancesGraphs = computed<GraphConfig>(() => {
     const config = {
       id: 'Balances',
       color: getBudgetColor,
-      graphs: {},
+      graphs: <Graphs>{},
       header: loanId => `Balances over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
-      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
       x: Period,
       xFormat: (x) => Period(x, true),
-      xLabel: Time,
+      xLabel: () => Time,
       xScale: graphXScale.value,
       y: y => y,
       yFormat: Money,
@@ -572,7 +580,7 @@ export default defineStore('core', () => {
       config.graphs[loan.id] = {
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
-          maxY: getLoan(loan.id).currentBalance,
+          maxY: getLoan(loan.id)!.currentBalance,
         },
         lines: {},
       };
@@ -580,7 +588,7 @@ export default defineStore('core', () => {
 
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
-        const line = [];
+        const line: Point[] = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
@@ -590,17 +598,17 @@ export default defineStore('core', () => {
     return config;
   });
 
-  const interestSavedGraphs = computed(() => {
+  const interestSavedGraphs = computed<GraphConfig>(() => {
     const config = {
       id: 'InterestSaved',
       color: getBudgetColor,
-      graphs: {},
+      graphs: <Graphs>{},
       header: loanId => `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
-      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
       x: Period,
       xFormat: (x) => Period(x, true),
-      xLabel: Time,
+      xLabel: () => Time,
       xScale: graphXScale.value,
       y: y => y,
       yFormat: Money,
@@ -620,7 +628,7 @@ export default defineStore('core', () => {
 
     Object.keys(config.graphs).forEach((loanId) => {
       Object.keys(paymentSchedules.value).forEach((budgetId) => {
-        const line = [];
+        const line: Point[] = [];
         getPaymentSummary(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
           line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, budgetId, index) });
         });
@@ -630,17 +638,17 @@ export default defineStore('core', () => {
     return config;
   });
 
-  const percentOfPaymentAsPrincaplGraphs = computed(() => {
+  const percentOfPaymentAsPrincaplGraphs = computed<GraphConfig>(() => {
     const config = {
       id: 'PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
-      graphs: {},
+      graphs: <Graphs>{},
       header: loanId => `Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
-      subheader: loanId => buildLoanSubtitle(getLoan(loanId)),
+      subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
       x: Period,
       xFormat: (x) => Period(x, true),
-      xLabel: Time,
+      xLabel: () => Time,
       xScale: graphXScale.value,
       y: y => y,
       yLabel: () => 'Percent to Principal',
@@ -649,7 +657,7 @@ export default defineStore('core', () => {
     };
 
     loansWithTotals.value.forEach((loan) => {
-      config.graphs[loan.id] = {
+      config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
@@ -660,7 +668,7 @@ export default defineStore('core', () => {
 
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentSchedules.value).forEach(([budgetId, schedule]) => {
-        const line = [];
+        const line: Point[] = [];
         schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });

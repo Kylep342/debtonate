@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
+import { GraphConfig } from '../types/graph';
 
 const coreState = useCoreStore();
 
-const viewedGraphId = ref(constants.GRAPH_BALANCES_OVER_TIME);
-const viewedLoanId = ref(constants.TOTALS);
+const viewedGraphId = ref<String>(constants.GRAPH_BALANCES_OVER_TIME);
+const viewedLoanId = ref<String>(constants.TOTALS);
 
-const activeGraph = computed(() => coreState.graphs[viewedGraphId.value]);
+const activeGraph = computed<GraphConfig>(() => coreState.graphs[viewedGraphId.value]);
 
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
