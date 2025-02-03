@@ -8,13 +8,13 @@ const exportState = () => navigator.clipboard.writeText(
   JSON.stringify(coreState.exportState())
 );
 
-const buttons = [
-  {text: constants.BTN_OPTIONS, onClick: coreState.openOptionsForm},
-  {text: constants.BTN_LOAD, onClick: coreState.loadState},
-  {text: constants.BTN_SAVE, onClick: coreState.saveState},
-  {text: constants.BTN_CLEAR, onClick: coreState.clearState},
+const buttons = {
+  [constants.BTN_OPTIONS]: coreState.openOptionsForm,
+  [constants.BTN_LOAD]: coreState.loadState,
+  [constants.BTN_SAVE]: coreState.saveState,
+  [constants.BTN_CLEAR]: coreState.clearState,
   // {text: constants.BTN_EXPORT, onClick: exportState},
-]
+}
 const classes = ['rounded-none btn-secondary'];
 </script>
 
@@ -29,14 +29,14 @@ const classes = ['rounded-none btn-secondary'];
     </div>
     <ul :class="['menu menu-horizontal bg-secondary']">
       <li
-        v-for="(button) in buttons"
-        :key="button.text"
+        v-for="(onClick, text) in buttons"
+        :key="text"
       >
         <base-button
           :class="classes"
-          @click="button.onClick"
+          @click="onClick"
         >
-          {{ button.text }}
+          {{ text }}
         </base-button>
       </li>
     </ul>
