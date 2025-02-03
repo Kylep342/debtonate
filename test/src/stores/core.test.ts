@@ -40,12 +40,14 @@ const RefinancingScenarios = (loan) => [
     loan.annualRate - 0.0075,
     12,
     loan.termInYears + 1,
+    "lower rate longer term",
   ),
   new Loan(
     loan.currentBalance,
     loan.annualRate + 0.0150,
     12,
     Math.max(loan.termInYears - 2, 2),
+    "higher rate shorter term",
   ),
 ];
 
