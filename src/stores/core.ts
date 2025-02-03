@@ -8,7 +8,6 @@ import keys from '../constants/keys';
 import {
   MonthlyBudget,
   PaymentSchedule,
-  RefinancingScenarios,
 } from '../types/core';
 import {
   Graph,

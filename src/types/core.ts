@@ -1,7 +1,4 @@
-import {
-  ILoan,
-  LoansPaymentSchedule
-} from 'moneyfunx';
+import { LoansPaymentSchedule } from 'moneyfunx';
 
 export type MonthlyBudget = {
   id: string;
@@ -13,5 +10,3 @@ export type PaymentSchedule = {
   paymentAmount: number;
   paymentSchedule: LoansPaymentSchedule;
 };
-
-export type RefinancingScenarios = Record<string, ILoan[]>;
