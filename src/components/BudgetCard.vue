@@ -4,10 +4,10 @@ import { PaymentSummary } from 'moneyfunx';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import { monthlyBudget } from '../types/core';
+import { MonthlyBudget } from '../types/core';
 
 const props = defineProps<{
-  budget: monthlyBudget,
+  budget: MonthlyBudget,
   totalsAsALoanPaymentSummaryForBudget: PaymentSummary,
 }>();
 
