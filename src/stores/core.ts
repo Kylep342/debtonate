@@ -552,7 +552,7 @@ export default defineStore('core', () => {
   ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildLoanSubtitle = (
     loan: moneyfunx.ILoan
-  ): string => `(${Money(loan.currentBalance)} - ${Percent(loan.annualRate * 100)} - ${loan.termInYears * loan.periodsPerYear} Payments)`;
+  ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
   // graph data
 
