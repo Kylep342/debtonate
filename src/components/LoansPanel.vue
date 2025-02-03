@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {
   ref,
   onBeforeUnmount,
@@ -11,12 +11,13 @@ import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
+import { Button } from '../types/app';
 
 const coreState = useCoreStore();
 
 const scrollContainer = ref(null);
 
-const buttons = [
+const buttons: Array<Button> = [
   {
     text: constants.BTN_CREATE,
     onClick: coreState.openLoanForm,

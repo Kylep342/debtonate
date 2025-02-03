@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore()

@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 
-const props = defineProps({
+const props = defineProps<{
   getItemName: Function,
-  pivot: Array,
+  pivot: Array<Any>,
   isViewedItemId: Function,
-  setViewedItemId: Function,
-});
+  setViewedItemId: Function
+}>();
 
 const flexBasis = computed(() => props.pivot ? `basis-1/${props.pivot?.length}` : 'basis-1');
 const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';

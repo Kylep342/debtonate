@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
@@ -7,15 +7,15 @@ import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
-const currentLoan = ref(null);
-const viewedBudgetId = ref(constants.DEFAULT);
+const currentLoan = ref<String>(null);
+const viewedBudgetId = ref<String>(constants.DEFAULT);
 
 const buildLoanDetailsTitle = (loan) => loan
   ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
     + `${coreState.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
 
-const title = computed(() => buildLoanDetailsTitle(currentLoan.value));
+const title = computed<String>(() => buildLoanDetailsTitle(currentLoan.value));
 
 const isViewedBudgetId = (itemId) => viewedBudgetId.value === itemId;
 const setViewedBudgetId = (itemId) => {

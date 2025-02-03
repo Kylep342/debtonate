@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
@@ -6,8 +6,8 @@ import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
-const currentBudget = ref(null);
-const viewedLoanId = ref(constants.TOTALS);
+const currentBudget = ref<String>(null);
+const viewedLoanId = ref<String>(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
   ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
@@ -15,7 +15,7 @@ const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
     + `(+${coreState.Money(monthlyBudget.relative)}/month)`
   : constants.BUDGET_DETAILS;
 
-const title = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
+const title = computed<String>(() => (buildBudgetDetailsTitle(currentBudget.value)))
 
 const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
 const setViewedLoanId = (itemId) => {
