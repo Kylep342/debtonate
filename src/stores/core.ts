@@ -232,11 +232,11 @@ export default defineStore('core', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = () => moneyfunx.sortLoans(
+  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
     moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
-  const snowball = () => moneyfunx.sortLoans(
+  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
     moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
     moneyfunx.snowball,
   );
