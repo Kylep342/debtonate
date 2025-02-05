@@ -88,8 +88,7 @@ export default defineStore('core', () => {
     const match = formatted.match(/[\p{Sc}]+/u);
 
     return match ? match[0] : '$';
-  }
-  );
+  });
 
   const rawGlobalMinPayment = computed(
     () => loans.value.reduce(

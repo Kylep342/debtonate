@@ -12,17 +12,17 @@ describe('viewport module', () => {
     setActivePinia(createPinia());
   });
 
-  // const componentRef = ref(null);
-  // mount(LoansPanel, {
-  //   global: {
-  //     provide: {
-  //       componentRef
-  //     }
-  //   }
-  // });
   // it('fills height correctly', async () => {
-  //   expect(fillHeight(componentRef)).toBe(100);
+  //   const componentRef = ref(null);
+  //   mount(LoansPanel, {
+  //     global: {
+  //       provide: {
+  //         componentRef
+  //       }
+  //     }
+  //   });   expect(fillHeight(componentRef)).toBe(100);
   // });
+
   it('passes', async () => {
     expect(1).toBe(1);
   })
