@@ -33,7 +33,11 @@ const Loans = () => [
     6283.19,
   ),
 ];
-const Budgets = () => [1200, 555, 200];
+const Budgets = () => [
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
+];
 const RefinancingScenarios = (loan) => [
   new Loan(
     loan.currentBalance,
@@ -169,15 +173,13 @@ describe('Core Store', () => {
   describe('with budgets', async () => {
     it('creates a budget', async () => {
       const coreState = useCoreStore();
-      expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('0.00');
-
       coreState.createBudget(100);
       expect(
         coreState.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
       ).toStrictEqual(['100.00', '0.00']);
 
       coreState.loans = Loans();
-      expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('3307.71');
+      expect(coreState.getBudget(constants.DEFAULT).absolute.toFixed(2)).toBe('3307.71');
 
       coreState.createBudget(200);
       expect(
@@ -350,7 +352,7 @@ describe('Core Store', () => {
       expect(Object.keys(coreState.refinancingSchedules)).toStrictEqual([]);
       expect(coreState.refinancingUseHighestPayment).toBe(false);
 
-      const [ firstDummy, secondDummy ] = RefinancingScenarios(firstLoan);
+      const [firstDummy, secondDummy] = RefinancingScenarios(firstLoan);
 
       const firstScenarioId = coreState.createRefinanceScenario(
         firstLoanId,

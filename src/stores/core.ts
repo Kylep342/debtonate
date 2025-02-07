@@ -6,6 +6,7 @@ import { computed, ref } from 'vue';
 import constants from '../constants/constants';
 import keys from '../constants/keys';
 import {
+  Budget,
   MonthlyBudget,
   PaymentSchedule,
 } from '../types/core';
@@ -18,9 +19,8 @@ import {
 
 export default defineStore('core', () => {
   const budgetDetailsPanelActive = ref<boolean>(false);
-  const budgets = ref<Array<number>>([]);
   const budgetFormActive = ref<boolean>(false);
-  const loanFormActive = ref<boolean>(false);
+  const budgets = ref<Array<Budget>>([]);
   const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref<string|null>(null);
@@ -28,18 +28,108 @@ export default defineStore('core', () => {
   const language = ref(navigator.language);
   const languages = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const loanDetailsPanelActive = ref(false);
+  const loanFormActive = ref<boolean>(false);
   const loans = ref<Array<moneyfunx.Loan>>([]);
+  const minimumBudget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
   const periodsAsDates = ref<boolean>(false);
   const reducePayments = ref<boolean>(false);
   const refinancingFormActive = ref<boolean>(false);
-  const refinancingUseHighestPayment = ref<boolean>(false);
   const refinancingScenarios = ref<Record<string, moneyfunx.Loan[]>>({});
-  const roundingScale = ref<number>(100);
+  const refinancingUseHighestPayment = ref<boolean>(false);
   const roundingEnabled = ref<boolean>(false);
+  const roundingScale = ref<number>(100);
   const snowballSort = ref<boolean>(false);
 
   // primitive computed values/methods
+
+  const clearState = () => {
+    budgetDetailsPanelActive.value = false;
+    budgetFormActive.value = false;
+    budgets.value = [];
+    currency.value = constants.LOCALE_CURRENCY[navigator.language];
+    currentBudgetId.value = null;
+    currentLoanId.value = null;
+    language.value = navigator.language;
+    loanDetailsPanelActive.value = false;
+    loanFormActive.value = false;
+    loans.value = [];
+    optionsFormActive.value = false;
+    periodsAsDates.value = false;
+    reducePayments.value = false;
+    refinancingFormActive.value = false;
+    refinancingScenarios.value = {};
+    refinancingUseHighestPayment.value = false;
+    roundingEnabled.value = false;
+    roundingScale.value = 100;
+    snowballSort.value = true;
+  };
+  const loadState = () => {
+    budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
+    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
+    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
+    loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)!).map(
+      (loan) => new moneyfunx.Loan(
+        loan.principal,
+        loan.annualRate,
+        12,
+        loan.termInYears,
+        loan.name,
+        loan.currentBalance,
+        loan.fees,
+      ),
+    );
+    periodsAsDates.value = JSON.parse(
+      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
+    );
+    reducePayments.value = JSON.parse(
+      localStorage.getItem(keys.LS_REDUCE_PAYMENTS)!,
+    );
+    refinancingUseHighestPayment.value = JSON.parse(
+      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT)!,
+    );
+    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED)!);
+    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE)!);
+    snowballSort.value = JSON.parse(
+      localStorage.getItem(keys.LS_SNOWBALL_SORT)!,
+    );
+  };
+  const saveState = () => {
+    localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
+    localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
+    localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
+    localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
+    localStorage.setItem(
+      keys.LS_PERIODS_AS_DATES,
+      JSON.stringify(periodsAsDates.value),
+    );
+    localStorage.setItem(
+      keys.LS_REDUCE_PAYMENTS,
+      JSON.stringify(reducePayments.value),
+    );
+    localStorage.setItem(
+      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
+      JSON.stringify(refinancingUseHighestPayment.value),
+    );
+    localStorage.setItem(keys.LS_ROUNDING_ENABLED, JSON.stringify(roundingEnabled.value));
+    localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
+    localStorage.setItem(
+      keys.LS_SNOWBALL_SORT,
+      JSON.stringify(snowballSort.value),
+    );
+  };
+  const exportState = () => ({
+    [keys.LS_BUDGETS]: budgets.value,
+    [keys.LS_CURRENCY]: currency.value,
+    [keys.LS_LANGUAGE]: language.value,
+    [keys.LS_LOANS]: loans.value,
+    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
+    [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
+    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
+    [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
+    [keys.LS_ROUNDING_SCALE]: roundingScale.value,
+    [keys.LS_SNOWBALL_SORT]: snowballSort.value,
+  });
 
   const baseDate = ref(Date.now());
 
@@ -157,25 +247,12 @@ export default defineStore('core', () => {
 
   const getLoan = (id: string): moneyfunx.ILoan|undefined => loansWithTotals.value.find((loan) => loan.id === id);
 
-  const minimumBudget = computed<MonthlyBudget>(() => ({
-    id: constants.DEFAULT,
-    relative: 0,
-    absolute: globalMinPayment.value,
-  }));
+  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
+      ...budget,
+      absolute: budget.relative + globalMinPayment.value,
+    }))));
 
-  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => {
-    const budgetsArray = budgets.value.map((budget) => ({
-      id: String(Math.floor(Math.random() * Date.now())),
-      relative: budget,
-      absolute: budget + globalMinPayment.value,
-    }));
-
-    budgetsArray.push(minimumBudget.value);
-
-    return budgetsArray;
-  });
-
-  const getBudget = (id: string): MonthlyBudget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
+  const getBudget = (id: string): Budget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
   const openBudgetForm = () => {
     budgetFormActive.value = true;
@@ -309,9 +386,8 @@ export default defineStore('core', () => {
   });
 
   const deleteBudget = (id: string) => {
-    const monthlyBudget = getBudget(id)!;
     budgets.value = budgets.value.filter(
-      (budget) => budget !== monthlyBudget.relative,
+      (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
     );
   };
   const editBudget = (id: string) => {
@@ -334,92 +410,8 @@ export default defineStore('core', () => {
     budgetDetailsPanelActive.value = true;
   };
 
-  const clearState = () => {
-    budgets.value = [];
-    budgetFormActive.value = false;
-    loanFormActive.value = false;
-    currency.value = constants.LOCALE_CURRENCY[navigator.language];
-    currentBudgetId.value = null;
-    currentLoanId.value = null;
-    language.value = navigator.language;
-    loans.value = [];
-    periodsAsDates.value = false;
-    refinancingUseHighestPayment.value = false;
-    reducePayments.value = false;
-    roundingEnabled.value = false;
-    roundingScale.value = 100;
-    budgetDetailsPanelActive.value = false;
-    loanDetailsPanelActive.value = false;
-    snowballSort.value = true;
-  };
-  const loadState = () => {
-    budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
-    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
-    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
-    loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)!).map(
-      (loan) => new moneyfunx.Loan(
-        loan.principal,
-        loan.annualRate,
-        12,
-        loan.termInYears,
-        loan.name,
-        loan.currentBalance,
-        loan.fees,
-      ),
-    );
-    periodsAsDates.value = JSON.parse(
-      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
-    );
-    reducePayments.value = JSON.parse(
-      localStorage.getItem(keys.LS_REDUCE_PAYMENTS)!,
-    );
-    refinancingUseHighestPayment.value = JSON.parse(
-      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT)!,
-    );
-    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED)!);
-    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE)!);
-    snowballSort.value = JSON.parse(
-      localStorage.getItem(keys.LS_SNOWBALL_SORT)!,
-    );
-  };
-  const saveState = () => {
-    localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
-    localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
-    localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
-    localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
-    localStorage.setItem(
-      keys.LS_PERIODS_AS_DATES,
-      JSON.stringify(periodsAsDates.value),
-    );
-    localStorage.setItem(
-      keys.LS_REDUCE_PAYMENTS,
-      JSON.stringify(reducePayments.value),
-    );
-    localStorage.setItem(
-      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
-      JSON.stringify(refinancingUseHighestPayment.value),
-    );
-    localStorage.setItem(keys.LS_ROUNDING_ENABLED, JSON.stringify(roundingEnabled.value));
-    localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
-    localStorage.setItem(
-      keys.LS_SNOWBALL_SORT,
-      JSON.stringify(snowballSort.value),
-    );
-  };
-  const exportState = () => ({
-    [keys.LS_BUDGETS]: budgets.value,
-    [keys.LS_CURRENCY]: currency.value,
-    [keys.LS_LANGUAGE]: language.value,
-    [keys.LS_LOANS]: loans.value,
-    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
-    [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
-    [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
-    [keys.LS_ROUNDING_SCALE]: roundingScale.value,
-    [keys.LS_SNOWBALL_SORT]: snowballSort.value,
-  });
-
   // dependent computed values/methods
+
   const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
@@ -492,8 +484,11 @@ export default defineStore('core', () => {
       deleteBudget(currentBudgetId.value);
       currentBudgetId.value = null;
     }
-    budgets.value.push(proposedBudget);
-    budgets.value.sort((a, b) => b - a);
+    budgets.value.push({
+      id: String(Math.floor(Math.random() * Date.now())),
+      relative: proposedBudget
+    });
+    budgets.value.sort((a, b) => b.relative - a.relative);
     exitBudgetForm();
   };
   const createLoan = (
@@ -740,7 +735,6 @@ export default defineStore('core', () => {
     loanFormTitle,
     loans,
     loansWithTotals,
-    minimumBudget,
     Money,
     monthlyBudgets,
     openBudgetForm,
