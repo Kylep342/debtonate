@@ -519,6 +519,9 @@ describe('Core Store', () => {
     coreState.loans = Loans();
     const firstBudgetId = coreState.monthlyBudgets[0].id;
     const firstLoanId = coreState.loans[0].id;
+    expect(coreState.buildLoanSubtitle(coreState.getLoan(firstLoanId))).toBe(
+      '($314,159.26 | 5.35% | 180 Payments)'
+    );
 
     expect(coreState.budgetFormTitle).toBe('Creating a Budget');
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
@@ -546,6 +549,19 @@ describe('Core Store', () => {
     expect(coreState.budgetFormTitle).toBe('Creating a Budget');
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
     expect(coreState.refinancingFormTitle).toBe('Refinancing');
+
+    expect(
+      coreState.buildAmortizationTableSubtitle(
+        coreState.getLoan(firstLoanId),
+        coreState.getBudget(firstBudgetId)
+      )
+    ).toBe('($314,159.26 | 5.35% | $4,507.71/month | 106 Payments)');
+    expect(
+      coreState.buildAmortizationTableTitle(
+        coreState.getLoan(firstLoanId),
+        coreState.getBudget(firstBudgetId)
+      )
+    ).toBe('Amortization Table - house | Budget 1');
   });
 
   it('computes payment schedules', async () => {

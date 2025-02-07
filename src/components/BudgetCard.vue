@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { PaymentSummary } from 'moneyfunx';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
@@ -8,17 +7,18 @@ import { MonthlyBudget } from '../types/core';
 
 const props = defineProps<{
   budget: MonthlyBudget,
-  totalsAsALoanPaymentSummaryForBudget: PaymentSummary,
 }>();
 
 const coreState = useCoreStore();
 
-const budgetAmount = computed(() => `${coreState.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed(() => `${coreState.Money(props.budget.relative)}/month`);
-const budgetPayments = computed(() => coreState.Period(props.totalsAsALoanPaymentSummaryForBudget.amortizationSchedule.length, true));
-const budgetTotalInterest = computed(() => `${coreState.Money(props.totalsAsALoanPaymentSummaryForBudget.lifetimeInterest)}`);
+const totalsAsALoanPaymentSummaryForBudget = computed(() => coreState.getPaymentSummary(constants.TOTALS, props.budget.id))
 
-const paymentsLabel = computed(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
+const budgetAmount = computed<String>(() => `${coreState.Money(props.budget.absolute)}/month`);
+const budgetExtra = computed<String>(() => `${coreState.Money(props.budget.relative)}/month`);
+const budgetPayments = computed<Number>(() => coreState.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
+const budgetTotalInterest = computed<String>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
+
+const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewBudget,

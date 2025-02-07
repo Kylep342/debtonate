@@ -73,7 +73,6 @@ onBeforeUnmount(() => {
           >
             <BudgetCard
               :budget="budget"
-              :totals-as-a-loan-payment-summary-for-budget="coreState.totalsByBudget[budget.id]"
             />
           </li>
         </ul>
