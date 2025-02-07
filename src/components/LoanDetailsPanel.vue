@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ILoan } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
@@ -7,10 +8,10 @@ import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
-const currentLoan = ref<String>(null);
+const currentLoan = ref<ILoan>();
 const viewedBudgetId = ref<String>(constants.DEFAULT);
 
-const buildLoanDetailsTitle = (loan) => loan
+const buildLoanDetailsTitle = (loan: ILoan): string => loan
   ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
     + `${coreState.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
@@ -65,7 +66,7 @@ watch(
         >
           <template #tabContent>
             <AmortizationTable
-              :payment-summary="coreState.getPaymentSummary(currentLoan.id, viewedBudgetId)"
+              :payment-schedule="coreState.getPaymentSummary(currentLoan.id, viewedBudgetId)"
               :title="coreState.buildAmortizationTableTitle(
                 currentLoan,
                 coreState.getBudget(viewedBudgetId),

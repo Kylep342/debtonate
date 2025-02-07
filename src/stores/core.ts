@@ -568,7 +568,7 @@ export default defineStore('core', () => {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id)!.currentBalance,
         },
-        lines: {},
+        lines: <Record<string, Point[]>>{},
       };
     });
 
@@ -608,7 +608,7 @@ export default defineStore('core', () => {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
         },
-        lines: {},
+        lines: <Record<string, Point[]>>{},
       }
     });
 
@@ -648,7 +648,7 @@ export default defineStore('core', () => {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
         },
-        lines: {},
+        lines: <Record<string, Point[]>>{},
       }
     });
 

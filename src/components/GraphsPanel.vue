@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
@@ -15,6 +15,12 @@ const activeGraph = computed<GraphConfig>(() => coreState.graphs[viewedGraphId.v
 const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
+
+watch(() => coreState.loans, async (value) => {
+  if (!value.map((loan) => loan.id).includes(viewedLoanId.value)) {
+    setViewedLoanId(constants.TOTALS);
+  }
+});
 </script>
 
 <template>
