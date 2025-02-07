@@ -12,7 +12,11 @@ defineProps<{
 
 const coreState = useCoreStore();
 
+<<<<<<< HEAD
 const paymentHeader = computed<String>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+=======
+const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+>>>>>>> main
 </script>
 
 <template>
