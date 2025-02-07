@@ -439,14 +439,6 @@ export default defineStore('core', () => {
     return schedules;
   });
 
-  const totalsByBudget = computed<Record<string, moneyfunx.LoansPaymentSchedule>>(() => {
-    const totals = {};
-    monthlyBudgets.value.forEach((budget) => {
-      totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
-    });
-    return totals;
-  });
-
   const paymentSummaries = computed(() => {
     const summaries = {};
 
@@ -773,7 +765,6 @@ export default defineStore('core', () => {
     toggleRounding,
     toggleSnowballSort,
     totalsAsALoan,
-    totalsByBudget,
     unviewBudget,
     unviewLoan,
     viewBudget,

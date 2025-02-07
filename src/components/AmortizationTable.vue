@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { PaymentSummary } from 'moneyfunx';
+import { PaymentSchedule } from 'moneyfunx';
 
 import useCoreStore from '../stores/core';
 
 defineProps<{
-  paymentSummary: PaymentSummary,
-  title: string,
-  subtitle: string,
+  paymentSchedule: PaymentSchedule,
+  title: String,
+  subtitle: String,
 }>();
 
 const coreState = useCoreStore();
 
-const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed<String>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -51,7 +51,7 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
         <template #body>
           <tbody>
             <tr
-              v-for="(record, rowno) in paymentSummary.amortizationSchedule"
+              v-for="(record, rowno) in paymentSchedule.amortizationSchedule"
               :key="rowno"
             >
               <td :class="['text-center']">
@@ -81,16 +81,16 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
               <td :class="['text-right']">
                 <b>{{
                   coreState.Money(
-                    paymentSummary.lifetimePrincipal +
-                      paymentSummary.lifetimeInterest
+                    paymentSchedule.lifetimePrincipal +
+                      paymentSchedule.lifetimeInterest
                   )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSummary.lifetimePrincipal) }}</b>
+                <b>{{ coreState.Money(paymentSchedule.lifetimePrincipal) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSummary.lifetimeInterest) }}</b>
+                <b>{{ coreState.Money(paymentSchedule.lifetimeInterest) }}</b>
               </td>
               <td :class="['text-right']">
                 <b>{{ coreState.Money(0) }}</b>

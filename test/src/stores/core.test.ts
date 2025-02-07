@@ -589,24 +589,6 @@ describe('Core Store', () => {
     });
   });
 
-  it('collects budget totals', async () => {
-    const coreState = useCoreStore();
-    coreState.budgets = Budgets();
-    coreState.loans = Loans();
-
-    expect(
-      Object.keys(coreState.totalsByBudget)
-    ).toStrictEqual(
-      coreState.monthlyBudgets.map((budget) => budget.id)
-    );
-
-    expect(
-      coreState.totalsByBudget[constants.DEFAULT].lifetimeInterest
-    ).toBe(
-      coreState.getLifetimeInterest(constants.TOTALS, constants.DEFAULT)
-    );
-  });
-
   it('computes payment summaries', async () => {
     const coreState = useCoreStore();
     coreState.budgets = Budgets();

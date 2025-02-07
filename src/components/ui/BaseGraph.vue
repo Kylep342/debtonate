@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import * as d3 from 'd3';
 import {
   onMounted, ref, shallowReactive, shallowRef, watch,
 } from 'vue';
 
+import HoverTemplate from '../HoverTemplate.vue';
 import { smartPosition } from '../../functions/viewport';
-import HoverTemplate from '../HoverTemplate.vue'
+import { GraphConfig } from '../../types/graph';
 
-const props = defineProps([
-  'graph',
-  'anchorId'
-]);
+const props = defineProps<{
+  graph: GraphConfig,
+  anchorId: string
+}>();
 
-const chart = shallowReactive({});
+const chart = shallowReactive(<GraphConfig>{});
 const tooltipContent = shallowRef(null);
 const tooltipPosition = ref({ left: 0, top: 0 });
 const tooltipProps = ref(null);
@@ -20,15 +21,11 @@ const tooltipRef = ref(null);
 const tooltipSize = ref({ width: 0, height: 0 });
 
 const updateTooltipSize = (size) => {
-  tooltipSize.value = size; // Update size dynamically
+  tooltipSize.value = size;
 };
 
 const initializeChart = () => {
   const graph = chart.graphs[props.anchorId];
-  if (!graph.config || !graph.lines || graph.lines.length === 0) {
-    return;
-  }
-
   const width = 800;
   const height = 500;
   const margin = 50;
