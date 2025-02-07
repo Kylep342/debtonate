@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onUpdated, ref } from 'vue';
 
-import { GraphConfig } from '../types/graph';
+import { TooltipConfig } from '../types/graph';
 
 const props = defineProps<{
-  graphConfig: GraphConfig,
+  tooltipConfig: TooltipConfig,
   index: number,
   updateTooltipSize: Function,
 }>();
@@ -26,9 +26,9 @@ onUpdated(() => {
       <thead>
         <tr :class="['bg-transparent']">
           <th>Color</th>
-          <th>{{ graphConfig.xLabel }}</th>
+          <th>{{ tooltipConfig.xLabel }}</th>
           <th :class="['text-right']">
-            {{ graphConfig.xFormat(index) }}
+            {{ tooltipConfig.xFormat(index) }}
           </th>
         </tr>
       </thead>
@@ -36,7 +36,7 @@ onUpdated(() => {
     <template #body>
       <tbody>
         <tr
-          v-for="(line, id) in graphConfig.lines"
+          v-for="(line, id) in tooltipConfig.lines"
           :key="id"
         >
           <td>
@@ -48,14 +48,14 @@ onUpdated(() => {
                 cx="5"
                 cy="5"
                 r="5"
-                :fill="graphConfig.color(id)"
+                :fill="tooltipConfig.color(id)"
               />
             </svg>
           </td>
-          <td>{{ graphConfig.lineName(id) }}</td>
+          <td>{{ tooltipConfig.lineName(id) }}</td>
           <td :class="['text-right']">
             {{
-              graphConfig.yFormat(
+              tooltipConfig.yFormat(
                 line[Math.min(index - 1, line.length - 1)].y
               )
             }}
