@@ -16,7 +16,7 @@ const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthl
     + `(+${coreState.Money(monthlyBudget.relative)}/month)`
   : constants.BUDGET_DETAILS;
 
-const title = computed<String>(() => (buildBudgetDetailsTitle(currentBudget.value)))
+const title = computed<String>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
 
 const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
 const setViewedLoanId = (itemId) => {

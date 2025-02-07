@@ -16,7 +16,7 @@ const buildLoanDetailsTitle = (loan: ILoan): string => loan
     + `${coreState.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
 
-const title = computed<String>(() => buildLoanDetailsTitle(currentLoan.value));
+const title = computed<String>(() => buildLoanDetailsTitle(currentLoan.value!));
 
 const isViewedBudgetId = (itemId) => viewedBudgetId.value === itemId;
 const setViewedBudgetId = (itemId) => {

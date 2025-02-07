@@ -80,7 +80,7 @@ const initializeChart = () => {
           tooltipContent.value = HoverTemplate;
           tooltipProps.value = {
             graphConfig: {
-              xLabel: chart.xLabel.value,
+              xLabel: chart.xLabel(),
               xFormat: chart.xFormat,
               lines: graph.lines,
               color: chart.color,

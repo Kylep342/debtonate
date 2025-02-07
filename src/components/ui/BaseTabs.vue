@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   getItemName: Function,
-  pivot: Array<Any>,
+  pivot: Array<any>,
   isViewedItemId: Function,
   setViewedItemId: Function
 }>();
