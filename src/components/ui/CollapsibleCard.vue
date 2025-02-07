@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import BaseCard from './BaseCard.vue';
 
-const props = defineProps(['bodyClasses']);
-const isCollapsed = ref(false);
+defineProps<{ bodyClasses?: Array<string> }>();
+const isCollapsed = ref<Boolean>(false);
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
@@ -11,7 +11,7 @@ const toggleCollapse = () => {
 </script>
 
 <template>
-  <BaseCard :body-classes="props.bodyClasses">
+  <BaseCard :body-classes="bodyClasses">
     <template #cardTitle>
       <div class="flex items-center justify-between">
         <span><slot name="cardTitle" /></span>

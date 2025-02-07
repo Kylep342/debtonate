@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import {
   computed,
   ref,
@@ -73,7 +73,6 @@ onBeforeUnmount(() => {
           >
             <BudgetCard
               :budget="budget"
-              :totals-as-a-loan-payment-summary-for-budget="coreState.totalsByBudget[budget.id]"
             />
           </li>
         </ul>

@@ -1,23 +1,24 @@
-<script setup>
-const props = defineProps(['title', 'id', 'bodyClasses']);
+<script setup lang="ts">
+defineProps<{
+  id: string,
+  bodyClasses?: Array<string>,
+}>();
 </script>
 
 <template>
   <dialog
-    :id="props.id"
+    :id="id"
     class="modal modal-bottom sm:modal-middle"
   >
     <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit']">
       <base-card
         :class="['overflow-hidden']"
-        :body-classes="props.bodyClasses"
+        :body-classes="bodyClasses"
       >
         <template #cardTitle>
           <header class="navbar bg-secondary">
             <div class="flex-1">
-              <slot name="header">
-                <h2>{{ title }}</h2>
-              </slot>
+              <slot name="header" />
             </div>
             <div class="modal-action flex-none mt-0">
               <menu>

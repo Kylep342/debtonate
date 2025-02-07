@@ -33,19 +33,25 @@ const Loans = () => [
     6283.19,
   ),
 ];
-const Budgets = () => [1200, 555, 200];
+const Budgets = () => [
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
+  { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
+];
 const RefinancingScenarios = (loan) => [
   new Loan(
     loan.currentBalance,
     loan.annualRate - 0.0075,
     12,
     loan.termInYears + 1,
+    "lower rate longer term",
   ),
   new Loan(
     loan.currentBalance,
     loan.annualRate + 0.0150,
     12,
     Math.max(loan.termInYears - 2, 2),
+    "higher rate shorter term",
   ),
 ];
 
@@ -167,15 +173,13 @@ describe('Core Store', () => {
   describe('with budgets', async () => {
     it('creates a budget', async () => {
       const coreState = useCoreStore();
-      expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('0.00');
-
       coreState.createBudget(100);
       expect(
         coreState.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
       ).toStrictEqual(['100.00', '0.00']);
 
       coreState.loans = Loans();
-      expect(coreState.minimumBudget.absolute.toFixed(2)).toBe('3307.71');
+      expect(coreState.getBudget(constants.DEFAULT).absolute.toFixed(2)).toBe('3307.71');
 
       coreState.createBudget(200);
       expect(
@@ -348,7 +352,7 @@ describe('Core Store', () => {
       expect(Object.keys(coreState.refinancingSchedules)).toStrictEqual([]);
       expect(coreState.refinancingUseHighestPayment).toBe(false);
 
-      const [ firstDummy, secondDummy ] = RefinancingScenarios(firstLoan);
+      const [firstDummy, secondDummy] = RefinancingScenarios(firstLoan);
 
       const firstScenarioId = coreState.createRefinanceScenario(
         firstLoanId,
@@ -515,6 +519,9 @@ describe('Core Store', () => {
     coreState.loans = Loans();
     const firstBudgetId = coreState.monthlyBudgets[0].id;
     const firstLoanId = coreState.loans[0].id;
+    expect(coreState.buildLoanSubtitle(coreState.getLoan(firstLoanId))).toBe(
+      '($314,159.26 | 5.35% | 180 Payments)'
+    );
 
     expect(coreState.budgetFormTitle).toBe('Creating a Budget');
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
@@ -542,6 +549,19 @@ describe('Core Store', () => {
     expect(coreState.budgetFormTitle).toBe('Creating a Budget');
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
     expect(coreState.refinancingFormTitle).toBe('Refinancing');
+
+    expect(
+      coreState.buildAmortizationTableSubtitle(
+        coreState.getLoan(firstLoanId),
+        coreState.getBudget(firstBudgetId)
+      )
+    ).toBe('($314,159.26 | 5.35% | $4,507.71/month | 106 Payments)');
+    expect(
+      coreState.buildAmortizationTableTitle(
+        coreState.getLoan(firstLoanId),
+        coreState.getBudget(firstBudgetId)
+      )
+    ).toBe('Amortization Table - house | Budget 1');
   });
 
   it('computes payment schedules', async () => {
@@ -567,24 +587,6 @@ describe('Core Store', () => {
         budget.relative
       );
     });
-  });
-
-  it('collects budget totals', async () => {
-    const coreState = useCoreStore();
-    coreState.budgets = Budgets();
-    coreState.loans = Loans();
-
-    expect(
-      Object.keys(coreState.totalsByBudget)
-    ).toStrictEqual(
-      coreState.monthlyBudgets.map((budget) => budget.id)
-    );
-
-    expect(
-      coreState.totalsByBudget[constants.DEFAULT].lifetimeInterest
-    ).toBe(
-      coreState.getLifetimeInterest(constants.TOTALS, constants.DEFAULT)
-    );
   });
 
   it('computes payment summaries', async () => {

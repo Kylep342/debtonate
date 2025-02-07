@@ -14,7 +14,7 @@ import './assets/main.css';
 import './assets/built.css';
 
 const app = createApp(App);
-const pinia = createPinia(app);
+const pinia = createPinia();
 
 app.component('BaseButton', BaseButton);
 app.component('BaseCard', BaseCard);

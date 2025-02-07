@@ -19,7 +19,6 @@ const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${coreStat
 const title = computed(() => buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
 
 const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lifetimeInterest
-
 </script>
 
 <template>
@@ -67,7 +66,7 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
         <template #body>
           <tbody>
             <tr>
-              <td> {{ coreState.getLoanName(parentLoan.id) }}</td>
+              <td>{{ coreState.getLoanName(parentLoan.id) }}</td>
               <td>{{ coreState.Percent(parentLoan.annualRate * 100) }}</td>
               <td>{{ parentLoan.termInYears }}</td>
               <td>{{ coreState.Money(parentLoan.minPayment) }}</td>
@@ -75,10 +74,10 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
                 {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(0) }}
+                {{ coreState.Money(parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
+                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT) + parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
                 {{ coreState.getNumPayments(parentLoan.id, constants.DEFAULT) }}
@@ -88,7 +87,7 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
               v-for="(scenario) in scenarios"
               :key="scenario.id"
             >
-              <td> {{ scenario.name }}</td>
+              <td>{{ scenario.name }}</td>
               <td>{{ coreState.Percent(scenario.annualRate * 100) }}</td>
               <td>{{ scenario.termInYears }}</td>
               <td>{{ coreState.Money(schedules[scenario.id].paymentAmount) }}</td>

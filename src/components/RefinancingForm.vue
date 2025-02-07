@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
@@ -6,14 +6,14 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const loanId = ref(null);
-const currentBalance = ref(null);
-const interestRate = ref(null);
-const termInYears = ref(null);
-const name = ref(null);
-const fees = ref(null);
+const loanId = ref<String>(null);
+const currentBalance = ref<Number>(null);
+const interestRate = ref<Number>(null);
+const termInYears = ref<Number>(null);
+const name = ref<String>(null);
+const fees = ref<Number>(null);
 
-const createButtonEnabled = computed(
+const createButtonEnabled = computed<Boolean>(
   () => [currentBalance.value, interestRate.value, termInYears.value].every(
     (input) => !Number.isNaN(input) && input > 0,
   ),

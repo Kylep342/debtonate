@@ -1,21 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from './AmortizationTable.vue';
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
+import { MonthlyBudget } from '../types/core';
 
 const coreState = useCoreStore();
-const currentBudget = ref(null);
-const viewedLoanId = ref(constants.TOTALS);
+const currentBudget = ref<MonthlyBudget>();
+const viewedLoanId = ref<String>(constants.TOTALS);
 
-const buildBudgetDetailsTitle = (monthlyBudget) => monthlyBudget
+const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
     + `${coreState.Money(monthlyBudget.absolute)}/month `
     + `(+${coreState.Money(monthlyBudget.relative)}/month)`
   : constants.BUDGET_DETAILS;
 
-const title = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
+const title = computed<String>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
 
 const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
 const setViewedLoanId = (itemId) => {
@@ -59,7 +60,7 @@ watch(
         >
           <template #tabContent>
             <AmortizationTable
-              :payment-summary="coreState.getPaymentSummary(viewedLoanId, currentBudget.id)"
+              :payment-schedule="coreState.getPaymentSummary(viewedLoanId, currentBudget.id)"
               :title="coreState.buildAmortizationTableTitle(
                 coreState.getLoan(viewedLoanId),
                 currentBudget,

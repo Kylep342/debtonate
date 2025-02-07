@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
 import constants from '../constants/constants';
@@ -6,13 +6,13 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const amount = ref(null);
+const amount = ref<Number>(null);
 
-const createButtonEnabled = computed(
+const createButtonEnabled = computed<Boolean>(
   () => !Number.isNaN(amount.value) && amount.value > 0,
 );
 
-const createBudgetButtonText = computed(() => (
+const createBudgetButtonText = computed<String>(() => (
   coreState.currentBudgetId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
