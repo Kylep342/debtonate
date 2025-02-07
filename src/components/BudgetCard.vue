@@ -7,10 +7,6 @@ import { MonthlyBudget } from '../types/core';
 
 const props = defineProps<{
   budget: MonthlyBudget,
-<<<<<<< HEAD
-=======
-  totalsAsALoanPaymentSummaryForBudget: PaymentSummary,
->>>>>>> main
 }>();
 
 const coreState = useCoreStore();

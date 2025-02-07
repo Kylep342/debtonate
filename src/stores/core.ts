@@ -6,10 +6,7 @@ import { computed, ref } from 'vue';
 import constants from '../constants/constants';
 import keys from '../constants/keys';
 import {
-<<<<<<< HEAD
   Budget,
-=======
->>>>>>> main
   MonthlyBudget,
   PaymentSchedule,
 } from '../types/core';
@@ -23,11 +20,7 @@ import {
 export default defineStore('core', () => {
   const budgetDetailsPanelActive = ref<boolean>(false);
   const budgetFormActive = ref<boolean>(false);
-<<<<<<< HEAD
   const budgets = ref<Array<Budget>>([]);
-=======
-  const loanFormActive = ref<boolean>(false);
->>>>>>> main
   const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref<string|null>(null);
@@ -44,11 +37,6 @@ export default defineStore('core', () => {
   const refinancingFormActive = ref<boolean>(false);
   const refinancingScenarios = ref<Record<string, moneyfunx.Loan[]>>({});
   const refinancingUseHighestPayment = ref<boolean>(false);
-<<<<<<< HEAD
-=======
-  const refinancingScenarios = ref<Record<string, moneyfunx.Loan[]>>({});
-  const roundingScale = ref<number>(100);
->>>>>>> main
   const roundingEnabled = ref<boolean>(false);
   const roundingScale = ref<number>(100);
   const snowballSort = ref<boolean>(false);
@@ -398,10 +386,6 @@ export default defineStore('core', () => {
   });
 
   const deleteBudget = (id: string) => {
-<<<<<<< HEAD
-=======
-    const monthlyBudget = getBudget(id)!;
->>>>>>> main
     budgets.value = budgets.value.filter(
       (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
     );
@@ -426,94 +410,6 @@ export default defineStore('core', () => {
     budgetDetailsPanelActive.value = true;
   };
 
-<<<<<<< HEAD
-=======
-  const clearState = () => {
-    budgets.value = [];
-    budgetFormActive.value = false;
-    loanFormActive.value = false;
-    currency.value = constants.LOCALE_CURRENCY[navigator.language];
-    currentBudgetId.value = null;
-    currentLoanId.value = null;
-    language.value = navigator.language;
-    loans.value = [];
-    periodsAsDates.value = false;
-    refinancingUseHighestPayment.value = false;
-    reducePayments.value = false;
-    roundingEnabled.value = false;
-    roundingScale.value = 100;
-    budgetDetailsPanelActive.value = false;
-    loanDetailsPanelActive.value = false;
-    snowballSort.value = true;
-  };
-  const loadState = () => {
-    budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
-    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
-    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
-    loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)!).map(
-      (loan) => new moneyfunx.Loan(
-        loan.principal,
-        loan.annualRate,
-        12,
-        loan.termInYears,
-        loan.name,
-        loan.currentBalance,
-        loan.fees,
-      ),
-    );
-    periodsAsDates.value = JSON.parse(
-      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
-    );
-    reducePayments.value = JSON.parse(
-      localStorage.getItem(keys.LS_REDUCE_PAYMENTS)!,
-    );
-    refinancingUseHighestPayment.value = JSON.parse(
-      localStorage.getItem(keys.LS_REFINANCING_USE_HIGHEST_PAYMENT)!,
-    );
-    roundingEnabled.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_ENABLED)!);
-    roundingScale.value = JSON.parse(localStorage.getItem(keys.LS_ROUNDING_SCALE)!);
-    snowballSort.value = JSON.parse(
-      localStorage.getItem(keys.LS_SNOWBALL_SORT)!,
-    );
-  };
-  const saveState = () => {
-    localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
-    localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
-    localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
-    localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
-    localStorage.setItem(
-      keys.LS_PERIODS_AS_DATES,
-      JSON.stringify(periodsAsDates.value),
-    );
-    localStorage.setItem(
-      keys.LS_REDUCE_PAYMENTS,
-      JSON.stringify(reducePayments.value),
-    );
-    localStorage.setItem(
-      keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
-      JSON.stringify(refinancingUseHighestPayment.value),
-    );
-    localStorage.setItem(keys.LS_ROUNDING_ENABLED, JSON.stringify(roundingEnabled.value));
-    localStorage.setItem(keys.LS_ROUNDING_SCALE, JSON.stringify(roundingScale.value));
-    localStorage.setItem(
-      keys.LS_SNOWBALL_SORT,
-      JSON.stringify(snowballSort.value),
-    );
-  };
-  const exportState = () => ({
-    [keys.LS_BUDGETS]: budgets.value,
-    [keys.LS_CURRENCY]: currency.value,
-    [keys.LS_LANGUAGE]: language.value,
-    [keys.LS_LOANS]: loans.value,
-    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
-    [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
-    [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
-    [keys.LS_ROUNDING_SCALE]: roundingScale.value,
-    [keys.LS_SNOWBALL_SORT]: snowballSort.value,
-  });
-
->>>>>>> main
   // dependent computed values/methods
 
   const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
@@ -543,17 +439,6 @@ export default defineStore('core', () => {
     return schedules;
   });
 
-<<<<<<< HEAD
-=======
-  const totalsByBudget = computed<Record<string, moneyfunx.LoansPaymentSchedule>>(() => {
-    const totals = {};
-    monthlyBudgets.value.forEach((budget) => {
-      totals[budget.id] = paymentSchedules.value[budget.id].paymentSchedule.totals;
-    });
-    return totals;
-  });
-
->>>>>>> main
   const paymentSummaries = computed(() => {
     const summaries = {};
 
