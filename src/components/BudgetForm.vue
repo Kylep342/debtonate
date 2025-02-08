@@ -36,7 +36,7 @@ const clearForm = () => {
 const createBudget = () => {
   coreState.createBudget(amount.value);
   clearForm();
-}
+};
 
 const exit = () => {
   clearForm();
