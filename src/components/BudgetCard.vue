@@ -5,9 +5,7 @@ import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
 import { MonthlyBudget } from '../types/core';
 
-const props = defineProps<{
-  budget: MonthlyBudget,
-}>();
+const props = defineProps<{ budget: MonthlyBudget }>();
 
 const coreState = useCoreStore();
 

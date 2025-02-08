@@ -9,7 +9,7 @@ const coreState = useCoreStore();
 const amount = ref<Number>(null);
 
 const createButtonEnabled = computed<Boolean>(
-  () => !Number.isNaN(amount.value) && amount.value > 0,
+  () => !Number.isNaN(amount.value) && amount.value > 0
 );
 
 const createBudgetButtonText = computed<String>(() => (
