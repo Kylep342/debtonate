@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const coreState = useCoreStore();
 
-const totalsAsALoanPaymentSummaryForBudget = computed(() => coreState.getPaymentSummary(constants.TOTALS, props.budget.id))
+const totalsAsALoanPaymentSummaryForBudget = computed(() => coreState.getPaymentSchedule(constants.TOTALS, props.budget.id))
 
 const budgetAmount = computed<String>(() => `${coreState.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed<String>(() => `${coreState.Money(props.budget.relative)}/month`);

@@ -570,19 +570,19 @@ describe('Core Store', () => {
     coreState.loans = Loans();
 
     expect(
-      Object.keys(coreState.paymentSchedules)
+      Object.keys(coreState.paymentScenarios)
     ).toStrictEqual(
       coreState.monthlyBudgets.map((budget) => budget.id)
     );
 
     coreState.monthlyBudgets.forEach((budget) => {
       expect(
-        Object.keys(coreState.paymentSchedules[budget.id].paymentSchedule)
+        Object.keys(coreState.paymentScenarios[budget.id].paymentSchedule)
       ).toStrictEqual(
         [...coreState.loans.map((loan) => loan.id), constants.TOTALS]
       );
       expect(
-        coreState.paymentSchedules[budget.id].paymentAmount
+        coreState.paymentScenarios[budget.id].paymentAmount
       ).toBe(
         budget.relative
       );
@@ -595,14 +595,14 @@ describe('Core Store', () => {
     coreState.loans = Loans();
 
     expect(
-      Object.keys(coreState.paymentSummaries)
+      Object.keys(coreState.paymentSchedules)
     ).toStrictEqual(
       coreState.loansWithTotals.map((loan) => loan.id)
     );
 
-    Object.keys(coreState.paymentSummaries).forEach((loanId) => {
+    Object.keys(coreState.paymentSchedules).forEach((loanId) => {
       expect(
-        Object.keys(coreState.paymentSummaries[loanId])
+        Object.keys(coreState.paymentSchedules[loanId])
       ).toStrictEqual(
         coreState.monthlyBudgets.map((budget) => budget.id)
       );

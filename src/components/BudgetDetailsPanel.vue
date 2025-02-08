@@ -60,7 +60,7 @@ watch(
         >
           <template #tabContent>
             <AmortizationTable
-              :payment-schedule="coreState.getPaymentSummary(viewedLoanId, currentBudget.id)"
+              :payment-schedule="coreState.getPaymentSchedule(viewedLoanId, currentBudget.id)"
               :title="coreState.buildAmortizationTableTitle(
                 coreState.getLoan(viewedLoanId),
                 currentBudget,

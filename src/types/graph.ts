@@ -29,3 +29,12 @@ export type GraphConfig = {
   yLabel: Function;
   yScale: Function;
 };
+
+export type TooltipConfig = {
+  xLabel: string,
+  xFormat: Function,
+  lines: Function,
+  color: Function,
+  lineName: Function,
+  yFormat: Function,
+};
