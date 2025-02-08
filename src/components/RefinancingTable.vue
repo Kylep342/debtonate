@@ -4,12 +4,12 @@ import { Loan, LoansPaymentSummary } from 'moneyfunx';
 
 import constants from '../constants/constants';
 import useCoreStore from '../stores/core';
-import { PaymentSchedule } from '../types/core';
+import { PaymentScenario } from '../types/core';
 
 const props = defineProps<{
   parentId: string,
   scenarios: Array<Loan>,
-  schedules: Record<string, PaymentSchedule>,
+  schedules: Record<string, PaymentScenario>,
 }>();
 
 const coreState = useCoreStore();

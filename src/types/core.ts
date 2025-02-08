@@ -11,7 +11,7 @@ export type MonthlyBudget = {
   absolute: number;
 };
 
-export type PaymentSchedule = {
+export type PaymentScenario = {
   paymentAmount: number;
   paymentSchedule: LoansPaymentSchedule;
 };
