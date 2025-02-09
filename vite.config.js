@@ -3,7 +3,6 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   base: '/debtonate/',
   plugins: [vue()],
@@ -18,8 +17,10 @@ export default defineConfig({
       provider: 'v8',
       include: ['src'],
     },
-    deps: {
-      inline: ['moneyfunx'],
+    server: {
+      deps: {
+        inline: ['moneyfunx'],
+      },
     },
     environment: 'jsdom',
     exclude: ['build', 'node_modules'],

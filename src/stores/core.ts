@@ -377,9 +377,7 @@ export default defineStore('core', () => {
           payment,
           false,
         );
-        schedules[parentLoanId][scenario.id] = {
-          paymentAmount: payment, paymentSchedule: paymentSchedule[scenario.id],
-        };
+        schedules[parentLoanId][scenario.id] = {...paymentSchedule[scenario.id]};
       });
     });
     return schedules
@@ -571,7 +569,7 @@ export default defineStore('core', () => {
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentScenarios.value).forEach(([budgetId, schedule]) => {
         const line: Point[] = [];
-        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
+        schedule[loanId].amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
         config.graphs[loanId].lines[budgetId] = line;
@@ -651,7 +649,7 @@ export default defineStore('core', () => {
     Object.keys(config.graphs).forEach((loanId) => {
       Object.entries(paymentScenarios.value).forEach(([budgetId, schedule]) => {
         const line: Point[] = [];
-        schedule.paymentSchedule[loanId].amortizationSchedule.forEach((record) => {
+        schedule[loanId].amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
         config.graphs[loanId].lines[budgetId] = line;
