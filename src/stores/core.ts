@@ -377,7 +377,7 @@ export default defineStore('core', () => {
           payment,
           false,
         );
-        schedules[parentLoanId][scenario.id] = {...paymentSchedule[scenario.id]};
+        schedules[parentLoanId][scenario.id] = { paymentAmount: payment, paymentschedule: paymentSchedule[scenario.id] };
       });
     });
     return schedules
@@ -564,15 +564,12 @@ export default defineStore('core', () => {
         },
         lines: <Record<string, Point[]>>{},
       };
-    });
-
-    Object.keys(config.graphs).forEach((loanId) => {
-      Object.entries(paymentScenarios.value).forEach(([budgetId, schedule]) => {
+      monthlyBudgets.value.forEach((budget) => {
         const line: Point[] = [];
-        schedule[loanId].amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
+        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
-        config.graphs[loanId].lines[budgetId] = line;
+        config.graphs[loan.id].lines[budget.id] = line;
       });
     });
     return config;
@@ -604,15 +601,16 @@ export default defineStore('core', () => {
         },
         lines: <Record<string, Point[]>>{},
       }
-    });
-
-    Object.keys(config.graphs).forEach((loanId) => {
-      Object.keys(paymentScenarios.value).forEach((budgetId) => {
+      monthlyBudgets.value.forEach((budget) => {
         const line: Point[] = [];
-        getPaymentSchedule(loanId, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
-          line.push({ x: record.period, y: getInterestUpToPeriod(loanId, constants.DEFAULT, index) - getInterestUpToPeriod(loanId, budgetId, index) });
+        getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
+          line.push({
+            x: record.period,
+            y: getInterestUpToPeriod(loan.id, constants.DEFAULT, index) -
+              getInterestUpToPeriod(loan.id, budget.id, index)
+          });
         });
-        config.graphs[loanId].lines[budgetId] = line;
+        config.graphs[loan.id].lines[budget.id] = line;
       });
     });
     return config;
@@ -644,15 +642,12 @@ export default defineStore('core', () => {
         },
         lines: <Record<string, Point[]>>{},
       }
-    });
-
-    Object.keys(config.graphs).forEach((loanId) => {
-      Object.entries(paymentScenarios.value).forEach(([budgetId, schedule]) => {
+      monthlyBudgets.value.forEach((budget) => {
         const line: Point[] = [];
-        schedule[loanId].amortizationSchedule.forEach((record) => {
+        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
-        config.graphs[loanId].lines[budgetId] = line;
+        config.graphs[loan.id].lines[budget.id] = line;
       });
     });
     return config;
