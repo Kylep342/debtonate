@@ -377,7 +377,7 @@ export default defineStore('core', () => {
           payment,
           false,
         );
-        schedules[parentLoanId][scenario.id] = { paymentAmount: payment, paymentschedule: paymentSchedule[scenario.id] };
+        schedules[parentLoanId][scenario.id] = { paymentAmount: payment, paymentSchedule: paymentSchedule[scenario.id] };
       });
     });
     return schedules

@@ -9,7 +9,7 @@ import { PaymentScenario } from '../types/core';
 const props = defineProps<{
   parentId: string,
   scenarios: Array<Loan>,
-  schedules: Record<string, PaymentScenario>,
+  schedules: Record<string, moneyfunx.LoansPaymentSchedule>,
 }>();
 
 const coreState = useCoreStore();

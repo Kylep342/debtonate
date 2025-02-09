@@ -2,30 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --ff: "Mono", sans-serif ;
-    /* --h1: bold max(36px, 4v2) / max(48px, 5vw) var(--ff); */
-    --h1: bold 1.125rem/1.4em var(--ff);
-    --h2: bold 1rem/1.4em var(--ff);
-    --p: 1rem/1.4em var(--ff);
-    --p2: .875rem/1.4em var(--ff);
-
-    --gray100: hsl(0,0%,100%);
-    --gray70: hsl(0,0%,70%);
-    --gray0: hsl(0,0%,0%);
-    --color-primary: hsl(123, 50%, 90%);
-    --color-secondary: hsl(123, 50%, 10%);
-    --color-tertiary: hsl(183, 80%, 20%);
-    --color-accent: hsl(63, 80%, 20%);
-}
-.dark {
-    --color-primary: hsl(123, 50%, 10%);
-    --color-secondary: hsl(123, 50%, 90%);
-    --color-tertiary: hsl(183, 80%, 80%);
-    --color-accent: hsl(63, 80%, 80%);
-}
-
-
 header img {
     margin: 0 0.5rem 0.25rem 0.5rem;
     max-height: 60px;
