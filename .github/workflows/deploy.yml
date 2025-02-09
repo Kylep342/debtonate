@@ -37,6 +37,8 @@ jobs:
         run: npm run css
       - name: Build
         run: npm run build
+      - name: CNAME
+        run: echo 'www.debtonate.app' > ./dist/CNAME
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
