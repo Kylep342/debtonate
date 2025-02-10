@@ -2,8 +2,8 @@
 
 set -eux
 
-npm run dev > >(tee dev.log) 2>&1 &
-npm run cssw > >(tee cssw.log) 2>&1 &
-npm run test > >(tee test.log) 2>&1 &
+npm run dev > >(tee logs/dev.log) 2>&1 &
+npm run cssw > >(tee logs/cssw.log) 2>&1 &
+npm run test > >(tee logs/test.log) 2>&1 &
 
 wait
