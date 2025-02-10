@@ -17,9 +17,10 @@ const budgetPayments = computed<Number>(() => coreState.Period(totalsAsALoanPaym
 const budgetTotalInterest = computed<String>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
 
 const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
+const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
 const baseButtons = {
-  [constants.BTN_DETAILS]: coreState.viewBudget,
+  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewBudget : alertButtonIsDisabled,
 }
 
 const editButtons = {
@@ -29,8 +30,6 @@ const editButtons = {
 }
 
 const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : editButtons;
-
-const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 </script>
 
 <template>
@@ -50,7 +49,7 @@ const alertButtonIsDisabled = () => alert('Create a loan to use this action');
               <li
                 v-for="(onClick, text) in getButtons(budget.id)"
                 :key="text"
-                @click.prevent="coreState.loans.length ? onClick(budget.id) : alertButtonIsDisabled()"
+                @click.prevent="onClick(budget.id)"
               >
                 <a>{{ text }}</a>
               </li>

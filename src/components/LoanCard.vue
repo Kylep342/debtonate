@@ -18,9 +18,11 @@ const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`)
 const loanTermInYears = computed(() => `${props.loan.termInYears}`);
 const loanFees = computed(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : undefined);
 
+const alertButtonIsDisabled = () => alert('Create a loan to use this action');
+
 const baseButtons = {
-  [constants.BTN_DETAILS]: coreState.viewLoan,
-  [constants.BTN_REFINANCE]: coreState.refinanceLoan,
+  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewLoan : alertButtonIsDisabled,
+  [constants.BTN_REFINANCE]: coreState.loans.length ? coreState.refinanceLoan: alertButtonIsDisabled,
 }
 
 const editButtons = {
@@ -31,7 +33,6 @@ const editButtons = {
 
 const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editButtons;
 
-const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 </script>
 
 <template>
