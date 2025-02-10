@@ -19,17 +19,17 @@ const budgetTotalInterest = computed<String>(() => `${coreState.Money(totalsAsAL
 const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = {
-  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewBudget : alertButtonIsDisabled,
-}
+const baseButtons = computed(() => ({
+  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewBudget : alertButtonIsDisabled
+}));
 
-const editButtons = {
-  ...baseButtons,
+const editButtons = computed(() => ({
+  ...baseButtons.value,
   [constants.BTN_EDIT]: coreState.editBudget,
   [constants.BTN_DELETE]: coreState.deleteBudget,
-}
+}));
 
-const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : editButtons;
+const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -40,12 +40,11 @@ const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : 
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getBudgetName(budget.id) }}
           </h2>
-          <div className="dropdown dropdown-bottom dropdown-end">
+          <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
-            >
+              :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']">
               <li
                 v-for="(onClick, text) in getButtons(budget.id)"
                 :key="text"
