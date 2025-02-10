@@ -42,11 +42,11 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value :
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getLoanName(loan.id) }}
           </h2>
-          <div className="dropdown dropdown-bottom dropdown-end">
+          <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+              :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']"
             >
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"
