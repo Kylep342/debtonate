@@ -6,7 +6,7 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const amount = ref<Number>(null);
+const amount = ref<number>(null);
 
 const createButtonEnabled = computed<Boolean>(
   () => !Number.isNaN(amount.value) && amount.value > 0

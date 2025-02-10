@@ -6,14 +6,14 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const loanId = ref<String>(null);
-const currentBalance = ref<Number>(null);
-const interestRate = ref<Number>(null);
-const termInYears = ref<Number>(null);
-const name = ref<String>(null);
-const fees = ref<Number>(null);
+const loanId = ref<string>(null);
+const currentBalance = ref<number>(null);
+const interestRate = ref<number>(null);
+const termInYears = ref<number>(null);
+const name = ref<string>(null);
+const fees = ref<number>(null);
 
-const createButtonEnabled = computed<Boolean>(
+const createButtonEnabled = computed<boolean>(
   () => [currentBalance.value, interestRate.value, termInYears.value].every(
     (input) => !Number.isNaN(input) && input > 0,
   ),

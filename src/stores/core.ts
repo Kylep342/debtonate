@@ -263,7 +263,7 @@ export default defineStore('core', () => {
   const openOptionsForm = () => {
     optionsFormActive.value = true;
   };
-  const openRefinancingForm = (id: string) => {
+  const refinanceLoan = (id: string) => {
     currentLoanId.value = id;
     refinancingFormActive.value = true;
   }
@@ -721,7 +721,7 @@ export default defineStore('core', () => {
     openBudgetForm,
     openLoanForm,
     openOptionsForm,
-    openRefinancingForm,
+    refinanceLoan,
     optionsFormActive,
     paymentScenarios,
     paymentSchedules,
