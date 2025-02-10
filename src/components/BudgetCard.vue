@@ -49,7 +49,11 @@ const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : 
               <li
                 v-for="(onClick, text) in getButtons(budget.id)"
                 :key="text"
+<<<<<<< HEAD
                 @click.prevent="onClick(budget.id)"
+=======
+                @click.prevent="coreState.loans.length ? onClick(budget.id) : alertButtonIsDisabled()"
+>>>>>>> main
               >
                 <a>{{ text }}</a>
               </li>

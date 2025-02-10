@@ -32,7 +32,6 @@ const editButtons = {
 }
 
 const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editButtons;
-
 </script>
 
 <template>
