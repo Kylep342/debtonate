@@ -20,18 +20,18 @@ const loanFees = computed(() => props.loan.fees ? `${coreState.Money(props.loan.
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = {
+const baseButtons = computed(() => ({
   [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewLoan : alertButtonIsDisabled,
-  [constants.BTN_REFINANCE]: coreState.loans.length ? coreState.refinanceLoan: alertButtonIsDisabled,
-}
+  [constants.BTN_REFINANCE]: coreState.loans.length ? coreState.refinanceLoan : alertButtonIsDisabled,
+}));
 
-const editButtons = {
-  ...baseButtons,
+const editButtons = computed(() => ({
+  ...baseButtons.value,
   [constants.BTN_EDIT]: coreState.editLoan,
   [constants.BTN_DELETE]: coreState.deleteLoan,
-}
+}));
 
-const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editButtons;
+const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -51,7 +51,7 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"
                 :key="text"
-                @click.prevent="coreState.loans.length ? onClick(loan.id) : alertButtonIsDisabled()"
+                @click.prevent="onClick(loan.id)"
               >
                 <a>{{ text }}</a>
               </li>
