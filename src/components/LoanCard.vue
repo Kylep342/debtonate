@@ -20,7 +20,7 @@ const loanFees = computed(() => props.loan.fees ? `${coreState.Money(props.loan.
 
 const baseButtons = {
   [constants.BTN_DETAILS]: coreState.viewLoan,
-  [constants.BTN_REFINANCE]: coreState.openRefinancingForm,
+  [constants.BTN_REFINANCE]: coreState.refinanceLoan,
 }
 
 const editButtons = {
@@ -31,6 +31,7 @@ const editButtons = {
 
 const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editButtons;
 
+const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 </script>
 
 <template>
@@ -50,7 +51,7 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons : editB
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"
                 :key="text"
-                @click="onClick(loan.id)"
+                @click.prevent="coreState.loans.length ? onClick(loan.id) : alertButtonIsDisabled()"
               >
                 <a>{{ text }}</a>
               </li>

@@ -507,7 +507,7 @@ describe('Core Store', () => {
 
     // refinancingFormActive
     expect(coreState.refinancingFormActive).toBe(false);
-    coreState.openRefinancingForm();
+    coreState.refinanceLoan();
     expect(coreState.refinancingFormActive).toBe(true);
     coreState.exitRefinancingForm();
     expect(coreState.refinancingFormActive).toBe(false);
@@ -541,7 +541,7 @@ describe('Core Store', () => {
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
     expect(coreState.refinancingFormTitle).toBe('Refinancing');
 
-    coreState.openRefinancingForm(firstLoanId);
+    coreState.refinanceLoan(firstLoanId);
     expect(coreState.budgetFormTitle).toBe('Creating a Budget');
     expect(coreState.loanFormTitle).toBe('Creating a Loan');
     expect(coreState.refinancingFormTitle).toBe('Refinancing house');

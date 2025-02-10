@@ -30,6 +30,7 @@ const editButtons = {
 
 const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : editButtons;
 
+const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 </script>
 
 <template>
@@ -49,7 +50,7 @@ const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons : 
               <li
                 v-for="(onClick, text) in getButtons(budget.id)"
                 :key="text"
-                @click="onClick(budget.id)"
+                @click.prevent="coreState.loans.length ? onClick(budget.id) : alertButtonIsDisabled()"
               >
                 <a>{{ text }}</a>
               </li>
