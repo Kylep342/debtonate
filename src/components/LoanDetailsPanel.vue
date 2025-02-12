@@ -35,7 +35,10 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_DETAILS_ID">
+  <base-modal
+    :id="constants.LOAN_DETAILS_ID"
+    @exit="coreState.unviewLoan"
+  >
     <template #header>
       <h2>{{ title }}</h2>
     </template>

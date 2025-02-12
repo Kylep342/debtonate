@@ -58,7 +58,10 @@ const exit = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.REFINANCING_FORM_ID">
+  <base-modal
+    :id="constants.REFINANCING_FORM_ID"
+    @exit="exit"
+  >
     <template #header>
       <h2>{{ coreState.refinancingFormTitle }}</h2>
     </template>
