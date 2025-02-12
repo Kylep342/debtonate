@@ -9,12 +9,12 @@ const props = defineProps<{ budget: MonthlyBudget }>();
 
 const coreState = useCoreStore();
 
-const totalsAsALoanPaymentSummaryForBudget = computed(() => coreState.getPaymentSchedule(constants.TOTALS, props.budget.id))
+const totalsAsALoanPaymentSummaryForBudget = computed(() => coreState.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
-const budgetAmount = computed<String>(() => `${coreState.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed<String>(() => `${coreState.Money(props.budget.relative)}/month`);
-const budgetPayments = computed<Number>(() => coreState.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
-const budgetTotalInterest = computed<String>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
+const budgetAmount = computed<string>(() => `${coreState.Money(props.budget.absolute)}/month`);
+const budgetExtra = computed<string>(() => `${coreState.Money(props.budget.relative)}/month`);
+const budgetPayments = computed<number>(() => coreState.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
+const budgetTotalInterest = computed<string>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
 
 const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');

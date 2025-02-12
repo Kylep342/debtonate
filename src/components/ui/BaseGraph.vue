@@ -15,10 +15,10 @@ const props = defineProps<{
 
 const chart = shallowReactive(<GraphConfig>{});
 const tooltipContent = shallowRef(null);
-const tooltipPosition = ref({ left: 0, top: 0 });
+const tooltipPosition = ref<Object<string, number>>({ left: 0, top: 0 });
 const tooltipProps = ref(null);
 const tooltipRef = ref(null);
-const tooltipSize = ref({ width: 0, height: 0 });
+const tooltipSize = ref<Object<string, number>>({ width: 0, height: 0 });
 
 const updateTooltipSize = (size) => {
   tooltipSize.value = size;
