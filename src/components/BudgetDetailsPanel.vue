@@ -35,7 +35,10 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.BUDGET_DETAILS_ID">
+  <base-modal
+    :id="constants.BUDGET_DETAILS_ID"
+    @exit="coreState.unviewBudget"
+  >
     <template #header>
       <h2>{{ title }}</h2>
     </template>

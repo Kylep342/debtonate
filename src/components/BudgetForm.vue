@@ -45,7 +45,10 @@ const exit = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.BUDGET_FORM_ID">
+  <base-modal
+    :id="constants.BUDGET_FORM_ID"
+    @exit="exit"
+  >
     <template #header>
       <h2>{{ coreState.budgetFormTitle }}</h2>
     </template>

@@ -11,12 +11,12 @@ const props = defineProps<{
 
 const coreState = useCoreStore();
 
-const loanCurrentBalance = computed(() => `${coreState.Money(props.loan.currentBalance)}`);
-const loanInterestRate = computed(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
-const loanMinPayment = computed(() => `${coreState.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed(() => `${coreState.Money(props.loan.principal)}`);
-const loanTermInYears = computed(() => `${props.loan.termInYears}`);
-const loanFees = computed(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : undefined);
+const loanCurrentBalance = computed<string>(() => `${coreState.Money(props.loan.currentBalance)}`);
+const loanInterestRate = computed<string>(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
+const loanMinPayment = computed<string>(() => `${coreState.Money(props.loan.minPayment)}/month`);
+const loanPrincipal = computed<string>(() => `${coreState.Money(props.loan.principal)}`);
+const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
+const loanFees = computed<string>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : undefined);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -42,11 +42,11 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value :
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getLoanName(loan.id) }}
           </h2>
-          <div className="dropdown dropdown-bottom dropdown-end">
+          <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
             <base-button>{{ constants.BTN_MENU }}</base-button>
             <ul
               tabIndex="{0}"
-              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-fit p-2 shadow"
+              :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']"
             >
               <li
                 v-for="(onClick, text) in getButtons(loan.id)"

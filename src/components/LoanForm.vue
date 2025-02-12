@@ -69,7 +69,10 @@ const exit = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_FORM_ID">
+  <base-modal
+    :id="constants.LOAN_FORM_ID"
+    @exit="exit"
+  >
     <template #header>
       <h2 :class="['pl-4']">
         {{ coreState.loanFormTitle }}

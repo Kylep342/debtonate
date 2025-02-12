@@ -8,7 +8,8 @@ defineProps<{
 <template>
   <dialog
     :id="id"
-    class="modal modal-bottom sm:modal-middle"
+    @close="$emit('exit')"
+    :class="['modal', 'modal-bottom', 'sm:modal-middle']"
   >
     <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit']">
       <base-card

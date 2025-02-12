@@ -49,6 +49,7 @@ watch(() => roundingScale.value, async (newValue) => {
   <base-modal
     :id="constants.OPTIONS_FORM_ID"
     :body-classes="['overflow-y-auto']"
+    @exit="coreState.exitOptionsForm"
   >
     <template #header>
       <h2>Options</h2>
