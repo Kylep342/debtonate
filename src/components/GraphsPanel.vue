@@ -7,8 +7,8 @@ import { GraphConfig } from '../types/graph';
 
 const coreState = useCoreStore();
 
-const viewedGraphId = ref<String>(constants.GRAPH_BALANCES_OVER_TIME);
-const viewedLoanId = ref<String>(constants.TOTALS);
+const viewedGraphId = ref<string>(constants.GRAPH_BALANCES_OVER_TIME);
+const viewedLoanId = ref<string>(constants.TOTALS);
 
 const activeGraph = computed<GraphConfig>(() => coreState.graphs[viewedGraphId.value]);
 

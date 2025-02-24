@@ -105,6 +105,7 @@ watch(() => coreState.refinancingFormActive, async (show) => {
         </div>
       </div>
     </div>
+    <!-- <BaseAlert :id="'alert'" :message="'lmao'" / -->
     <FooterBar />
   </div>
 </template>

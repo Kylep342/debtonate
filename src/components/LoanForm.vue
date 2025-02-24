@@ -6,12 +6,12 @@ import useCoreStore from '../stores/core';
 
 const coreState = useCoreStore();
 
-const principal = ref<number>(null);
-const interestRate = ref<number>(null);
-const termInYears = ref<number>(null);
-const name = ref<string>(null);
-const currentBalance = ref<number>(null);
-const fees = ref<number>(null);
+const principal = ref<number|null>(null);
+const interestRate = ref<number|null>(null);
+const termInYears = ref<number|null>(null);
+const name = ref<string|null>(null);
+const currentBalance = ref<number|null>(null);
+const fees = ref<number|null>(null);
 
 const createButtonEnabled = computed<Boolean>(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -53,7 +53,7 @@ const clearForm = () => {
 const createLoan = () => {
   coreState.createLoan(
     principal.value,
-    interestRate.value / 100,
+    interestRate.value! / 100,
     termInYears.value,
     name.value,
     currentBalance.value,

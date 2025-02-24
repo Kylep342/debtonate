@@ -13,7 +13,7 @@ const buttons = {
   [constants.BTN_LOAD]: coreState.loadState,
   [constants.BTN_SAVE]: coreState.saveState,
   [constants.BTN_CLEAR]: coreState.clearState,
-  // {text: constants.BTN_EXPORT, onClick: exportState},
+  [constants.BTN_EXPORT]: exportState,
 }
 const classes = ['rounded-none btn-secondary'];
 </script>
