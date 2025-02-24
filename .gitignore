@@ -32,3 +32,5 @@ src/assets/built.css
 
 .terraform
 terraform.tfstate*
+
+scratch

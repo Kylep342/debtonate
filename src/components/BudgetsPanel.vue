@@ -11,13 +11,14 @@ import ManagementPanel from './ManagementPanel.vue';
 import constants from '../constants/constants';
 import { fillHeight } from '../functions/viewport';
 import useCoreStore from '../stores/core';
+import { MonthlyBudget } from '../types/core';
 
 const coreState = useCoreStore();
 
-const defaultBudgetIndex = computed(
-  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT),
+const defaultBudgetIndex = computed<number>(
+  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
 );
-const orderedBudgets = computed(() => [
+const orderedBudgets = computed<MonthlyBudget[]>(() => [
   coreState.monthlyBudgets[defaultBudgetIndex.value],
   ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),

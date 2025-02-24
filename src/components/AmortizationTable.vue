@@ -6,13 +6,13 @@ import useCoreStore from '../stores/core';
 
 defineProps<{
   paymentSchedule: PaymentSchedule,
-  title: String,
-  subtitle: String,
+  title: string,
+  subtitle: string,
 }>();
 
 const coreState = useCoreStore();
 
-const paymentHeader = computed<String>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
