@@ -15,7 +15,6 @@ const buttons = {
   [constants.BTN_CLEAR]: coreState.clearState,
   [constants.BTN_EXPORT]: exportState,
 }
-const classes = ['rounded-none btn-secondary'];
 </script>
 
 <template>
@@ -27,18 +26,20 @@ const classes = ['rounded-none btn-secondary'];
       <img src="/icon.png">
       <h1>Debtonate</h1>
     </div>
-    <ul :class="['menu menu-horizontal bg-secondary']">
-      <li
-        v-for="(onClick, text) in buttons"
-        :key="text"
+    <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
+      <base-button>{{ constants.BTN_MENU }}</base-button>
+      <ul
+        tabIndex="{0}"
+        :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']"
       >
-        <base-button
-          :class="classes"
-          @click="onClick"
+        <li
+          v-for="(onClick, text) in buttons"
+          :key="text"
+          @click.prevent="onClick"
         >
-          {{ text }}
-        </base-button>
-      </li>
-    </ul>
+          <a>{{ text }}</a>
+        </li>
+      </ul>
+    </div>
   </header>
 </template>
