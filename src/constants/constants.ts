@@ -2,11 +2,11 @@ import { TOTALS } from 'moneyfunx';
 
 const BTN_AMORTIZATION_TABLES = "Amortization Tables";
 const BTN_CLEAR = 'Clear';
+const BTN_COPY = 'Copy';
 const BTN_CREATE = 'Create';
 const BTN_DELETE = 'Delete';
 const BTN_DETAILS = 'Details';
 const BTN_EDIT = 'Edit';
-const BTN_EXPORT = 'Export';
 const BTN_LOAD = 'Load';
 const BTN_MENU = 'Menu';
 const BTN_OFF = 'Off';
@@ -100,11 +100,11 @@ const LOCALE_CURRENCY = {
 export default Object.freeze({
   BTN_AMORTIZATION_TABLES,
   BTN_CLEAR,
+  BTN_COPY,
   BTN_CREATE,
   BTN_DELETE,
   BTN_DETAILS,
   BTN_EDIT,
-  BTN_EXPORT,
   BTN_LOAD,
   BTN_MENU,
   BTN_OFF,
