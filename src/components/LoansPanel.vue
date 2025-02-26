@@ -6,12 +6,12 @@ import {
   onUpdated,
 } from 'vue';
 
-import LoanCard from './LoanCard.vue';
-import ManagementPanel from './ManagementPanel.vue';
-import constants from '../constants/constants';
-import { fillHeight } from '../functions/viewport';
-import useCoreStore from '../stores/core';
-import { Button } from '../types/app';
+import LoanCard from '@/components/LoanCard.vue';
+import ManagementPanel from '@/components/ManagementPanel.vue';
+import constants from '@/constants/constants';
+import { fillHeight } from '@/functions/viewport';
+import useCoreStore from '@/stores/core';
+import { Button } from '@/types/app';
 
 const coreState = useCoreStore();
 

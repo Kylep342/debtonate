@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import BaseCard from './BaseCard.vue';
+import BaseCard from '@/components/ui/BaseCard.vue';
 
 defineProps<{ bodyClasses?: Array<string> }>();
 const isCollapsed = ref<Boolean>(false);

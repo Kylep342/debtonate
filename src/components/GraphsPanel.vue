@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
-import { GraphConfig } from '../types/graph';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
+import { GraphConfig } from '@/types/graph';
 
 const coreState = useCoreStore();
 

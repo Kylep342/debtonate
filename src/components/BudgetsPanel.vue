@@ -6,12 +6,12 @@ import {
   onMounted,
 } from 'vue';
 
-import BudgetCard from './BudgetCard.vue';
-import ManagementPanel from './ManagementPanel.vue';
-import constants from '../constants/constants';
-import { fillHeight } from '../functions/viewport';
-import useCoreStore from '../stores/core';
-import { MonthlyBudget } from '../types/core';
+import BudgetCard from '@/components/BudgetCard.vue';
+import ManagementPanel from '@/components/ManagementPanel.vue';
+import constants from '@/constants/constants';
+import { fillHeight } from '@/functions/viewport';
+import useCoreStore from '@/stores/core';
+import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 

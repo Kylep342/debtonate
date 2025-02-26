@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useCoreStore from '../stores/core';
+import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore()
 </script>

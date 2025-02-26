@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from './AmortizationTable.vue';
-import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
-import { MonthlyBudget } from '../types/core';
+import AmortizationTable from '@/components/AmortizationTable.vue';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
+import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 const currentBudget = ref<MonthlyBudget>();

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { PaymentSchedule } from 'moneyfunx';
 
-import useCoreStore from '../stores/core';
+import useCoreStore from '@/stores/core';
 
 defineProps<{
   paymentSchedule: PaymentSchedule,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import RefinancingTable from './RefinancingTable.vue';
-import useCoreStore from '../stores/core';
+import RefinancingTable from '@/components/RefinancingTable.vue';
+import useCoreStore from '@/stores/core';
 
 defineProps<{ parentId: string }>();
 

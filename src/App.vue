@@ -1,20 +1,20 @@
 <script setup>
 import { watch } from 'vue';
 
-import BudgetDetailsPanel from './components/BudgetDetailsPanel.vue';
-import BudgetForm from './components/BudgetForm.vue';
-import BudgetsPanel from './components/BudgetsPanel.vue';
-import FooterBar from './components/FooterBar.vue';
-import GraphsPanel from './components/GraphsPanel.vue';
-import HeaderBar from './components/HeaderBar.vue';
-import LoanDetailsPanel from './components/LoanDetailsPanel.vue';
-import LoanForm from './components/LoanForm.vue';
-import LoansPanel from './components/LoansPanel.vue';
-import OptionsForm from './components/OptionsForm.vue';
-import RefinancingForm from './components/RefinancingForm.vue';
-import SiteIntro from './components/SiteIntro.vue';
-import constants from './constants/constants';
-import useCoreStore from './stores/core';
+import BudgetDetailsPanel from '@/components/BudgetDetailsPanel.vue';
+import BudgetForm from '@/components/forms/BudgetForm.vue';
+import BudgetsPanel from '@/components/BudgetsPanel.vue';
+import FooterBar from '@/components/FooterBar.vue';
+import GraphsPanel from '@/components/GraphsPanel.vue';
+import HeaderBar from '@/components/HeaderBar.vue';
+import LoanDetailsPanel from '@/components/LoanDetailsPanel.vue';
+import LoanForm from '@/components/forms/LoanForm.vue';
+import LoansPanel from '@/components/LoansPanel.vue';
+import OptionsForm from '@/components/forms/OptionsForm.vue';
+import RefinancingForm from '@/components/forms/RefinancingForm.vue';
+import SiteIntro from '@/components/SiteIntro.vue';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 

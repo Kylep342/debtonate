@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import useCoreStore from '../stores/core';
-import constants from '../constants/constants';
+import useCoreStore from '@/stores/core';
+import constants from '@/constants/constants';
 
 const coreState = useCoreStore();
 

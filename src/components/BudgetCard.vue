@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
-import { MonthlyBudget } from '../types/core';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
+import { MonthlyBudget } from '@/types/core';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
 

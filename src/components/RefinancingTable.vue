@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import { Loan, LoansPaymentSummary } from 'moneyfunx';
 
-import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
-import { PaymentScenario } from '../types/core';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
+import { PaymentScenario } from '@/types/core';
 
 const props = defineProps<{
   parentId: string,

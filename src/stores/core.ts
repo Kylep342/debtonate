@@ -3,19 +3,19 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import constants from '../constants/constants';
-import keys from '../constants/keys';
+import constants from '@/constants/constants';
+import keys from '@/constants/keys';
 import {
   Budget,
   MonthlyBudget,
   PaymentScenario,
-} from '../types/core';
+} from '@/types/core';
 import {
   Graph,
   GraphConfig,
   Graphs,
   Point,
-} from '../types/graph';
+} from '@/types/graph';
 
 export default defineStore('core', () => {
   const budgetDetailsPanelActive = ref<boolean>(false);

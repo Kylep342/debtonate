@@ -2,10 +2,10 @@
 import { ILoan } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from './AmortizationTable.vue';
-import RefinancingTable from './RefinancingTable.vue';
-import constants from '../constants/constants';
-import useCoreStore from '../stores/core';
+import AmortizationTable from '@/components/AmortizationTable.vue';
+import RefinancingTable from '@/components/RefinancingTable.vue';
+import constants from '@/constants/constants';
+import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 const currentLoan = ref<ILoan>();

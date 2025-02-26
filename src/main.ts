@@ -1,19 +1,19 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
-import App from './App.vue';
-import BaseAlert from './components/ui/BaseAlert.vue';
-import BaseButton from './components/ui/BaseButton.vue';
-import BaseCard from './components/ui/BaseCard.vue';
-import BaseGraph from './components/ui/BaseGraph.vue';
-import BaseMenu from './components/ui/BaseMenu.vue';
-import BaseModal from './components/ui/BaseModal.vue';
-import BaseTable from './components/ui/BaseTable.vue';
-import BaseTabs from './components/ui/BaseTabs.vue';
-import CollapsibleCard from './components/ui/CollapsibleCard.vue';
+import App from '@/App.vue';
+import BaseAlert from '@/components/ui/BaseAlert.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseCard from '@/components/ui/BaseCard.vue';
+import BaseGraph from '@/components/ui/BaseGraph.vue';
+import BaseMenu from '@/components/ui/BaseMenu.vue';
+import BaseModal from '@/components/ui/BaseModal.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
+import BaseTabs from '@/components/ui/BaseTabs.vue';
+import CollapsibleCard from '@/components/ui/CollapsibleCard.vue';
 
-import './assets/main.css';
-import './assets/built.css';
+import '@/assets/main.css';
+import '@/assets/built.css';
 
 const app = createApp(App);
 const pinia = createPinia();
