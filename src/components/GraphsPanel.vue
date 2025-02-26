@@ -16,6 +16,11 @@ const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
 
+const buttons = Object.keys(coreState.graphs).map((graphId) => ({
+  text: graphId,
+  onClick: () => setViewedGraphId(graphId),
+}));
+
 watch(() => coreState.loans, async (value) => {
   if (!value.map((loan) => loan.id).includes(viewedLoanId.value)) {
     setViewedLoanId(constants.TOTALS);
@@ -30,21 +35,10 @@ watch(() => coreState.loans, async (value) => {
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ constants.GRAPHS }} - {{ viewedGraphId }}
         </h2>
-        <div className="dropdown dropdown-bottom dropdown-end">
-          <base-button>{{ constants.BTN_SELECT }}</base-button>
-          <ul
-            tabIndex="{0}"
-            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-          >
-            <li
-              v-for="(graphId) in Object.keys(coreState.graphs)"
-              :key="graphId"
-              @click="setViewedGraphId(graphId)"
-            >
-              <a>{{ graphId }}</a>
-            </li>
-          </ul>
-        </div>
+        <base-menu
+          :menu="constants.BTN_SELECT"
+          :buttons="buttons"
+        />
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">

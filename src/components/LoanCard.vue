@@ -16,20 +16,33 @@ const loanInterestRate = computed<string>(() => `${coreState.Percent(props.loan.
 const loanMinPayment = computed<string>(() => `${coreState.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed<string>(() => `${coreState.Money(props.loan.principal)}`);
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
-const loanFees = computed<string>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : undefined);
+const loanFees = computed<string|null>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : null);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed(() => ({
-  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewLoan : alertButtonIsDisabled,
-  [constants.BTN_REFINANCE]: coreState.loans.length ? coreState.refinanceLoan : alertButtonIsDisabled,
-}));
+const baseButtons = computed(() => ([
+  {
+    text: constants.BTN_DETAILS,
+    onClick: () => coreState.loans.length ? coreState.viewLoan(props.loan.id) : alertButtonIsDisabled(),
+  },
+  {
+    text: constants.BTN_REFINANCE,
+    onClick: () => coreState.loans.length ? coreState.refinanceLoan(props.loan.id) : alertButtonIsDisabled(),
+  },
+]));
 
-const editButtons = computed(() => ({
+
+const editButtons = computed(() => ([
   ...baseButtons.value,
-  [constants.BTN_EDIT]: coreState.editLoan,
-  [constants.BTN_DELETE]: coreState.deleteLoan,
-}));
+  {
+    text: constants.BTN_EDIT,
+    onClick: () => coreState.editLoan(props.loan.id),
+  },
+  {
+    text: constants.BTN_DELETE,
+    onClick: () => coreState.deleteLoan(props.loan.id),
+  },
+]));
 
 const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
@@ -42,21 +55,10 @@ const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value :
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getLoanName(loan.id) }}
           </h2>
-          <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
-            <base-button>{{ constants.BTN_MENU }}</base-button>
-            <ul
-              tabIndex="{0}"
-              :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']"
-            >
-              <li
-                v-for="(onClick, text) in getButtons(loan.id)"
-                :key="text"
-                @click.prevent="onClick(loan.id)"
-              >
-                <a>{{ text }}</a>
-              </li>
-            </ul>
-          </div>
+        <base-menu
+          :menu="constants.BTN_MENU"
+          :buttons="getButtons(loan.id)"
+        />
         </div>
       </div>
     </template>

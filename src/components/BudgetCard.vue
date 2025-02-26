@@ -19,15 +19,24 @@ const budgetTotalInterest = computed<string>(() => `${coreState.Money(totalsAsAL
 const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed(() => ({
-  [constants.BTN_DETAILS]: coreState.loans.length ? coreState.viewBudget : alertButtonIsDisabled
-}));
+const baseButtons = computed(() => ([
+  {
+    text: constants.BTN_DETAILS,
+    onClick: () => coreState.loans.length ? coreState.viewBudget(props.budget.id) : alertButtonIsDisabled(),
+  },
+]));
 
-const editButtons = computed(() => ({
+const editButtons = computed(() => ([
   ...baseButtons.value,
-  [constants.BTN_EDIT]: coreState.editBudget,
-  [constants.BTN_DELETE]: coreState.deleteBudget,
-}));
+  {
+    text: constants.BTN_EDIT,
+    onClick: () => coreState.editBudget(props.budget.id),
+  },
+  {
+    text: constants.BTN_DELETE,
+    onClick: () => coreState.deleteBudget(props.budget.id),
+  },
+]));
 
 const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
 </script>
@@ -40,20 +49,10 @@ const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons.va
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getBudgetName(budget.id) }}
           </h2>
-          <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
-            <base-button>{{ constants.BTN_MENU }}</base-button>
-            <ul
-              tabIndex="{0}"
-              :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']">
-              <li
-                v-for="(onClick, text) in getButtons(budget.id)"
-                :key="text"
-                @click.prevent="onClick(budget.id)"
-              >
-                <a>{{ text }}</a>
-              </li>
-            </ul>
-          </div>
+          <base-menu
+            :menu="constants.BTN_MENU"
+            :buttons="getButtons(budget.id)"
+          />
         </div>
       </div>
     </template>
