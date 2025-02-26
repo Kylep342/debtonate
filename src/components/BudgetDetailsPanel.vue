@@ -8,7 +8,7 @@ import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 const currentBudget = ref<MonthlyBudget>();
-const viewedLoanId = ref<String>(constants.TOTALS);
+const viewedLoanId = ref<string>(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
@@ -16,7 +16,7 @@ const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthl
     + `(+${coreState.Money(monthlyBudget.relative)}/month)`
   : constants.BUDGET_DETAILS;
 
-const title = computed<String>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
+const title = computed<string>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
 
 const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
 const setViewedLoanId = (itemId) => {

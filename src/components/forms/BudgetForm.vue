@@ -8,11 +8,11 @@ const coreState = useCoreStore();
 
 const amount = ref<number|null>(null);
 
-const createButtonEnabled = computed<Boolean>(
+const createButtonEnabled = computed<boolean>(
   () => !Number.isNaN(amount.value) && amount.value > 0
 );
 
-const createBudgetButtonText = computed<String>(() => (
+const createBudgetButtonText = computed<string>(() => (
   coreState.currentBudgetId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE

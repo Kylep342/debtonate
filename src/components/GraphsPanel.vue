@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
+import { Button } from '@/types/app';
 import { GraphConfig } from '@/types/graph';
 
 const coreState = useCoreStore();
@@ -16,7 +17,7 @@ const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
 const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
 
-const buttons = Object.keys(coreState.graphs).map((graphId) => ({
+const buttons: Array<Button> = Object.keys(coreState.graphs).map((graphId) => ({
   text: graphId,
   onClick: () => setViewedGraphId(graphId),
 }));

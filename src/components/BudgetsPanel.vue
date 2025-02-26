@@ -11,6 +11,7 @@ import ManagementPanel from '@/components/ManagementPanel.vue';
 import constants from '@/constants/constants';
 import { fillHeight } from '@/functions/viewport';
 import useCoreStore from '@/stores/core';
+import { Button } from '@/types/app';
 import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
@@ -26,7 +27,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
 
 const scrollContainer = ref(null);
 
-const buttons = [
+const buttons: Array<Button> = [
   {
     text: constants.BTN_CREATE,
     onClick: coreState.openBudgetForm,

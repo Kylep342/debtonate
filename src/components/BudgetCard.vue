@@ -3,6 +3,7 @@ import { computed } from 'vue';
 
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
+import { Button } from '@/types/app';
 import { MonthlyBudget } from '@/types/core';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
@@ -16,17 +17,17 @@ const budgetExtra = computed<string>(() => `${coreState.Money(props.budget.relat
 const budgetPayments = computed<number>(() => coreState.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
 const budgetTotalInterest = computed<string>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
 
-const paymentsLabel = computed<String>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
+const paymentsLabel = computed<string>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed(() => ([
+const baseButtons = computed<Array<Button>>(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => coreState.loans.length ? coreState.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
 
-const editButtons = computed(() => ([
+const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -38,7 +39,7 @@ const editButtons = computed(() => ([
   },
 ]));
 
-const getButtons = (budgetId) => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
+const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
 </script>
 
 <template>

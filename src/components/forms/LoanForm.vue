@@ -13,13 +13,13 @@ const name = ref<string|null>(null);
 const currentBalance = ref<number|null>(null);
 const fees = ref<number|null>(null);
 
-const createButtonEnabled = computed<Boolean>(
+const createButtonEnabled = computed<boolean>(
   () => [principal.value, interestRate.value, termInYears.value].every(
     (input) => !Number.isNaN(input) && input > 0,
   ),
 );
 
-const createLoanButtonText = computed<String>(() => (
+const createLoanButtonText = computed<string>(() => (
   coreState.currentLoanId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE

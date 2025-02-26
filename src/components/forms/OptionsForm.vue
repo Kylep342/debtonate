@@ -6,16 +6,16 @@ import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 
-const _currency = ref<String>(coreState.currency);
-const _language = ref<String>(coreState.language);
-const roundingScale = ref<Number>(coreState.roundingScale);
+const _currency = ref<string>(coreState.currency);
+const _language = ref<string>(coreState.language);
+const roundingScale = ref<number>(coreState.roundingScale);
 
-const sortedCurrencies = computed<Array<String>>(() => coreState.currencies.toSorted());
-const sortedLanguages = computed<Array<String>>(() => coreState.languages.toSorted());
-const reducePaymentsExample = computed<String>(
+const sortedCurrencies = computed<Array<string>>(() => coreState.currencies.toSorted());
+const sortedLanguages = computed<Array<string>>(() => coreState.languages.toSorted());
+const reducePaymentsExample = computed<string>(
   () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
 );
-const refinancingUseHighestPaymentExample = computed<String>(() => {
+const refinancingUseHighestPaymentExample = computed<string>(() => {
     if (coreState.loans.length) {
       const firstLoan = coreState.loans[0]
       const basePayment = firstLoan.minPayment;
@@ -25,7 +25,7 @@ const refinancingUseHighestPaymentExample = computed<String>(() => {
     }
     return '';
 });
-const repaymentPriorityExample = computed<String>(
+const repaymentPriorityExample = computed<string>(
   () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')})`) : ''),
 );
 

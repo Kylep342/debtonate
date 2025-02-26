@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import BaseCard from '@/components/ui/BaseCard.vue';
 
 defineProps<{ bodyClasses?: Array<string> }>();
-const isCollapsed = ref<Boolean>(false);
+const isCollapsed = ref<boolean>(false);
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;

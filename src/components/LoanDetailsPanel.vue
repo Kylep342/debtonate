@@ -9,14 +9,14 @@ import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 const currentLoan = ref<ILoan>();
-const viewedBudgetId = ref<String>(constants.DEFAULT);
+const viewedBudgetId = ref<string>(constants.DEFAULT);
 
 const buildLoanDetailsTitle = (loan: ILoan): string => loan
   ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
     + `${coreState.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
 
-const title = computed<String>(() => buildLoanDetailsTitle(currentLoan.value!));
+const title = computed<string>(() => buildLoanDetailsTitle(currentLoan.value!));
 
 const isViewedBudgetId = (itemId) => viewedBudgetId.value === itemId;
 const setViewedBudgetId = (itemId) => {

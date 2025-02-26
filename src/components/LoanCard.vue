@@ -4,6 +4,7 @@ import { ILoan } from 'moneyfunx';
 
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
+import { Button } from '@/types/app';
 
 const props = defineProps<{
   loan: ILoan
@@ -20,7 +21,7 @@ const loanFees = computed<string|null>(() => props.loan.fees ? `${coreState.Mone
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed(() => ([
+const baseButtons = computed<Array<Button>>(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => coreState.loans.length ? coreState.viewLoan(props.loan.id) : alertButtonIsDisabled(),
@@ -32,7 +33,7 @@ const baseButtons = computed(() => ([
 ]));
 
 
-const editButtons = computed(() => ([
+const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -44,7 +45,7 @@ const editButtons = computed(() => ([
   },
 ]));
 
-const getButtons = (loanId) => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
+const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
