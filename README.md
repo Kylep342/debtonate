@@ -1,6 +1,6 @@
 # Debtonate
 
-![build status](https://github.com/Kylep342/debtonate/workflows/deploy.yml/badge.svg)
+![Live Site](https://github.com/Kylep342/debtonate/actions/workflows/deploy.yml/badge.svg)
 
 
 Debtonate is a simple, visual, data-rich financial calculator for budgeting repayment of debt
