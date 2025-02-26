@@ -8,13 +8,13 @@ const exportState = () => navigator.clipboard.writeText(
   JSON.stringify(coreState.exportState())
 );
 
-const buttons = {
-  [constants.BTN_OPTIONS]: coreState.openOptionsForm,
-  [constants.BTN_LOAD]: coreState.loadState,
-  [constants.BTN_SAVE]: coreState.saveState,
-  [constants.BTN_CLEAR]: coreState.clearState,
-  [constants.BTN_EXPORT]: exportState,
-}
+const buttons = [
+  {text: constants.BTN_OPTIONS, onClick: coreState.openOptionsForm},
+  {text: constants.BTN_LOAD, onClick: coreState.loadState},
+  {text: constants.BTN_SAVE, onClick: coreState.saveState},
+  {text: constants.BTN_CLEAR, onClick: coreState.clearState},
+  {text: constants.BTN_EXPORT, onClick: exportState},
+]
 </script>
 
 <template>
@@ -26,20 +26,9 @@ const buttons = {
       <img src="/icon.png">
       <h1>Debtonate</h1>
     </div>
-    <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
-      <base-button>{{ constants.BTN_MENU }}</base-button>
-      <ul
-        tabIndex="{0}"
-        :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']"
-      >
-        <li
-          v-for="(onClick, text) in buttons"
-          :key="text"
-          @click.prevent="onClick"
-        >
-          <a>{{ text }}</a>
-        </li>
-      </ul>
-    </div>
+    <base-menu
+      :menu="constants.BTN_MENU"
+      :buttons="buttons"
+    />
   </header>
 </template>
