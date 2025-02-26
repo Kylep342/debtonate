@@ -79,6 +79,7 @@ const exit = () => {
           <span :class="['label-text']">Principal</span>
         </div>
         <input
+          :id="`${constants.REFINANCING_FORM_ID}-current-balance`"
           v-model.number="currentBalance"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
@@ -89,6 +90,7 @@ const exit = () => {
           <span :class="['label-text']">Interest Rate</span>
         </div>
         <input
+          :id="`${constants.REFINANCING_FORM_ID}-interest-rate`"
           v-model.number="interestRate"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
@@ -99,6 +101,7 @@ const exit = () => {
           <span :class="['label-text']">Term (In Years)</span>
         </div>
         <input
+          :id="`${constants.REFINANCING_FORM_ID}-term-in-years`"
           v-model.number="termInYears"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"
@@ -108,6 +111,7 @@ const exit = () => {
           <span :class="['label-text']">Name (Optional)</span>
         </div>
         <input
+          :id="`${constants.REFINANCING_FORM_ID}-name`"
           v-model="name"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="string"
@@ -117,6 +121,7 @@ const exit = () => {
           <span :class="['label-text']">Fees (Optional)</span>
         </div>
         <input
+          :id="`${constants.REFINANCING_FORM_ID}-fees`"
           v-model.number="fees"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"

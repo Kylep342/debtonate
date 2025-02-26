@@ -66,6 +66,7 @@ const exit = () => {
           <span :class="['label-text']">Budget</span>
         </div>
         <input
+          :id="`${constants.BUDGET_FORM_ID}-amount`"
           v-model.number="amount"
           :class="['input input-bordered input-secondary w-full max-ws']"
           type="number"

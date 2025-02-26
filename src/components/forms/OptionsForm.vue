@@ -173,6 +173,7 @@ watch(() => roundingScale.value, async (newValue) => {
                 <span :class="['label-text']">scale:</span>
               </div>
               <input
+                :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
                 v-model.number="roundingScale"
                 :class="['input input-bordered input-secondary w-full max-ws']"
                 type="number"
@@ -236,6 +237,7 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardTitleActions>
             <div>
               <select
+                :id="`${constants.OPTIONS_FORM_ID}-currency`"
                 v-model="_currency"
                 class="select select-bordered w-full max-w-xs"
               >
@@ -262,6 +264,7 @@ watch(() => roundingScale.value, async (newValue) => {
           <template #cardTitleActions>
             <div>
               <select
+                :id="`${constants.OPTIONS_FORM_ID}-language`"
                 v-model="_language"
                 class="select select-bordered w-full max-w-xs"
               >
