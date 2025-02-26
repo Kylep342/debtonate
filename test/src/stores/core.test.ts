@@ -137,10 +137,10 @@ describe('Core Store', () => {
 
     it('reduces payments', async () => {
       const coreState = useCoreStore();
-      expect(coreState.reducePayments).toBe(false);
+      expect(coreState.reducePayments).toBe(true);
 
       coreState.toggleReducePayments();
-      expect(coreState.reducePayments).toBe(true);
+      expect(coreState.reducePayments).toBe(false);
     })
   });
 
