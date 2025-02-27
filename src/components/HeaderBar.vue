@@ -20,7 +20,7 @@ const buttons: Array<Button> = [
 
 <template>
   <header
-    id="headerBar"
+    :id="'header-bar'"
     :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']"
   >
     <div :class="['flex-1']">

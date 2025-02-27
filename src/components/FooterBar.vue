@@ -1,6 +1,6 @@
 <template>
   <footer
-    :id="['footer']"
+    :id="'footer-bar'"
     :class="['bg-secondary', 'sticky', 'bottom-0', 'z-30']"
   >
     <div :class="['flex-1', 'text-right', 'pr-4']">
