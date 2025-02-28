@@ -17,7 +17,7 @@ const loanInterestRate = computed<string>(() => `${coreState.Percent(props.loan.
 const loanMinPayment = computed<string>(() => `${coreState.Money(props.loan.minPayment)}/month`);
 const loanPrincipal = computed<string>(() => `${coreState.Money(props.loan.principal)}`);
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
-const loanFees = computed<string|null>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : null);
+const loanFees = computed<string | null>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : null);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -56,10 +56,7 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getLoanName(loan.id) }}
           </h2>
-        <base-menu
-          :menu="constants.BTN_MENU"
-          :buttons="getButtons(loan.id)"
-        />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
         </div>
       </div>
     </template>

@@ -50,10 +50,7 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
         </template>
         <template #body>
           <tbody>
-            <tr
-              v-for="(record, rowno) in paymentSchedule.amortizationSchedule"
-              :key="rowno"
-            >
+            <tr v-for="(record, rowno) in paymentSchedule.amortizationSchedule" :key="rowno">
               <td :class="['text-center']">
                 {{ coreState.Period(record.period, true) }}
               </td>
@@ -82,7 +79,7 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
                 <b>{{
                   coreState.Money(
                     paymentSchedule.lifetimePrincipal +
-                      paymentSchedule.lifetimeInterest
+                    paymentSchedule.lifetimeInterest
                   )
                 }}</b>
               </td>

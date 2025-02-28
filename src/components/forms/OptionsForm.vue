@@ -16,17 +16,17 @@ const reducePaymentsExample = computed<string>(
   () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
 );
 const refinancingUseHighestPaymentExample = computed<string>(() => {
-    if (coreState.loans.length) {
-      const firstLoan = coreState.loans[0]
-      const basePayment = firstLoan.minPayment;
-      const hypotheticalPayment = Math.max(firstLoan.minPayment - (firstLoan.minPayment % 10), 100);
-      const usedPayment = coreState.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
-      return `(A scenario for ${coreState.getLoanName(firstLoan.id)} [${coreState.Money(basePayment)}] with a minimum payment of ${coreState.Money(hypotheticalPayment)} uses ${coreState.Money(usedPayment)})`;
-    }
-    return '';
+  if (coreState.loans.length) {
+    const firstLoan = coreState.loans[0]
+    const basePayment = firstLoan.minPayment;
+    const hypotheticalPayment = Math.max(firstLoan.minPayment - (firstLoan.minPayment % 10), 100);
+    const usedPayment = coreState.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
+    return `(A scenario for ${coreState.getLoanName(firstLoan.id)} [${coreState.Money(basePayment)}] with a minimum payment of ${coreState.Money(hypotheticalPayment)} uses ${coreState.Money(usedPayment)})`;
+  }
+  return '';
 });
 const repaymentPriorityExample = computed<string>(
-  () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join( ', ')})`) : ''),
+  () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join(', ')})`) : ''),
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -46,19 +46,12 @@ watch(() => roundingScale.value, async (newValue) => {
 </script>
 
 <template>
-  <base-modal
-    :id="constants.OPTIONS_FORM_ID"
-    :body-classes="['overflow-y-auto']"
-    @exit="coreState.exitOptionsForm"
-  >
+  <base-modal :id="constants.OPTIONS_FORM_ID" :body-classes="['overflow-y-auto']" @exit="coreState.exitOptionsForm">
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button
-        :class="['btn btn-circle btn-ghost']"
-        @click="coreState.exitOptionsForm"
-      >
+      <base-button :class="['btn btn-circle btn-ghost']" @click="coreState.exitOptionsForm">
         x
       </base-button>
     </template>
@@ -74,16 +67,10 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button
-                :class="buttonStyle(!coreState.snowballSort)"
-                @click="coreState.toggleAvalancheSort"
-              >
+              <base-button :class="buttonStyle(!coreState.snowballSort)" @click="coreState.toggleAvalancheSort">
                 Avalanche
               </base-button>
-              <base-button
-                :class="buttonStyle(coreState.snowballSort)"
-                @click="coreState.toggleSnowballSort"
-              >
+              <base-button :class="buttonStyle(coreState.snowballSort)" @click="coreState.toggleSnowballSort">
                 Snowball
               </base-button>
             </div>
@@ -107,10 +94,7 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button
-                :class="buttonStyle(coreState.reducePayments)"
-                @click="coreState.toggleReducePayments"
-              >
+              <base-button :class="buttonStyle(coreState.reducePayments)" @click="coreState.toggleReducePayments">
                 {{
                   buttonText(coreState.reducePayments) }}
               </base-button>
@@ -137,10 +121,8 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button
-                :class="buttonStyle(coreState.refinancingUseHighestPayment)"
-                @click="coreState.toggleRefinancingUseHighestPayment"
-              >
+              <base-button :class="buttonStyle(coreState.refinancingUseHighestPayment)"
+                @click="coreState.toggleRefinancingUseHighestPayment">
                 {{
                   buttonText(coreState.refinancingUseHighestPayment) }}
               </base-button>
@@ -172,18 +154,10 @@ watch(() => roundingScale.value, async (newValue) => {
               <div :class="['label']">
                 <span :class="['label-text']">scale:</span>
               </div>
-              <input
-                :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
-                v-model.number="roundingScale"
-                :class="['input input-bordered input-secondary w-full max-ws']"
-                type="number"
-                step="0.01"
-                label="scale"
-              >
-              <base-button
-                :class="buttonStyle(coreState.roundingEnabled)"
-                @click="coreState.toggleRounding(roundingScale)"
-              >
+              <input :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`" v-model.number="roundingScale"
+                :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="scale">
+              <base-button :class="buttonStyle(coreState.roundingEnabled)"
+                @click="coreState.toggleRounding(roundingScale)">
                 {{ buttonText(coreState.roundingEnabled) }}
               </base-button>
             </div>
@@ -209,10 +183,7 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button
-                :class="buttonStyle(coreState.periodsAsDates)"
-                @click="coreState.togglePeriodsAsDates"
-              >
+              <base-button :class="buttonStyle(coreState.periodsAsDates)" @click="coreState.togglePeriodsAsDates">
                 {{ buttonText(coreState.periodsAsDates) }}
               </base-button>
             </div>
@@ -236,16 +207,9 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <select
-                :id="`${constants.OPTIONS_FORM_ID}-currency`"
-                v-model="_currency"
-                class="select select-bordered w-full max-w-xs"
-              >
-                <option
-                  v-for="currency in sortedCurrencies"
-                  :key="currency"
-                  :value="currency"
-                >
+              <select :id="`${constants.OPTIONS_FORM_ID}-currency`" v-model="_currency"
+                class="select select-bordered w-full max-w-xs">
+                <option v-for="currency in sortedCurrencies" :key="currency" :value="currency">
                   {{ currency }}
                 </option>
               </select>
@@ -263,16 +227,9 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <select
-                :id="`${constants.OPTIONS_FORM_ID}-language`"
-                v-model="_language"
-                class="select select-bordered w-full max-w-xs"
-              >
-                <option
-                  v-for="language in sortedLanguages"
-                  :key="language"
-                  :value="language"
-                >
+              <select :id="`${constants.OPTIONS_FORM_ID}-language`" v-model="_language"
+                class="select select-bordered w-full max-w-xs">
+                <option v-for="language in sortedLanguages" :key="language" :value="language">
                   {{ language }}
                 </option>
               </select>

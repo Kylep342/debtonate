@@ -6,7 +6,7 @@ import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 
-const amount = ref<number|null>(null);
+const amount = ref<number | null>(null);
 
 const createButtonEnabled = computed<boolean>(
   () => !Number.isNaN(amount.value) && amount.value > 0
@@ -45,18 +45,12 @@ const exit = () => {
 </script>
 
 <template>
-  <base-modal
-    :id="constants.BUDGET_FORM_ID"
-    @exit="exit"
-  >
+  <base-modal :id="constants.BUDGET_FORM_ID" @exit="exit">
     <template #header>
       <h2>{{ coreState.budgetFormTitle }}</h2>
     </template>
     <template #headerActions>
-      <base-button
-        :class="['btn btn-circle btn-ghost']"
-        @click="exit"
-      >
+      <base-button :class="['btn btn-circle btn-ghost']" @click="exit">
         x
       </base-button>
     </template>
@@ -65,21 +59,12 @@ const exit = () => {
         <div :class="['label']">
           <span :class="['label-text']">Budget</span>
         </div>
-        <input
-          :id="`${constants.BUDGET_FORM_ID}-amount`"
-          v-model.number="amount"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          label="Budget"
-        >
+        <input :id="`${constants.BUDGET_FORM_ID}-amount`" v-model.number="amount"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Budget">
       </div>
     </template>
     <template #actions>
-      <base-button
-        :disabled="!createButtonEnabled"
-        :class="'btn-success'"
-        @click="createBudget"
-      >
+      <base-button :disabled="!createButtonEnabled" :class="'btn-success'" @click="createBudget">
         {{ createBudgetButtonText }}
       </base-button>
     </template>

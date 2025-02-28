@@ -6,12 +6,12 @@ import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 
-const principal = ref<number|null>(null);
-const interestRate = ref<number|null>(null);
-const termInYears = ref<number|null>(null);
-const name = ref<string|null>(null);
-const currentBalance = ref<number|null>(null);
-const fees = ref<number|null>(null);
+const principal = ref<number | null>(null);
+const interestRate = ref<number | null>(null);
+const termInYears = ref<number | null>(null);
+const name = ref<string | null>(null);
+const currentBalance = ref<number | null>(null);
+const fees = ref<number | null>(null);
 
 const createButtonEnabled = computed<boolean>(
   () => [principal.value, interestRate.value, termInYears.value].every(
@@ -69,20 +69,14 @@ const exit = () => {
 </script>
 
 <template>
-  <base-modal
-    :id="constants.LOAN_FORM_ID"
-    @exit="exit"
-  >
+  <base-modal :id="constants.LOAN_FORM_ID" @exit="exit">
     <template #header>
       <h2 :class="['pl-4']">
         {{ coreState.loanFormTitle }}
       </h2>
     </template>
     <template #headerActions>
-      <base-button
-        :class="['btn btn-circle btn-ghost']"
-        @click="exit"
-      >
+      <base-button :class="['btn btn-circle btn-ghost']" @click="exit">
         x
       </base-button>
     </template>
@@ -91,75 +85,39 @@ const exit = () => {
         <div :class="['label']">
           <span :class="['label-text']">Principal</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-principal`"
-          v-model.number="principal"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          step="0.01"
-          label="Principal"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-principal`" v-model.number="principal"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="Principal">
         <div :class="['label']">
           <span :class="['label-text']">Interest Rate</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-interest-rate`"
-          v-model.number="interestRate"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          step="0.01"
-          label="Interest Rate"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-interest-rate`" v-model.number="interestRate"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01"
+          label="Interest Rate">
         <div :class="['label']">
           <span :class="['label-text']">Term (In Years)</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-term-in-years`"
-          v-model.number="termInYears"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          label="Term In Years"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-term-in-years`" v-model.number="termInYears"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Term In Years">
         <div :class="['label']">
           <span :class="['label-text']">Name (Optional)</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-name`"
-          v-model="name"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="string"
-          label="Name"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-name`" v-model="name"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="string" label="Name">
         <div :class="['label']">
           <span :class="['label-text']">Current Balance (Optional)</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-current-balance`"
-          v-model.number="currentBalance"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          step="0.01"
-          label="Current Balance"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-current-balance`" v-model.number="currentBalance"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01"
+          label="Current Balance">
         <div :class="['label']">
           <span :class="['label-text']">Fees (Optional)</span>
         </div>
-        <input
-          :id="`${constants.LOAN_FORM_ID}-fees`"
-          v-model.number="fees"
-          :class="['input input-bordered input-secondary w-full max-ws']"
-          type="number"
-          step="0.01"
-          label="Fees"
-        >
+        <input :id="`${constants.LOAN_FORM_ID}-fees`" v-model.number="fees"
+          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="Fees">
       </div>
     </template>
     <template #actions>
-      <base-button
-        :disabled="!createButtonEnabled"
-        :class="'btn-success'"
-        @click="createLoan"
-      >
+      <base-button :disabled="!createButtonEnabled" :class="'btn-success'" @click="createLoan">
         {{ createLoanButtonText }}
       </base-button>
     </template>

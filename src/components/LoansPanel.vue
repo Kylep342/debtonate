@@ -40,33 +40,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <base-card
-    :id="'loanManagementPanel'"
-    :class="['bg-base-100', 'w-90', 'flex-none']"
-  >
+  <base-card :id="'loanManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
-      <ManagementPanel
-        :buttons="buttons"
-        :title="constants.LOANS"
-        :class="['sticky', 'fixed', 'border-b-2']"
-      />
+      <ManagementPanel :buttons="buttons" :title="constants.LOANS" :class="['sticky', 'fixed', 'border-b-2']" />
     </template>
     <template #cardBody>
-      <div
-        ref="scrollContainer"
-        :class="[
-          'border-r-2',
-          'overflow-y-auto',
-          'flex',
-          'flex-col',
-          'min-h-0'
-        ]"
-      >
+      <div ref="scrollContainer" :class="[
+        'border-r-2',
+        'overflow-y-auto',
+        'flex',
+        'flex-col',
+        'min-h-0'
+      ]">
         <ul>
-          <li
-            v-for="(loan) in coreState.loansWithTotals"
-            :key="loan.id"
-          >
+          <li v-for="(loan) in coreState.loansWithTotals" :key="loan.id">
             <LoanCard :loan="loan" />
           </li>
         </ul>

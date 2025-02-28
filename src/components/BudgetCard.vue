@@ -50,10 +50,7 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ coreState.getBudgetName(budget.id) }}
           </h2>
-          <base-menu
-            :menu="constants.BTN_MENU"
-            :buttons="getButtons(budget.id)"
-          />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
         </div>
       </div>
     </template>

@@ -82,10 +82,7 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
                 {{ coreState.getNumPayments(parentLoan.id, constants.DEFAULT) }}
               </td>
             </tr>
-            <tr
-              v-for="(scenario) in scenarios"
-              :key="scenario.id"
-            >
+            <tr v-for="(scenario) in scenarios" :key="scenario.id">
               <td>{{ scenario.name }}</td>
               <td>{{ coreState.Percent(scenario.annualRate * 100) }}</td>
               <td>{{ scenario.termInYears }}</td>
@@ -103,10 +100,7 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
                 {{ schedules[scenario.id].paymentSchedule.amortizationSchedule.length }}
               </td>
               <td>
-                <base-button
-                  :class="['btn-error']"
-                  @click="coreState.deleteRefinancingScenario(parentId, scenario.id)"
-                >
+                <base-button :class="['btn-error']" @click="coreState.deleteRefinancingScenario(parentId, scenario.id)">
                   {{ constants.BTN_DELETE }}
                 </base-button>
               </td>

@@ -36,25 +36,14 @@ watch(() => coreState.loans, async (value) => {
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ constants.GRAPHS }} - {{ viewedGraphId }}
         </h2>
-        <base-menu
-          :menu="constants.BTN_SELECT"
-          :buttons="buttons"
-        />
+        <base-menu :menu="constants.BTN_SELECT" :buttons="buttons" />
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">
-      <base-tabs
-        :get-item-name="coreState.getLoanName"
-        :pivot="coreState.loansWithTotals"
-        :is-viewed-item-id="isViewedLoanId"
-        :set-viewed-item-id="setViewedLoanId"
-      >
+      <base-tabs :get-item-name="coreState.getLoanName" :pivot="coreState.loansWithTotals"
+        :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
         <template #tabContent>
-          <base-graph
-            :key="viewedLoanId"
-            :graph="activeGraph"
-            :anchor-id="viewedLoanId"
-          />
+          <base-graph :key="viewedLoanId" :graph="activeGraph" :anchor-id="viewedLoanId" />
         </template>
       </base-tabs>
     </div>

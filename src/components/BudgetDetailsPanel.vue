@@ -12,8 +12,8 @@ const viewedLoanId = ref<string>(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
-    + `${coreState.Money(monthlyBudget.absolute)}/month `
-    + `(+${coreState.Money(monthlyBudget.relative)}/month)`
+  + `${coreState.Money(monthlyBudget.absolute)}/month `
+  + `(+${coreState.Money(monthlyBudget.relative)}/month)`
   : constants.BUDGET_DETAILS;
 
 const title = computed<string>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
@@ -35,44 +35,27 @@ watch(
 </script>
 
 <template>
-  <base-modal
-    :id="constants.BUDGET_DETAILS_ID"
-    @exit="coreState.unviewBudget"
-  >
+  <base-modal :id="constants.BUDGET_DETAILS_ID" @exit="coreState.unviewBudget">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button
-        :class="['btn btn-circle btn-ghost']"
-        @click="coreState.unviewBudget"
-      >
+      <base-button :class="['btn btn-circle btn-ghost']" @click="coreState.unviewBudget">
         x
       </base-button>
     </template>
     <template #body>
-      <div
-        v-if="currentBudget"
-        :class="['tabframe', 'w-auto']"
-      >
-        <base-tabs
-          :get-item-name="coreState.getLoanName"
-          :pivot="coreState.loansWithTotals"
-          :is-viewed-item-id="isViewedLoanId"
-          :set-viewed-item-id="setViewedLoanId"
-        >
+      <div v-if="currentBudget" :class="['tabframe', 'w-auto']">
+        <base-tabs :get-item-name="coreState.getLoanName" :pivot="coreState.loansWithTotals"
+          :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
           <template #tabContent>
-            <AmortizationTable
-              :payment-schedule="coreState.getPaymentSchedule(viewedLoanId, currentBudget.id)"
-              :title="coreState.buildAmortizationTableTitle(
+            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(viewedLoanId, currentBudget.id)" :title="coreState.buildAmortizationTableTitle(
+              coreState.getLoan(viewedLoanId),
+              currentBudget,
+            )" :subtitle="coreState.buildAmortizationTableSubtitle(
                 coreState.getLoan(viewedLoanId),
                 currentBudget,
-              )"
-              :subtitle="coreState.buildAmortizationTableSubtitle(
-                coreState.getLoan(viewedLoanId),
-                currentBudget,
-              )"
-            />
+              )" />
           </template>
         </base-tabs>
       </div>

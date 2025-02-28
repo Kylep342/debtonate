@@ -126,27 +126,20 @@ watch(
       {{ chart.subheader(anchorId) }}
     </h2>
     <svg id="graph" />
-    <div
-      id="tooltip"
-      ref="tooltipRef"
-      :style="{
-        left: tooltipPosition.left + 'px',
-        top: tooltipPosition.top + 'px',
-        opacity: tooltipContent ? 1 : 0
-      }"
-    >
-      <component
-        :is="tooltipContent"
-        v-bind="tooltipProps"
-      />
+    <div id="tooltip" ref="tooltipRef" :style="{
+      left: tooltipPosition.left + 'px',
+      top: tooltipPosition.top + 'px',
+      opacity: tooltipContent ? 1 : 0
+    }">
+      <component :is="tooltipContent" v-bind="tooltipProps" />
     </div>
   </div>
 </template>
 
 <style>
-  #tooltip {
-    pointer-events: none;
-    position: absolute;
-    transition: transform 0.1s ease;
-  }
+#tooltip {
+  pointer-events: none;
+  position: absolute;
+  transition: transform 0.1s ease;
+}
 </style>

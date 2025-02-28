@@ -14,28 +14,21 @@ const toggleCollapse = () => {
   <BaseCard :body-classes="bodyClasses">
     <template #cardTitle>
       <div class="flex items-center justify-between">
-        <span><slot name="cardTitle" /></span>
+        <span>
+          <slot name="cardTitle" />
+        </span>
         <div :class="['card-actions', 'justify-end', 'p-4']">
           <slot name="cardTitleActions" />
-          <base-button
-            :class="['btn-ghost']"
-            @click="toggleCollapse"
-          >
+          <base-button :class="['btn-ghost']" @click="toggleCollapse">
             {{ isCollapsed ? '+' : '-' }}
           </base-button>
         </div>
       </div>
     </template>
-    <template
-      v-if="!isCollapsed"
-      #cardBody
-    >
+    <template v-if="!isCollapsed" #cardBody>
       <slot name="cardBody" />
     </template>
-    <template
-      v-if="!isCollapsed"
-      #cardActions
-    >
+    <template v-if="!isCollapsed" #cardActions>
       <slot name="cardActions" />
     </template>
   </BaseCard>

@@ -13,14 +13,8 @@ const props = defineProps<{
       <h2>{{ props.title }}</h2>
     </div>
     <div :class="['flex-none']">
-      <div
-        v-for="(button) in buttons"
-        :key="button.text"
-      >
-        <base-button
-          :class="button.classes"
-          @click="button.onClick"
-        >
+      <div v-for="(button) in buttons" :key="button.text">
+        <base-button :class="button.classes" @click="button.onClick">
           {{ button.text }}
         </base-button>
       </div>
