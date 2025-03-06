@@ -3,9 +3,9 @@ import { Loan } from "moneyfunx";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import constants from '../../../src/constants/constants';
-import keys from '../../../src/constants/keys';
-import useCoreStore from '../../../src/stores/core';
+import constants from '@/constants/constants';
+import keys from '@/constants/keys';
+import useCoreStore from '@/stores/core';
 
 const Loans = () => [
   new Loan(

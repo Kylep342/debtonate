@@ -134,7 +134,7 @@ watch(() => roundingScale.value, async (newValue) => {
                 When enabled this uses the higher value between
                 a refinanced loan's minimum payment
                 and its base loan's minimum payment
-                for calculating totals for refinancing scenarios
+                when projecting refinancing scenarios
               </p>
               <br>
               <p>
