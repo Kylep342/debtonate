@@ -8,15 +8,15 @@ import {
 
 import BudgetCard from '@/components/BudgetCard.vue';
 import ManagementPanel from '@/components/ManagementPanel.vue';
+import { useResize } from '@/composables/useResize';
 import constants from '@/constants/constants';
-import { fillHeight } from '@/functions/viewport';
 import useCoreStore from '@/stores/core';
 import { Button } from '@/types/app';
 import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 
-const scrollContainer = ref(null);
+const { scrollContainer } = useResize('resizeBudgetsPanel');
 
 const buttons: Array<Button> = [
   {
@@ -35,19 +35,6 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
   ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
 ]);
-
-const resize = () => {
-  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
-};
-
-onMounted(() => {
-  resize()
-  window.addEventListener('resizeBudgetsPanel', resize);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resizeBudgetsPanel', resize);
-});
 </script>
 
 <template>

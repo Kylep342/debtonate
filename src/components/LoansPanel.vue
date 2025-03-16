@@ -8,14 +8,14 @@ import {
 
 import LoanCard from '@/components/LoanCard.vue';
 import ManagementPanel from '@/components/ManagementPanel.vue';
+import { useResize } from '@/composables/useResize';
 import constants from '@/constants/constants';
-import { fillHeight } from '@/functions/viewport';
 import useCoreStore from '@/stores/core';
 import { Button } from '@/types/app';
 
 const coreState = useCoreStore();
 
-const scrollContainer = ref(null);
+const { scrollContainer } = useResize('resizeLoansPanel');
 
 const buttons: Array<Button> = [
   {
@@ -24,19 +24,6 @@ const buttons: Array<Button> = [
     classes: ['btn-success', 'text-center'],
   },
 ];
-
-const resize = () => {
-  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
-};
-
-onMounted(() => {
-  resize()
-  window.addEventListener('resizeLoansPanel', resize);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resizeLoansPanel', resize);
-});
 </script>
 
 <template>
