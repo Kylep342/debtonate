@@ -16,15 +16,6 @@ import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 
-const defaultBudgetIndex = computed<number>(
-  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
-);
-const orderedBudgets = computed<MonthlyBudget[]>(() => [
-  coreState.monthlyBudgets[defaultBudgetIndex.value],
-  ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
-  ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
-]);
-
 const scrollContainer = ref(null);
 
 const buttons: Array<Button> = [
@@ -33,15 +24,29 @@ const buttons: Array<Button> = [
     onClick: coreState.openBudgetForm,
     classes: ['btn-success', 'text-center'],
   },
-]
+];
+
+const defaultBudgetIndex = computed<number>(
+  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
+);
+
+const orderedBudgets = computed<MonthlyBudget[]>(() => [
+  coreState.monthlyBudgets[defaultBudgetIndex.value],
+  ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
+  ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
+]);
+
+const resize = () => {
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+};
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
-  window.addEventListener('resizeBudgetsPanel', fillHeight);
+  resize()
+  window.addEventListener('resizeBudgetsPanel', resize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeBudgetsPanel', fillHeight);
+  window.removeEventListener('resizeBudgetsPanel', resize);
 });
 </script>
 

@@ -19,7 +19,7 @@ const buttons: Array<Button> = [
 </script>
 
 <template>
-  <header :id="'header-bar'" :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']">
+  <header id="header-bar" :class="['navbar', 'bg-secondary', 'sticky', 'top-0', 'z-30']">
     <div :class="['flex-1']">
       <img src="/icon.png">
       <h1>Debtonate</h1>

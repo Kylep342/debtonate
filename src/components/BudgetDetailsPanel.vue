@@ -2,13 +2,15 @@
 import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from '@/components/AmortizationTable.vue';
+import { usePivot } from '@/composables/usePivot';
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
 import { MonthlyBudget } from '@/types/core';
 
 const coreState = useCoreStore();
 const currentBudget = ref<MonthlyBudget>();
-const viewedLoanId = ref<string>(constants.TOTALS);
+
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${coreState.getBudgetName(monthlyBudget.id)} | `
@@ -17,11 +19,6 @@ const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthl
   : constants.BUDGET_DETAILS;
 
 const title = computed<string>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
-
-const isViewedLoanId = (itemId) => viewedLoanId.value === itemId;
-const setViewedLoanId = (itemId) => {
-  viewedLoanId.value = itemId;
-};
 
 watch(
   () => coreState.currentBudgetId,
@@ -47,13 +44,13 @@ watch(
     <template #body>
       <div v-if="currentBudget" :class="['tabframe', 'w-auto']">
         <base-tabs :get-item-name="coreState.getLoanName" :pivot="coreState.loansWithTotals"
-          :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
+          :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(viewedLoanId, currentBudget.id)" :title="coreState.buildAmortizationTableTitle(
-              coreState.getLoan(viewedLoanId),
+            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(viewedItemId, currentBudget.id)" :title="coreState.buildAmortizationTableTitle(
+              coreState.getLoan(viewedItemId),
               currentBudget,
             )" :subtitle="coreState.buildAmortizationTableSubtitle(
-                coreState.getLoan(viewedLoanId),
+                coreState.getLoan(viewedItemId),
                 currentBudget,
               )" />
           </template>

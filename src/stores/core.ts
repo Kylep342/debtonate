@@ -566,7 +566,7 @@ export default defineStore('core', () => {
       };
       monthlyBudgets.value.forEach((budget) => {
         const line: Point[] = [];
-        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.AmortizationRecord) => {
+        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.PaymentRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
         });
         config.graphs[loan.id].lines[budget.id] = line;

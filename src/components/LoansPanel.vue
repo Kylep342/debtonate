@@ -23,19 +23,19 @@ const buttons: Array<Button> = [
     onClick: coreState.openLoanForm,
     classes: ['btn-success', 'text-center'],
   },
-]
+];
+
+const resize = () => {
+  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+};
 
 onMounted(() => {
-  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
-  window.addEventListener('resizeLoansPanel', fillHeight);
-});
-
-onUpdated(() => {
-  scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
+  resize()
+  window.addEventListener('resizeLoansPanel', resize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resizeLoansPanel', fillHeight);
+  window.removeEventListener('resizeLoansPanel', resize);
 });
 </script>
 

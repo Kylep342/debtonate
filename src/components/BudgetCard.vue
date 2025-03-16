@@ -18,6 +18,7 @@ const budgetPayments = computed<number>(() => coreState.Period(totalsAsALoanPaym
 const budgetTotalInterest = computed<string>(() => `${coreState.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
 
 const paymentsLabel = computed<string>(() => coreState.periodsAsDates ? 'Debt Free' : 'Payments')
+
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([

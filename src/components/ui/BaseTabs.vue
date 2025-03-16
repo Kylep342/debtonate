@@ -8,7 +8,7 @@ const props = defineProps<{
   setViewedItemId: Function
 }>();
 
-const flexBasis = computed(() => props.pivot ? `basis-1/${props.pivot?.length}` : 'basis-1');
+const flexBasis = computed(() => props.pivot ? `basis-1/${props.pivot!.length}` : 'basis-1');
 const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 

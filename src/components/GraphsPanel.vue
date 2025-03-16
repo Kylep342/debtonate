@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
+import { usePivot } from '@/composables/usePivot';
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
 import { Button } from '@/types/app';
@@ -8,23 +9,20 @@ import { GraphConfig } from '@/types/graph';
 
 const coreState = useCoreStore();
 
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+
 const viewedGraphId = ref<string>(constants.GRAPH_BALANCES_OVER_TIME);
-const viewedLoanId = ref<string>(constants.TOTALS);
-
 const activeGraph = computed<GraphConfig>(() => coreState.graphs[viewedGraphId.value]);
-
-const isViewedLoanId = (loanId) => viewedLoanId.value === loanId;
 const setViewedGraphId = (graphId) => viewedGraphId.value = graphId;
-const setViewedLoanId = (loanId) => viewedLoanId.value = loanId;
 
 const buttons: Array<Button> = Object.keys(coreState.graphs).map((graphId) => ({
   text: graphId,
   onClick: () => setViewedGraphId(graphId),
 }));
 
-watch(() => coreState.loans, async (value) => {
-  if (!value.map((loan) => loan.id).includes(viewedLoanId.value)) {
-    setViewedLoanId(constants.TOTALS);
+watch(() => coreState.loans, async (loans) => {
+  if (!loans.map((loan) => loan.id).includes(viewedItemId.value)) {
+    setViewedItemId(constants.TOTALS);
   }
 });
 </script>
@@ -41,9 +39,9 @@ watch(() => coreState.loans, async (value) => {
     </div>
     <div :class="['tabframe', 'w-fit']">
       <base-tabs :get-item-name="coreState.getLoanName" :pivot="coreState.loansWithTotals"
-        :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
+        :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
         <template #tabContent>
-          <base-graph :key="viewedLoanId" :graph="activeGraph" :anchor-id="viewedLoanId" />
+          <base-graph :key="viewedItemId" :graph="activeGraph" :anchor-id="viewedItemId" />
         </template>
       </base-tabs>
     </div>

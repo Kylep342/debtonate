@@ -4,12 +4,13 @@ import { computed, ref, watch } from 'vue';
 
 import AmortizationTable from '@/components/AmortizationTable.vue';
 import RefinancingTable from '@/components/RefinancingTable.vue';
+import { usePivot } from '@/composables/usePivot';
 import constants from '@/constants/constants';
 import useCoreStore from '@/stores/core';
 
 const coreState = useCoreStore();
 const currentLoan = ref<ILoan>();
-const viewedBudgetId = ref<string>(constants.DEFAULT);
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
 const buildLoanDetailsTitle = (loan: ILoan): string => loan
   ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
@@ -17,11 +18,6 @@ const buildLoanDetailsTitle = (loan: ILoan): string => loan
   : constants.LOAN_DETAILS;
 
 const title = computed<string>(() => buildLoanDetailsTitle(currentLoan.value!));
-
-const isViewedBudgetId = (itemId) => viewedBudgetId.value === itemId;
-const setViewedBudgetId = (itemId) => {
-  viewedBudgetId.value = itemId;
-};
 
 watch(
   () => coreState.currentLoanId,
@@ -50,14 +46,14 @@ watch(
           :scenarios="coreState.refinancingScenarios[currentLoan.id]"
           :schedules="coreState.refinancingSchedules[currentLoan.id]" />
         <base-tabs :get-item-name="coreState.getBudgetName" :pivot="coreState.monthlyBudgets"
-          :is-viewed-item-id="isViewedBudgetId" :set-viewed-item-id="setViewedBudgetId">
+          :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(currentLoan.id, viewedBudgetId)" :title="coreState.buildAmortizationTableTitle(
+            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(currentLoan.id, viewedItemId)" :title="coreState.buildAmortizationTableTitle(
               currentLoan,
-              coreState.getBudget(viewedBudgetId),
+              coreState.getBudget(viewedItemId),
             )" :subtitle="coreState.buildAmortizationTableSubtitle(
                 currentLoan,
-                coreState.getBudget(viewedBudgetId),
+                coreState.getBudget(viewedItemId),
               )" />
           </template>
         </base-tabs>
