@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  ref,
-  onBeforeUnmount,
-  onMounted,
-} from 'vue';
+import { computed } from 'vue';
 
 import BudgetCard from '@/components/BudgetCard.vue';
 import ManagementPanel from '@/components/ManagementPanel.vue';

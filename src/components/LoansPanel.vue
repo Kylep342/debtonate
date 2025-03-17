@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import {
-  ref,
-  onBeforeUnmount,
-  onMounted,
-  onUpdated,
-} from 'vue';
-
 import LoanCard from '@/components/LoanCard.vue';
 import ManagementPanel from '@/components/ManagementPanel.vue';
 import { useResize } from '@/composables/useResize';
