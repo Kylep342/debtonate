@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { fillHeight, fillWidth, smartPosition } from '../../../src/functions/viewport';
-import LoansPanel from '../../../src/components/LoansPanel.vue';
+import { fillHeight, fillWidth, smartPosition } from '@/apps/shared/functions/viewport';
+import LoansPanel from '@/apps/debtonate/components/LoansPanel.vue';
 
 
 describe('viewport module', () => {
