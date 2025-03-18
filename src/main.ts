@@ -2,15 +2,16 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
 import App from '@/App.vue';
-import BaseAlert from '@/components/ui/BaseAlert.vue';
-import BaseButton from '@/components/ui/BaseButton.vue';
-import BaseCard from '@/components/ui/BaseCard.vue';
-import BaseGraph from '@/components/ui/BaseGraph.vue';
-import BaseMenu from '@/components/ui/BaseMenu.vue';
-import BaseModal from '@/components/ui/BaseModal.vue';
-import BaseTable from '@/components/ui/BaseTable.vue';
-import BaseTabs from '@/components/ui/BaseTabs.vue';
-import CollapsibleCard from '@/components/ui/CollapsibleCard.vue';
+import BaseAlert from '@/apps/shared/components/ui/BaseAlert.vue';
+import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
+import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
+import BaseGraph from '@/apps/shared/components/ui/BaseGraph.vue';
+import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
+import BaseModal from '@/apps/shared/components/ui/BaseModal.vue';
+import BaseTable from '@/apps/shared/components/ui/BaseTable.vue';
+import BaseTabs from '@/apps/shared/components/ui/BaseTabs.vue';
+import CollapsibleCard from '@/apps/shared/components/ui/CollapsibleCard.vue';
+import router from '@/apps/router';
 
 import '@/assets/main.css';
 import '@/assets/built.css';
@@ -29,4 +30,5 @@ app.component('BaseTabs', BaseTabs);
 app.component('CollapsibleCard', CollapsibleCard);
 
 app.use(pinia);
+app.use(router);
 app.mount('#app');

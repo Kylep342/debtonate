@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import constants from '@/constants/constants';
-import useCoreStore from '@/stores/core';
-import { Button } from '@/types/app';
-import { MonthlyBudget } from '@/types/core';
+import constants from '@/apps/debtonate/constants/constants';
+import useCoreStore from '@/apps/debtonate/stores/core';
+import { Button } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
 

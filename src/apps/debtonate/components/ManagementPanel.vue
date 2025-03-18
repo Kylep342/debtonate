@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@/types/app';
+import { Button } from '@/apps/shard/types/app';
 
 const props = defineProps<{
   buttons: Array<Button>,

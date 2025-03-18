@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import BudgetCard from '@/components/BudgetCard.vue';
-import ManagementPanel from '@/components/ManagementPanel.vue';
-import { useResize } from '@/composables/useResize';
-import constants from '@/constants/constants';
-import useCoreStore from '@/stores/core';
-import { Button } from '@/types/app';
-import { MonthlyBudget } from '@/types/core';
+import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
+import ManagementPanel from '@/apps/debtonate/components/ManagementPanel.vue';
+import { useResize } from '@/apps/shared/composables/useResize';
+import constants from '@/apps/debtonate/constants/constants';
+import useCoreStore from '@/apps/debtonate/stores/core';
+import { Button } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const coreState = useCoreStore();
 

@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import { ILoan } from 'moneyfunx';
 
-import constants from '@/constants/constants';
-import useCoreStore from '@/stores/core';
-import { Button } from '@/types/app';
+import constants from '@/apps/debtonate/constants/constants';
+import useCoreStore from '@/apps/debtonate/stores/core';
+import { Button } from '@/apps/shared/types/app';
 
 const props = defineProps<{
   loan: ILoan

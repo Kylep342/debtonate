@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-import { fillHeight } from '@/functions/viewport';
+import { fillHeight } from '@/apps/shared/functions/viewport';
 
 export function useResize(listenerName) {
   const scrollContainer = ref(null);

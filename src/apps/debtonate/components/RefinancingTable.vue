@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { Loan, LoansPaymentSchedule } from 'moneyfunx';
 
-import constants from '@/constants/constants';
-import useCoreStore from '@/stores/core';
+import constants from '@/apps/debtonate/constants/constants';
+import useCoreStore from '@/apps/debtonate/stores/core';
 
 const props = defineProps<{
   parentId: string,

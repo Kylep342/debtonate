@@ -4,9 +4,9 @@ import {
   onMounted, ref, shallowReactive, shallowRef, watch,
 } from 'vue';
 
-import HoverTemplate from '@/components/HoverTemplate.vue';
-import { smartPosition } from '@/functions/viewport';
-import { GraphConfig, TooltipConfig } from '@/types/graph';
+import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
+import { smartPosition } from '@/apps/shared/functions/viewport';
+import { GraphConfig, TooltipConfig } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   graph: GraphConfig,
