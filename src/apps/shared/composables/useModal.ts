@@ -1,9 +1,9 @@
 import { toValue, watch } from 'vue';
 
 /**
- * 
+ *
  * registers a watcher to show/close a modal
- * 
+ *
  * @param flag Boolean variable for show/close state
  * @param domId ID of the modal dialog HTML element
  */

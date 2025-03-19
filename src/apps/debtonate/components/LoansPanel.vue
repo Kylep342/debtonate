@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
-import ManagementPanel from '@/apps/debtonate/components/ManagementPanel.vue';
-import { useResize } from '@/apps/shared/composables/useResize';
 import constants from '@/apps/debtonate/constants/constants';
 import useCoreStore from '@/apps/debtonate/stores/core';
+import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
+import { useResize } from '@/apps/shared/composables/useResize';
 import { Button } from '@/apps/shared/types/app';
 
 const coreState = useCoreStore();

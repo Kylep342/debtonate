@@ -13,7 +13,7 @@ export function useResize(listenerName) {
     resize()
     window.addEventListener(listenerName, resize);
   });
-  
+
   onUnmounted(() => {
     window.removeEventListener(listenerName, resize);
   });

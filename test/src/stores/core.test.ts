@@ -513,7 +513,7 @@ describe('Core Store', () => {
     expect(coreState.refinancingFormActive).toBe(false);
   });
 
-  it('builds tiles', async () => {
+  it('builds titles', async () => {
     const coreState = useCoreStore();
     coreState.budgets = Budgets();
     coreState.loans = Loans();

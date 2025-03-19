@@ -9,7 +9,7 @@ import {
   Budget,
   MonthlyBudget,
   PaymentScenario,
-} from '@/apps/shared/types/core';
+} from '@/apps/debtonate/types/core';
 import {
   Graph,
   GraphConfig,
@@ -41,7 +41,7 @@ export default defineStore('core', () => {
   const roundingScale = ref<number>(100);
   const snowballSort = ref<boolean>(false);
 
-  // primitive computed values/methods
+  // independent functions/computed values
 
   const clearState = () => {
     budgetDetailsPanelActive.value = false;
@@ -362,9 +362,11 @@ export default defineStore('core', () => {
     exitRefinancingForm();
     return loan.id;
   };
+
   const deleteRefinancingScenario = (parentLoanId: string, scenarioId: string) => {
     refinancingScenarios.value[parentLoanId] = refinancingScenarios.value[parentLoanId].filter((scenario) => scenario.id !== scenarioId)
   };
+
   const refinancingSchedules = computed(() => {
     const schedules = {}
     Object.entries(refinancingScenarios.value).forEach(([parentLoanId, scenarios]) => {
@@ -457,14 +459,17 @@ export default defineStore('core', () => {
   const sortLoans = () => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
+
   const toggleAvalancheSort = () => {
     snowballSort.value = false;
     sortLoans();
   };
+
   const toggleSnowballSort = () => {
     snowballSort.value = true;
     sortLoans();
   };
+
   const createBudget = (proposedBudget: number) => {
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
       deleteBudget(currentBudgetId.value);
@@ -477,6 +482,7 @@ export default defineStore('core', () => {
     budgets.value.sort((a, b) => b.relative - a.relative);
     exitBudgetForm();
   };
+
   const createLoan = (
     principal: number,
     interestRate: number,
@@ -496,15 +502,20 @@ export default defineStore('core', () => {
     return loan.id;
   };
 
+  // ease-of-use getters over computed values
+
   const getPaymentSchedule = (loanId: string, budgetId: string) => paymentSchedules.value[loanId][budgetId];
+
   const getNumPayments = (
     loanId: string,
     budgetId: string
   ): number => getPaymentSchedule(loanId, budgetId).amortizationSchedule.length;
+
   const getLifetimeInterest = (
     loanId: string,
     budgetId: string
   ): number => getPaymentSchedule(loanId, budgetId).lifetimeInterest;
+
   const getInterestUpToPeriod = (
     loanId: string,
     budgetId: string,
