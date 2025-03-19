@@ -1,3 +1,14 @@
+/**
+ *
+ * *** Global Options Store ***
+ *
+ * app-agnostic store for shared, user-modifiable settings
+ *    locale options
+ *      currency
+ *      language
+ *      period/date formatting
+ *
+ */
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -12,13 +23,12 @@ export default defineStore('globalOptions', () => {
   const languages = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const periodsAsDates = ref<boolean>(false);
 
-
   // independent functions/computed values
 
   // The state functions below are for user-modifiable state only
 
   /**
-   * Resets modified state to initial state
+   * Resets modifiable state to initial state
    */
   const clearState = () => {
     currency.value = constants.LOCALE_CURRENCY[navigator.language];
@@ -102,11 +112,11 @@ export default defineStore('globalOptions', () => {
    */
   const Period = (period: number, asStr: boolean = false) => {
     if (periodsAsDates.value) {
-      const date = new Date(baseDate.value);
+      const anchorDate = new Date(baseDate.value);
       const relativeDate = new Date(
-        date.getFullYear(),
-        date.getMonth() + period,
-        date.getDate(),
+        anchorDate.getFullYear(),
+        anchorDate.getMonth() + period,
+        anchorDate.getDate(),
       );
       return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
     }
