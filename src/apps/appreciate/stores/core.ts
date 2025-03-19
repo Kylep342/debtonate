@@ -43,7 +43,7 @@ export default defineStore('appreciateCore', () => {
 
   // state management
 
-  const clearState = () => {
+  const clearState = (): void => {
     globalOptions.clearState();
 
     accrueBeforeContribution.value = false;
@@ -58,7 +58,7 @@ export default defineStore('appreciateCore', () => {
     optionsFormActive.value = false;
   };
 
-  const loadState = () => {
+  const loadState = (): void => {
     globalOptions.loadState();
 
     accrueBeforeContribution.value = JSON.parse(localStorage.getItem(keys.LS_ACCRUE_BEFORE_CONTRIBUTION)!);
@@ -66,7 +66,7 @@ export default defineStore('appreciateCore', () => {
     instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!);
   };
 
-  const saveState = () => {
+  const saveState = (): void => {
     globalOptions.saveState();
 
     localStorage.setItem(keys.LS_ACCRUE_BEFORE_CONTRIBUTION, JSON.stringify(accrueBeforeContribution.value));
@@ -84,13 +84,13 @@ export default defineStore('appreciateCore', () => {
 
   // appreciate settings
 
-  const setYearsToContribute = (newYears: number) => {
+  const setYearsToContribute = (newYears: number): void => {
     if (!Number.isNaN(newYears && newYears > 0 && newYears < moneyfunx.MAX_DURATION_YEARS)) {
       yearsToContribute.value = newYears;
     }
   };
 
-  const toggleAccrueBeforeContribution = () => {
+  const toggleAccrueBeforeContribution = (): void => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
   };
 
@@ -99,43 +99,44 @@ export default defineStore('appreciateCore', () => {
 
   // total values across all instruments
 
-  const totalCurrentBalance = computed(() => instruments.value.reduce(
+  const totalCurrentBalance = computed<number>(() => instruments.value.reduce(
     (totalBalance, instruments) => totalBalance + instruments.currentBalance,
     0,
   ));
 
-  const totalMaxPeriodsPerYear = computed(
+  const totalMaxPeriodsPerYear = computed<number>(
     () => instruments.value.reduce((curMax, instrument) => Math.max(curMax, instrument.periodsPerYear), 0),
   );
 
 
   /** form functions */
 
-  const openBudgetForm = () => {
+  const openBudgetForm = (): void => {
     budgetFormActive.value = true;
   };
-  const openInstrumentForm = () => {
+  const openInstrumentForm = (): void => {
     instrumentFormActive.value = true;
   };
-  const openOptionsForm = () => {
+  const openOptionsForm = (): void => {
     optionsFormActive.value = true;
   };
 
-  const exitBudgetForm = () => {
+  const exitBudgetForm = (): void => {
     budgetFormActive.value = false;
     currentBudgetId.value = null;
   };
-  const exitInstrumentForm = () => {
+  const exitInstrumentForm = (): void => {
     instrumentFormActive.value = false;
     currentInstrumentId.value = null;
   };
-  const exitOptionsForm = () => {
+  const exitOptionsForm = (): void => {
     optionsFormActive.value = false;
   };
 
 
   /** Instruments */
 
+  // attribute functions in here are placeholder
   const totalsAsAnInstrument = computed<moneyfunx.IInstrument>(() => ({
     id: sharedConstants.TOTALS,
     name: constants.NAME_TOTALS_AS_AN_INSTRUMENT,
@@ -150,20 +151,20 @@ export default defineStore('appreciateCore', () => {
 
   const getInstrument = (id: string): moneyfunx.IInstrument|undefined => instrumentsWithTotals.value.find((instrument) => instrument.id === id);
 
-  const deleteInstrument = (id: string) => {
+  const deleteInstrument = (id: string): void => {
     instruments.value = instruments.value.filter((instrument) => instrument.id !== id);
   };
-  const editInstrument = (id: string) => {
+  const editInstrument = (id: string): void => {
     currentInstrumentId.value = id;
     openInstrumentForm();
   };
   const getInstrumentIndex = (id: string): number => instrumentsWithTotals.value.findIndex((instrument) => instrument.id === id);
   const getInstrumentName = (id: string): string => getInstrument(id)!.name
-  const unviewInstrument = () => {
+  const unviewInstrument = (): void => {
     instrumentDetailsPanelActive.value = false;
     currentInstrumentId.value = null;
   };
-  const viewInstrument = (id: string) => {
+  const viewInstrument = (id: string): void => {
     currentInstrumentId.value = id;
     instrumentDetailsPanelActive.value = true;
   };
@@ -173,12 +174,12 @@ export default defineStore('appreciateCore', () => {
 
   const monthlyBudgets = computed<Array<Budget>>(() => [...budgets.value, minimumBudget]);
 
-  const deleteBudget = (id: string) => {
+  const deleteBudget = (id: string): void => {
     budgets.value = budgets.value.filter(
       (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
     );
   };
-  const editBudget = (id: string) => {
+  const editBudget = (id: string): void => {
     currentBudgetId.value = id;
     openBudgetForm();
   };
@@ -189,11 +190,11 @@ export default defineStore('appreciateCore', () => {
       ? constants.NAME_MIN_BUDGET
       : `${constants.BUDGET} ${getBudgetIndex(id)}`
   );
-  const unviewBudget = () => {
+  const unviewBudget = (): void => {
     budgetDetailsPanelActive.value = false;
     currentBudgetId.value = null;
   };
-  const viewBudget = (id: string) => {
+  const viewBudget = (id: string): void => {
     currentBudgetId.value = id;
     budgetDetailsPanelActive.value = true;
   };
@@ -201,11 +202,11 @@ export default defineStore('appreciateCore', () => {
 
   /** dependent computed values */
 
-  const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
+  const budgetFormTitle = computed<string>(() => (currentBudgetId.value && budgetFormActive.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
-  const instrumentFormTitle = computed(() => (currentInstrumentId.value && instrumentFormActive.value
+  const instrumentFormTitle = computed<string>(() => (currentInstrumentId.value && instrumentFormActive.value
     ? `Editing ${getInstrumentName(currentInstrumentId.value)}`
     : 'Creating an Instrument'));
 
@@ -228,14 +229,14 @@ export default defineStore('appreciateCore', () => {
     const contributionSchedules = computed<Record<string, Record<string, moneyfunx.ContributionSchedule>>>(() => {
       const schedules: Record<string, Record<string, moneyfunx.ContributionSchedule>> = {};
 
-      instrumentsWithTotals.value.forEach((loan) => {
-        schedules[loan.id] = {};
+      instrumentsWithTotals.value.forEach((instrument) => {
+        schedules[instrument.id] = {};
       });
 
-      Object.keys(schedules).forEach((loanId) => {
+      Object.keys(schedules).forEach((instrumentId) => {
         Object.keys(contributionScenarios.value).forEach((budgetId) => {
           const schedule = contributionScenarios.value[budgetId];
-          schedules[loanId][budgetId] = {...schedule.contributionSchedule[loanId]}});
+          schedules[instrumentId][budgetId] = {...schedule.contributionSchedule[instrumentId]}});
         });
       return schedules;
     });
@@ -245,17 +246,19 @@ export default defineStore('appreciateCore', () => {
 
     // Budget
 
-    const createBudget = (proposedBudget: number) => {
+    const createBudget = (proposedBudget: number): string => {
+      const budget = {
+        id: String(Math.floor(Math.random() * Date.now())),
+        relative: proposedBudget
+      };
       if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
         deleteBudget(currentBudgetId.value);
         currentBudgetId.value = null;
-      }
-      budgets.value.push({
-        id: String(Math.floor(Math.random() * Date.now())),
-        relative: proposedBudget
-      });
+      };
+      budgets.value.push(budget);
       budgets.value.sort((a, b) => b.relative - a.relative);
       exitBudgetForm();
+      return budget.id
     };
 
     // Instrument
@@ -266,15 +269,15 @@ export default defineStore('appreciateCore', () => {
       name: string,
       annualLimit: Function,
     ): string => {
-      const loan = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
+      const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
       if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
         deleteInstrument(currentInstrumentId.value);
         currentInstrumentId.value = null;
-      }
-      instruments.value.push(loan);
+      };
+      instruments.value.push(instrument);
       // sortInstruments();
       exitInstrumentForm();
-      return loan.id;
+      return instrument.id;
     };
 
   // ease-of-use getters over computed values

@@ -477,17 +477,19 @@ export default defineStore('core', () => {
     sortLoans();
   };
 
-  const createBudget = (proposedBudget: number) => {
+  const createBudget = (proposedBudget: number): string => {
+    const budget = {
+      id: String(Math.floor(Math.random() * Date.now())),
+      relative: proposedBudget
+    };
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
       deleteBudget(currentBudgetId.value);
       currentBudgetId.value = null;
-    }
-    budgets.value.push({
-      id: String(Math.floor(Math.random() * Date.now())),
-      relative: proposedBudget
-    });
+    };
+    budgets.value.push(budget);
     budgets.value.sort((a, b) => b.relative - a.relative);
     exitBudgetForm();
+    return budget.id
   };
 
   const createLoan = (
