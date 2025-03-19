@@ -55,7 +55,7 @@ const RefinancingScenarios = (loan) => [
   ),
 ];
 
-describe('Core Store', () => {
+describe('Debtonate Core Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });

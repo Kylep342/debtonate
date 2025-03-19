@@ -171,7 +171,7 @@ export default defineStore('appreciateCore', () => {
 
   /** Budgets */
 
-  const monthlyBudgets = computed<Array<Budget>>(() => [minimumBudget, ...budgets.value]);
+  const monthlyBudgets = computed<Array<Budget>>(() => [...budgets.value, minimumBudget]);
 
   const deleteBudget = (id: string) => {
     budgets.value = budgets.value.filter(
