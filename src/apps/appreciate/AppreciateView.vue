@@ -1,10 +1,16 @@
 <script setup lang="ts">
-
-import { RouterLink, useRouter } from 'vue-router';
+import HeaderBar from '@/apps/appreciate/components/HeaderBar.vue';
+import FooterBar from '@/apps/shared/components/FooterBar.vue';
 
 </script>
 
 <template>
-  <div><h2>Appreciate</h2></div>
-  <RouterLink to="/">back to Debtonate</RouterLink>
+  <div
+    :class="['h-screen', 'flex', 'flex-col']"
+  >
+    <HeaderBar />
+    <br>
+    <br>
+    <FooterBar />
+  </div>
 </template>

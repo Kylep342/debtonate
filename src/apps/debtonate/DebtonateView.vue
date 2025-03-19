@@ -77,8 +77,7 @@ watch(() => coreState.refinancingFormActive, async (show) => {
 
 <template>
   <div
-    id="debtonate"
-    :class="['font-mono', 'h-screen', 'flex', 'flex-col']"
+    :class="['h-screen', 'flex', 'flex-col']"
   >
     <HeaderBar :class="['flex-none']" />
     <BudgetForm />

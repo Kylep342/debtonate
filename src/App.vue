@@ -3,5 +3,10 @@ import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <RouterView />
+  <div
+    id="debtonate"
+    :class="['font-mono']"
+  >
+    <RouterView />
+  </div>
 </template>

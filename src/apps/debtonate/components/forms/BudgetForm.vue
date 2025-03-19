@@ -57,7 +57,7 @@ const exit = () => {
     <template #body>
       <div :class="['formInputs']">
         <div :class="['label']">
-          <span :class="['label-text']">Budget</span>
+          <span :class="['label-text']">{{ constants.BUDGET }}</span>
         </div>
         <input :id="`${constants.BUDGET_FORM_ID}-amount`" v-model.number="amount"
           :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Budget">
