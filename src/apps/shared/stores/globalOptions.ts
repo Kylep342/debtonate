@@ -123,11 +123,13 @@ export default defineStore('globalOptions', () => {
    * defaults to '$'
    */
   const currencySymbol = computed(() => {
+    // fixed to a style that leads with a symbol
     const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency.value,
     }).format(1);
 
+    // Capture only the currency symbol
     const match = formatted.match(/[\p{Sc}]+/u);
 
     return match ? match[0] : '$';

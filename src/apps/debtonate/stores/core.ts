@@ -64,6 +64,7 @@ export default defineStore('core', () => {
     roundingScale.value = 100;
     snowballSort.value = true;
   };
+
   const loadState = () => {
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
     currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
@@ -94,6 +95,7 @@ export default defineStore('core', () => {
       localStorage.getItem(keys.LS_SNOWBALL_SORT)!,
     );
   };
+
   const saveState = () => {
     localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
     localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
@@ -118,6 +120,7 @@ export default defineStore('core', () => {
       JSON.stringify(snowballSort.value),
     );
   };
+
   const exportState = () => ({
     [keys.LS_BUDGETS]: budgets.value,
     [keys.LS_CURRENCY]: currency.value,
@@ -180,67 +183,71 @@ export default defineStore('core', () => {
     return match ? match[0] : '$';
   });
 
-  const rawGlobalMinPayment = computed(
+  //
+
+  const rawTotalMinPayment = computed(
     () => loans.value.reduce(
       (minPayment, loan) => minPayment + loan.minPayment,
       0,
     ),
   );
 
-  const roundedGlobalMinPayment = computed(
-    () => rawGlobalMinPayment.value
-      + (roundingScale.value - (rawGlobalMinPayment.value % roundingScale.value)),
+  const roundedTotalMinPayment = computed(
+    () => rawTotalMinPayment.value
+      + (roundingScale.value - (rawTotalMinPayment.value % roundingScale.value)),
   );
 
-  const globalMaxPeriods = computed(() => loans.value.reduce(
+  const totalMaxPeriods = computed(() => loans.value.reduce(
     (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
     0,
   ));
 
-  const globalMaxPeriodsPerYear = computed(
+  const totalMaxPeriodsPerYear = computed(
     () => loans.value.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0),
   );
 
-  const globalMaxTermInYears = computed(
+  const totalMaxTermInYears = computed(
     () => loans.value.reduce((curMax, loan) => Math.max(curMax, loan.termInYears), 0),
   );
 
-  const globalMinPayment = computed(
-    () => (roundingEnabled.value ? roundedGlobalMinPayment.value : rawGlobalMinPayment.value),
+  const totalMinPayment = computed(
+    () => (roundingEnabled.value ? roundedTotalMinPayment.value : rawTotalMinPayment.value),
   );
 
-  const globalPrincipal = computed(() => loans.value.reduce(
+  const totalPrincipal = computed(() => loans.value.reduce(
     (totalPrincipal, loan) => totalPrincipal + loan.principal,
     0,
   ));
 
-  const globalCurrentBalance = computed(() => loans.value.reduce(
+  const totalCurrentBalance = computed(() => loans.value.reduce(
     (totalBalance, loan) => totalBalance + loan.currentBalance,
     0,
   ));
 
-  const globalEffectiveInterestRate = computed(() => loans.value.reduce(
-    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.currentBalance / globalCurrentBalance.value),
+  const totalEffectiveInterestRate = computed(() => loans.value.reduce(
+    (weightedRate, loan) => weightedRate + loan.annualRate * (loan.currentBalance / totalCurrentBalance.value),
     0,
   ));
 
-  const globalFees = computed(() => loans.value.reduce(
+  const totalFees = computed(() => loans.value.reduce(
     (totalFees, loan) => totalFees + loan.fees,
     0,
   ));
 
+  //
+
   const totalsAsALoan = computed<moneyfunx.ILoan>(() => ({
     id: constants.TOTALS,
-    principal: globalPrincipal.value,
-    annualRate: globalEffectiveInterestRate.value,
-    periodsPerYear: globalMaxPeriodsPerYear.value,
-    termInYears: globalMaxTermInYears.value,
-    periodicRate: globalEffectiveInterestRate.value / 12, // not implemented for Totals as a Loan (see notes.ts)
-    periods: globalMaxPeriods.value,
-    minPayment: globalMinPayment.value,
+    principal: totalPrincipal.value,
+    annualRate: totalEffectiveInterestRate.value,
+    periodsPerYear: totalMaxPeriodsPerYear.value,
+    termInYears: totalMaxTermInYears.value,
+    periodicRate: totalEffectiveInterestRate.value / 12, // not implemented for Totals as a Loan (see notes.ts)
+    periods: totalMaxPeriods.value,
+    minPayment: totalMinPayment.value,
     name: constants.NAME_TOTALS_AS_LOAN,
-    currentBalance: globalCurrentBalance.value,
-    fees: globalFees.value,
+    currentBalance: totalCurrentBalance.value,
+    fees: totalFees.value,
   }));
 
   const loansWithTotals = computed<Array<moneyfunx.ILoan>>(() => [totalsAsALoan.value, ...loans.value]);
@@ -249,7 +256,7 @@ export default defineStore('core', () => {
 
   const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
       ...budget,
-      absolute: budget.relative + globalMinPayment.value,
+      absolute: budget.relative + totalMinPayment.value,
     }))));
 
   const getBudget = (id: string): Budget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
@@ -709,14 +716,6 @@ export default defineStore('core', () => {
     getLoanName,
     getNumPayments,
     getPaymentSchedule,
-    globalCurrentBalance,
-    globalEffectiveInterestRate,
-    globalFees,
-    globalMaxPeriods,
-    globalMaxPeriodsPerYear,
-    globalMaxTermInYears,
-    globalMinPayment,
-    globalPrincipal,
     graphs,
     graphXScale,
     language,
@@ -740,14 +739,14 @@ export default defineStore('core', () => {
     percentOfPaymentAsPrincaplGraphs,
     Period,
     periodsAsDates,
-    rawGlobalMinPayment,
+    rawTotalMinPayment,
     reducePayments,
     refinancingFormActive,
     refinancingFormTitle,
     refinancingScenarios,
     refinancingSchedules,
     refinancingUseHighestPayment,
-    roundedGlobalMinPayment,
+    roundedTotalMinPayment,
     roundingEnabled,
     roundingScale,
     saveState,
@@ -764,6 +763,14 @@ export default defineStore('core', () => {
     toggleRefinancingUseHighestPayment,
     toggleRounding,
     toggleSnowballSort,
+    totalCurrentBalance,
+    totalEffectiveInterestRate,
+    totalFees,
+    totalMaxPeriods,
+    totalMaxPeriodsPerYear,
+    totalMaxTermInYears,
+    totalMinPayment,
+    totalPrincipal,
     totalsAsALoan,
     unviewBudget,
     unviewLoan,

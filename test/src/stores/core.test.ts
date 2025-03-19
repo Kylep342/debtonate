@@ -117,12 +117,12 @@ describe('Core Store', () => {
       coreState.loans = Loans();
       expect(coreState.roundingEnabled).toBe(false);
       expect(coreState.roundingScale).toBe(100);
-      expect(coreState.globalMinPayment.toFixed(2)).toBe('3307.71');
+      expect(coreState.totalMinPayment.toFixed(2)).toBe('3307.71');
 
       coreState.toggleRounding(300);
       expect(coreState.roundingEnabled).toBe(true);
       expect(coreState.roundingScale).toBe(300);
-      expect(coreState.globalMinPayment.toFixed(2)).toBe('3600.00');
+      expect(coreState.totalMinPayment.toFixed(2)).toBe('3600.00');
     });
 
     it('preserves rounding scale', async () => {
@@ -144,7 +144,7 @@ describe('Core Store', () => {
     })
   });
 
-  it('has correct global values', async () => {
+  it('has correct total values', async () => {
     const coreState = useCoreStore();
     coreState.budgets = Budgets();
     coreState.loans = Loans();
@@ -158,16 +158,16 @@ describe('Core Store', () => {
       coreState.monthlyBudgets.map((budget) => budget.relative)
     ).toStrictEqual([1200, 555, 200, 0]);
 
-    expect(coreState.rawGlobalMinPayment.toFixed(2)).toBe('3307.71');
-    expect(coreState.roundedGlobalMinPayment.toFixed(2)).toBe('3400.00');
-    expect(coreState.globalMaxPeriods).toBe(180);
-    expect(coreState.globalMaxPeriodsPerYear).toBe(12);
-    expect(coreState.globalMaxTermInYears).toBe(15);
-    expect(coreState.globalMinPayment.toFixed(2)).toBe('3307.71');
-    expect(coreState.globalPrincipal.toFixed(2)).toBe('351342.07');
-    expect(coreState.globalCurrentBalance.toFixed(2)).toBe('343899.23');
-    expect(coreState.globalEffectiveInterestRate.toFixed(4)).toBe('0.0551');
-    expect(coreState.globalFees).toBe(200);
+    expect(coreState.rawTotalMinPayment.toFixed(2)).toBe('3307.71');
+    expect(coreState.roundedTotalMinPayment.toFixed(2)).toBe('3400.00');
+    expect(coreState.totalMaxPeriods).toBe(180);
+    expect(coreState.totalMaxPeriodsPerYear).toBe(12);
+    expect(coreState.totalMaxTermInYears).toBe(15);
+    expect(coreState.totalMinPayment.toFixed(2)).toBe('3307.71');
+    expect(coreState.totalPrincipal.toFixed(2)).toBe('351342.07');
+    expect(coreState.totalCurrentBalance.toFixed(2)).toBe('343899.23');
+    expect(coreState.totalEffectiveInterestRate.toFixed(4)).toBe('0.0551');
+    expect(coreState.totalFees).toBe(200);
   });
 
   describe('with budgets', async () => {
