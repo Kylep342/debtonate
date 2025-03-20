@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 
+import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import constants from '../../constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import sharedConstants from '@/apps/shared/constants/constants';
@@ -53,7 +54,6 @@ const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BT
             </div>
           </template>
         </collapsible-card>
-
         <collapsible-card>
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
@@ -94,76 +94,8 @@ const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BT
             </div>
           </template>
         </collapsible-card>
-
         <br>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Periods As Dates
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <base-button :class="buttonStyle(globalOptions.periodsAsDates)" @click="globalOptions.togglePeriodsAsDates">
-                {{ buttonText(globalOptions.periodsAsDates) }}
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this displays all period tags as dates (relative to
-                today)
-              </p>
-              <br>
-              <p>Next Period: {{ globalOptions.Period(1, true) }}</p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Currency
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <select :id="`${constants.OPTIONS_FORM_ID}-currency`" v-model="globalOptions.currency"
-                class="select select-bordered w-full max-w-xs">
-                <option v-for="currency in sortedCurrencies" :key="currency" :value="currency">
-                  {{ currency }}
-                </option>
-              </select>
-            </div>
-          </template>
-          <template #cardBody>
-            <p>Money: {{ globalOptions.Money(state.totalCurrentBalance) }}</p>
-          </template>
-        </collapsible-card>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Locale
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <select :id="`${constants.OPTIONS_FORM_ID}-language`" v-model="globalOptions.language"
-                class="select select-bordered w-full max-w-xs">
-                <option v-for="language in sortedLanguages" :key="language" :value="language">
-                  {{ language }}
-                </option>
-              </select>
-            </div>
-          </template>
-          <template #cardBody>
-            <p>Localization setting for formatting numbers and dates</p>
-            <br>
-            <p>Money: {{ globalOptions.Money(state.totalCurrentBalance) }}</p>
-            <p>Next Period: {{ globalOptions.Period(1, true) }}</p>
-            <p>Percent: {{ globalOptions.Percent(3.42) }}</p>
-          </template>
-        </collapsible-card>
+        <global-options-formlet />
       </div>
     </template>
   </base-modal>
