@@ -494,7 +494,7 @@ export default defineStore('debtonateCore', () => {
 
   // graph data
 
-  const graphXScale = computed(() => globalOptions.periodsAsDates.value ? d3.scaleTime : d3.scaleLinear);
+  const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
 
   const balancesGraphs = computed<GraphConfig>(() => {
     const config = {
