@@ -74,6 +74,8 @@ const LOCALE_CURRENCY = {
   'zh-HK': 'HKD', // Hong Kong Dollar
   'zh-TW': 'TWD', // New Taiwan Dollar
 };
+const NAME_APPRECIATE = 'Appreciate';
+const NAME_DEBTONATE = 'Debtonate';
 
 export default Object.freeze({
   BTN_CLEAR,
@@ -95,6 +97,8 @@ export default Object.freeze({
   DEFAULT,
   GRAPHS,
   LOCALE_CURRENCY,
+  NAME_APPRECIATE,
+  NAME_DEBTONATE,
   PERIOD,
   TABLES,
 });
