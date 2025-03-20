@@ -1,0 +1,24 @@
+import { MAX_DURATION_YEARS } from "moneyfunx";
+
+const DEFAULT_INFLATION_FACTOR = 0.03;
+const DEFAULT_YEARS_TO_CONTRIBUTE = 25;
+const DEFAULT_YEARS_TO_SPEND = 40;
+const INSTRUMENT_DETAILS_ID = "instrumentDetails";
+const INSTRUMENT_FORM_ID = "instrumentForm";
+const INSTRUMENTS = "Instruments";
+const MAX_DELTA_FACTOR = 0.30; // used for both growth and inflation
+const NAME_TOTALS_AS_AN_INSTRUMENT = "All Instruments";
+const OPTIONS_FORM_ID = "appreciateOptionsForm";
+
+export default Object.freeze({
+  DEFAULT_INFLATION_FACTOR,
+  DEFAULT_YEARS_TO_CONTRIBUTE,
+  DEFAULT_YEARS_TO_SPEND,
+  INSTRUMENT_DETAILS_ID,
+  INSTRUMENT_FORM_ID,
+  INSTRUMENTS,
+  MAX_DURATION_YEARS,
+  MAX_DELTA_FACTOR,
+  NAME_TOTALS_AS_AN_INSTRUMENT,
+  OPTIONS_FORM_ID,
+});
