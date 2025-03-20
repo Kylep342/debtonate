@@ -1,10 +1,8 @@
-import { scaleLinear, scaleTime } from "d3";
 import { Loan } from "moneyfunx";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import constants from '@/apps/debtonate/constants/constants';
-import sharedConstants from '@/apps/shared/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import sharedKeys from '@/apps/shared/constants/keys';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
@@ -337,6 +335,7 @@ describe('Debtonate Core Store', () => {
     state.budgets = Budgets();
     state.loans = Loans();
     state.toggleRounding(200);
+    state.toggleReducePayments();
     globalOptions.setCurrency('JPY');
     globalOptions.setLanguage('en-GB');
     const changedState = state.exportState();
@@ -348,6 +347,7 @@ describe('Debtonate Core Store', () => {
     ).toStrictEqual(initialState[keys.LS_LOANS].map(
       (loan) => loan.name
     ));
+    expect(state.reducePayments).toBe(initialState[keys.LS_REDUCE_PAYMENTS]);
     expect(state.roundingEnabled).toBe(initialState[keys.LS_ROUNDING_ENABLED]);
     expect(state.roundingScale).toBe(initialState[keys.LS_ROUNDING_SCALE]);
     expect(globalOptions.language).toBe(initialState[sharedKeys.LS_LANGUAGE]);
