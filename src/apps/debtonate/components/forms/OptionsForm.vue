@@ -47,6 +47,10 @@ watch(() => roundingScale.value, async (newValue) => {
       </base-button>
     </template>
     <template #body>
+      <h3>Debtonate Options</h3>
+      <br>
+      <hr>
+      <br>
       <div :class="['formInputs']">
         <collapsible-card>
           <template #cardTitle>
@@ -166,6 +170,9 @@ watch(() => roundingScale.value, async (newValue) => {
             </div>
           </template>
         </collapsible-card>
+        <br>
+        <hr>
+        <br>
         <global-options-formlet />
       </div>
     </template>

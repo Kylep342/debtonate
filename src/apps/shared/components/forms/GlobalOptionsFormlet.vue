@@ -15,6 +15,10 @@ const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BT
 </script>
 
 <template>
+  <h3>Global Options</h3>
+  <br>
+  <hr>
+  <br>
   <div :class="['formInputs']">
     <collapsible-card>
       <template #cardTitle>

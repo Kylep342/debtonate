@@ -3,7 +3,6 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import sharedConstants from '@/apps/shared/constants/constants';
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import {
