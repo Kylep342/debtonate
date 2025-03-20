@@ -504,7 +504,7 @@ export default defineStore('core', () => {
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
-    }
+    };
     loans.value.push(loan);
     sortLoans();
     exitLoanForm();
