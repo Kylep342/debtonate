@@ -12,55 +12,55 @@ describe('Global Options Store', () => {
 
   describe('with global options', () => {
     it('styles currency', async () => {
-      const state = useGlobalOptionsStore();
-      state.setCurrency('USD');
-      state.setLanguage('en-US');
+      const globalOptions = useGlobalOptionsStore();
+      globalOptions.setCurrency('USD');
+      globalOptions.setLanguage('en-US');
 
-      expect(state.currency).toBe('USD');
-      expect(state.language).toBe('en-US');
-      expect(state.currencySymbol).toBe('$');
-      expect(state.Money(100)).toBe('$100.00');
+      expect(globalOptions.currency).toBe('USD');
+      expect(globalOptions.language).toBe('en-US');
+      expect(globalOptions.currencySymbol).toBe('$');
+      expect(globalOptions.Money(100)).toBe('$100.00');
 
-      state.setLanguage('de-DE');
-      state.setCurrency('EUR');
+      globalOptions.setLanguage('de-DE');
+      globalOptions.setCurrency('EUR');
 
-      expect(state.language).toBe('de-DE');
-      expect(state.currency).toBe('EUR');
-      expect(state.currencySymbol).toBe('€');
+      expect(globalOptions.language).toBe('de-DE');
+      expect(globalOptions.currency).toBe('EUR');
+      expect(globalOptions.currencySymbol).toBe('€');
     });
 
     it('styles percentages', async () => {
-      const coreState = useGlobalOptionsStore();
-      coreState.setLanguage('en-US');
+      const globalOptions = useGlobalOptionsStore();
+      globalOptions.setLanguage('en-US');
 
-      expect(coreState.language).toBe('en-US');
-      expect(coreState.Percent(40.23)).toBe('40.23%')
+      expect(globalOptions.language).toBe('en-US');
+      expect(globalOptions.Percent(40.23)).toBe('40.23%')
 
-      coreState.setLanguage('es-MX');
+      globalOptions.setLanguage('es-MX');
 
-      expect(coreState.Percent(40.23)).toBe('40.23%')
+      expect(globalOptions.Percent(40.23)).toBe('40.23%')
     });
 
     it('styles dates', async () => {
-      const coreState = useGlobalOptionsStore();
-      const baseDate = new Date(coreState.baseDate)
-      coreState.setLanguage('en-US');
+      const globalOptions = useGlobalOptionsStore();
+      const baseDate = new Date(globalOptions.baseDate)
+      globalOptions.setLanguage('en-US');
 
-      expect(coreState.periodsAsDates).toBe(false);
-      expect(coreState.Time).toBe(constants.PERIOD);
-      expect(coreState.Period(1, true)).toBe(1);
-      expect(coreState.Period(1)).toBe(1);
+      expect(globalOptions.periodsAsDates).toBe(false);
+      expect(globalOptions.Time).toBe(constants.PERIOD);
+      expect(globalOptions.Period(1, true)).toBe(1);
+      expect(globalOptions.Period(1)).toBe(1);
 
-      coreState.togglePeriodsAsDates();
+      globalOptions.togglePeriodsAsDates();
 
-      expect(coreState.periodsAsDates).toBe(true);
-      expect(coreState.Time).toBe(constants.DATE);
-      expect(coreState.Period(1, true)).toBe(new Date(
+      expect(globalOptions.periodsAsDates).toBe(true);
+      expect(globalOptions.Time).toBe(constants.DATE);
+      expect(globalOptions.Period(1, true)).toBe(new Date(
         baseDate.getFullYear(),
         baseDate.getMonth() + 1,
         baseDate.getDate(),
       ).toLocaleDateString());
-      expect(coreState.Period(1)).toStrictEqual(new Date(
+      expect(globalOptions.Period(1)).toStrictEqual(new Date(
         baseDate.getFullYear(),
         baseDate.getMonth() + 1,
         baseDate.getDate(),
@@ -68,9 +68,9 @@ describe('Global Options Store', () => {
     });
   });
 
-  it('handles internal state', async () => {
-    const state = useGlobalOptionsStore();
-    const initialState = state.exportState();
+  it('handles internal globalOptions', async () => {
+    const globalOptions = useGlobalOptionsStore();
+    const initialState = globalOptions.exportState();
 
     expect(Object.keys(initialState)).toStrictEqual([
       keys.LS_CURRENCY,
@@ -78,22 +78,22 @@ describe('Global Options Store', () => {
       keys.LS_PERIODS_AS_DATES,
     ]);
 
-    state.togglePeriodsAsDates();
-    state.setCurrency('JPY');
-    state.setLanguage('en-GB');
-    const changedState = state.exportState();
+    globalOptions.togglePeriodsAsDates();
+    globalOptions.setCurrency('JPY');
+    globalOptions.setLanguage('en-GB');
+    const changedState = globalOptions.exportState();
 
-    state.saveState();
-    state.clearState();
+    globalOptions.saveState();
+    globalOptions.clearState();
 
-    expect(state.currency).toBe(initialState[keys.LS_CURRENCY]);
-    expect(state.language).toBe(initialState[keys.LS_LANGUAGE]);
-    expect(state.periodsAsDates).toBe(initialState[keys.LS_PERIODS_AS_DATES]);
+    expect(globalOptions.currency).toBe(initialState[keys.LS_CURRENCY]);
+    expect(globalOptions.language).toBe(initialState[keys.LS_LANGUAGE]);
+    expect(globalOptions.periodsAsDates).toBe(initialState[keys.LS_PERIODS_AS_DATES]);
 
-    state.loadState();
+    globalOptions.loadState();
 
-    expect(state.currency).toBe(changedState[keys.LS_CURRENCY]);
-    expect(state.language).toBe(changedState[keys.LS_LANGUAGE]);
-    expect(state.periodsAsDates).toBe(changedState[keys.LS_PERIODS_AS_DATES]);
+    expect(globalOptions.currency).toBe(changedState[keys.LS_CURRENCY]);
+    expect(globalOptions.language).toBe(changedState[keys.LS_LANGUAGE]);
+    expect(globalOptions.periodsAsDates).toBe(changedState[keys.LS_PERIODS_AS_DATES]);
   });
 });

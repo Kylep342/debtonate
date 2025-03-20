@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import { useResize } from '@/apps/shared/composables/useResize';
 import { Button } from '@/apps/shared/types/app';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
 const { scrollContainer } = useResize('resizeLoansPanel');
 
 const buttons: Array<Button> = [
   {
     text: constants.BTN_CREATE,
-    onClick: coreState.openLoanForm,
+    onClick: state.openLoanForm,
     classes: ['btn-success', 'text-center'],
   },
 ];
@@ -33,7 +33,7 @@ const buttons: Array<Button> = [
         'min-h-0'
       ]">
         <ul>
-          <li v-for="(loan) in coreState.loansWithTotals" :key="loan.id">
+          <li v-for="(loan) in state.loansWithTotals" :key="loan.id">
             <LoanCard :loan="loan" />
           </li>
         </ul>

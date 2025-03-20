@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import constants from '../../constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import sharedConstants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 
 const state = useAppreciateCoreStore();
-const globalOptions = useGlobalOptionsStore();
-
-const sortedCurrencies = computed<Array<string>>(() => globalOptions.currencies.toSorted());
-const sortedLanguages = computed<Array<string>>(() => globalOptions.languages.toSorted());
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BTN_OFF);

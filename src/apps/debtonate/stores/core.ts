@@ -3,6 +3,7 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
+import sharedConstants from '@/apps/shared/constants/constants';
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import {
@@ -10,6 +11,7 @@ import {
   MonthlyBudget,
   PaymentScenario,
 } from '@/apps/debtonate/types/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
   Graph,
   GraphConfig,
@@ -17,22 +19,23 @@ import {
   Point,
 } from '@/apps/shared/types/graph';
 
-export default defineStore('core', () => {
+export default defineStore('debtonateCore', () => {
+  // dependent stores
+
+  const globalOptions = useGlobalOptionsStore();
+
+  // 'debtonateCore' primitive state
+
   const budgetDetailsPanelActive = ref<boolean>(false);
   const budgetFormActive = ref<boolean>(false);
   const budgets = ref<Array<Budget>>([]);
-  const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
-  const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const currentBudgetId = ref<string|null>(null);
   const currentLoanId = ref<string|null>(null);
-  const language = ref(navigator.language);
-  const languages = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const loanDetailsPanelActive = ref(false);
   const loanFormActive = ref<boolean>(false);
   const loans = ref<Array<moneyfunx.Loan>>([]);
   const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
-  const periodsAsDates = ref<boolean>(false);
   const reducePayments = ref<boolean>(true);
   const refinancingFormActive = ref<boolean>(false);
   const refinancingScenarios = ref<Record<string, moneyfunx.Loan[]>>({});
@@ -44,18 +47,17 @@ export default defineStore('core', () => {
   // independent functions/computed values
 
   const clearState = () => {
+    globalOptions.clearState();
+
     budgetDetailsPanelActive.value = false;
     budgetFormActive.value = false;
     budgets.value = [];
-    currency.value = constants.LOCALE_CURRENCY[navigator.language];
     currentBudgetId.value = null;
     currentLoanId.value = null;
-    language.value = navigator.language;
     loanDetailsPanelActive.value = false;
     loanFormActive.value = false;
     loans.value = [];
     optionsFormActive.value = false;
-    periodsAsDates.value = false;
     reducePayments.value = true;
     refinancingFormActive.value = false;
     refinancingScenarios.value = {};
@@ -66,9 +68,9 @@ export default defineStore('core', () => {
   };
 
   const loadState = () => {
+    globalOptions.loadState();
+
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
-    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
-    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
     loans.value = JSON.parse(localStorage.getItem(keys.LS_LOANS)!).map(
       (loan) => new moneyfunx.Loan(
         loan.principal,
@@ -79,9 +81,6 @@ export default defineStore('core', () => {
         loan.currentBalance,
         loan.fees,
       ),
-    );
-    periodsAsDates.value = JSON.parse(
-      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
     );
     reducePayments.value = JSON.parse(
       localStorage.getItem(keys.LS_REDUCE_PAYMENTS)!,
@@ -97,14 +96,10 @@ export default defineStore('core', () => {
   };
 
   const saveState = () => {
+    globalOptions.saveState();
+
     localStorage.setItem(keys.LS_BUDGETS, JSON.stringify(budgets.value));
-    localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
-    localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
     localStorage.setItem(keys.LS_LOANS, JSON.stringify(loans.value));
-    localStorage.setItem(
-      keys.LS_PERIODS_AS_DATES,
-      JSON.stringify(periodsAsDates.value),
-    );
     localStorage.setItem(
       keys.LS_REDUCE_PAYMENTS,
       JSON.stringify(reducePayments.value),
@@ -122,11 +117,10 @@ export default defineStore('core', () => {
   };
 
   const exportState = () => ({
+    ...globalOptions.exportState(),
+
     [keys.LS_BUDGETS]: budgets.value,
-    [keys.LS_CURRENCY]: currency.value,
-    [keys.LS_LANGUAGE]: language.value,
     [keys.LS_LOANS]: loans.value,
-    [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
     [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
     [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
     [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
@@ -134,56 +128,10 @@ export default defineStore('core', () => {
     [keys.LS_SNOWBALL_SORT]: snowballSort.value,
   });
 
-  const baseDate = ref(Date.now());
 
-  const Money = (amount: number): string => (
-    Intl.NumberFormat(
-      language.value,
-      {
-        style: 'currency',
-        currency: currency.value,
-      },
-    ).format(amount)
-  );
+  /** dependent computed options/functions */
 
-  const Percent = (amount: number): string => (
-    Intl.NumberFormat(
-      language.value,
-      {
-        style: 'unit',
-        unit: 'percent',
-        maximumFractionDigits: 2,
-      },
-    ).format(amount)
-  );
-
-  const Period = (period: number, asStr: boolean=false) => {
-    if (periodsAsDates.value) {
-      const date = new Date(baseDate.value);
-      const relativeDate = new Date(
-        date.getFullYear(),
-        date.getMonth() + period,
-        date.getDate(),
-      );
-      return asStr ? relativeDate.toLocaleDateString(language.value) : relativeDate;
-    }
-    return period;
-  };
-
-  const Time = computed(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
-
-  const currencySymbol = computed(() => {
-    const formatted = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.value,
-    }).format(1);
-
-    const match = formatted.match(/[\p{Sc}]+/u);
-
-    return match ? match[0] : '$';
-  });
-
-  //
+  // total values across all instruments
 
   const rawTotalMinPayment = computed(
     () => loans.value.reduce(
@@ -289,19 +237,10 @@ export default defineStore('core', () => {
     refinancingFormActive.value = false;
     currentLoanId.value = null;
   };
-  const setCurrency = (newCurrency: string) => {
-    currency.value = newCurrency;
-  };
-  const setLanguage = (newLanguage: string) => {
-    language.value = newLanguage;
-  };
   const setRoundingScale = (newScale: number) => {
     if (!Number.isNaN(newScale) && newScale > 0) {
       roundingScale.value = newScale;
     }
-  };
-  const togglePeriodsAsDates = () => {
-    periodsAsDates.value = !periodsAsDates.value;
   };
   const toggleReducePayments = () => {
     reducePayments.value = !reducePayments.value;
@@ -549,14 +488,14 @@ export default defineStore('core', () => {
   const buildAmortizationTableSubtitle = (
     loan: moneyfunx.ILoan,
     monthlyBudget: MonthlyBudget
-  ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
+  ): string => `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(loan.annualRate * 100)} | ${globalOptions.Money(monthlyBudget.absolute)}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
   const buildLoanSubtitle = (
     loan: moneyfunx.ILoan
-  ): string => `(${Money(loan.currentBalance)} | ${Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
+  ): string => `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
   // graph data
 
-  const graphXScale = computed(() => periodsAsDates.value ? d3.scaleTime : d3.scaleLinear);
+  const graphXScale = computed(() => globalOptions.periodsAsDates.value ? d3.scaleTime : d3.scaleLinear);
 
   const balancesGraphs = computed<GraphConfig>(() => {
     const config = {
@@ -566,12 +505,12 @@ export default defineStore('core', () => {
       header: loanId => `Balances over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
-      x: Period,
-      xFormat: (x) => Period(x, true),
-      xLabel: () => Time,
+      x: globalOptions.Period,
+      xFormat: (x) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
       xScale: graphXScale.value,
       y: y => y,
-      yFormat: Money,
+      yFormat: globalOptions.Money,
       yLabel: () => 'Balance',
       yScale: d3.scaleLinear,
     };
@@ -603,12 +542,12 @@ export default defineStore('core', () => {
       header: loanId => `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
-      x: Period,
-      xFormat: (x) => Period(x, true),
-      xLabel: () => Time,
+      x: globalOptions.Period,
+      xFormat: (x) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
       xScale: graphXScale.value,
       y: y => y,
-      yFormat: Money,
+      yFormat: globalOptions.Money,
       yLabel: () => 'Interest Saved',
       yScale: d3.scaleLinear,
     };
@@ -638,19 +577,19 @@ export default defineStore('core', () => {
 
   const percentOfPaymentAsPrincaplGraphs = computed<GraphConfig>(() => {
     const config = {
-      id: 'PercentOfPaymentAsPrincipal',
+      id: 'globalOptions.PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
       graphs: <Graphs>{},
-      header: loanId => `Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
+      header: loanId => `globalOptions.Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
-      x: Period,
-      xFormat: (x) => Period(x, true),
-      xLabel: () => Time,
+      x: globalOptions.Period,
+      xFormat: (x) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
       xScale: graphXScale.value,
       y: y => y,
-      yLabel: () => 'Percent to Principal',
-      yFormat: Percent,
+      yLabel: () => 'globalOptions.Percent to Principal',
+      yFormat: globalOptions.Percent,
       yScale: d3.scaleLinear,
     };
 
@@ -681,7 +620,6 @@ export default defineStore('core', () => {
 
   return {
     avalanche,
-    baseDate,
     budgetDetailsPanelActive,
     budgetFormActive,
     budgetFormTitle,
@@ -693,9 +631,6 @@ export default defineStore('core', () => {
     createBudget,
     createLoan,
     createRefinanceScenario,
-    currencies,
-    currency,
-    currencySymbol,
     currentBudgetId,
     currentLoanId,
     deleteBudget,
@@ -720,15 +655,12 @@ export default defineStore('core', () => {
     getPaymentSchedule,
     graphs,
     graphXScale,
-    language,
-    languages,
     loadState,
     loanDetailsPanelActive,
     loanFormActive,
     loanFormTitle,
     loans,
     loansWithTotals,
-    Money,
     monthlyBudgets,
     openBudgetForm,
     openLoanForm,
@@ -737,10 +669,7 @@ export default defineStore('core', () => {
     optionsFormActive,
     paymentScenarios,
     paymentSchedules,
-    Percent,
     percentOfPaymentAsPrincaplGraphs,
-    Period,
-    periodsAsDates,
     rawTotalMinPayment,
     reducePayments,
     refinancingFormActive,
@@ -752,15 +681,11 @@ export default defineStore('core', () => {
     roundingEnabled,
     roundingScale,
     saveState,
-    setCurrency,
-    setLanguage,
     setRoundingScale,
     snowball,
     snowballSort,
     sortLoans,
-    Time,
     toggleAvalancheSort,
-    togglePeriodsAsDates,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,
     toggleRounding,

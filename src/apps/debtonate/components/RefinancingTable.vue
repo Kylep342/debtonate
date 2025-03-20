@@ -3,7 +3,8 @@ import { computed } from 'vue';
 import { Loan, LoansPaymentSchedule } from 'moneyfunx';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   parentId: string,
@@ -11,11 +12,13 @@ const props = defineProps<{
   schedules: Record<string, LoansPaymentSchedule>,
 }>();
 
-const coreState = useCoreStore();
-const parentLoan = computed(() => coreState.getLoan(props.parentId))
+const globalOptions = useGlobalOptionsStore();
+const state = useDebtonateCoreStore();
 
-const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${coreState.getLoanName(loan.id)}`;
-const title = computed(() => buildRefinancingTableTitle(coreState.getLoan(props.parentId)))
+const parentLoan = computed(() => state.getLoan(props.parentId))
+
+const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${state.getLoanName(loan.id)}`;
+const title = computed(() => buildRefinancingTableTitle(state.getLoan(props.parentId)))
 
 const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lifetimeInterest
 </script>
@@ -65,42 +68,42 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
         <template #body>
           <tbody>
             <tr>
-              <td>{{ coreState.getLoanName(parentLoan.id) }}</td>
-              <td>{{ coreState.Percent(parentLoan.annualRate * 100) }}</td>
+              <td>{{ state.getLoanName(parentLoan.id) }}</td>
+              <td>{{ globalOptions.Percent(parentLoan.annualRate * 100) }}</td>
               <td>{{ parentLoan.termInYears }}</td>
-              <td>{{ coreState.Money(parentLoan.minPayment) }}</td>
+              <td>{{ globalOptions.Money(parentLoan.minPayment) }}</td>
               <td :class="['text-right']">
-                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
+                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(parentLoan.fees) }}
+                {{ globalOptions.Money(parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(coreState.getLifetimeInterest(parentLoan.id, constants.DEFAULT) + parentLoan.fees) }}
+                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT) + parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.getNumPayments(parentLoan.id, constants.DEFAULT) }}
+                {{ state.getNumPayments(parentLoan.id, constants.DEFAULT) }}
               </td>
             </tr>
             <tr v-for="(scenario) in scenarios" :key="scenario.id">
               <td>{{ scenario.name }}</td>
-              <td>{{ coreState.Percent(scenario.annualRate * 100) }}</td>
+              <td>{{ globalOptions.Percent(scenario.annualRate * 100) }}</td>
               <td>{{ scenario.termInYears }}</td>
-              <td>{{ coreState.Money(schedules[scenario.id].paymentAmount) }}</td>
+              <td>{{ globalOptions.Money(schedules[scenario.id].paymentAmount) }}</td>
               <td :class="['text-right']">
-                {{ coreState.Money(interest(scenario.id)) }}
+                {{ globalOptions.Money(interest(scenario.id)) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(scenario.fees) }}
+                {{ globalOptions.Money(scenario.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(interest(scenario.id) + scenario.fees) }}
+                {{ globalOptions.Money(interest(scenario.id) + scenario.fees) }}
               </td>
               <td :class="['text-right']">
                 {{ schedules[scenario.id].paymentSchedule.amortizationSchedule.length }}
               </td>
               <td>
-                <base-button :class="['btn-error']" @click="coreState.deleteRefinancingScenario(parentId, scenario.id)">
+                <base-button :class="['btn-error']" @click="state.deleteRefinancingScenario(parentId, scenario.id)">
                   {{ constants.BTN_DELETE }}
                 </base-button>
               </td>

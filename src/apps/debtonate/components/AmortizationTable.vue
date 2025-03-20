@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import { PaymentSchedule } from 'moneyfunx';
 
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 defineProps<{
   paymentSchedule: PaymentSchedule,
@@ -10,9 +11,10 @@ defineProps<{
   subtitle: string,
 }>();
 
-const coreState = useCoreStore();
+const globalOptions = useGlobalOptionsStore();
+const state = useDebtonateCoreStore();
 
-const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Payment Date' : 'Payment Number'));
+const paymentHeader = computed<string>(() => (globalOptions.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 </script>
 
 <template>
@@ -52,19 +54,19 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
           <tbody>
             <tr v-for="(record, rowno) in paymentSchedule.amortizationSchedule" :key="rowno">
               <td :class="['text-center']">
-                {{ coreState.Period(record.period, true) }}
+                {{ globalOptions.Period(record.period, true) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(record.interest + record.principal) }}
+                {{ globalOptions.Money(record.interest + record.principal) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(record.principal) }}
+                {{ globalOptions.Money(record.principal) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(record.interest) }}
+                {{ globalOptions.Money(record.interest) }}
               </td>
               <td :class="['text-right']">
-                {{ coreState.Money(record.principalRemaining) }}
+                {{ globalOptions.Money(record.principalRemaining) }}
               </td>
             </tr>
           </tbody>
@@ -77,20 +79,20 @@ const paymentHeader = computed<string>(() => (coreState.periodsAsDates ? 'Paymen
               </td>
               <td :class="['text-right']">
                 <b>{{
-                  coreState.Money(
+                  globalOptions.Money(
                     paymentSchedule.lifetimePrincipal +
                     paymentSchedule.lifetimeInterest
                   )
                 }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSchedule.lifetimePrincipal) }}</b>
+                <b>{{ globalOptions.Money(paymentSchedule.lifetimePrincipal) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(paymentSchedule.lifetimeInterest) }}</b>
+                <b>{{ globalOptions.Money(paymentSchedule.lifetimeInterest) }}</b>
               </td>
               <td :class="['text-right']">
-                <b>{{ coreState.Money(0) }}</b>
+                <b>{{ globalOptions.Money(0) }}</b>
               </td>
             </tr>
           </tfoot>

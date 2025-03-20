@@ -14,18 +14,18 @@ import OptionsForm from '@/apps/debtonate/components/forms/OptionsForm.vue';
 import RefinancingForm from '@/apps/debtonate/components/forms/RefinancingForm.vue';
 import SiteIntro from '@/apps/debtonate/components/SiteIntro.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import { useModal } from '@/apps/shared/composables/useModal';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
-// useModal(coreState.budgetDetailsPanelActive, constants.BUDGET_DETAILS_ID);
-// useModal(coreState.budgetFormActive, constants.BUDGET_FORM_ID);
-// useModal(coreState.loanDetailsPanelActive, constants.LOAN_DETAILS_ID);
-// useModal(coreState.loanFormActive, constants.LOAN_FORM_ID);
-// useModal(coreState.refinancingFormActive, constants.REFINANCING_FORM_ID);
+// useModal(state.budgetDetailsPanelActive, constants.BUDGET_DETAILS_ID);
+// useModal(state.budgetFormActive, constants.BUDGET_FORM_ID);
+// useModal(state.loanDetailsPanelActive, constants.LOAN_DETAILS_ID);
+// useModal(state.loanFormActive, constants.LOAN_FORM_ID);
+// useModal(state.refinancingFormActive, constants.REFINANCING_FORM_ID);
 
-watch(() => coreState.budgetDetailsPanelActive, async (show) => {
+watch(() => state.budgetDetailsPanelActive, async (show) => {
   if (show) {
     document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
   } else if (!show) {
@@ -33,7 +33,7 @@ watch(() => coreState.budgetDetailsPanelActive, async (show) => {
   }
 });
 
-watch(() => coreState.loanFormActive, async (show) => {
+watch(() => state.loanFormActive, async (show) => {
   if (show) {
     document.getElementById(constants.LOAN_FORM_ID).showModal();
   } else if (!show) {
@@ -41,7 +41,7 @@ watch(() => coreState.loanFormActive, async (show) => {
   }
 });
 
-watch(() => coreState.budgetFormActive, async (show) => {
+watch(() => state.budgetFormActive, async (show) => {
   if (show) {
     document.getElementById(constants.BUDGET_FORM_ID).showModal();
   } else if (!show) {
@@ -49,7 +49,7 @@ watch(() => coreState.budgetFormActive, async (show) => {
   }
 });
 
-watch(() => coreState.loanDetailsPanelActive, async (show) => {
+watch(() => state.loanDetailsPanelActive, async (show) => {
   if (show) {
     document.getElementById(constants.LOAN_DETAILS_ID).showModal();
   } else if (!show) {
@@ -57,7 +57,7 @@ watch(() => coreState.loanDetailsPanelActive, async (show) => {
   }
 });
 
-watch(() => coreState.optionsFormActive, async (show) => {
+watch(() => state.optionsFormActive, async (show) => {
   if (show) {
     document.getElementById(constants.OPTIONS_FORM_ID).showModal();
   } else if (!show) {
@@ -65,7 +65,7 @@ watch(() => coreState.optionsFormActive, async (show) => {
   }
 });
 
-watch(() => coreState.refinancingFormActive, async (show) => {
+watch(() => state.refinancingFormActive, async (show) => {
   if (show) {
     document.getElementById(constants.REFINANCING_FORM_ID).showModal();
   } else if (!show) {
@@ -89,7 +89,7 @@ watch(() => coreState.refinancingFormActive, async (show) => {
       <BudgetsPanel />
       <div :class="['m-4']">
         <div
-          v-if="!coreState.loans.length"
+          v-if="!state.loans.length"
           :class="['text-wrap', 'text-pretty', 'w-30']"
         >
           <SiteIntro />

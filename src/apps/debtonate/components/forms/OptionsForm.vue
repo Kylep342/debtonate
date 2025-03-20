@@ -2,56 +2,47 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
-const coreState = useCoreStore();
+const globalOptions = useGlobalOptionsStore();
+const state = useDebtonateCoreStore();
 
-const _currency = ref<string>(coreState.currency);
-const _language = ref<string>(coreState.language);
-const roundingScale = ref<number>(coreState.roundingScale);
+const roundingScale = ref<number>(state.roundingScale);
 
-const sortedCurrencies = computed<Array<string>>(() => coreState.currencies.toSorted());
-const sortedLanguages = computed<Array<string>>(() => coreState.languages.toSorted());
 const reducePaymentsExample = computed<string>(
-  () => (coreState.loans.length ? (`(Paying off ${coreState.getLoanName(coreState.loans[0].id)} reduces future payments by ${coreState.Money(coreState.loans[0].minPayment)})`) : ''),
+  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),
 );
 const refinancingUseHighestPaymentExample = computed<string>(() => {
-  if (coreState.loans.length) {
-    const firstLoan = coreState.loans[0]
+  if (state.loans.length) {
+    const firstLoan = state.loans[0]
     const basePayment = firstLoan.minPayment;
     const hypotheticalPayment = Math.max(firstLoan.minPayment - (firstLoan.minPayment % 10), 100);
-    const usedPayment = coreState.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
-    return `(A scenario for ${coreState.getLoanName(firstLoan.id)} [${coreState.Money(basePayment)}] with a minimum payment of ${coreState.Money(hypotheticalPayment)} uses ${coreState.Money(usedPayment)})`;
+    const usedPayment = state.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
+    return `(A scenario for ${state.getLoanName(firstLoan.id)} [${globalOptions.Money(basePayment)}] with a minimum payment of ${globalOptions.Money(hypotheticalPayment)} uses ${globalOptions.Money(usedPayment)})`;
   }
   return '';
 });
 const repaymentPriorityExample = computed<string>(
-  () => (coreState.loans.length ? (`(Priority: ${coreState.loans.map((loan) => coreState.getLoanName(loan.id)).join(', ')})`) : ''),
+  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 
-watch(() => _currency.value, async (newValue) => {
-  coreState.setCurrency(newValue);
-}, { immediate: true });
-
-watch(() => _language.value, async (newValue) => {
-  coreState.setLanguage(newValue);
-}, { immediate: true });
-
 watch(() => roundingScale.value, async (newValue) => {
-  coreState.setRoundingScale(newValue);
+  state.setRoundingScale(newValue);
 }, { immediate: true });
 </script>
 
 <template>
-  <base-modal :id="constants.OPTIONS_FORM_ID" :body-classes="['overflow-y-auto']" @exit="coreState.exitOptionsForm">
+  <base-modal :id="constants.OPTIONS_FORM_ID" :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="coreState.exitOptionsForm">
+      <base-button :class="['btn btn-circle btn-ghost']" @click="state.exitOptionsForm">
         x
       </base-button>
     </template>
@@ -67,10 +58,10 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(!coreState.snowballSort)" @click="coreState.toggleAvalancheSort">
+              <base-button :class="buttonStyle(!state.snowballSort)" @click="state.toggleAvalancheSort">
                 Avalanche
               </base-button>
-              <base-button :class="buttonStyle(coreState.snowballSort)" @click="coreState.toggleSnowballSort">
+              <base-button :class="buttonStyle(state.snowballSort)" @click="state.toggleSnowballSort">
                 Snowball
               </base-button>
             </div>
@@ -94,9 +85,9 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(coreState.reducePayments)" @click="coreState.toggleReducePayments">
+              <base-button :class="buttonStyle(state.reducePayments)" @click="state.toggleReducePayments">
                 {{
-                  buttonText(coreState.reducePayments) }}
+                  buttonText(state.reducePayments) }}
               </base-button>
             </div>
           </template>
@@ -121,10 +112,10 @@ watch(() => roundingScale.value, async (newValue) => {
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(coreState.refinancingUseHighestPayment)"
-                @click="coreState.toggleRefinancingUseHighestPayment">
+              <base-button :class="buttonStyle(state.refinancingUseHighestPayment)"
+                @click="state.toggleRefinancingUseHighestPayment">
                 {{
-                  buttonText(coreState.refinancingUseHighestPayment) }}
+                  buttonText(state.refinancingUseHighestPayment) }}
               </base-button>
             </div>
           </template>
@@ -156,9 +147,9 @@ watch(() => roundingScale.value, async (newValue) => {
               </div>
               <input :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`" v-model.number="roundingScale"
                 :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="scale">
-              <base-button :class="buttonStyle(coreState.roundingEnabled)"
-                @click="coreState.toggleRounding(roundingScale)">
-                {{ buttonText(coreState.roundingEnabled) }}
+              <base-button :class="buttonStyle(state.roundingEnabled)"
+                @click="state.toggleRounding(roundingScale)">
+                {{ buttonText(state.roundingEnabled) }}
               </base-button>
             </div>
           </template>
@@ -166,83 +157,16 @@ watch(() => roundingScale.value, async (newValue) => {
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
-                multiple of {{ coreState.Money(roundingScale) }}
+                multiple of {{ globalOptions.Money(roundingScale) }}
               </p>
               <br>
               <p>
-                Minimum Monthly Payment: {{ coreState.Money(coreState.totalMinPayment) }}
+                Minimum Monthly Payment: {{ globalOptions.Money(state.totalMinPayment) }}
               </p>
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Periods As Dates
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <base-button :class="buttonStyle(coreState.periodsAsDates)" @click="coreState.togglePeriodsAsDates">
-                {{ buttonText(coreState.periodsAsDates) }}
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this displays all period tags as dates (relative to
-                today)
-              </p>
-              <br>
-              <p>Next Period: {{ coreState.Period(1, true) }}</p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Currency
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <select :id="`${constants.OPTIONS_FORM_ID}-currency`" v-model="_currency"
-                class="select select-bordered w-full max-w-xs">
-                <option v-for="currency in sortedCurrencies" :key="currency" :value="currency">
-                  {{ currency }}
-                </option>
-              </select>
-            </div>
-          </template>
-          <template #cardBody>
-            <p>Money: {{ coreState.Money(coreState.totalMinPayment) }}</p>
-          </template>
-        </collapsible-card>
-        <collapsible-card>
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Locale
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <select :id="`${constants.OPTIONS_FORM_ID}-language`" v-model="_language"
-                class="select select-bordered w-full max-w-xs">
-                <option v-for="language in sortedLanguages" :key="language" :value="language">
-                  {{ language }}
-                </option>
-              </select>
-            </div>
-          </template>
-          <template #cardBody>
-            <p>Localization setting for formatting numbers and dates</p>
-            <br>
-            <p>Money: {{ coreState.Money(coreState.totalMinPayment) }}</p>
-            <p>Next Period: {{ coreState.Period(1, true) }}</p>
-            <p>Percent: {{ coreState.Percent(coreState.totalEffectiveInterestRate * 100) }}</p>
-          </template>
-        </collapsible-card>
+        <global-options-formlet />
       </div>
     </template>
   </base-modal>

@@ -3,32 +3,34 @@ import { computed } from 'vue';
 import { ILoan } from 'moneyfunx';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 
 const props = defineProps<{
   loan: ILoan
 }>();
 
-const coreState = useCoreStore();
+const globalOptions = useGlobalOptionsStore();
+const state = useDebtonateCoreStore();
 
-const loanCurrentBalance = computed<string>(() => `${coreState.Money(props.loan.currentBalance)}`);
-const loanInterestRate = computed<string>(() => `${coreState.Percent(props.loan.annualRate * 100)}`);
-const loanMinPayment = computed<string>(() => `${coreState.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed<string>(() => `${coreState.Money(props.loan.principal)}`);
+const loanCurrentBalance = computed<string>(() => `${globalOptions.Money(props.loan.currentBalance)}`);
+const loanInterestRate = computed<string>(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
+const loanMinPayment = computed<string>(() => `${globalOptions.Money(props.loan.minPayment)}/month`);
+const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.principal)}`);
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
-const loanFees = computed<string | null>(() => props.loan.fees ? `${coreState.Money(props.loan.fees)}` : null);
+const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
     text: constants.BTN_DETAILS,
-    onClick: () => coreState.loans.length ? coreState.viewLoan(props.loan.id) : alertButtonIsDisabled(),
+    onClick: () => state.loans.length ? state.viewLoan(props.loan.id) : alertButtonIsDisabled(),
   },
   {
     text: constants.BTN_REFINANCE,
-    onClick: () => coreState.loans.length ? coreState.refinanceLoan(props.loan.id) : alertButtonIsDisabled(),
+    onClick: () => state.loans.length ? state.refinanceLoan(props.loan.id) : alertButtonIsDisabled(),
   },
 ]));
 
@@ -37,11 +39,11 @@ const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
-    onClick: () => coreState.editLoan(props.loan.id),
+    onClick: () => state.editLoan(props.loan.id),
   },
   {
     text: constants.BTN_DELETE,
-    onClick: () => coreState.deleteLoan(props.loan.id),
+    onClick: () => state.deleteLoan(props.loan.id),
   },
 ]));
 
@@ -54,7 +56,7 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ coreState.getLoanName(loan.id) }}
+            {{ state.getLoanName(loan.id) }}
           </h2>
           <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
         </div>

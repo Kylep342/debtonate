@@ -3,32 +3,32 @@ import { computed } from 'vue';
 
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import { useResize } from '@/apps/shared/composables/useResize';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
 const { scrollContainer } = useResize('resizeBudgetsPanel');
 
 const buttons: Array<Button> = [
   {
     text: constants.BTN_CREATE,
-    onClick: coreState.openBudgetForm,
+    onClick: state.openBudgetForm,
     classes: ['btn-success', 'text-center'],
   },
 ];
 
 const defaultBudgetIndex = computed<number>(
-  () => coreState.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
+  () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
 );
 
 const orderedBudgets = computed<MonthlyBudget[]>(() => [
-  coreState.monthlyBudgets[defaultBudgetIndex.value],
-  ...coreState.monthlyBudgets.slice(0, defaultBudgetIndex.value),
-  ...coreState.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
+  state.monthlyBudgets[defaultBudgetIndex.value],
+  ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
+  ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
 ]);
 </script>
 

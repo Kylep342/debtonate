@@ -6,24 +6,24 @@ import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 const currentLoan = ref<ILoan>();
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
 const buildLoanDetailsTitle = (loan: ILoan): string => loan
-  ? `Loan Details - ${coreState.getLoanName(loan.id)} | `
-  + `${coreState.buildLoanSubtitle(loan)}`
+  ? `Loan Details - ${state.getLoanName(loan.id)} | `
+  + `${state.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
 
 const title = computed<string>(() => buildLoanDetailsTitle(currentLoan.value!));
 
 watch(
-  () => coreState.currentLoanId,
+  () => state.currentLoanId,
   (newId) => {
-    if (newId && coreState.loanDetailsPanelActive) {
-      currentLoan.value = coreState.getLoan(newId);
+    if (newId && state.loanDetailsPanelActive) {
+      currentLoan.value = state.getLoan(newId);
     }
   },
   { immediate: true },
@@ -31,29 +31,29 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_DETAILS_ID" @exit="coreState.unviewLoan">
+  <base-modal :id="constants.LOAN_DETAILS_ID" @exit="state.unviewLoan">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="coreState.unviewLoan">
+      <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewLoan">
         x
       </base-button>
     </template>
     <template #body>
       <div v-if="currentLoan" :class="['tabframe', 'w-auto']">
-        <RefinancingTable v-if="coreState.refinancingScenarios[currentLoan.id]?.length" :parent-id="currentLoan.id"
-          :scenarios="coreState.refinancingScenarios[currentLoan.id]"
-          :schedules="coreState.refinancingSchedules[currentLoan.id]" />
-        <base-tabs :get-item-name="coreState.getBudgetName" :pivot="coreState.monthlyBudgets"
+        <RefinancingTable v-if="state.refinancingScenarios[currentLoan.id]?.length" :parent-id="currentLoan.id"
+          :scenarios="state.refinancingScenarios[currentLoan.id]"
+          :schedules="state.refinancingSchedules[currentLoan.id]" />
+        <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="coreState.getPaymentSchedule(currentLoan.id, viewedItemId)" :title="coreState.buildAmortizationTableTitle(
+            <AmortizationTable :payment-schedule="state.getPaymentSchedule(currentLoan.id, viewedItemId)" :title="state.buildAmortizationTableTitle(
               currentLoan,
-              coreState.getBudget(viewedItemId),
-            )" :subtitle="coreState.buildAmortizationTableSubtitle(
+              state.getBudget(viewedItemId),
+            )" :subtitle="state.buildAmortizationTableSubtitle(
                 currentLoan,
-                coreState.getBudget(viewedItemId),
+                state.getBudget(viewedItemId),
               )" />
           </template>
         </base-tabs>

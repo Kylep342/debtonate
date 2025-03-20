@@ -2,9 +2,9 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
 const loanId = ref<string | null>(null);
 const currentBalance = ref<number | null>(null);
@@ -20,11 +20,11 @@ const createButtonEnabled = computed<boolean>(
 );
 
 watch(
-  () => coreState.currentLoanId,
+  () => state.currentLoanId,
   (newId) => {
-    if (newId && coreState.refinancingFormActive) {
+    if (newId && state.refinancingFormActive) {
       loanId.value = newId;
-      const currentLoan = coreState.getLoan(loanId.value);
+      const currentLoan = state.getLoan(loanId.value);
       currentBalance.value = currentLoan.currentBalance;
     }
   },
@@ -40,7 +40,7 @@ const clearForm = () => {
 };
 
 const refinanceLoan = () => {
-  coreState.createRefinanceScenario(
+  state.createRefinanceScenario(
     loanId.value,
     currentBalance.value,
     interestRate.value! / 100,
@@ -53,14 +53,14 @@ const refinanceLoan = () => {
 
 const exit = () => {
   clearForm();
-  coreState.exitRefinancingForm();
+  state.exitRefinancingForm();
 };
 </script>
 
 <template>
   <base-modal :id="constants.REFINANCING_FORM_ID" @exit="exit">
     <template #header>
-      <h2>{{ coreState.refinancingFormTitle }}</h2>
+      <h2>{{ state.refinancingFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button :class="['btn btn-circle btn-ghost']" @click="exit">

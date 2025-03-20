@@ -2,9 +2,9 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
 const principal = ref<number | null>(null);
 const interestRate = ref<number | null>(null);
@@ -20,16 +20,16 @@ const createButtonEnabled = computed<boolean>(
 );
 
 const createLoanButtonText = computed<string>(() => (
-  coreState.currentLoanId
+  state.currentLoanId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
 ));
 
 watch(
-  () => coreState.currentLoanId,
+  () => state.currentLoanId,
   (newId) => {
-    if (newId && coreState.loanFormActive) {
-      const currentLoan = coreState.getLoan(newId);
+    if (newId && state.loanFormActive) {
+      const currentLoan = state.getLoan(newId);
       principal.value = currentLoan.principal;
       interestRate.value = currentLoan.annualRate * 100;
       termInYears.value = currentLoan.termInYears;
@@ -51,7 +51,7 @@ const clearForm = () => {
 };
 
 const createLoan = () => {
-  coreState.createLoan(
+  state.createLoan(
     principal.value,
     interestRate.value! / 100,
     termInYears.value,
@@ -64,7 +64,7 @@ const createLoan = () => {
 
 const exit = () => {
   clearForm();
-  coreState.exitLoanForm();
+  state.exitLoanForm();
 };
 </script>
 
@@ -72,7 +72,7 @@ const exit = () => {
   <base-modal :id="constants.LOAN_FORM_ID" @exit="exit">
     <template #header>
       <h2 :class="['pl-4']">
-        {{ coreState.loanFormTitle }}
+        {{ state.loanFormTitle }}
       </h2>
     </template>
     <template #headerActions>

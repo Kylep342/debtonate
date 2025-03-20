@@ -2,9 +2,9 @@
 import { computed, ref, watch } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useCoreStore from '@/apps/debtonate/stores/core';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
-const coreState = useCoreStore();
+const state = useDebtonateCoreStore();
 
 const amount = ref<number | null>(null);
 
@@ -13,16 +13,16 @@ const createButtonEnabled = computed<boolean>(
 );
 
 const createBudgetButtonText = computed<string>(() => (
-  coreState.currentBudgetId
+  state.currentBudgetId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
 ));
 
 watch(
-  () => coreState.currentBudgetId,
+  () => state.currentBudgetId,
   (newId) => {
-    if (newId && coreState.budgetFormActive) {
-      const currentBudget = coreState.getBudget(newId);
+    if (newId && state.budgetFormActive) {
+      const currentBudget = state.getBudget(newId);
       amount.value = currentBudget.relative;
     }
   },
@@ -34,20 +34,20 @@ const clearForm = () => {
 };
 
 const createBudget = () => {
-  coreState.createBudget(amount.value);
+  state.createBudget(amount.value);
   clearForm();
 };
 
 const exit = () => {
   clearForm();
-  coreState.exitBudgetForm();
+  state.exitBudgetForm();
 };
 </script>
 
 <template>
   <base-modal :id="constants.BUDGET_FORM_ID" @exit="exit">
     <template #header>
-      <h2>{{ coreState.budgetFormTitle }}</h2>
+      <h2>{{ state.budgetFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button :class="['btn btn-circle btn-ghost']" @click="exit">
