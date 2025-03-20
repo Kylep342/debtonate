@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
@@ -8,8 +8,6 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
-
-const roundingScale = ref<number>(state.roundingScale);
 
 const reducePaymentsExample = computed<string>(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),
@@ -30,10 +28,6 @@ const repaymentPriorityExample = computed<string>(
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
-
-watch(() => roundingScale.value, async (newValue) => {
-  state.setRoundingScale(newValue);
-}, { immediate: true });
 </script>
 
 <template>
@@ -149,10 +143,10 @@ watch(() => roundingScale.value, async (newValue) => {
               <div :class="['label']">
                 <span :class="['label-text']">scale:</span>
               </div>
-              <input :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`" v-model.number="roundingScale"
+              <input :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`" v-model.number="state.roundingScale"
                 :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="scale">
               <base-button :class="buttonStyle(state.roundingEnabled)"
-                @click="state.toggleRounding(roundingScale)">
+                @click="state.toggleRounding(state.roundingScale)">
                 {{ buttonText(state.roundingEnabled) }}
               </base-button>
             </div>
@@ -161,7 +155,7 @@ watch(() => roundingScale.value, async (newValue) => {
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 When enabled this rounds your minimum contribution up to the next
-                multiple of {{ globalOptions.Money(roundingScale) }}
+                multiple of {{ globalOptions.Money(state.roundingScale) }}
               </p>
               <br>
               <p>

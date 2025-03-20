@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUpdated, ref } from 'vue';
 
-import { TooltipConfig } from '@/apps/shared/types/graph';
+import { TooltipConfig } from '../types/graph';
 
 const props = defineProps<{
   tooltipConfig: TooltipConfig,
