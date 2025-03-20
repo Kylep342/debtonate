@@ -31,12 +31,16 @@ export default defineStore('appreciateCore', () => {
   const budgets = ref<Array<Budget>>([]);
   const currentBudgetId = ref<string|null>(null);
   const currentInstrumentId = ref<string|null>(null);
+  const deflateAllMoney = ref<boolean>(false);
+  const inflationFactor = ref<number>(constants.DEFAULT_INFLATION_FACTOR);
   const instrumentDetailsPanelActive = ref<boolean>(false);
   const instrumentFormActive = ref<boolean>(false);
   const instruments = ref<Array<moneyfunx.Instrument>>([]);
   const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
-  const yearsToContribute = ref<number>(25);
+  const yearsToContribute = ref<number>(constants.DEFAULT_YEARS_TO_CONTRIBUTE);
+  const yearsToSpend = ref<number>(constants.DEFAULT_YEARS_TO_SPEND);
+
 
 
   /** independent functions/computed values */
@@ -52,10 +56,14 @@ export default defineStore('appreciateCore', () => {
     budgets.value = [];
     currentBudgetId.value = null;
     currentInstrumentId.value = null;
+    deflateAllMoney.value = false;
+    inflationFactor.value = constants.DEFAULT_INFLATION_FACTOR;
     instrumentDetailsPanelActive.value = false;
     instrumentFormActive.value = false;
     instruments.value = [];
     optionsFormActive.value = false;
+    yearsToContribute.value = constants.DEFAULT_YEARS_TO_CONTRIBUTE;
+    yearsToSpend.value = constants.DEFAULT_YEARS_TO_SPEND;
   };
 
   const loadState = (): void => {
@@ -63,7 +71,11 @@ export default defineStore('appreciateCore', () => {
 
     accrueBeforeContribution.value = JSON.parse(localStorage.getItem(keys.LS_ACCRUE_BEFORE_CONTRIBUTION)!);
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
+    deflateAllMoney.value = JSON.parse(localStorage.getItem(keys.LS_DEFLATE_ALL_MONEY)!);
+    inflationFactor.value = JSON.parse(localStorage.getItem(keys.LS_INFLATION_FACTOR)!);
     instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!);
+    yearsToContribute.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_CONTRIBUTE)!);
+    yearsToSpend.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_SPEND)!);
   };
 
   const saveState = (): void => {
@@ -71,7 +83,11 @@ export default defineStore('appreciateCore', () => {
 
     localStorage.setItem(keys.LS_ACCRUE_BEFORE_CONTRIBUTION, JSON.stringify(accrueBeforeContribution.value));
     localStorage.setItem(keys.LS_BUDGETS , JSON.stringify(budgets.value));
+    localStorage.setItem(keys.LS_DEFLATE_ALL_MONEY , JSON.stringify(deflateAllMoney.value));
+    localStorage.setItem(keys.LS_INFLATION_FACTOR, JSON.stringify(inflationFactor.value));
     localStorage.setItem(keys.LS_INSTRUMENTS , JSON.stringify(instruments.value));
+    localStorage.setItem(keys.LS_YEARS_TO_CONTRIBUTE, JSON.stringify(yearsToContribute.value));
+    localStorage.setItem(keys.LS_YEARS_TO_SPEND, JSON.stringify(yearsToSpend.value));
   };
 
   const exportState = () => ({
@@ -79,10 +95,20 @@ export default defineStore('appreciateCore', () => {
 
     [keys.LS_ACCRUE_BEFORE_CONTRIBUTION]: accrueBeforeContribution.value,
     [keys.LS_BUDGETS]: budgets.value,
+    [keys.LS_DEFLATE_ALL_MONEY]: deflateAllMoney.value,
+    [keys.LS_INFLATION_FACTOR]: inflationFactor.value,
     [keys.LS_INSTRUMENTS]: instruments.value,
+    [keys.LS_YEARS_TO_CONTRIBUTE]: yearsToContribute.value,
+    [keys.LS_YEARS_TO_SPEND]: yearsToSpend.value,
   });
 
   // appreciate settings
+
+  const setInflationFactor = (newFactor: number): void => {
+    if (!Number.isNaN(newFactor && newFactor > 0 && newFactor < constants.MAX_DELTA_FACTOR)) {
+      inflationFactor.value = newFactor;
+    }
+  };
 
   const setYearsToContribute = (newYears: number): void => {
     if (!Number.isNaN(newYears && newYears > 0 && newYears < moneyfunx.MAX_DURATION_YEARS)) {
@@ -90,8 +116,18 @@ export default defineStore('appreciateCore', () => {
     }
   };
 
+  const setYearsToSpend = (newYears: number): void => {
+    if (!Number.isNaN(newYears && newYears > 0 && newYears < moneyfunx.MAX_DURATION_YEARS)) {
+      yearsToSpend.value = newYears;
+    }
+  };
+
   const toggleAccrueBeforeContribution = (): void => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
+  };
+
+  const toggleDeflateAllMoney = (): void => {
+    deflateAllMoney.value = !deflateAllMoney.value
   };
 
 
@@ -342,6 +378,7 @@ export default defineStore('appreciateCore', () => {
     createInstrument,
     currentBudgetId,
     currentInstrumentId,
+    deflateAllMoney,
     deleteBudget,
     deleteInstrument,
     editBudget,
@@ -373,8 +410,11 @@ export default defineStore('appreciateCore', () => {
     openOptionsForm,
     optionsFormActive,
     saveState,
+    setInflationFactor,
     setYearsToContribute,
+    setYearsToSpend,
     toggleAccrueBeforeContribution,
+    toggleDeflateAllMoney,
     totalCurrentBalance,
     totalMaxPeriodsPerYear,
     totalsAsAnInstrument,
@@ -383,5 +423,6 @@ export default defineStore('appreciateCore', () => {
     viewBudget,
     viewInstrument,
     yearsToContribute,
+    yearsToSpend,
   };
 });
