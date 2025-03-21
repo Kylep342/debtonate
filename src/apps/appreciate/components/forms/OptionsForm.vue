@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import constants from '../../constants/constants';
 import useAppreciateCoreStore from '../../stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
@@ -9,7 +8,7 @@ const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BTN_OFF);
+const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>

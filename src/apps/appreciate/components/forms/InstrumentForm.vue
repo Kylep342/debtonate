@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 
 const state = useAppreciateCoreStore();
 
@@ -20,8 +19,8 @@ const createButtonEnabled = computed<boolean>(
 
 const createInstrumentButtonText = computed<string>(() => (
   state.currentInstrumentId
-    ? sharedConstants.BTN_SAVE
-    : sharedConstants.BTN_CREATE
+    ? constants.BTN_SAVE
+    : constants.BTN_CREATE
 ));
 
 watch(

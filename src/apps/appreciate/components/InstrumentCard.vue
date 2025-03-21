@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { IInstrument } from 'moneyfunx';
 
-import sharedConstants from '@/apps/shared/constants/constants';
+import constants from '@/apps/shared/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
@@ -27,7 +27,7 @@ const alertButtonIsDisabled = () => alert('Create a instrument to use this actio
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
-    text: sharedConstants.BTN_DETAILS,
+    text: constants.BTN_DETAILS,
     onClick: () => state.instruments.length ? state.viewInstrument(props.instrument.id) : alertButtonIsDisabled(),
   },
 ]));
@@ -35,16 +35,16 @@ const baseButtons = computed<Array<Button>>(() => ([
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
-    text: sharedConstants.BTN_EDIT,
+    text: constants.BTN_EDIT,
     onClick: () => state.editInstrument(props.instrument.id),
   },
   {
-    text: sharedConstants.BTN_DELETE,
+    text: constants.BTN_DELETE,
     onClick: () => state.deleteInstrument(props.instrument.id),
   },
 ]));
 
-const getButtons = (instrumentId): Array<Button> => instrumentId === sharedConstants.TOTALS ? baseButtons.value : editButtons.value;
+const getButtons = (instrumentId): Array<Button> => instrumentId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -55,7 +55,7 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === sharedConst
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getInstrumentName(instrument.id) }}
           </h2>
-          <base-menu :menu="sharedConstants.BTN_MENU" :buttons="getButtons(instrument.id)" />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(instrument.id)" />
         </div>
       </div>
     </template>

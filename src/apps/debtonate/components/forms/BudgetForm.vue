@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue';
 
 import constants from '../../constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 
 const state = useDebtonateCoreStore();
 
@@ -15,8 +14,8 @@ const createButtonEnabled = computed<boolean>(
 
 const createBudgetButtonText = computed<string>(() => (
   state.currentBudgetId
-    ? sharedConstants.BTN_SAVE
-    : sharedConstants.BTN_CREATE
+    ? constants.BTN_SAVE
+    : constants.BTN_CREATE
 ));
 
 watch(
@@ -58,7 +57,7 @@ const exit = () => {
     <template #body>
       <div :class="['formInputs']">
         <div :class="['label']">
-          <span :class="['label-text']">{{ sharedConstants.BUDGET }}</span>
+          <span :class="['label-text']">{{ constants.BUDGET }}</span>
         </div>
         <input :id="`${constants.BUDGET_FORM_ID}-amount`" v-model.number="amount"
           :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Budget">

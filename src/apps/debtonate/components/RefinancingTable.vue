@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Loan, LoansPaymentSchedule } from 'moneyfunx';
 
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
+import constants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
@@ -73,16 +73,16 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
               <td>{{ parentLoan.termInYears }}</td>
               <td>{{ globalOptions.Money(parentLoan.minPayment) }}</td>
               <td :class="['text-right']">
-                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, sharedConstants.DEFAULT)) }}
+                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
               </td>
               <td :class="['text-right']">
                 {{ globalOptions.Money(parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, sharedConstants.DEFAULT) + parentLoan.fees) }}
+                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT) + parentLoan.fees) }}
               </td>
               <td :class="['text-right']">
-                {{ state.getNumPayments(parentLoan.id, sharedConstants.DEFAULT) }}
+                {{ state.getNumPayments(parentLoan.id, constants.DEFAULT) }}
               </td>
             </tr>
             <tr v-for="(scenario) in scenarios" :key="scenario.id">
@@ -104,7 +104,7 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
               </td>
               <td>
                 <base-button :class="['btn-error']" @click="state.deleteRefinancingScenario(parentId, scenario.id)">
-                  {{ sharedConstants.BTN_DELETE }}
+                  {{ constants.BTN_DELETE }}
                 </base-button>
               </td>
             </tr>

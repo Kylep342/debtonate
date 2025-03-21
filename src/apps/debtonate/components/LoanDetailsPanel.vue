@@ -7,11 +7,10 @@ import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 
 const state = useDebtonateCoreStore();
 const currentLoan = ref<ILoan>();
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(sharedConstants.DEFAULT);
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
 const buildLoanDetailsTitle = (loan: ILoan): string => loan
   ? `Loan Details - ${state.getLoanName(loan.id)} | `

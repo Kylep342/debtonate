@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import constants from '../constants/constants';
 import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
-import sharedConstants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
@@ -26,7 +25,7 @@ const alertButtonIsDisabled = () => alert('Create an instrument to use this acti
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
-    text: sharedConstants.BTN_DETAILS,
+    text: constants.BTN_DETAILS,
     onClick: () => state.instruments.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
@@ -34,16 +33,16 @@ const baseButtons = computed<Array<Button>>(() => ([
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
-    text: sharedConstants.BTN_EDIT,
+    text: constants.BTN_EDIT,
     onClick: () => state.editBudget(props.budget.id),
   },
   {
-    text: sharedConstants.BTN_DELETE,
+    text: constants.BTN_DELETE,
     onClick: () => state.deleteBudget(props.budget.id),
   },
 ]));
 
-const getButtons = (budgetId): Array<Button> => budgetId === sharedConstants.DEFAULT ? baseButtons.value : editButtons.value;
+const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -54,7 +53,7 @@ const getButtons = (budgetId): Array<Button> => budgetId === sharedConstants.DEF
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getBudgetName(budget.id) }}
           </h2>
-          <base-menu :menu="sharedConstants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
         </div>
       </div>
     </template>
@@ -68,7 +67,7 @@ const getButtons = (budgetId): Array<Button> => budgetId === sharedConstants.DEF
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
-            <tr v-if="budget.id !== sharedConstants.DEFAULT">
+            <tr v-if="budget.id !== constants.DEFAULT">
               <td>Extra</td>
               <td :class="['text-right']">
                 <b>{{ budgetExtra }}</b>

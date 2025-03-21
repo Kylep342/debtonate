@@ -4,13 +4,12 @@ import { computed, ref, watch } from 'vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 import { GraphConfig } from '@/apps/shared/types/graph';
 
 const state = useDebtonateCoreStore();
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(sharedConstants.TOTALS);
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
 const viewedGraphId = ref<string>(constants.GRAPH_BALANCES_OVER_TIME);
 const activeGraph = computed<GraphConfig>(() => state.graphs[viewedGraphId.value]);
@@ -23,7 +22,7 @@ const buttons: Array<Button> = Object.keys(state.graphs).map((graphId) => ({
 
 watch(() => state.loans, async (loans) => {
   if (!loans.map((loan) => loan.id).includes(viewedItemId.value)) {
-    setViewedItemId(sharedConstants.TOTALS);
+    setViewedItemId(constants.TOTALS);
   }
 });
 </script>
@@ -33,9 +32,9 @@ watch(() => state.loans, async (loans) => {
     <div :class="['card-actions', 'flow-root', 'p-0']">
       <div :class="['flex', 'justify-between', 'pr-4']">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          {{ sharedConstants.GRAPHS }} - {{ viewedGraphId }}
+          {{ constants.GRAPHS }} - {{ viewedGraphId }}
         </h2>
-        <base-menu :menu="sharedConstants.BTN_SELECT" :buttons="buttons" />
+        <base-menu :menu="constants.BTN_SELECT" :buttons="buttons" />
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">

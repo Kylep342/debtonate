@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
+import constants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
@@ -12,7 +12,7 @@ const props = defineProps<{ budget: MonthlyBudget }>();
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
-const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(sharedConstants.TOTALS, props.budget.id));
+const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
@@ -25,7 +25,7 @@ const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
-    text: sharedConstants.BTN_DETAILS,
+    text: constants.BTN_DETAILS,
     onClick: () => state.loans.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
@@ -33,17 +33,17 @@ const baseButtons = computed<Array<Button>>(() => ([
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
-    text: sharedConstants.BTN_EDIT,
+    text: constants.BTN_EDIT,
     onClick: () => state.editBudget(props.budget.id),
   },
   {
-    text: sharedConstants.BTN_DELETE,
+    text: constants.BTN_DELETE,
     onClick: () => state.deleteBudget(props.budget.id),
   },
 ]));
 
 const getButtons = (budgetId): Array<Button> => (
-  budgetId === sharedConstants.DEFAULT
+  budgetId === constants.DEFAULT
     ? baseButtons.value
     : editButtons.value
   );
@@ -57,7 +57,7 @@ const getButtons = (budgetId): Array<Button> => (
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getBudgetName(budget.id) }}
           </h2>
-          <base-menu :menu="sharedConstants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
         </div>
       </div>
     </template>
@@ -71,7 +71,7 @@ const getButtons = (budgetId): Array<Button> => (
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
-            <tr v-if="budget.id !== sharedConstants.DEFAULT">
+            <tr v-if="budget.id !== constants.DEFAULT">
               <td>Extra</td>
               <td :class="['text-right']">
                 <b>{{ budgetExtra }}</b>

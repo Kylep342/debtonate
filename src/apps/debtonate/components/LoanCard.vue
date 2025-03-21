@@ -4,7 +4,6 @@ import { ILoan } from 'moneyfunx';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 
@@ -26,7 +25,7 @@ const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
-    text: sharedConstants.BTN_DETAILS,
+    text: constants.BTN_DETAILS,
     onClick: () => state.loans.length ? state.viewLoan(props.loan.id) : alertButtonIsDisabled(),
   },
   {
@@ -39,16 +38,16 @@ const baseButtons = computed<Array<Button>>(() => ([
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
   {
-    text: sharedConstants.BTN_EDIT,
+    text: constants.BTN_EDIT,
     onClick: () => state.editLoan(props.loan.id),
   },
   {
-    text: sharedConstants.BTN_DELETE,
+    text: constants.BTN_DELETE,
     onClick: () => state.deleteLoan(props.loan.id),
   },
 ]));
 
-const getButtons = (loanId): Array<Button> => loanId === sharedConstants.TOTALS ? baseButtons.value : editButtons.value;
+const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -59,7 +58,7 @@ const getButtons = (loanId): Array<Button> => loanId === sharedConstants.TOTALS 
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getLoanName(loan.id) }}
           </h2>
-          <base-menu :menu="sharedConstants.BTN_MENU" :buttons="getButtons(loan.id)" />
+          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
         </div>
       </div>
     </template>

@@ -4,7 +4,6 @@ import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import { useResize } from '@/apps/shared/composables/useResize';
-import sharedConstants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 
 const state = useAppreciateCoreStore();
@@ -13,7 +12,7 @@ const { scrollContainer } = useResize('resizeInstrumentsPanel');
 
 const buttons: Array<Button> = [
   {
-    text: sharedConstants.BTN_CREATE,
+    text: constants.BTN_CREATE,
     onClick: state.openInstrumentForm,
     classes: ['btn-success', 'text-center'],
   },

@@ -4,7 +4,6 @@ import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import { useResize } from '@/apps/shared/composables/useResize';
-import sharedConstants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 
 const state = useDebtonateCoreStore();
@@ -13,7 +12,7 @@ const { scrollContainer } = useResize('resizeLoansPanel');
 
 const buttons: Array<Button> = [
   {
-    text: sharedConstants.BTN_CREATE,
+    text: constants.BTN_CREATE,
     onClick: state.openLoanForm,
     classes: ['btn-success', 'text-center'],
   },

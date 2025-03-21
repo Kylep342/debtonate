@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import sharedConstants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
@@ -28,7 +27,7 @@ const repaymentPriorityExample = computed<string>(
 );
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BTN_OFF);
+const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>

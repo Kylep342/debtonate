@@ -5,7 +5,6 @@ import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
@@ -14,13 +13,13 @@ const state = useDebtonateCoreStore();
 
 const currentBudget = ref<MonthlyBudget>();
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(sharedConstants.TOTALS);
+const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
   + `${globalOptions.Money(monthlyBudget.absolute)}/month `
   + `(+${globalOptions.Money(monthlyBudget.relative)}/month)`
-  : sharedConstants.BUDGET_DETAILS;
+  : constants.BUDGET_DETAILS;
 
 const title = computed<string>(() => (buildBudgetDetailsTitle(currentBudget.value!)))
 

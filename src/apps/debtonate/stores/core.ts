@@ -10,7 +10,6 @@ import {
   MonthlyBudget,
   PaymentScenario,
 } from '../types/core';
-import sharedConstants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
   Graph,
@@ -34,7 +33,7 @@ export default defineStore('debtonateCore', () => {
   const loanDetailsPanelActive = ref(false);
   const loanFormActive = ref<boolean>(false);
   const loans = ref<Array<moneyfunx.Loan>>([]);
-  const minimumBudget: Budget = {id: sharedConstants.DEFAULT, relative: 0};
+  const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
   const reducePayments = ref<boolean>(true);
   const refinancingFormActive = ref<boolean>(false);
@@ -185,7 +184,7 @@ export default defineStore('debtonateCore', () => {
   //
 
   const totalsAsALoan = computed<moneyfunx.ILoan>(() => ({
-    id: sharedConstants.TOTALS,
+    id: constants.TOTALS,
     principal: totalPrincipal.value,
     annualRate: totalEffectiveInterestRate.value,
     periodsPerYear: totalMaxPeriodsPerYear.value,
@@ -333,19 +332,19 @@ export default defineStore('debtonateCore', () => {
 
   const deleteBudget = (id: string) => {
     budgets.value = budgets.value.filter(
-      (budget) => budget.id !== id && budget.id !== sharedConstants.DEFAULT,
+      (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
     );
   };
   const editBudget = (id: string) => {
     currentBudgetId.value = id;
     openBudgetForm();
   };
-  const getBudgetColor = (id: string): string => sharedConstants.COLORS[getBudgetIndex(id) % sharedConstants.COLORS.length];
+  const getBudgetColor = (id: string): string => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
   const getBudgetIndex = (id: string): number => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
   const getBudgetName = (id: string): string => (
-    id === sharedConstants.DEFAULT
-      ? sharedConstants.NAME_MIN_BUDGET
-      : `${sharedConstants.BUDGET} ${getBudgetIndex(id)}`
+    id === constants.DEFAULT
+      ? constants.NAME_MIN_BUDGET
+      : `${constants.BUDGET} ${getBudgetIndex(id)}`
   );
   const unviewBudget = () => {
     budgetDetailsPanelActive.value = false;
@@ -421,7 +420,7 @@ export default defineStore('debtonateCore', () => {
       id: String(Math.floor(Math.random() * Date.now())),
       relative: proposedBudget
     };
-    if (currentBudgetId.value && currentBudgetId.value !== sharedConstants.DEFAULT) {
+    if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
       deleteBudget(currentBudgetId.value);
       currentBudgetId.value = null;
     };
@@ -440,7 +439,7 @@ export default defineStore('debtonateCore', () => {
     fees: number
   ): string => {
     const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance, fees);
-    if (currentLoanId.value && currentLoanId.value !== sharedConstants.TOTALS) {
+    if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
     };
@@ -518,7 +517,7 @@ export default defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = {
         config: {
-          maxX: getNumPayments(loan.id, sharedConstants.DEFAULT),
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id)!.currentBalance,
         },
         lines: <Record<string, Point[]>>{},
@@ -555,17 +554,17 @@ export default defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = {
         config: {
-          maxX: getNumPayments(loan.id, sharedConstants.DEFAULT),
-          maxY: getLifetimeInterest(loan.id, sharedConstants.DEFAULT),
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
+          maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
         },
         lines: <Record<string, Point[]>>{},
       }
       monthlyBudgets.value.forEach((budget) => {
         const line: Point[] = [];
-        getPaymentSchedule(loan.id, sharedConstants.DEFAULT).amortizationSchedule.forEach((record, index) => {
+        getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
           line.push({
             x: record.period,
-            y: getInterestUpToPeriod(loan.id, sharedConstants.DEFAULT, index) -
+            y: getInterestUpToPeriod(loan.id, constants.DEFAULT, index) -
               getInterestUpToPeriod(loan.id, budget.id, index)
           });
         });
@@ -596,7 +595,7 @@ export default defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = <Graph>{
         config: {
-          maxX: getNumPayments(loan.id, sharedConstants.DEFAULT),
+          maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
         },
         lines: <Record<string, Point[]>>{},
