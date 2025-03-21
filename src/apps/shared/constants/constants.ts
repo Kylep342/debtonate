@@ -1,3 +1,5 @@
+import { TOTALS } from 'moneyfunx';
+
 const BTN_CLEAR = 'Clear';
 const BTN_COPY = 'Copy';
 const BTN_CREATE = 'Create';
@@ -11,6 +13,9 @@ const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
+const BUDGET = 'Budget';
+const BUDGET_DETAILS = 'Budget Details';
+const BUDGETS = 'Budgets';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 const COLORS = [
   'oklch(80.74% 0.0525 159.09)',
@@ -21,8 +26,6 @@ const COLORS = [
 const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPHS = 'Graphs';
-const PERIOD = 'Period';
-const TABLES = 'Tables';
 
 const LOCALE_CURRENCY = {
   'ar-AE': 'AED', // UAE Dirham
@@ -74,6 +77,11 @@ const LOCALE_CURRENCY = {
   'zh-HK': 'HKD', // Hong Kong Dollar
   'zh-TW': 'TWD', // New Taiwan Dollar
 };
+const NAME_APPRECIATE = 'Appreciate';
+const NAME_DEBTONATE = 'Debtonate';
+const NAME_MIN_BUDGET = 'Minimum Budget';
+const PERIOD = 'Period';
+const TABLES = 'Tables';
 
 export default Object.freeze({
   BTN_CLEAR,
@@ -89,12 +97,19 @@ export default Object.freeze({
   BTN_OPTIONS,
   BTN_SAVE,
   BTN_SELECT,
+  BUDGET,
+  BUDGET_DETAILS,
+  BUDGETS,
   BUG_FORM_LINK,
   COLORS,
   DATE,
   DEFAULT,
   GRAPHS,
   LOCALE_CURRENCY,
+  NAME_APPRECIATE,
+  NAME_DEBTONATE,
+  NAME_MIN_BUDGET,
   PERIOD,
   TABLES,
+  TOTALS,
 });

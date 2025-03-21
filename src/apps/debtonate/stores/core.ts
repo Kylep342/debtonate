@@ -3,13 +3,13 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import constants from '@/apps/debtonate/constants/constants';
-import keys from '@/apps/debtonate/constants/keys';
+import constants from '../constants/constants';
+import keys from '../constants/keys';
 import {
   Budget,
   MonthlyBudget,
   PaymentScenario,
-} from '@/apps/debtonate/types/core';
+} from '../types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
   Graph,

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 
 import htmlid from '../../constants/elementIds';
-import sharedConstants from '../../constants/constants';
+import constants from '../../constants/constants';
 import useGlobalOptionsStore from '../../stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
@@ -11,7 +11,7 @@ const sortedCurrencies = computed<Array<string>>(() => globalOptions.currencies.
 const sortedLanguages = computed<Array<string>>(() => globalOptions.languages.toSorted());
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BTN_OFF);
+const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>

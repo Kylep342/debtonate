@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import constants from '@/apps/shared/constants/constants';
+import constants from '../constants/constants';
+import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
@@ -10,23 +10,23 @@ import { MonthlyBudget } from '@/apps/shared/types/core';
 const props = defineProps<{ budget: MonthlyBudget }>();
 
 const globalOptions = useGlobalOptionsStore();
-const state = useDebtonateCoreStore();
+const state = useAppreciateCoreStore();
 
-const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
+// const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
-const budgetPayments = computed<number>(() => globalOptions.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
-const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
+// const budgetPayments = computed<number>(() => globalOptions.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
+// const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
 
-const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
+// const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 
-const alertButtonIsDisabled = () => alert('Create a loan to use this action');
+const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([
   {
     text: constants.BTN_DETAILS,
-    onClick: () => state.loans.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
+    onClick: () => state.instruments.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
 
@@ -42,11 +42,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const getButtons = (budgetId): Array<Button> => (
-  budgetId === constants.DEFAULT
-    ? baseButtons.value
-    : editButtons.value
-  );
+const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -77,18 +73,18 @@ const getButtons = (budgetId): Array<Button> => (
                 <b>{{ budgetExtra }}</b>
               </td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Interest Paid</td>
               <td :class="['text-right']">
                 <b>{{ budgetTotalInterest }}</b>
               </td>
-            </tr>
-            <tr>
+            </tr> -->
+            <!-- <tr>
               <td>{{ paymentsLabel }}</td>
               <td :class="['text-right']">
                 <b>{{ budgetPayments }}</b>
               </td>
-            </tr>
+            </tr> -->
           </tbody>
         </template>
       </base-table>

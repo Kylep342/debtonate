@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { Loan, LoansPaymentSchedule } from 'moneyfunx';
 
-import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{

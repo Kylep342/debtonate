@@ -3,11 +3,11 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import sharedConstants from '@/apps/shared/constants/constants';
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
 import {
   Budget,
+  MonthlyBudget,
   ContributionScenario
 } from '@/apps/appreciate/types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
@@ -126,7 +126,7 @@ export default defineStore('appreciateCore', () => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
   };
 
-  const toggleDeflateAllMoney = (): void => {
+  const toggleDeflateAllMoney = (foo: number): void => {
     deflateAllMoney.value = !deflateAllMoney.value
   };
 
@@ -174,7 +174,7 @@ export default defineStore('appreciateCore', () => {
 
   // attribute functions in here are placeholder
   const totalsAsAnInstrument = computed<moneyfunx.IInstrument>(() => ({
-    id: sharedConstants.TOTALS,
+    id: constants.TOTALS,
     name: constants.NAME_TOTALS_AS_AN_INSTRUMENT,
     currentBalance: totalCurrentBalance.value,
     annualRate: () => 0,
@@ -208,7 +208,12 @@ export default defineStore('appreciateCore', () => {
 
   /** Budgets */
 
-  const monthlyBudgets = computed<Array<Budget>>(() => [...budgets.value, minimumBudget]);
+  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
+    ...budget,
+    absolute: budget.relative,
+  }))));
+
+  const getBudget = (id: string): Budget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
   const deleteBudget = (id: string): void => {
     budgets.value = budgets.value.filter(
@@ -387,6 +392,7 @@ export default defineStore('appreciateCore', () => {
     exitInstrumentForm,
     exitOptionsForm,
     exportState,
+    getBudget,
     getBudgetColor,
     getBudgetIndex,
     getBudgetName,
@@ -397,6 +403,7 @@ export default defineStore('appreciateCore', () => {
     getInstrumentName,
     getLifetimeGrowth,
     getNumContributions,
+    inflationFactor,
     instrumentDetailsPanelActive,
     instrumentFormActive,
     instrumentFormTitle,
