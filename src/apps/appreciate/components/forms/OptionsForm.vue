@@ -75,11 +75,11 @@ const buttonText = (flag) => (flag ? sharedConstants.BTN_ON : sharedConstants.BT
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
-                When enabled this deflates <b><i>all</i></b> future money to current year dollars (CYD) at a rate of {{ globalOptions.Percent(state.inflationFactor) }} per year
+                When enabled this deflates <b><i>all</i></b> future money to current year money (CYM) at a rate of {{ globalOptions.Percent(state.inflationFactor) }} per year
               </p>
               <br>
               <p>
-                Purchasing power analyses are always deflated to CYD
+                Purchasing power analyses are always deflated to CYM
               </p>
             </div>
           </template>

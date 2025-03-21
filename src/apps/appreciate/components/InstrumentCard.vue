@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import { IInstrument } from 'moneyfunx';
 
-import constants from '@/apps/appreciate/constants/constants';
 import sharedConstants from '@/apps/shared/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
@@ -45,7 +44,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const getButtons = (instrumentId): Array<Button> => instrumentId === constants.TOTALS ? baseButtons.value : editButtons.value;
+const getButtons = (instrumentId): Array<Button> => instrumentId === sharedConstants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>

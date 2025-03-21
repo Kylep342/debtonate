@@ -8,6 +8,7 @@ import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
 import {
   Budget,
+  MonthlyBudget,
   ContributionScenario
 } from '@/apps/appreciate/types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
@@ -36,7 +37,7 @@ export default defineStore('appreciateCore', () => {
   const instrumentDetailsPanelActive = ref<boolean>(false);
   const instrumentFormActive = ref<boolean>(false);
   const instruments = ref<Array<moneyfunx.Instrument>>([]);
-  const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
+  const minimumBudget: Budget = {id: sharedConstants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
   const yearsToContribute = ref<number>(constants.DEFAULT_YEARS_TO_CONTRIBUTE);
   const yearsToSpend = ref<number>(constants.DEFAULT_YEARS_TO_SPEND);
@@ -208,23 +209,28 @@ export default defineStore('appreciateCore', () => {
 
   /** Budgets */
 
-  const monthlyBudgets = computed<Array<Budget>>(() => [...budgets.value, minimumBudget]);
+  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
+    ...budget,
+    absolute: budget.relative,
+  }))));
+
+  const getBudget = (id: string): Budget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
   const deleteBudget = (id: string): void => {
     budgets.value = budgets.value.filter(
-      (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
+      (budget) => budget.id !== id && budget.id !== sharedConstants.DEFAULT,
     );
   };
   const editBudget = (id: string): void => {
     currentBudgetId.value = id;
     openBudgetForm();
   };
-  const getBudgetColor = (id: string): string => constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
+  const getBudgetColor = (id: string): string => sharedConstants.COLORS[getBudgetIndex(id) % sharedConstants.COLORS.length];
   const getBudgetIndex = (id: string): number => monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
   const getBudgetName = (id: string): string => (
-    id === constants.DEFAULT
-      ? constants.NAME_MIN_BUDGET
-      : `${constants.BUDGET} ${getBudgetIndex(id)}`
+    id === sharedConstants.DEFAULT
+      ? sharedConstants.NAME_MIN_BUDGET
+      : `${sharedConstants.BUDGET} ${getBudgetIndex(id)}`
   );
   const unviewBudget = (): void => {
     budgetDetailsPanelActive.value = false;
@@ -287,7 +293,7 @@ export default defineStore('appreciateCore', () => {
         id: String(Math.floor(Math.random() * Date.now())),
         relative: proposedBudget
       };
-      if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
+      if (currentBudgetId.value && currentBudgetId.value !== sharedConstants.DEFAULT) {
         deleteBudget(currentBudgetId.value);
         currentBudgetId.value = null;
       };
@@ -306,7 +312,7 @@ export default defineStore('appreciateCore', () => {
       annualLimit: Function,
     ): string => {
       const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
-      if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
+      if (currentInstrumentId.value && currentInstrumentId.value !== sharedConstants.TOTALS) {
         deleteInstrument(currentInstrumentId.value);
         currentInstrumentId.value = null;
       };
@@ -387,6 +393,7 @@ export default defineStore('appreciateCore', () => {
     exitInstrumentForm,
     exitOptionsForm,
     exportState,
+    getBudget,
     getBudgetColor,
     getBudgetIndex,
     getBudgetName,

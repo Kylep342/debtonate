@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import BudgetCard from './BudgetCard.vue';
+import useAppreciateCoreStore from '../stores/core';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import { useResize } from '@/apps/shared/composables/useResize';
 import sharedConstants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useDebtonateCoreStore();
+const state = useAppreciateCoreStore();
 
-const { scrollContainer } = useResize('resizeBudgetsPanel');
+const { scrollContainer } = useResize('resizeAppreciateBudgetsPanel');
 
 const buttons: Array<Button> = [
   {

@@ -5,6 +5,12 @@ export type Budget = {
   relative: number
 };
 
+export type MonthlyBudget = {
+  id: string
+  relative: number
+  absolute: number
+};
+
 export type ContributionScenario = {
   contributionAmount: number
   contributionSchedule: InstrumentsContributionSchedule

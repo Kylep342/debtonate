@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import constants from '@/apps/debtonate/constants/constants';
+import constants from '../../constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import sharedConstants from '@/apps/shared/constants/constants';
 
 const state = useDebtonateCoreStore();
 
@@ -21,8 +22,8 @@ const createButtonEnabled = computed<boolean>(
 
 const createLoanButtonText = computed<string>(() => (
   state.currentLoanId
-    ? constants.BTN_SAVE
-    : constants.BTN_CREATE
+    ? sharedConstants.BTN_SAVE
+    : sharedConstants.BTN_CREATE
 ));
 
 watch(
