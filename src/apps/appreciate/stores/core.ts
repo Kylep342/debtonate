@@ -126,7 +126,7 @@ export default defineStore('appreciateCore', () => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
   };
 
-  const toggleDeflateAllMoney = (): void => {
+  const toggleDeflateAllMoney = (foo: number): void => {
     deflateAllMoney.value = !deflateAllMoney.value
   };
 
@@ -397,6 +397,7 @@ export default defineStore('appreciateCore', () => {
     getInstrumentName,
     getLifetimeGrowth,
     getNumContributions,
+    inflationFactor,
     instrumentDetailsPanelActive,
     instrumentFormActive,
     instrumentFormTitle,

@@ -100,7 +100,7 @@ watch(() => state.refinancingFormActive, async (show) => {
         >
           <div :class="['flex-grow']">
             <div :class="['header']">
-              <h2>Repayment Information</h2>
+              <h2>Repayment Analysis</h2>
             </div>
             <GraphsPanel />
           </div>

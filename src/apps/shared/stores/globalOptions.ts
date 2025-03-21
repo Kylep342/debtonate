@@ -2,7 +2,7 @@
  *
  * *** Global Options Store ***
  *
- * app-agnostic store for shared, user-modifiable settings
+ * shared store for user-modifiable settings
  *    locale options
  *      currency
  *      language
@@ -16,7 +16,7 @@ import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 
 export default defineStore('globalOptions', () => {
-  const baseDate = ref(Date.now());
+  const baseDate = ref(Date.now()); // TODO: consider letting users modify the base date
   const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
   const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
   const language = ref(navigator.language);
@@ -74,7 +74,7 @@ export default defineStore('globalOptions', () => {
   // Formatting functions
 
   /**
-   * Presents a number as currency
+   * Formats a number as locale-aware currency
    * @param {number} amount The amount to display
    * @returns {string} The formatted currency of `amount`
    */
@@ -89,7 +89,7 @@ export default defineStore('globalOptions', () => {
   );
 
   /**
-   * Presents a number as percent
+   * Formats a number as locale-aware percent
    * @param {number} amount The amount to display
    * @returns {string} the formatted percent of `amount`
    */
@@ -107,7 +107,7 @@ export default defineStore('globalOptions', () => {
   /**
    * Converts an integer period number to a date
    * @param {number[integer]} period The period to convert
-   * @param {boolean} asStr Flag to return as string (default=false)
+   * @param {boolean} asStr Flag to return as a locale-aware string (default=false)
    * @returns {Date | string} The date converted from `period`
    */
   const Period = (period: number, asStr: boolean = false) => {
