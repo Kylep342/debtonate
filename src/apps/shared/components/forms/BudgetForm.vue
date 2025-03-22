@@ -5,6 +5,8 @@ import { computed, ref, watch } from 'vue';
 import constants from '../../constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 
+// defineProps<Function>({budgetStore: Object})()
+
 const state = useAppreciateCoreStore();
 
 const amount = ref<number | null>(null);

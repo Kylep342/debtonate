@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 
-import BudgetForm from './components/forms/BudgetForm.vue';
+import BudgetForm from '@/apps/shared/components/forms/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import InstrumentsPanel from './components/InstrumentsPanel.vue';

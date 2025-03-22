@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, unref, watch } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
@@ -45,13 +45,14 @@ const clearForm = () => {
 };
 
 const createInstrument = () => {
+  const rateFunc = () => ((unref(interestRate.value) ?? 0) / 100);
+  const limitFunc = () => (annualLimit.value ?? 0);
   state.createInstrument(
     currentBalance.value,
-    () => (interestRate.value! / 100),
+    rateFunc,
     name.value,
-    () => (annualLimit.value || 0)
+    limitFunc,
   );
-  clearForm();
 };
 
 const exit = () => {

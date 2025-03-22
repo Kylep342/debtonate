@@ -73,7 +73,15 @@ export default defineStore('appreciateCore', () => {
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
     deflateAllMoney.value = JSON.parse(localStorage.getItem(keys.LS_DEFLATE_ALL_MONEY)!);
     inflationFactor.value = JSON.parse(localStorage.getItem(keys.LS_INFLATION_FACTOR)!);
-    instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!);
+    instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!).map(
+      (instrument) => new moneyfunx.Instrument(
+        instrument.currentBalance,
+        () => (instrument.annualRate ?? 0),
+        12,
+        instrument.name,
+        () => (instrument.annualLimit ?? 0)
+      )
+    );
     yearsToContribute.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_CONTRIBUTE)!);
     yearsToSpend.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_SPEND)!);
   };
