@@ -20,7 +20,7 @@ const buttons: Array<Button> = [
   { text: constants.BTN_SAVE, onClick: state.saveState },
   { text: constants.BTN_CLEAR, onClick: state.clearState },
   { text: constants.BTN_COPY, onClick: copyStateToClipboard },
-  // { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
+  { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
 ];
 </script>
 

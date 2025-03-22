@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 
+import BudgetForm from './components/forms/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import InstrumentsPanel from './components/InstrumentsPanel.vue';
@@ -12,6 +13,14 @@ import useAppreciateCoreStore from './stores/core';
 import FooterBar from '@/apps/shared/components/FooterBar.vue';
 
 const state = useAppreciateCoreStore();
+
+watch(() => state.budgetFormActive, async (show) => {
+  if (show) {
+    document.getElementById(constants.BUDGET_FORM_ID).showModal();
+  } else if (!show) {
+    document.getElementById(constants.BUDGET_FORM_ID).close();
+  }
+});
 
 watch(() => state.instrumentFormActive, async (show) => {
   if (show) {
@@ -35,6 +44,7 @@ watch(() => state.optionsFormActive, async (show) => {
     :class="['h-screen', 'flex', 'flex-col']"
   >
     <HeaderBar />
+    <BudgetForm />
     <InstrumentForm />
     <OptionsForm />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
