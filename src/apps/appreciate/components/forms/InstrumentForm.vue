@@ -44,6 +44,11 @@ const clearForm = () => {
   name.value = null;
 };
 
+const exit = () => {
+  clearForm();
+  state.exitInstrumentForm();
+};
+
 const createInstrument = () => {
   const rateFunc = () => ((unref(interestRate.value) ?? 0) / 100);
   const limitFunc = () => (annualLimit.value ?? 0);
@@ -53,11 +58,7 @@ const createInstrument = () => {
     name.value,
     limitFunc,
   );
-};
-
-const exit = () => {
-  clearForm();
-  state.exitInstrumentForm();
+  exit();
 };
 </script>
 

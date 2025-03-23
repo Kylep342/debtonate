@@ -306,7 +306,6 @@ export default defineStore('appreciateCore', () => {
       };
       budgets.value.push(budget);
       budgets.value.sort((a, b) => b.relative - a.relative);
-      exitBudgetForm();
       return budget.id
     };
 
@@ -325,7 +324,6 @@ export default defineStore('appreciateCore', () => {
       };
       instruments.value.push(instrument);
       // sortInstruments();
-      exitInstrumentForm();
       return instrument.id;
     };
 

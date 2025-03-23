@@ -34,14 +34,14 @@ const clearForm = () => {
   amount.value = null;
 };
 
-const createBudget = () => {
-  state.createBudget(amount.value);
-  clearForm();
-};
-
 const exit = () => {
   clearForm();
   state.exitBudgetForm();
+};
+
+const createBudget = () => {
+  state.createBudget(amount.value);
+  exit();
 };
 </script>
 

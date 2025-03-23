@@ -63,7 +63,7 @@ watch(() => state.optionsFormActive, async (show) => {
         >
           <div :class="['flex-grow']">
             <div :class="['header']">
-              <h2>Contribution Analysis</h2>
+              <h2>Investment Analysis</h2>
             </div>
             <!-- <GraphsPanel /> -->
           </div>

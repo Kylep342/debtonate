@@ -50,6 +50,11 @@ const clearForm = () => {
   fees.value = null;
 };
 
+const exit = () => {
+  clearForm();
+  state.exitLoanForm();
+};
+
 const createLoan = () => {
   state.createLoan(
     principal.value,
@@ -59,12 +64,7 @@ const createLoan = () => {
     currentBalance.value,
     fees.value,
   );
-  clearForm();
-};
-
-const exit = () => {
-  clearForm();
-  state.exitLoanForm();
+  exit();
 };
 </script>
 

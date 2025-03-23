@@ -304,7 +304,6 @@ export default defineStore('debtonateCore', () => {
     } else {
       refinancingScenarios.value[parentLoanId] = [loan];
     }
-    exitRefinancingForm();
     return loan.id;
   };
 
@@ -426,7 +425,6 @@ export default defineStore('debtonateCore', () => {
     };
     budgets.value.push(budget);
     budgets.value.sort((a, b) => b.relative - a.relative);
-    exitBudgetForm();
     return budget.id
   };
 
@@ -445,7 +443,6 @@ export default defineStore('debtonateCore', () => {
     };
     loans.value.push(loan);
     sortLoans();
-    exitLoanForm();
     return loan.id;
   };
 

@@ -39,6 +39,11 @@ const clearForm = () => {
   fees.value = null;
 };
 
+const exit = () => {
+  clearForm();
+  state.exitRefinancingForm();
+};
+
 const refinanceLoan = () => {
   state.createRefinanceScenario(
     loanId.value,
@@ -48,12 +53,7 @@ const refinanceLoan = () => {
     name.value,
     fees.value,
   );
-  clearForm();
-};
-
-const exit = () => {
-  clearForm();
-  state.exitRefinancingForm();
+  exit();
 };
 </script>
 
