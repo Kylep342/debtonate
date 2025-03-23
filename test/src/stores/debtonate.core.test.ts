@@ -132,6 +132,7 @@ describe('Debtonate Core Store', () => {
       expect(state.budgetFormActive).toBe(true);
 
       state.createBudget(firstBudget.relative + 100);
+      state.exitBudgetForm();
       expect(state.currentBudgetId).toBe(null);
       expect(state.budgetFormActive).toBe(false);
       expect(state.getBudget(firstBudgetId)).toBe(undefined);
@@ -217,6 +218,7 @@ describe('Debtonate Core Store', () => {
         firstLoan.termInYears + 1,
         'bananas'
       );
+      state.exitLoanForm();
       expect(state.currentLoanId).toBe(null);
       expect(state.loanFormActive).toBe(false);
       expect(state.getLoan(firstLoanId)).toBe(undefined);
