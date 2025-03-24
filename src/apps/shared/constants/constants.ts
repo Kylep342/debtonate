@@ -15,6 +15,7 @@ const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUDGET = 'Budget';
 const BUDGET_DETAILS = 'Budget Details';
+const BUDGET_FORM_ID = 'budgetForm'
 const BUDGETS = 'Budgets';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 const COLORS = [
@@ -99,6 +100,7 @@ export default Object.freeze({
   BTN_SELECT,
   BUDGET,
   BUDGET_DETAILS,
+  BUDGET_FORM_ID,
   BUDGETS,
   BUG_FORM_LINK,
   COLORS,

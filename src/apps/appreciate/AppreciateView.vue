@@ -1,33 +1,27 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { computed } from 'vue';
 
+import BudgetDetailsPanel from './components/BudgetDetailsPanel.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
-import InstrumentsPanel from './components/InstrumentsPanel.vue';
+import InstrumentDetailsPanel from './components/InstrumentDetailsPanel.vue';
 import InstrumentForm from './components/forms/InstrumentForm.vue';
+import InstrumentsPanel from './components/InstrumentsPanel.vue';
 import SiteIntro from './components/SiteIntro.vue';
 import OptionsForm from './components/forms/OptionsForm.vue';
 import constants from './constants/constants';
 import useAppreciateCoreStore from './stores/core';
 import FooterBar from '@/apps/shared/components/FooterBar.vue';
+import BudgetForm from '@/apps/shared/components/forms/BudgetForm.vue';
+import { useModal } from '@/apps/shared/composables/useModal';
 
 const state = useAppreciateCoreStore();
 
-watch(() => state.instrumentFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.INSTRUMENT_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.INSTRUMENT_FORM_ID).close();
-  }
-});
-
-watch(() => state.optionsFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).close();
-  }
-});
+useModal(computed(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
+useModal(computed(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
+useModal(computed(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
+useModal(computed(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
+useModal(computed(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
 </script>
 
 <template>
@@ -35,8 +29,9 @@ watch(() => state.optionsFormActive, async (show) => {
     :class="['h-screen', 'flex', 'flex-col']"
   >
     <HeaderBar />
-    <InstrumentForm />
-    <OptionsForm />
+    <BudgetForm :id="constants.BUDGET_FORM_ID" />
+    <InstrumentForm :id="constants.INSTRUMENT_FORM_ID" />
+    <OptionsForm :id="constants.OPTIONS_FORM_ID" />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <InstrumentsPanel />
       <BudgetsPanel />
@@ -53,14 +48,14 @@ watch(() => state.optionsFormActive, async (show) => {
         >
           <div :class="['flex-grow']">
             <div :class="['header']">
-              <h2>Contribution Analysis</h2>
+              <h2>Investment Analysis</h2>
             </div>
             <!-- <GraphsPanel /> -->
           </div>
-          <!-- <div>
-            <BudgetDetailsPanel />
-            <LoanDetailsPanel />
-          </div> -->
+          <div>
+            <BudgetDetailsPanel :id="constants.BUDGET_DETAILS_ID" />
+            <InstrumentDetailsPanel :id="constants.INSTRUMENT_DETAILS_ID" />
+          </div>
         </div>
       </div>
     </div>

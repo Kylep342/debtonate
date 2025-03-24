@@ -1,21 +1,25 @@
-import { toValue, watch } from 'vue';
+import { watch } from "vue";
 
 /**
+ * Registers a watcher to show/close a modal dialog element.
  *
- * registers a watcher to show/close a modal
- *
- * @param flag Boolean variable for show/close state
- * @param domId ID of the modal dialog HTML element
+ * @param {boolean} flag - A reactive boolean controlling the modal's visibility.
+ * @param {string} domId - The ID of the modal dialog element.
  */
-export function useModal(flag, domId) {
-  watch(() => toValue(flag), async (value) => {
-    const modal = document.getElementById(domId)
+export function useModal(flag: boolean, domId: string): void {
+  watch(flag, async (value) => {
+    const modal = document.getElementById(domId) as HTMLDialogElement | null;
+
+    // check to ensure modal element is on page
     if (!modal) {
-      return
-    } else if (value) {
+      console.warn(`Modal with ID '${domId}' not found.`);
+      return;
+    }
+
+    if (value) {
       modal.showModal();
     } else {
       modal.close();
     }
   });
-}
+};

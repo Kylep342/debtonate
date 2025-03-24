@@ -11,9 +11,8 @@ const props = defineProps<{
   instrument: IInstrument
 }>();
 
-const state = useAppreciateCoreStore();
 const globalOptions = useGlobalOptionsStore();
-
+const state = useAppreciateCoreStore();
 
 const instrumentCurrentBalance = computed<string>(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
 const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate() * 100)}`);
@@ -23,7 +22,7 @@ console.log(props.instrument.currentBalance);
 console.log(props.instrument.annualLimit());
 console.log(props.instrument.annualRate());
 
-const alertButtonIsDisabled = () => alert('Create a instrument to use this action');
+const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
 const baseButtons = computed<Array<Button>>(() => ([
   {

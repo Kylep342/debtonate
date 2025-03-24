@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
+// import AmortizationTable from '@/apps/appreciate/components/AmortizationTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '@/apps/appreciate/constants/constants';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions = useGlobalOptionsStore();
-const state = useDebtonateCoreStore();
+const state = useAppreciateCoreStore();
 
 const currentBudget = ref<MonthlyBudget>();
 
@@ -35,7 +35,7 @@ watch(
 </script>
 
 <template>
-  <base-modal @exit="state.unviewBudget">
+  <base-modal :id="constants.BUDGET_DETAILS_ID" @exit="state.unviewBudget">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
@@ -46,16 +46,17 @@ watch(
     </template>
     <template #body>
       <div v-if="currentBudget" :class="['tabframe', 'w-auto']">
-        <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
+        <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="state.getPaymentSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
+            <h2>{{ state.getInstrumentName(viewedItemId) }}</h2>
+            <!-- <AmortizationTable :payment-schedule="state.getPaymentSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
               state.getLoan(viewedItemId),
               currentBudget,
             )" :subtitle="state.buildAmortizationTableSubtitle(
                 state.getLoan(viewedItemId),
                 currentBudget,
-              )" />
+              )" /> -->
           </template>
         </base-tabs>
       </div>

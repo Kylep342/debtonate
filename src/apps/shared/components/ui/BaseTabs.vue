@@ -2,10 +2,10 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  getItemName: Function,
+  getItemName: () => string,
   pivot: Array<any>,
-  isViewedItemId: Function,
-  setViewedItemId: Function
+  isViewedItemId: () => boolean,
+  setViewedItemId: () => void,
 }>();
 
 const flexBasis = computed(() => props.pivot ? `basis-1/${props.pivot!.length}` : 'basis-1');

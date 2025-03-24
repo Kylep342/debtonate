@@ -73,7 +73,15 @@ export default defineStore('appreciateCore', () => {
     budgets.value = JSON.parse(localStorage.getItem(keys.LS_BUDGETS)!);
     deflateAllMoney.value = JSON.parse(localStorage.getItem(keys.LS_DEFLATE_ALL_MONEY)!);
     inflationFactor.value = JSON.parse(localStorage.getItem(keys.LS_INFLATION_FACTOR)!);
-    instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!);
+    instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!).map(
+      (instrument) => new moneyfunx.Instrument(
+        instrument.currentBalance,
+        () => (instrument.annualRate ?? 0),
+        12,
+        instrument.name,
+        () => (instrument.annualLimit ?? 0)
+      )
+    );
     yearsToContribute.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_CONTRIBUTE)!);
     yearsToSpend.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_SPEND)!);
   };
@@ -298,7 +306,6 @@ export default defineStore('appreciateCore', () => {
       };
       budgets.value.push(budget);
       budgets.value.sort((a, b) => b.relative - a.relative);
-      exitBudgetForm();
       return budget.id
     };
 
@@ -306,9 +313,9 @@ export default defineStore('appreciateCore', () => {
 
     const createInstrument = (
       currentBalance: number,
-      interestRate: Function,
+      interestRate: () => number,
       name: string,
-      annualLimit: Function,
+      annualLimit: () => number,
     ): string => {
       const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
       if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
@@ -317,7 +324,6 @@ export default defineStore('appreciateCore', () => {
       };
       instruments.value.push(instrument);
       // sortInstruments();
-      exitInstrumentForm();
       return instrument.id;
     };
 

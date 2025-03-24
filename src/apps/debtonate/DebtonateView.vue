@@ -1,5 +1,5 @@
 <script setup>
-import { watch } from 'vue';
+import { computed } from 'vue';
 
 import BudgetDetailsPanel from '@/apps/debtonate/components/BudgetDetailsPanel.vue';
 import BudgetForm from '@/apps/debtonate/components/forms/BudgetForm.vue';
@@ -19,60 +19,12 @@ import { useModal } from '@/apps/shared/composables/useModal';
 
 const state = useDebtonateCoreStore();
 
-// useModal(state.budgetDetailsPanelActive, constants.BUDGET_DETAILS_ID);
-// useModal(state.budgetFormActive, constants.BUDGET_FORM_ID);
-// useModal(state.loanDetailsPanelActive, constants.LOAN_DETAILS_ID);
-// useModal(state.loanFormActive, constants.LOAN_FORM_ID);
-// useModal(state.refinancingFormActive, constants.REFINANCING_FORM_ID);
-
-watch(() => state.budgetDetailsPanelActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.BUDGET_DETAILS_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.BUDGET_DETAILS_ID).close();
-  }
-});
-
-watch(() => state.loanFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.LOAN_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.LOAN_FORM_ID).close();
-  }
-});
-
-watch(() => state.budgetFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.BUDGET_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.BUDGET_FORM_ID).close();
-  }
-});
-
-watch(() => state.loanDetailsPanelActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.LOAN_DETAILS_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.LOAN_DETAILS_ID).close();
-  }
-});
-
-watch(() => state.optionsFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.OPTIONS_FORM_ID).close();
-  }
-});
-
-watch(() => state.refinancingFormActive, async (show) => {
-  if (show) {
-    document.getElementById(constants.REFINANCING_FORM_ID).showModal();
-  } else if (!show) {
-    document.getElementById(constants.REFINANCING_FORM_ID).close();
-  }
-});
-
+useModal(computed(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
+useModal(computed(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
+useModal(computed(() => state.loanDetailsPanelActive), constants.LOAN_DETAILS_ID);
+useModal(computed(() => state.loanFormActive), constants.LOAN_FORM_ID);
+useModal(computed(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
+useModal(computed(() => state.refinancingFormActive), constants.REFINANCING_FORM_ID);
 </script>
 
 <template>
@@ -80,10 +32,10 @@ watch(() => state.refinancingFormActive, async (show) => {
     :class="['h-screen', 'flex', 'flex-col']"
   >
     <HeaderBar :class="['flex-none']" />
-    <BudgetForm />
-    <LoanForm />
-    <OptionsForm />
-    <RefinancingForm />
+    <BudgetForm :id="constants.BUDGET_FORM_ID" />
+    <LoanForm :id="constants.LOAN_FORM_ID" />
+    <OptionsForm :id="constants.OPTIONS_FORM_ID" />
+    <RefinancingForm :id="constants.REFINANCING_FORM_ID" />
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <LoansPanel />
       <BudgetsPanel />
@@ -105,8 +57,8 @@ watch(() => state.refinancingFormActive, async (show) => {
             <GraphsPanel />
           </div>
           <div>
-            <BudgetDetailsPanel />
-            <LoanDetailsPanel />
+            <BudgetDetailsPanel :id="constants.BUDGET_DETAILS_ID" />
+            <LoanDetailsPanel :id="constants.LOAN_DETAILS_ID" />
           </div>
         </div>
       </div>

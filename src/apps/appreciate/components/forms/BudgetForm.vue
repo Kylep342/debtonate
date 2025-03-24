@@ -1,10 +1,11 @@
 <script setup lang="ts">
+// NOTE: Explore dependency injection of store instantiation to make this a shared form; all else that is same looks valid
 import { computed, ref, watch } from 'vue';
 
 import constants from '../../constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 
-const state = useDebtonateCoreStore();
+const state = useAppreciateCoreStore();
 
 const amount = ref<number | null>(null);
 
@@ -45,7 +46,7 @@ const createBudget = () => {
 </script>
 
 <template>
-  <base-modal @exit="exit">
+  <base-modal :id="constants.BUDGET_FORM_ID" @exit="exit">
     <template #header>
       <h2>{{ state.budgetFormTitle }}</h2>
     </template>

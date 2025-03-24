@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, unref, watch } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
@@ -44,24 +44,26 @@ const clearForm = () => {
   name.value = null;
 };
 
-const createInstrument = () => {
-  state.createInstrument(
-    currentBalance.value,
-    () => (interestRate.value! / 100),
-    name.value,
-    () => (annualLimit.value || 0)
-  );
-  clearForm();
-};
-
 const exit = () => {
   clearForm();
   state.exitInstrumentForm();
 };
+
+const createInstrument = () => {
+  const rateFunc = () => ((unref(interestRate.value) ?? 0) / 100);
+  const limitFunc = () => (annualLimit.value ?? 0);
+  state.createInstrument(
+    currentBalance.value,
+    rateFunc,
+    name.value,
+    limitFunc,
+  );
+  exit();
+};
 </script>
 
 <template>
-  <base-modal :id="constants.INSTRUMENT_FORM_ID" @exit="exit">
+  <base-modal @exit="exit">
     <template #header>
       <h2 :class="['pl-4']">
         {{ state.instrumentFormTitle }}

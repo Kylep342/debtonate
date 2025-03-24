@@ -4,6 +4,7 @@ import sharedConstants from '@/apps/shared/constants/constants';
 
 //
 
+const BUDGET_DETAILS_ID = "appreciateBudgetDetails";
 const DEFAULT_INFLATION_FACTOR = 0.03;
 const DEFAULT_YEARS_TO_CONTRIBUTE = 25;
 const DEFAULT_YEARS_TO_SPEND = 40;
@@ -16,6 +17,7 @@ const OPTIONS_FORM_ID = "appreciateOptionsForm";
 
 export default Object.freeze({
   ...sharedConstants,
+  BUDGET_DETAILS_ID,
   DEFAULT_INFLATION_FACTOR,
   DEFAULT_YEARS_TO_CONTRIBUTE,
   DEFAULT_YEARS_TO_SPEND,
