@@ -63,7 +63,7 @@ const createInstrument = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.INSTRUMENT_FORM_ID" @exit="exit">
+  <base-modal @exit="exit">
     <template #header>
       <h2 :class="['pl-4']">
         {{ state.instrumentFormTitle }}

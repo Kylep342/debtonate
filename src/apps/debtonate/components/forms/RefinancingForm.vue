@@ -58,7 +58,7 @@ const refinanceLoan = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.REFINANCING_FORM_ID" @exit="exit">
+  <base-modal @exit="exit">
     <template #header>
       <h2>{{ state.refinancingFormTitle }}</h2>
     </template>

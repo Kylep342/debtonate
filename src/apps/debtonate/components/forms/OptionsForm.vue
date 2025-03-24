@@ -31,7 +31,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
-  <base-modal :id="constants.OPTIONS_FORM_ID" :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
+  <base-modal :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
     <template #header>
       <h2>Options</h2>
     </template>

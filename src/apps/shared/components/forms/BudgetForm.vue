@@ -48,7 +48,7 @@ const createBudget = () => {
 </script>
 
 <template>
-  <base-modal :id="constants.BUDGET_FORM_ID" @exit="exit">
+  <base-modal @exit="exit">
     <template #header>
       <h2>{{ state.budgetFormTitle }}</h2>
     </template>

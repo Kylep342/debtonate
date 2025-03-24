@@ -12,14 +12,14 @@ const props = defineProps<{ budget: MonthlyBudget }>();
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
 
-// const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
+const totalsContributionSummary = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
-// const budgetPayments = computed<number>(() => globalOptions.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
-// const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
+const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
+const budgetTotalGrowth = computed<string>(() => `${globalOptions.Money(totalsContributionSummary.value.lifetimeGrowth)}`);
 
-// const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
+const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -73,18 +73,18 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
                 <b>{{ budgetExtra }}</b>
               </td>
             </tr>
-            <!-- <tr>
-              <td>Interest Paid</td>
+            <tr>
+              <td>Interest Accrued</td>
               <td :class="['text-right']">
-                <b>{{ budgetTotalInterest }}</b>
+                <b>{{ budgetTotalGrowth }}</b>
               </td>
-            </tr> -->
-            <!-- <tr>
+            </tr>
+            <tr>
               <td>{{ paymentsLabel }}</td>
               <td :class="['text-right']">
-                <b>{{ budgetPayments }}</b>
+                <b>{{ budgetContributions }}</b>
               </td>
-            </tr> -->
+            </tr>
           </tbody>
         </template>
       </base-table>

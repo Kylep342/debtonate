@@ -12,12 +12,12 @@ const props = defineProps<{ budget: MonthlyBudget }>();
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
-const totalsAsALoanPaymentSummaryForBudget = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
+const totalsPaymentSummary = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
-const budgetPayments = computed<number>(() => globalOptions.Period(totalsAsALoanPaymentSummaryForBudget.value.amortizationSchedule.length, true));
-const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsAsALoanPaymentSummaryForBudget.value.lifetimeInterest)}`);
+const budgetPayments = computed<number>(() => globalOptions.Period(totalsPaymentSummary.value.amortizationSchedule.length, true));
+const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest)}`);
 
 const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 

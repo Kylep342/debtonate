@@ -31,7 +31,7 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_DETAILS_ID" @exit="state.unviewLoan">
+  <base-modal @exit="state.unviewLoan">
     <template #header>
       <h2>{{ title }}</h2>
     </template>

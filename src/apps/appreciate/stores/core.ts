@@ -313,9 +313,9 @@ export default defineStore('appreciateCore', () => {
 
     const createInstrument = (
       currentBalance: number,
-      interestRate: Function,
+      interestRate: () => number,
       name: string,
-      annualLimit: Function,
+      annualLimit: () => number,
     ): string => {
       const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
       if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
