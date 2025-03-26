@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
+import { Button } from '@/apps/shared/types/app';
+import { GraphConfig } from '@/apps/shared/types/graph';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import { Button } from '@/apps/shared/types/app';
-import { GraphConfig } from '@/apps/shared/types/graph';
 
 const state = useDebtonateCoreStore();
 

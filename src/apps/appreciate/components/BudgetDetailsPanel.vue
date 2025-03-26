@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from './AmortizationTable.vue';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import AmortizationTable from './AmortizationTable.vue';
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
-import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();

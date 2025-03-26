@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { Button } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 import constants from '../constants/constants';
 import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
-import { Button } from '@/apps/shared/types/app';
-import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
 
@@ -17,19 +17,16 @@ const totalsContributionSummary = computed(() => state.getContributionSchedule(c
 const netWorth = computed<number>(() => state.deflateAllMoney
   ? state.deflate(
     totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
-    Math.ceil(totalsContributionSummary.value.amortizationSchedule.length / 12)
+    state.yearsToContribute
   )
   : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
 );
-const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Net Worth (CYM)' : 'Net Worth' );
-
-console.log(netWorth.value);
+const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
 const budgetContributionTotals = computed<number>(() => globalOptions.Money(totalsContributionSummary.value.amortizationSchedule.length * props.budget.absolute));
 const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
-const budgetTotalGrowth = computed<string>(() => `${globalOptions.Money(totalsContributionSummary.value.lifetimeGrowth)}`);
 
 const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
 

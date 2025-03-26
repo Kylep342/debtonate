@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { Button } from '@/apps/shared/types/app';
 import constants from '@/apps/shared/constants/constants';
 import routes from '@/apps/shared/constants/routes';
-import { Button } from '@/apps/shared/types/app';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
 

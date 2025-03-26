@@ -2,10 +2,10 @@
 import { computed } from 'vue';
 import { IInstrument } from 'moneyfunx';
 
-import useAppreciateCoreStore from '../stores/core';
-import constants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
+import constants from '@/apps/shared/constants/constants';
+import useAppreciateCoreStore from '../stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   instrument: IInstrument
