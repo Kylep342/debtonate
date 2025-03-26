@@ -78,7 +78,7 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
               </td>
             </tr>
             <tr v-if="instrument.annualLimit">
-              <td>Max Monthly Contribution</td>
+              <td>Max Contribution</td>
               <td :class="['text-right']">
                 <b>{{ instrumentMaxMonthlyContribution }}</b>
               </td>

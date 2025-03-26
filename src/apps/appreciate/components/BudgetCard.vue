@@ -28,7 +28,6 @@ console.log(netWorth.value);
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
 const budgetContributionTotals = computed<number>(() => globalOptions.Money(totalsContributionSummary.value.amortizationSchedule.length * props.budget.absolute));
-const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
 const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
 const budgetTotalGrowth = computed<string>(() => `${globalOptions.Money(totalsContributionSummary.value.lifetimeGrowth)}`);
 
@@ -78,12 +77,6 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
               <td>Amount</td>
               <td :class="['text-right']">
                 <b>{{ budgetAmount }}</b>
-              </td>
-            </tr>
-            <tr v-if="budget.id !== constants.DEFAULT">
-              <td>Extra</td>
-              <td :class="['text-right']">
-                <b>{{ budgetExtra }}</b>
               </td>
             </tr>
             <tr>
