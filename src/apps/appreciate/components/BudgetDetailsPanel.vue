@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-// import AmortizationTable from '@/apps/appreciate/components/AmortizationTable.vue';
+import AmortizationTable from './AmortizationTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
@@ -49,14 +49,13 @@ watch(
         <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <h2>{{ state.getInstrumentName(viewedItemId) }}</h2>
-            <!-- <AmortizationTable :payment-schedule="state.getPaymentSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
-              state.getLoan(viewedItemId),
+            <AmortizationTable :contribution-schedule="state.getContributionSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
+              state.getInstrument(viewedItemId),
               currentBudget,
             )" :subtitle="state.buildAmortizationTableSubtitle(
-                state.getLoan(viewedItemId),
+                state.getInstrument(viewedItemId),
                 currentBudget,
-              )" /> -->
+              )" />
           </template>
         </base-tabs>
       </div>

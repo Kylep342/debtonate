@@ -253,12 +253,12 @@ export default defineStore('debtonateCore', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
+  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+    moneyfunx.sortWith(loans.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
-  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
+  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+    moneyfunx.sortWith(loans.value, moneyfunx.avalanche),
     moneyfunx.snowball,
   );
 
@@ -400,18 +400,18 @@ export default defineStore('debtonateCore', () => {
 
   // dependent methods
 
-  const sortLoans = () => {
+  const sortWith = () => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
 
   const toggleAvalancheSort = () => {
     snowballSort.value = false;
-    sortLoans();
+    sortWith();
   };
 
   const toggleSnowballSort = () => {
     snowballSort.value = true;
-    sortLoans();
+    sortWith();
   };
 
   const createBudget = (proposedBudget: number): string => {
@@ -442,7 +442,7 @@ export default defineStore('debtonateCore', () => {
       currentLoanId.value = null;
     };
     loans.value.push(loan);
-    sortLoans();
+    sortWith();
     return loan.id;
   };
 
@@ -489,9 +489,11 @@ export default defineStore('debtonateCore', () => {
     loan: moneyfunx.ILoan
   ): string => `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
-  // graph data
+  /** Graphing */
 
   const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
+
+  // graph data
 
   const balancesGraphs = computed<GraphConfig>(() => {
     const config = {
@@ -680,7 +682,7 @@ export default defineStore('debtonateCore', () => {
     setRoundingScale,
     snowball,
     snowballSort,
-    sortLoans,
+    sortWith,
     toggleAvalancheSort,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,

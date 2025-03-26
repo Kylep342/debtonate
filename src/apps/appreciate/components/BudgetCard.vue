@@ -14,12 +14,25 @@ const state = useAppreciateCoreStore();
 
 const totalsContributionSummary = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
 
+const netWorth = computed<number>(() => state.deflateAllMoney
+  ? state.deflate(
+    totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
+    Math.ceil(totalsContributionSummary.value.amortizationSchedule.length / 12)
+  )
+  : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
+);
+const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Net Worth (CYM)' : 'Net Worth' );
+
+console.log(netWorth.value);
+
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
 const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
+const budgetContributionTotals = computed<number>(() => globalOptions.Money(totalsContributionSummary.value.amortizationSchedule.length * props.budget.absolute));
+const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
+const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
 const budgetTotalGrowth = computed<string>(() => `${globalOptions.Money(totalsContributionSummary.value.lifetimeGrowth)}`);
 
-const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
+const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -74,15 +87,15 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
               </td>
             </tr>
             <tr>
-              <td>Interest Accrued</td>
+              <td>Total Contributed</td>
               <td :class="['text-right']">
-                <b>{{ budgetTotalGrowth }}</b>
+                <b>{{ budgetContributionTotals }}</b>
               </td>
             </tr>
             <tr>
-              <td>{{ paymentsLabel }}</td>
+              <td>{{ netWorthLabel }}</td>
               <td :class="['text-right']">
-                <b>{{ budgetContributions }}</b>
+                <b>{{ budgetNetWorth }}</b>
               </td>
             </tr>
           </tbody>

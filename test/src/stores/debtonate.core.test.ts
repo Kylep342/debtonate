@@ -65,7 +65,7 @@ describe('Debtonate Core Store', () => {
     const state = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
-    state.sortLoans();
+    state.sortWith();
 
     expect(
       state.loansWithTotals.map((loan) => loan.name)
@@ -230,7 +230,7 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
       expect(state.snowballSort).toBe(false);
 
-      state.sortLoans();
+      state.sortWith();
       expect(
         state.loans.map((loan) => loan.name)
       ).toStrictEqual(["e-car", "house", "tau"]);
@@ -256,7 +256,7 @@ describe('Debtonate Core Store', () => {
       expect(state.getLoanName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_LOAN);
       expect(state.getLoanIndex(firstLoanId)).toBe(1);
       expect(state.getLoanName(firstLoanId)).toBe("house");
-      state.sortLoans();
+      state.sortWith();
       expect(state.getLoanIndex(firstLoanId)).toBe(2);
     });
   });

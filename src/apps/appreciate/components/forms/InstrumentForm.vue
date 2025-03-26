@@ -28,9 +28,9 @@ watch(
   (newId) => {
     if (newId && state.instrumentFormActive) {
       const currentInstrument = state.getInstrument(newId);
-      annualLimit.value = currentInstrument.annualLimit();
+      annualLimit.value = currentInstrument.annualLimit;
       currentBalance.value = currentInstrument.currentBalance;
-      interestRate.value = currentInstrument.annualRate() * 100;
+      interestRate.value = currentInstrument.annualRate * 100;
       name.value = currentInstrument.name;
     }
   },
@@ -50,13 +50,11 @@ const exit = () => {
 };
 
 const createInstrument = () => {
-  const rateFunc = () => ((unref(interestRate.value) ?? 0) / 100);
-  const limitFunc = () => (annualLimit.value ?? 0);
   state.createInstrument(
     currentBalance.value,
-    rateFunc,
+    interestRate.value! / 100,
     name.value,
-    limitFunc,
+    annualLimit.value
   );
   exit();
 };
