@@ -352,6 +352,14 @@ export default defineStore('appreciateCore', () => {
     budgetId: string
   ): number => getContributionSchedule(instrumentId, budgetId).lifetimeGrowth;
 
+  // budgets is sorted on every create
+  const getMaxMoney = (
+    instrumentId: string
+  ): number => {
+    const bestSchedule = getContributionSchedule(instrumentId, budgets.value[0].id)
+    return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth
+  };
+
   const getGrowthUpToPeriod = (
     instrumentId: string,
     budgetId: string,
@@ -410,7 +418,7 @@ export default defineStore('appreciateCore', () => {
       config.graphs[instrument.id] = {
         config: {
           maxX: getNumContributions(instrument.id, constants.DEFAULT),
-          maxY: getInstrument(instrument.id)!.currentBalance,
+          maxY: getMaxMoney(instrument.id) * 1.1,
         },
         lines: <Record<string, Point[]>>{},
       };
@@ -428,7 +436,6 @@ export default defineStore('appreciateCore', () => {
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
   }));
-  //
 
 
   /** return */
