@@ -42,7 +42,6 @@ export default defineStore('appreciateCore', () => {
   const yearsToSpend = ref<number>(constants.DEFAULT_YEARS_TO_SPEND);
 
 
-
   /** independent functions/computed values */
 
   // state management
@@ -76,10 +75,10 @@ export default defineStore('appreciateCore', () => {
     instruments.value = JSON.parse(localStorage.getItem(keys.LS_INSTRUMENTS)!).map(
       (instrument) => new moneyfunx.Instrument(
         instrument.currentBalance,
-        () => (instrument.annualRate ?? 0),
-        12,
+        instrument.annualRate,
+        constants.PERIODS_PER_YEAR,
         instrument.name,
-        () => (instrument.annualLimit ?? 0)
+        instrument.annualLimit
       )
     );
     yearsToContribute.value = JSON.parse(localStorage.getItem(keys.LS_YEARS_TO_CONTRIBUTE)!);
@@ -138,15 +137,26 @@ export default defineStore('appreciateCore', () => {
     deflateAllMoney.value = !deflateAllMoney.value
   };
 
+  const deflate = (amount: number, years: number): number => (amount * ((1 - inflationFactor.value) ** years));
 
   /** dependent computed options/functions */
 
   // total values across all instruments
 
-  const totalCurrentBalance = computed<number>(() => instruments.value.reduce(
-    (totalBalance, instruments) => totalBalance + instruments.currentBalance,
+  const totalAnnualLimit = computed<number>(() => instruments.value.reduce(
+    (annualLimit, instrument) => annualLimit + instrument.annualLimit,
     0,
   ));
+
+  const totalCurrentBalance = computed<number>(() => instruments.value.reduce(
+    (totalBalance, instrument) => totalBalance + instrument.currentBalance,
+    0,
+  ));
+
+  // const totalEffectiveInterestRate = computed<number>(() => instruments.value.reduce(
+  //   (interestRate, instrument) => ,
+  //   0,
+  // ))
 
   const totalMaxPeriodsPerYear = computed<number>(
     () => instruments.value.reduce((curMax, instrument) => Math.max(curMax, instrument.periodsPerYear), 0),
@@ -180,15 +190,14 @@ export default defineStore('appreciateCore', () => {
 
   /** Instruments */
 
-  // attribute functions in here are placeholder
   const totalsAsAnInstrument = computed<moneyfunx.IInstrument>(() => ({
     id: constants.TOTALS,
     name: constants.NAME_TOTALS_AS_AN_INSTRUMENT,
     currentBalance: totalCurrentBalance.value,
-    annualRate: () => 0,
+    annualRate: 0,
     periodsPerYear: totalMaxPeriodsPerYear.value,
-    periodicRate: () => 0.01,
-    annualLimit: () => 1000,
+    periodicRate: 0,
+    annualLimit: totalAnnualLimit.value,
   }));
 
   const instrumentsWithTotals = computed<Array<moneyfunx.IInstrument>>(() => [totalsAsAnInstrument.value, ...instruments.value]);
@@ -267,7 +276,7 @@ export default defineStore('appreciateCore', () => {
           contributionSchedule: moneyfunx.contributeInstruments(
             instruments.value,
             budget.relative,
-            yearsToContribute.value,
+            yearsToContribute.value * constants.PERIODS_PER_YEAR,
             accrueBeforeContribution.value,
           ),
         }
@@ -313,11 +322,11 @@ export default defineStore('appreciateCore', () => {
 
     const createInstrument = (
       currentBalance: number,
-      interestRate: () => number,
+      interestRate: number,
       name: string,
-      annualLimit: () => number,
+      annualLimit: number,
     ): string => {
-      const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
+      const instrument = new moneyfunx.Instrument(currentBalance, interestRate, constants.PERIODS_PER_YEAR, name, annualLimit);
       if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
         deleteInstrument(currentInstrumentId.value);
         currentInstrumentId.value = null;
@@ -340,6 +349,21 @@ export default defineStore('appreciateCore', () => {
     instrumentId: string,
     budgetId: string
   ): number => getContributionSchedule(instrumentId, budgetId).lifetimeGrowth;
+
+  // budgets is sorted on every create; order preserved on delete
+  const getMaxMoney = (
+    instrumentId: string
+  ): number => {
+    const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
+    return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth
+  };
+
+  // const getMaxGrowthBalanceRatio = (
+  //   instrumentId: string
+  // ): number => {
+  //   const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
+  //   return bestSchedule.lifetimeGrowth / (bestSchedule.lifetimeContribution + 1)
+  // };
 
   const getGrowthUpToPeriod = (
     instrumentId: string,
@@ -365,10 +389,96 @@ export default defineStore('appreciateCore', () => {
   const buildAmortizationTableSubtitle = (
     instrument: moneyfunx.IInstrument,
     monthlyBudget: Budget
-  ): string => `(${globalOptions.Money(instrument.currentBalance)} | ${globalOptions.Percent(instrument.annualRate() * 100)} | ${globalOptions.Money(monthlyBudget.absolute)}/month | ${getNumContributions(instrument.id, monthlyBudget.id)} Contributions)`;
+  ): string => `(${globalOptions.Money(instrument.currentBalance)} | ${globalOptions.Percent(instrument.annualRate * 100)} | ${globalOptions.Money(monthlyBudget.absolute)}/month | ${getNumContributions(instrument.id, monthlyBudget.id)} Contributions)`;
   const buildInstrumentSubtitle = (
     instrument: moneyfunx.IInstrument
-  ): string => `(${globalOptions.Money(instrument.currentBalance)} | ${globalOptions.Percent(instrument.annualRate() * 100)})`;
+  ): string => `(${globalOptions.Money(instrument.currentBalance)} | ${globalOptions.Percent(instrument.annualRate * 100)})`;
+
+
+  /** Graphing */
+
+  const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
+
+  // graph data
+
+  const balancesGraphs = computed<GraphConfig>(() => {
+    const config = {
+      id: 'Balances',
+      color: getBudgetColor,
+      graphs: <Graphs>{},
+      header: instrumentId => `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
+      lineName: getBudgetName,
+      subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+      x: globalOptions.Period,
+      xFormat: (x) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: y => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Balance',
+      yScale: d3.scaleLinear,
+    };
+
+    instrumentsWithTotals.value.forEach((instrument) => {
+      config.graphs[instrument.id] = {
+        config: {
+          maxX: getNumContributions(instrument.id, constants.DEFAULT),
+          maxY: getMaxMoney(instrument.id) * 1.1,
+        },
+        lines: <Record<string, Point[]>>{},
+      };
+      monthlyBudgets.value.forEach((budget) => {
+        const line: Point[] = [];
+        getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
+          line.push({ x: record.period, y: record.currentBalance });
+        });
+        config.graphs[instrument.id].lines[budget.id] = line;
+      });
+    });
+    return config;
+  });
+
+  // const growthContributionRationGraphs = computed<GraphConfig>(() => {
+  //   const config = {
+  //     id: 'GrowthToContribution',
+  //     color: getBudgetColor,
+  //     graphs: <Graphs>{},
+  //     header: instrumentId => `Growth/Contribution Ratio over Time by Budget - ${getInstrumentName(instrumentId)}`,
+  //     lineName: getBudgetName,
+  //     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+  //     x: globalOptions.Period,
+  //     xFormat: (x) => globalOptions.Period(x, true),
+  //     xLabel: () => globalOptions.Time,
+  //     xScale: graphXScale.value,
+  //     y: y => y,
+  //     yFormat: y => y,
+  //     yLabel: () => 'Ratio',
+  //     yScale: d3.scaleLinear,
+  //   };
+
+  //   instrumentsWithTotals.value.forEach((instrument) => {
+  //     config.graphs[instrument.id] = {
+  //       config: {
+  //         maxX: getNumContributions(instrument.id, constants.DEFAULT),
+  //         maxY: getMaxGrowthBalanceRatio(instrument.id),
+  //       },
+  //       lines: <Record<string, Point[]>>{},
+  //     };
+  //     budgets.value.forEach((budget) => {
+  //       const line: Point[] = [];
+  //       getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
+  //         line.push({ x: record.period, y: getGrowthUpToPeriod(instrument.id, budget.id, record.period) / record.currentBalance });
+  //       });
+  //       config.graphs[instrument.id].lines[budget.id] = line;
+  //     });
+  //   });
+  //   return config;
+  // });
+
+  const graphs = computed(() => ({
+    [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+    // [constants.GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME]: growthContributionRationGraphs.value,
+  }));
 
 
   /** return */
@@ -389,6 +499,7 @@ export default defineStore('appreciateCore', () => {
     createInstrument,
     currentBudgetId,
     currentInstrumentId,
+    deflate,
     deflateAllMoney,
     deleteBudget,
     deleteInstrument,
@@ -409,6 +520,7 @@ export default defineStore('appreciateCore', () => {
     getInstrumentName,
     getLifetimeGrowth,
     getNumContributions,
+    graphs,
     inflationFactor,
     instrumentDetailsPanelActive,
     instrumentFormActive,
@@ -428,6 +540,7 @@ export default defineStore('appreciateCore', () => {
     setYearsToSpend,
     toggleAccrueBeforeContribution,
     toggleDeflateAllMoney,
+    totalAnnualLimit,
     totalCurrentBalance,
     totalMaxPeriodsPerYear,
     totalsAsAnInstrument,

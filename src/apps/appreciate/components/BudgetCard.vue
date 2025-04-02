@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { Button } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 import constants from '../constants/constants';
 import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
-import { Button } from '@/apps/shared/types/app';
-import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
 
@@ -14,12 +14,21 @@ const state = useAppreciateCoreStore();
 
 const totalsContributionSummary = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
 
-const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
-const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
-const budgetTotalGrowth = computed<string>(() => `${globalOptions.Money(totalsContributionSummary.value.lifetimeGrowth)}`);
+const netWorth = computed<number>(() => state.deflateAllMoney
+  ? state.deflate(
+    totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
+    state.yearsToContribute
+  )
+  : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
+);
+const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
-const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
+const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
+const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
+const budgetContributionTotals = computed<number>(() => globalOptions.Money(totalsContributionSummary.value.amortizationSchedule.length * props.budget.absolute));
+const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
+
+const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -67,22 +76,16 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
-            <tr v-if="budget.id !== constants.DEFAULT">
-              <td>Extra</td>
+            <tr>
+              <td>Total Contributed</td>
               <td :class="['text-right']">
-                <b>{{ budgetExtra }}</b>
+                <b>{{ budgetContributionTotals }}</b>
               </td>
             </tr>
             <tr>
-              <td>Interest Accrued</td>
+              <td>{{ netWorthLabel }}</td>
               <td :class="['text-right']">
-                <b>{{ budgetTotalGrowth }}</b>
-              </td>
-            </tr>
-            <tr>
-              <td>{{ paymentsLabel }}</td>
-              <td :class="['text-right']">
-                <b>{{ budgetContributions }}</b>
+                <b>{{ budgetNetWorth }}</b>
               </td>
             </tr>
           </tbody>

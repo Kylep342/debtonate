@@ -2,10 +2,10 @@
 import { ILoan } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
-import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
 import constants from '@/apps/debtonate/constants/constants';
+import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();

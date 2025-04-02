@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import { useModal } from '@/apps/shared/composables/useModal';
 import BudgetDetailsPanel from './components/BudgetDetailsPanel.vue';
+import BudgetForm from '@/apps/shared/components/forms/BudgetForm.vue';
 import BudgetsPanel from './components/BudgetsPanel.vue';
+import constants from './constants/constants';
+import FooterBar from '@/apps/shared/components/FooterBar.vue';
+import GraphsPanel from './components/GraphsPanel.vue';
 import HeaderBar from './components/HeaderBar.vue';
 import InstrumentDetailsPanel from './components/InstrumentDetailsPanel.vue';
 import InstrumentForm from './components/forms/InstrumentForm.vue';
 import InstrumentsPanel from './components/InstrumentsPanel.vue';
-import SiteIntro from './components/SiteIntro.vue';
 import OptionsForm from './components/forms/OptionsForm.vue';
-import constants from './constants/constants';
+import SiteIntro from './components/SiteIntro.vue';
 import useAppreciateCoreStore from './stores/core';
-import FooterBar from '@/apps/shared/components/FooterBar.vue';
-import BudgetForm from '@/apps/shared/components/forms/BudgetForm.vue';
-import { useModal } from '@/apps/shared/composables/useModal';
 
 const state = useAppreciateCoreStore();
 
@@ -50,7 +51,7 @@ useModal(computed(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
             <div :class="['header']">
               <h2>Investment Analysis</h2>
             </div>
-            <!-- <GraphsPanel /> -->
+            <GraphsPanel />
           </div>
           <div>
             <BudgetDetailsPanel :id="constants.BUDGET_DETAILS_ID" />

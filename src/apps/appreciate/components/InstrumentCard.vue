@@ -2,10 +2,10 @@
 import { computed } from 'vue';
 import { IInstrument } from 'moneyfunx';
 
-import constants from '@/apps/shared/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
+import constants from '@/apps/shared/constants/constants';
+import useAppreciateCoreStore from '../stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   instrument: IInstrument
@@ -15,12 +15,9 @@ const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
 
 const instrumentCurrentBalance = computed<string>(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
-const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate() * 100)}`);
-const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit())}`);
-
-console.log(props.instrument.currentBalance);
-console.log(props.instrument.annualLimit());
-console.log(props.instrument.annualRate());
+const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
+const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
+const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -74,10 +71,16 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
                 <b>{{ instrumentInterestRate }}</b>
               </td>
             </tr>
-            <tr v-if="instrumentAnnualLimit">
+            <tr v-if="instrument.annualLimit">
               <td>Annual Limit</td>
               <td :class="['text-right']">
                 <b>{{ instrumentAnnualLimit }}</b>
+              </td>
+            </tr>
+            <tr v-if="instrument.annualLimit">
+              <td>Max Contribution</td>
+              <td :class="['text-right']">
+                <b>{{ instrumentMaxMonthlyContribution }}</b>
               </td>
             </tr>
           </tbody>

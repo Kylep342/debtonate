@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
-import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();

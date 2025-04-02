@@ -4,10 +4,10 @@ import { computed, ref, watch } from 'vue';
 import { Button } from '@/apps/shared/types/app';
 import { GraphConfig } from '@/apps/shared/types/graph';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '../constants/constants';
+import useAppreciateCoreStore from '../stores/core';
 
-const state = useDebtonateCoreStore();
+const state = useAppreciateCoreStore();
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
@@ -20,8 +20,8 @@ const buttons: Array<Button> = Object.keys(state.graphs).map((graphId) => ({
   onClick: () => setViewedGraphId(graphId),
 }));
 
-watch(() => state.loans, async (loans) => {
-  if (!loans.map((loan) => loan.id).includes(viewedItemId.value)) {
+watch(() => state.instruments, async (instruments) => {
+  if (!instruments.map((instrument) => instrument.id).includes(viewedItemId.value)) {
     setViewedItemId(constants.TOTALS);
   }
 });
@@ -38,7 +38,7 @@ watch(() => state.loans, async (loans) => {
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">
-      <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
+      <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
         :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
         <template #tabContent>
           <base-graph :key="viewedItemId" :graph="activeGraph" :anchor-id="viewedItemId" />

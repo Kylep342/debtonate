@@ -2,7 +2,7 @@
 import { IInstrument } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
-// import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
+import AmortizationTable from './AmortizationTable.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/appreciate/constants/constants';
 import shared_constants from '@/apps/shared/constants/constants';
@@ -47,14 +47,13 @@ watch(
         <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <h2>{{ state.getBudgetName(viewedItemId) }}</h2>
-            <!-- <AmortizationTable :payment-schedule="state.getPaymentSchedule(currentInstrument.id, viewedItemId)" :title="state.buildAmortizationTableTitle(
+            <AmortizationTable :contribution-schedule="state.getContributionSchedule(currentInstrument.id, viewedItemId)" :title="state.buildAmortizationTableTitle(
               currentInstrument,
               state.getBudget(viewedItemId),
             )" :subtitle="state.buildAmortizationTableSubtitle(
                 currentInstrument,
                 state.getBudget(viewedItemId),
-              )" /> -->
+              )" />
           </template>
         </base-tabs>
       </div>

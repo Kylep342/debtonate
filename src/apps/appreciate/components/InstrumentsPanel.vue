@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
-import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
-import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
-import { useResize } from '@/apps/shared/composables/useResize';
 import { Button } from '@/apps/shared/types/app';
+import { useResize } from '@/apps/shared/composables/useResize';
+import constants from '@/apps/appreciate/constants/constants';
+import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
+import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 
 const state = useAppreciateCoreStore();
 

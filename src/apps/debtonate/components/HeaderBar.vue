@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { Button } from '@/apps/shared/types/app';
 import constants from '@/apps/shared/constants/constants';
 import routes from '@/apps/shared/constants/routes';
-import { Button } from '@/apps/shared/types/app';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
 
@@ -20,7 +20,7 @@ const buttons: Array<Button> = [
   { text: constants.BTN_SAVE, onClick: state.saveState },
   { text: constants.BTN_CLEAR, onClick: state.clearState },
   { text: constants.BTN_COPY, onClick: copyStateToClipboard },
-  // { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
+  { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
 ];
 </script>
 

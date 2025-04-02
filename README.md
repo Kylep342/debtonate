@@ -26,3 +26,5 @@ View the app [in your browser](http://localhost:5173)
 Shared idea: "(focused) time travel view" - show cards 'at period X' in addtion to present value
  - visual table with selectable 'at period X'
  - essentially (maybe?) permanent HoverTemplate
+
+ flag to always meet annual maximums across instruments (i.e. set minimum budget to 0 or instruments.reduce((instrument, accumulator) => instrument.annualLimit + accumulator, 0))

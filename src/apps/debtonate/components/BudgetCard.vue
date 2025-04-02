@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import constants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import constants from '@/apps/shared/constants/constants';
+import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
 
@@ -15,9 +15,9 @@ const state = useDebtonateCoreStore();
 const totalsPaymentSummary = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetExtra = computed<string>(() => `${globalOptions.Money(props.budget.relative)}/month`);
 const budgetPayments = computed<number>(() => globalOptions.Period(totalsPaymentSummary.value.amortizationSchedule.length, true));
 const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest)}`);
+const budgetTotalPaid = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest + totalsPaymentSummary.value.lifetimePrincipal)}`);
 
 const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 
@@ -71,10 +71,10 @@ const getButtons = (budgetId): Array<Button> => (
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
-            <tr v-if="budget.id !== constants.DEFAULT">
-              <td>Extra</td>
+            <tr>
+              <td>Total Paid</td>
               <td :class="['text-right']">
-                <b>{{ budgetExtra }}</b>
+                <b>{{ budgetTotalPaid }}</b>
               </td>
             </tr>
             <tr>

@@ -74,7 +74,7 @@ export default defineStore('debtonateCore', () => {
       (loan) => new moneyfunx.Loan(
         loan.principal,
         loan.annualRate,
-        12,
+        constants.PERIODS_PER_YEAR,
         loan.termInYears,
         loan.name,
         loan.currentBalance,
@@ -189,7 +189,7 @@ export default defineStore('debtonateCore', () => {
     annualRate: totalEffectiveInterestRate.value,
     periodsPerYear: totalMaxPeriodsPerYear.value,
     termInYears: totalMaxTermInYears.value,
-    periodicRate: totalEffectiveInterestRate.value / 12, // not implemented for Totals as a Loan (see notes.ts)
+    periodicRate: totalEffectiveInterestRate.value / constants.PERIODS_PER_YEAR, // not implemented for Totals as a Loan (see notes.ts)
     periods: totalMaxPeriods.value,
     minPayment: totalMinPayment.value,
     name: constants.NAME_TOTALS_AS_LOAN,
@@ -253,12 +253,12 @@ export default defineStore('debtonateCore', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.snowball),
+  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+    moneyfunx.sortWith(loans.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
-  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortLoans(
-    moneyfunx.sortLoans(loans.value, moneyfunx.avalanche),
+  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+    moneyfunx.sortWith(loans.value, moneyfunx.avalanche),
     moneyfunx.snowball,
   );
 
@@ -298,7 +298,7 @@ export default defineStore('debtonateCore', () => {
     name: string,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, refinancingScenarioName(parentLoanId, name), undefined, fees);
+    const loan = new moneyfunx.Loan(principal, interestRate, constants.PERIODS_PER_YEAR, termInYears, refinancingScenarioName(parentLoanId, name), undefined, fees);
     if (refinancingScenarios.value[parentLoanId]) {
       refinancingScenarios.value[parentLoanId].push(loan);
     } else {
@@ -400,18 +400,18 @@ export default defineStore('debtonateCore', () => {
 
   // dependent methods
 
-  const sortLoans = () => {
+  const sortWith = () => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
 
   const toggleAvalancheSort = () => {
     snowballSort.value = false;
-    sortLoans();
+    sortWith();
   };
 
   const toggleSnowballSort = () => {
     snowballSort.value = true;
-    sortLoans();
+    sortWith();
   };
 
   const createBudget = (proposedBudget: number): string => {
@@ -436,13 +436,13 @@ export default defineStore('debtonateCore', () => {
     currentBalance: number,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance, fees);
+    const loan = new moneyfunx.Loan(principal, interestRate, constants.PERIODS_PER_YEAR, termInYears, name, currentBalance, fees);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
     };
     loans.value.push(loan);
-    sortLoans();
+    sortWith();
     return loan.id;
   };
 
@@ -489,9 +489,11 @@ export default defineStore('debtonateCore', () => {
     loan: moneyfunx.ILoan
   ): string => `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(loan.annualRate * 100)} | ${loan.termInYears * loan.periodsPerYear} Payments)`;
 
-  // graph data
+  /** Graphing */
 
   const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
+
+  // graph data
 
   const balancesGraphs = computed<GraphConfig>(() => {
     const config = {
@@ -680,7 +682,7 @@ export default defineStore('debtonateCore', () => {
     setRoundingScale,
     snowball,
     snowballSort,
-    sortLoans,
+    sortWith,
     toggleAvalancheSort,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,
