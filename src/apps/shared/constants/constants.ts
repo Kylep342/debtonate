@@ -82,6 +82,7 @@ const NAME_APPRECIATE = 'Appreciate';
 const NAME_DEBTONATE = 'Debtonate';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const PERIOD = 'Period';
+const PERIODS_PER_YEAR = 12;
 const TABLES = 'Tables';
 
 export default Object.freeze({
@@ -112,6 +113,7 @@ export default Object.freeze({
   NAME_DEBTONATE,
   NAME_MIN_BUDGET,
   PERIOD,
+  PERIODS_PER_YEAR,
   TABLES,
   TOTALS,
 });

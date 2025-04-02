@@ -74,7 +74,7 @@ export default defineStore('debtonateCore', () => {
       (loan) => new moneyfunx.Loan(
         loan.principal,
         loan.annualRate,
-        12,
+        constants.PERIODS_PER_YEAR,
         loan.termInYears,
         loan.name,
         loan.currentBalance,
@@ -189,7 +189,7 @@ export default defineStore('debtonateCore', () => {
     annualRate: totalEffectiveInterestRate.value,
     periodsPerYear: totalMaxPeriodsPerYear.value,
     termInYears: totalMaxTermInYears.value,
-    periodicRate: totalEffectiveInterestRate.value / 12, // not implemented for Totals as a Loan (see notes.ts)
+    periodicRate: totalEffectiveInterestRate.value / constants.PERIODS_PER_YEAR, // not implemented for Totals as a Loan (see notes.ts)
     periods: totalMaxPeriods.value,
     minPayment: totalMinPayment.value,
     name: constants.NAME_TOTALS_AS_LOAN,
@@ -298,7 +298,7 @@ export default defineStore('debtonateCore', () => {
     name: string,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, refinancingScenarioName(parentLoanId, name), undefined, fees);
+    const loan = new moneyfunx.Loan(principal, interestRate, constants.PERIODS_PER_YEAR, termInYears, refinancingScenarioName(parentLoanId, name), undefined, fees);
     if (refinancingScenarios.value[parentLoanId]) {
       refinancingScenarios.value[parentLoanId].push(loan);
     } else {
@@ -436,7 +436,7 @@ export default defineStore('debtonateCore', () => {
     currentBalance: number,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(principal, interestRate, 12, termInYears, name, currentBalance, fees);
+    const loan = new moneyfunx.Loan(principal, interestRate, constants.PERIODS_PER_YEAR, termInYears, name, currentBalance, fees);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;

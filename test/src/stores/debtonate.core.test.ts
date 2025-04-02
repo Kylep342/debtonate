@@ -9,48 +9,29 @@ import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Loans = () => [
-  new Loan(
-    314159.26,
-    0.0535,
-    12,
-    15,
-    "house",
-  ),
-  new Loan(
-    27182.81,
-    0.0828,
-    12,
-    4,
-    "e-car",
-    23456.78,
-    200,
-  ),
-  new Loan(
-    10000,
-    0.0342,
-    12,
-    10,
-    "tau",
-    6283.19,
-  ),
+  new Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, "house"),
+  new Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, "e-car", 23456.78, 200),
+  new Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, "tau", 6283.19 ),
 ];
+
 const Budgets = () => [
   { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
 ];
+
 const RefinancingScenarios = (loan) => [
   new Loan(
     loan.currentBalance,
     loan.annualRate - 0.0075,
-    12,
+    constants.PERIODS_PER_YEAR,
     loan.termInYears + 1,
     "lower rate longer term",
   ),
   new Loan(
     loan.currentBalance,
     loan.annualRate + 0.0150,
-    12,
+    constants.PERIODS_PER_YEAR,
     Math.max(loan.termInYears - 2, 2),
     "higher rate shorter term",
   ),
@@ -78,7 +59,7 @@ describe('Debtonate Core Store', () => {
     expect(state.rawTotalMinPayment.toFixed(2)).toBe('3307.71');
     expect(state.roundedTotalMinPayment.toFixed(2)).toBe('3400.00');
     expect(state.totalMaxPeriods).toBe(180);
-    expect(state.totalMaxPeriodsPerYear).toBe(12);
+    expect(state.totalMaxPeriodsPerYear).toBe(constants.PERIODS_PER_YEAR);
     expect(state.totalMaxTermInYears).toBe(15);
     expect(state.totalMinPayment.toFixed(2)).toBe('3307.71');
     expect(state.totalPrincipal.toFixed(2)).toBe('351342.07');
@@ -321,6 +302,7 @@ describe('Debtonate Core Store', () => {
   it('handles internal state', async () => {
     const state = useDebtonateCoreStore();
     const globalOptions = useGlobalOptionsStore();
+
     const initialState = state.exportState();
     expect(Object.keys(initialState)).toStrictEqual([
       sharedKeys.LS_CURRENCY,
@@ -334,15 +316,18 @@ describe('Debtonate Core Store', () => {
       keys.LS_ROUNDING_SCALE,
       keys.LS_SNOWBALL_SORT,
     ]);
+
     state.budgets = Budgets();
     state.loans = Loans();
     state.toggleRounding(200);
     state.toggleReducePayments();
     globalOptions.setCurrency('JPY');
     globalOptions.setLanguage('en-GB');
+
     const changedState = state.exportState();
     state.saveState();
     state.clearState();
+
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.loans.map(
       (loan) => loan.name)
@@ -354,6 +339,7 @@ describe('Debtonate Core Store', () => {
     expect(state.roundingScale).toBe(initialState[keys.LS_ROUNDING_SCALE]);
     expect(globalOptions.language).toBe(initialState[sharedKeys.LS_LANGUAGE]);
     expect(globalOptions.currency).toBe(initialState[sharedKeys.LS_CURRENCY]);
+
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.loans.map(
@@ -363,7 +349,8 @@ describe('Debtonate Core Store', () => {
     ));
     expect(state.roundingEnabled).toBe(changedState[keys.LS_ROUNDING_ENABLED]);
     expect(state.roundingScale).toBe(changedState[keys.LS_ROUNDING_SCALE]);
-    expect(state.language).toBe(changedState[keys.LS_LANGUAGE]);
+    expect(globalOptions.language).toBe(changedState[sharedKeys.LS_LANGUAGE]);
+    expect(globalOptions.currency).toBe(changedState[sharedKeys.LS_CURRENCY]);
   });
 
   it('manages component states', async () => {
@@ -534,7 +521,6 @@ describe('Debtonate Core Store', () => {
   describe('with graphing', () => {
     it('configures graphs', async () => {
       const state = useDebtonateCoreStore();
-      const globalOptions = useGlobalOptionsStore();
       state.budgets = Budgets();
       state.loans = Loans();
 

@@ -17,7 +17,7 @@ const state = useAppreciateCoreStore();
 const instrumentCurrentBalance = computed<string>(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
 const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
 const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
-const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / 12)}/month`);
+const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 

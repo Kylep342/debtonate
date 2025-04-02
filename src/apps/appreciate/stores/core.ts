@@ -76,7 +76,7 @@ export default defineStore('appreciateCore', () => {
       (instrument) => new moneyfunx.Instrument(
         instrument.currentBalance,
         instrument.annualRate,
-        12,
+        constants.PERIODS_PER_YEAR,
         instrument.name,
         instrument.annualLimit
       )
@@ -190,8 +190,6 @@ export default defineStore('appreciateCore', () => {
 
   /** Instruments */
 
-  // NOTE: To-do
-  // attribute functions in here are placeholder
   const totalsAsAnInstrument = computed<moneyfunx.IInstrument>(() => ({
     id: constants.TOTALS,
     name: constants.NAME_TOTALS_AS_AN_INSTRUMENT,
@@ -278,7 +276,7 @@ export default defineStore('appreciateCore', () => {
           contributionSchedule: moneyfunx.contributeInstruments(
             instruments.value,
             budget.relative,
-            yearsToContribute.value,
+            yearsToContribute.value * constants.PERIODS_PER_YEAR,
             accrueBeforeContribution.value,
           ),
         }
@@ -328,7 +326,7 @@ export default defineStore('appreciateCore', () => {
       name: string,
       annualLimit: number,
     ): string => {
-      const instrument = new moneyfunx.Instrument(currentBalance, interestRate, 12, name, annualLimit);
+      const instrument = new moneyfunx.Instrument(currentBalance, interestRate, constants.PERIODS_PER_YEAR, name, annualLimit);
       if (currentInstrumentId.value && currentInstrumentId.value !== constants.TOTALS) {
         deleteInstrument(currentInstrumentId.value);
         currentInstrumentId.value = null;
@@ -352,13 +350,20 @@ export default defineStore('appreciateCore', () => {
     budgetId: string
   ): number => getContributionSchedule(instrumentId, budgetId).lifetimeGrowth;
 
-  // budgets is sorted on every create
+  // budgets is sorted on every create; order preserved on delete
   const getMaxMoney = (
     instrumentId: string
   ): number => {
-    const bestSchedule = getContributionSchedule(instrumentId, budgets.value[0].id)
+    const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
     return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth
   };
+
+  // const getMaxGrowthBalanceRatio = (
+  //   instrumentId: string
+  // ): number => {
+  //   const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
+  //   return bestSchedule.lifetimeGrowth / (bestSchedule.lifetimeContribution + 1)
+  // };
 
   const getGrowthUpToPeriod = (
     instrumentId: string,
@@ -433,8 +438,46 @@ export default defineStore('appreciateCore', () => {
     return config;
   });
 
+  // const growthContributionRationGraphs = computed<GraphConfig>(() => {
+  //   const config = {
+  //     id: 'GrowthToContribution',
+  //     color: getBudgetColor,
+  //     graphs: <Graphs>{},
+  //     header: instrumentId => `Growth/Contribution Ratio over Time by Budget - ${getInstrumentName(instrumentId)}`,
+  //     lineName: getBudgetName,
+  //     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+  //     x: globalOptions.Period,
+  //     xFormat: (x) => globalOptions.Period(x, true),
+  //     xLabel: () => globalOptions.Time,
+  //     xScale: graphXScale.value,
+  //     y: y => y,
+  //     yFormat: y => y,
+  //     yLabel: () => 'Ratio',
+  //     yScale: d3.scaleLinear,
+  //   };
+
+  //   instrumentsWithTotals.value.forEach((instrument) => {
+  //     config.graphs[instrument.id] = {
+  //       config: {
+  //         maxX: getNumContributions(instrument.id, constants.DEFAULT),
+  //         maxY: getMaxGrowthBalanceRatio(instrument.id),
+  //       },
+  //       lines: <Record<string, Point[]>>{},
+  //     };
+  //     budgets.value.forEach((budget) => {
+  //       const line: Point[] = [];
+  //       getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
+  //         line.push({ x: record.period, y: getGrowthUpToPeriod(instrument.id, budget.id, record.period) / record.currentBalance });
+  //       });
+  //       config.graphs[instrument.id].lines[budget.id] = line;
+  //     });
+  //   });
+  //   return config;
+  // });
+
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+    // [constants.GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME]: growthContributionRationGraphs.value,
   }));
 
 
@@ -497,6 +540,7 @@ export default defineStore('appreciateCore', () => {
     setYearsToSpend,
     toggleAccrueBeforeContribution,
     toggleDeflateAllMoney,
+    totalAnnualLimit,
     totalCurrentBalance,
     totalMaxPeriodsPerYear,
     totalsAsAnInstrument,
