@@ -514,7 +514,7 @@ export default defineStore('debtonateCore', () => {
     };
 
     loansWithTotals.value.forEach((loan) => {
-      config.graphs[loan.id] = {
+      config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLoan(loan.id)!.currentBalance,
@@ -551,7 +551,7 @@ export default defineStore('debtonateCore', () => {
     };
 
     loansWithTotals.value.forEach((loan) => {
-      config.graphs[loan.id] = {
+      config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: getLifetimeInterest(loan.id, constants.DEFAULT),

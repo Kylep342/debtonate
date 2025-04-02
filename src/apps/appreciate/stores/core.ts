@@ -420,7 +420,7 @@ export default defineStore('appreciateCore', () => {
     };
 
     instrumentsWithTotals.value.forEach((instrument) => {
-      config.graphs[instrument.id] = {
+      config.graphs[instrument.id] = <Graph>{
         config: {
           maxX: getNumContributions(instrument.id, constants.DEFAULT),
           maxY: getMaxMoney(instrument.id) * 1.1,
