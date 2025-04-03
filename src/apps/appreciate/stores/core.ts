@@ -133,8 +133,11 @@ export default defineStore('appreciateCore', () => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
   };
 
-  const toggleDeflateAllMoney = (foo: number): void => {
+  const toggleDeflateAllMoney = (newFactor: number): void => {
     deflateAllMoney.value = !deflateAllMoney.value
+    if (deflateAllMoney.value) {
+      setInflationFactor(newFactor);
+    }
   };
 
   const deflate = (amount: number, years: number): number => (amount * ((1 - inflationFactor.value) ** years));

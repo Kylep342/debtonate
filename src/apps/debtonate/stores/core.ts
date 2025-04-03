@@ -575,10 +575,10 @@ export default defineStore('debtonateCore', () => {
 
   const percentOfPaymentAsPrincaplGraphs = computed<GraphConfig>(() => {
     const config = {
-      id: 'globalOptions.PercentOfPaymentAsPrincipal',
+      id: 'PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
       graphs: <Graphs>{},
-      header: loanId => `globalOptions.Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
+      header: loanId => `Percent of Payment as Principal over Time by Budget - ${getLoanName(loanId)}`,
       lineName: getBudgetName,
       subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
       x: globalOptions.Period,
@@ -586,7 +586,7 @@ export default defineStore('debtonateCore', () => {
       xLabel: () => globalOptions.Time,
       xScale: graphXScale.value,
       y: y => y,
-      yLabel: () => 'globalOptions.Percent to Principal',
+      yLabel: () => 'Percent of Payemnt to Principal',
       yFormat: globalOptions.Percent,
       yScale: d3.scaleLinear,
     };
