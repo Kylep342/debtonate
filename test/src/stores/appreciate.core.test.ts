@@ -409,5 +409,28 @@ describe('Appreciate Core Store', () => {
         constants.GRAPH_PURCHASING_POWER_OVER_TIME,
       ]);
     });
+
+    it('computs balances over time graphs', async () => {
+      const state = useAppreciateCoreStore();
+      state.budgets = Budgets(); state.loans = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument) => instrument.id)
+      );
+    });
+
+    it('computs purchasing power over time graphs', async () => {
+      const state = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs)
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument) => instrument.id)
+      );
+    })
   });
 });
