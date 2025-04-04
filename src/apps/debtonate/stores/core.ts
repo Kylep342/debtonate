@@ -400,18 +400,18 @@ export default defineStore('debtonateCore', () => {
 
   // dependent methods
 
-  const sortWith = () => {
+  const sortLoans = () => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
 
   const toggleAvalancheSort = () => {
     snowballSort.value = false;
-    sortWith();
+    sortLoans();
   };
 
   const toggleSnowballSort = () => {
     snowballSort.value = true;
-    sortWith();
+    sortLoans();
   };
 
   const createBudget = (proposedBudget: number): string => {
@@ -442,7 +442,7 @@ export default defineStore('debtonateCore', () => {
       currentLoanId.value = null;
     };
     loans.value.push(loan);
-    sortWith();
+    sortLoans();
     return loan.id;
   };
 
@@ -682,7 +682,7 @@ export default defineStore('debtonateCore', () => {
     setRoundingScale,
     snowball,
     snowballSort,
-    sortWith,
+    sortLoans,
     toggleAvalancheSort,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,
