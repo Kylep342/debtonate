@@ -211,7 +211,7 @@ describe('Appreciate Core Store', () => {
     state.instruments = Instruments();
     state.setInflationFactor(0.05);
     state.toggleAccrueBeforeContribution();
-    state.toggleDeflateAllMoney();
+    state.toggleDeflateAllMoney(0.04);
     state.setYearsToContribute(30);
     state.setYearsToSpend(42);
     globalOptions.setCurrency('JPY');
