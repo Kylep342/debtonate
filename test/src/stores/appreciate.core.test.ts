@@ -406,6 +406,7 @@ describe('Appreciate Core Store', () => {
         Object.keys(state.graphs)
       ).toStrictEqual([
         constants.GRAPH_BALANCES_OVER_TIME,
+        constants.GRAPH_PURCHASING_POWER_OVER_TIME,
       ]);
     });
   });
