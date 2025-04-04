@@ -211,7 +211,7 @@ describe('Appreciate Core Store', () => {
     state.instruments = Instruments();
     state.setInflationFactor(0.05);
     state.toggleAccrueBeforeContribution();
-    state.toggleDeflateAllMoney();
+    state.toggleDeflateAllMoney(0.04);
     state.setYearsToContribute(30);
     state.setYearsToSpend(42);
     globalOptions.setCurrency('JPY');
@@ -406,6 +406,7 @@ describe('Appreciate Core Store', () => {
         Object.keys(state.graphs)
       ).toStrictEqual([
         constants.GRAPH_BALANCES_OVER_TIME,
+        constants.GRAPH_PURCHASING_POWER_OVER_TIME,
       ]);
     });
   });

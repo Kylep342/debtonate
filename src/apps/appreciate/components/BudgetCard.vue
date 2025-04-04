@@ -17,7 +17,7 @@ const totalsContributionSummary = computed(() => state.getContributionSchedule(c
 const netWorth = computed<number>(() => state.deflateAllMoney
   ? state.deflate(
     totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
-    state.yearsToContribute
+    state.getNumContributions(constants.TOTALS, props.budget.id)
   )
   : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
 );

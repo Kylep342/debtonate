@@ -133,11 +133,14 @@ export default defineStore('appreciateCore', () => {
     accrueBeforeContribution.value = !accrueBeforeContribution.value
   };
 
-  const toggleDeflateAllMoney = (foo: number): void => {
+  const toggleDeflateAllMoney = (newFactor: number): void => {
     deflateAllMoney.value = !deflateAllMoney.value
+    if (deflateAllMoney.value) {
+      setInflationFactor(newFactor);
+    }
   };
 
-  const deflate = (amount: number, years: number): number => (amount * ((1 - inflationFactor.value) ** years));
+  const deflate = (amount: number, periods: number): number => (amount * ((1 - inflationFactor.value / constants.PERIODS_PER_YEAR) ** periods));
 
   /** dependent computed options/functions */
 
@@ -420,7 +423,7 @@ export default defineStore('appreciateCore', () => {
     };
 
     instrumentsWithTotals.value.forEach((instrument) => {
-      config.graphs[instrument.id] = {
+      config.graphs[instrument.id] = <Graph>{
         config: {
           maxX: getNumContributions(instrument.id, constants.DEFAULT),
           maxY: getMaxMoney(instrument.id) * 1.1,
@@ -431,6 +434,43 @@ export default defineStore('appreciateCore', () => {
         const line: Point[] = [];
         getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
           line.push({ x: record.period, y: record.currentBalance });
+        });
+        config.graphs[instrument.id].lines[budget.id] = line;
+      });
+    });
+    return config;
+  });
+
+  const purchasingPowerGraphs = computed<GraphConfig>(() => {
+    const config = {
+      id: 'PurchasingPower',
+      color: getBudgetColor,
+      graphs: <Graphs>{},
+      header: instrumentId => `Purchasing Power over Time by Budget - ${getInstrumentName(instrumentId)}`,
+      lineName: getBudgetName,
+      subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+      x: globalOptions.Period,
+      xFormat: (x) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: y => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Balance',
+      yScale: d3.scaleLinear,
+    };
+
+    instrumentsWithTotals.value.forEach((instrument) => {
+      config.graphs[instrument.id] = <Graph>{
+        config: {
+          maxX: getNumContributions(instrument.id, constants.DEFAULT),
+          maxY: deflate(getMaxMoney(instrument.id) * 1.1, getNumContributions(instrument.id, constants.DEFAULT)),
+        },
+        lines: <Record<string, Point[]>>{},
+      };
+      monthlyBudgets.value.forEach((budget) => {
+        const line: Point[] = [];
+        getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
+          line.push({ x: record.period, y: deflate(record.currentBalance, record.period) });
         });
         config.graphs[instrument.id].lines[budget.id] = line;
       });
@@ -477,6 +517,7 @@ export default defineStore('appreciateCore', () => {
 
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+    [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
     // [constants.GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME]: growthContributionRationGraphs.value,
   }));
 
