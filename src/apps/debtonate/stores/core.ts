@@ -591,6 +591,7 @@ export default defineStore('debtonateCore', () => {
       yScale: d3.scaleLinear,
     };
 
+    // idea; toggle presence of lines as data with boolean k-v
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = <Graph>{
         config: {

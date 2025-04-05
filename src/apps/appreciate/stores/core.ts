@@ -140,7 +140,16 @@ export default defineStore('appreciateCore', () => {
     }
   };
 
+  const avalanche = (): Array<moneyfunx.Instrument> => moneyfunx.sortWith(
+    moneyfunx.sortWith(instruments.value, moneyfunx.snowball),
+    moneyfunx.avalanche,
+  );
+
   const deflate = (amount: number, periods: number): number => (amount * ((1 - inflationFactor.value / constants.PERIODS_PER_YEAR) ** periods));
+
+  const sortInstruments = () => {
+    instruments.value = avalanche();
+  }
 
   /** dependent computed options/functions */
 
@@ -335,7 +344,7 @@ export default defineStore('appreciateCore', () => {
         currentInstrumentId.value = null;
       };
       instruments.value.push(instrument);
-      // sortInstruments();
+      sortInstruments();
       return instrument.id;
     };
 
@@ -526,6 +535,7 @@ export default defineStore('appreciateCore', () => {
 
   return {
     accrueBeforeContribution,
+    avalanche,
     budgetDetailsPanelActive,
     budgetFormActive,
     budgetFormTitle,
@@ -579,6 +589,7 @@ export default defineStore('appreciateCore', () => {
     setInflationFactor,
     setYearsToContribute,
     setYearsToSpend,
+    sortInstruments,
     toggleAccrueBeforeContribution,
     toggleDeflateAllMoney,
     totalAnnualLimit,
