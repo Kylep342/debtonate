@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
-import sharedKeys from '@/apps/shared/constants/keys';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import sharedKeys from '@/apps/shared/constants/keys';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Instruments = () => [

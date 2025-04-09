@@ -2,14 +2,13 @@
 import { computed } from 'vue';
 import { ILoan } from 'moneyfunx';
 
-import { Button } from '@/apps/shared/types/app';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import DonutGraph from '@/apps/shared/components/ui/DonutGraph.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
 
-const props = defineProps<{
-  loan: ILoan
-}>();
+const props = defineProps<{ loan: ILoan }>();
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
@@ -20,6 +19,11 @@ const loanMinPayment = computed<string>(() => `${globalOptions.Money(props.loan.
 const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.principal)}`);
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
+
+const graph = [
+  { label: 'Interest', value: state.getLifetimeInterest(props.loan.id, constants.DEFAULT) },
+  { label: 'Principal', value: props.loan.currentBalance },
+];
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -33,7 +37,6 @@ const baseButtons = computed<Array<Button>>(() => ([
     onClick: () => state.loans.length ? state.refinanceLoan(props.loan.id) : alertButtonIsDisabled(),
   },
 ]));
-
 
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
@@ -63,6 +66,7 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
       </div>
     </template>
     <template #cardBody>
+      <DonutGraph v-if="state.loans.length" :data="graph" :anchorId="loan.id"/>
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

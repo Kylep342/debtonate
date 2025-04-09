@@ -5,6 +5,7 @@ import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import constants from '@/apps/shared/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import DonutGraph from '@/apps/shared/components/ui/DonutGraph.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{ budget: MonthlyBudget }>();
@@ -20,6 +21,11 @@ const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totals
 const budgetTotalPaid = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest + totalsPaymentSummary.value.lifetimePrincipal)}`);
 
 const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
+
+const graph = [
+  { label: 'Interest', value: totalsPaymentSummary.value.lifetimeInterest },
+  { label: 'Principal', value: totalsPaymentSummary.value.lifetimePrincipal },
+];
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -62,6 +68,7 @@ const getButtons = (budgetId): Array<Button> => (
       </div>
     </template>
     <template #cardBody>
+      <DonutGraph v-if="state.loans.length" :data="graph" :anchorId="budget.id"/>
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

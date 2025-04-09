@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import constants from '../../constants/constants';
-import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import useAppreciateCoreStore from '../../stores/core';
+import constants from '@/apps/appreciate/constants/constants';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();

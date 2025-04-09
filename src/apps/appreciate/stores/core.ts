@@ -414,7 +414,7 @@ export default defineStore('appreciateCore', () => {
   // graph data
 
   const balancesGraphs = computed<GraphConfig>(() => {
-    const config = {
+    const config = <GraphConfig>{
       id: 'Balances',
       color: getBudgetColor,
       graphs: <Graphs>{},
@@ -451,7 +451,7 @@ export default defineStore('appreciateCore', () => {
   });
 
   const purchasingPowerGraphs = computed<GraphConfig>(() => {
-    const config = {
+    const config = <GraphConfig>{
       id: 'PurchasingPower',
       color: getBudgetColor,
       graphs: <Graphs>{},

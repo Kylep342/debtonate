@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
-import sharedKeys from '@/apps/shared/constants/keys';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import sharedKeys from '@/apps/shared/constants/keys';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Loans = () => [
@@ -356,8 +356,7 @@ describe('Debtonate Core Store', () => {
   it('manages component states', async () => {
     const state = useDebtonateCoreStore();
     state.budgets = Budgets();
-    // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
-    const firstBudgetId = state.monthlyBudgets[1].id;
+    const firstBudgetId = state.budgets[0].id;
     state.loans = Loans();
     const firstLoanId = state.loans[0].id;
 
