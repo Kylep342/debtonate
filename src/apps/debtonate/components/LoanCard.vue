@@ -4,7 +4,6 @@ import { ILoan } from 'moneyfunx';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import DonutGraph from '@/apps/shared/components/ui/DonutGraph.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 
@@ -20,10 +19,10 @@ const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.p
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
-const graph = [
+const graph = computed(() => [
   { label: 'Interest', value: state.getLifetimeInterest(props.loan.id, constants.DEFAULT) },
   { label: 'Principal', value: props.loan.currentBalance },
-];
+]);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -66,7 +65,7 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
       </div>
     </template>
     <template #cardBody>
-      <DonutGraph v-if="state.loans.length" :data="graph" :anchorId="loan.id"/>
+      <donut-graph v-if="state.loans.length" :data="graph" :anchorId="loan.id"/>
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
