@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { Button } from '@/apps/shared/types/app';
-import { MonthlyBudget } from '@/apps/shared/types/core';
-import constants from '@/apps/shared/constants/constants';
+import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
+import { Arc } from '@/apps/shared/types/graph';
 
-const props = defineProps<{ budget: MonthlyBudget }>();
+const props = defineProps<{
+  budget: MonthlyBudget,
+  viewedLoanId: string
+}>();
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
@@ -21,10 +25,7 @@ const budgetTotalPaid = computed<string>(() => `${globalOptions.Money(totalsPaym
 
 const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 
-const graph = computed(() => [
-  { label: 'Interest', value: totalsPaymentSummary.value.lifetimeInterest },
-  { label: 'Principal', value: totalsPaymentSummary.value.lifetimePrincipal },
-]);
+const graph = computed(() => state.cardGraphs[props.viewedLoanId][props.budget.id])
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -67,7 +68,12 @@ const getButtons = (budgetId): Array<Button> => (
       </div>
     </template>
     <template #cardBody>
-      <donut-graph v-if="state.loans.length" :data="graph" :anchorId="budget.id"/>
+      <donut-graph
+        v-if="state.loans.length"
+        :config="state.budgetCardGraphConfig"
+        :graph="graph"
+        :anchorId="budget.id"
+      />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

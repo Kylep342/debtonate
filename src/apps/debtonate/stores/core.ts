@@ -12,6 +12,7 @@ import {
 } from '../types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
+  Arc,
   Graph,
   GraphConfig,
   Graphs,
@@ -532,6 +533,55 @@ export default defineStore('debtonateCore', () => {
     return config;
   });
 
+  const budgetCardGraphConfig = computed(() => ({
+    id: 'BudgetCardSummary',
+    color: getBudgetColor,
+    graphs: <Graphs>{},
+    header: loanId => `Cost Breakdown - ${getLoanName(loanId)}`,
+    lineName: getBudgetName,
+    subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const loanCardGraphConfig = computed(() => ({
+    id: 'LoanCardSummary',
+    color: () => '#FFFFFF',
+    graphs: <Graphs>{},
+    header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
+    lineName: getBudgetName,
+    subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const cardGraphs = computed<Record<string, Record<string, Arc[]>>>(() => {
+    const config = <Record<string, Record<string, Arc[]>>>{};
+    loansWithTotals.value.forEach((loan) => {
+      config[loan.id] = <Record<string, Arc[]>>{};
+      monthlyBudgets.value.forEach((budget) => {
+        const totalsPaymentSummary = getPaymentSchedule(loan.id, budget.id);
+        config[loan.id][budget.id] = [
+          { label: 'Interest', value: totalsPaymentSummary.lifetimeInterest },
+          { label: 'Principal', value: totalsPaymentSummary.lifetimePrincipal },
+        ];
+      });
+    });
+    return config;
+  });
+
   const interestSavedGraphs = computed<GraphConfig>(() => {
     const config = {
       id: 'InterestSaved',
@@ -619,6 +669,7 @@ export default defineStore('debtonateCore', () => {
 
   return {
     avalanche,
+    budgetCardGraphConfig,
     budgetDetailsPanelActive,
     budgetFormActive,
     budgetFormTitle,
@@ -626,6 +677,7 @@ export default defineStore('debtonateCore', () => {
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
     buildLoanSubtitle,
+    cardGraphs,
     clearState,
     createBudget,
     createLoan,
@@ -655,6 +707,7 @@ export default defineStore('debtonateCore', () => {
     graphs,
     graphXScale,
     loadState,
+    loanCardGraphConfig,
     loanDetailsPanelActive,
     loanFormActive,
     loanFormTitle,

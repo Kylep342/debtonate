@@ -1,15 +1,28 @@
+export type Arc = {
+  label: string;
+  value: number;
+  color?: string;
+};
+
 export type Point = {
   x: number
   y: number
 };
 
-export type Graph = {
+export type LineGraph = {
   config: {
     maxX: number
     maxY: number
   },
   lines: Record<string, Point[]>
 };
+
+export type DonutGraph = {
+  config: {},
+  lines: Record<string, Arc[]>
+};
+
+export type Graph = DonutGraph | LineGraph
 
 export type Graphs = Record<string, Graph>;
 

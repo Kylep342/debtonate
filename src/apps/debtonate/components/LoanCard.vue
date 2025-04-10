@@ -12,6 +12,8 @@ const props = defineProps<{ loan: ILoan }>();
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
+const totalsPaymentSummary = computed(() => state.getPaymentSchedule(props.loan.id, constants.DEFAULT));
+
 const loanCurrentBalance = computed<string>(() => `${globalOptions.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed<string>(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
 const loanMinPayment = computed<string>(() => `${globalOptions.Money(props.loan.minPayment)}/month`);
@@ -19,10 +21,7 @@ const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.p
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
-const graph = computed(() => [
-  { label: 'Interest', value: state.getLifetimeInterest(props.loan.id, constants.DEFAULT) },
-  { label: 'Principal', value: props.loan.currentBalance },
-]);
+const graph = computed(()=> state.cardGraphs[props.loan.id][constants.DEFAULT]);
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -65,7 +64,12 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
       </div>
     </template>
     <template #cardBody>
-      <donut-graph v-if="state.loans.length" :data="graph" :anchorId="loan.id"/>
+      <donut-graph
+        v-if="state.loans.length"
+        :config="state.loanCardGraphConfig"
+        :graph="graph"
+        :anchorId="loan.id"
+      />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

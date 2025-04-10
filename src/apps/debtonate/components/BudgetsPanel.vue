@@ -3,6 +3,7 @@ import { computed } from 'vue';
 
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useResize } from '@/apps/shared/composables/useResize';
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
 import constants from '@/apps/shared/constants/constants';
@@ -10,6 +11,12 @@ import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
+
+const {
+  viewedItemId: viewedLoanId,
+  isViewedItemId: isViewedLoanId,
+  setViewedItemId: setViewedLoanId
+} = usePivot(constants.TOTALS);
 
 const { scrollContainer } = useResize('resizeBudgetsPanel');
 
@@ -47,7 +54,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
       ]">
         <ul>
           <li v-for="(budget) in orderedBudgets" :key="budget.id">
-            <BudgetCard :budget="budget" />
+            <BudgetCard :budget="budget" :viewedLoanId="viewedLoanId"/>
           </li>
         </ul>
       </div>

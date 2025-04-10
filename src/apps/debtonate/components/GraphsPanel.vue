@@ -41,6 +41,7 @@ watch(() => state.loans, async (loans) => {
       <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
         :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
         <template #tabContent>
+          <!-- TODO: Move to split config/lines model -->
           <base-graph :key="viewedItemId" :graph="activeGraph" :anchor-id="viewedItemId" />
         </template>
       </base-tabs>
