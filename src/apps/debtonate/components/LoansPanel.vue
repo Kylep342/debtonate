@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/apps/shared/types/app';
+import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useResize } from '@/apps/shared/composables/useResize';
 import constants from '@/apps/debtonate/constants/constants';
 import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
@@ -7,6 +8,12 @@ import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
+
+const {
+  viewedItemId: viewedBudgetId,
+  isViewedItemId: isViewedBudgetId,
+  setViewedItemId: setViewedBudgetId
+} = usePivot(constants.DEFAULT);
 
 const { scrollContainer } = useResize('resizeLoansPanel');
 
@@ -34,7 +41,7 @@ const buttons: Array<Button> = [
       ]">
         <ul>
           <li v-for="(loan) in state.loansWithTotals" :key="loan.id">
-            <LoanCard :loan="loan" />
+            <LoanCard :loan="loan" :viewedBudgetId="viewedBudgetId" />
           </li>
         </ul>
       </div>

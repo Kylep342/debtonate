@@ -536,7 +536,6 @@ export default defineStore('debtonateCore', () => {
   const budgetCardGraphConfig = computed(() => ({
     id: 'BudgetCardSummary',
     color: getBudgetColor,
-    graphs: <Graphs>{},
     header: loanId => `Cost Breakdown - ${getLoanName(loanId)}`,
     lineName: getBudgetName,
     subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
@@ -553,7 +552,6 @@ export default defineStore('debtonateCore', () => {
   const loanCardGraphConfig = computed(() => ({
     id: 'LoanCardSummary',
     color: () => '#FFFFFF',
-    graphs: <Graphs>{},
     header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
     lineName: getBudgetName,
     subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),

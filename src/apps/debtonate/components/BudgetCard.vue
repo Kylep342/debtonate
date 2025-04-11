@@ -10,7 +10,7 @@ import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   budget: MonthlyBudget,
-  viewedLoanId: string
+  viewedLoanId: string,
 }>();
 
 const globalOptions = useGlobalOptionsStore();

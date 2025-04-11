@@ -7,7 +7,10 @@ import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 
-const props = defineProps<{ loan: ILoan }>();
+const props = defineProps<{
+  loan: ILoan,
+  viewedBudgetId: string,
+}>();
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
@@ -21,7 +24,7 @@ const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.p
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
-const graph = computed(()=> state.cardGraphs[props.loan.id][constants.DEFAULT]);
+const graph = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetId])
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
