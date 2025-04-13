@@ -58,7 +58,7 @@ const initializeChart = () => {
     .append("path")
     .attr("d", arc)
     .attr("fill", d => d.data.color || color(d.data.label))
-    .attr("stroke", "white")
+    // .attr("stroke", "white")
     .style("stroke-width", "2px")
     .style("opacity", 0.8)
     .on("mouseover", (event, d) => {

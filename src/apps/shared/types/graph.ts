@@ -43,6 +43,8 @@ export type GraphConfig = {
   yScale: Function
 };
 
+export type DonutGraphCobfig = {}
+
 export type TooltipConfig = {
   xLabel: string
   xFormat: Function

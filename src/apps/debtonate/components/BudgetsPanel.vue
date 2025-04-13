@@ -20,6 +20,11 @@ const {
 
 const { scrollContainer } = useResize('resizeBudgetsPanel');
 
+const loanSelectors: Array<Button> = state.loansWithTotals.map((loan) => ({
+  text: state.getLoanName(loan.id),
+  onClick: () => setViewedLoanId(loan.id),
+}));
+
 const buttons: Array<Button> = [
   {
     text: constants.BTN_CREATE,
@@ -43,6 +48,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
   <base-card :id="'budgetManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
       <ManagementPanel :buttons="buttons" :title="constants.BUDGETS" :class="['sticky', 'fixed', 'border-b-2']" />
+      <base-menu :menu="constants.BTN_FOCUS" :buttons="loanSelectors" />
     </template>
     <template #cardBody>
       <div ref="scrollContainer" :class="[

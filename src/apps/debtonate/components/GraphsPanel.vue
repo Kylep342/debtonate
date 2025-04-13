@@ -9,7 +9,11 @@ import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+const {
+  viewedItemId: viewedLoanId,
+  isViewedItemId: isViewedLoanId,
+  setViewedItemId: setViewedLoanId
+} = usePivot(constants.TOTALS);
 
 const viewedGraphId = ref<string>(constants.GRAPH_BALANCES_OVER_TIME);
 const activeGraph = computed<GraphConfig>(() => state.graphs[viewedGraphId.value]);
@@ -39,10 +43,10 @@ watch(() => state.loans, async (loans) => {
     </div>
     <div :class="['tabframe', 'w-fit']">
       <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
-        :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
+        :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
         <template #tabContent>
           <!-- TODO: Move to split config/lines model -->
-          <base-graph :key="viewedItemId" :graph="activeGraph" :anchor-id="viewedItemId" />
+          <base-graph :key="viewedLoanId" :graph="activeGraph" :anchor-id="viewedLoanId" />
         </template>
       </base-tabs>
     </div>
