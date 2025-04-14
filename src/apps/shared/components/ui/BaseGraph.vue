@@ -52,7 +52,6 @@ const initializeChart = () => {
   svg.append('g')
     .attr('transform', `translate(${margin},0)`)
     .call(d3.axisLeft(y).ticks(height / 40).tickFormat(chart.yFormat))
-    // .call(d3.axisLeft(y).ticks(height / 40))
     .call((g) => g.select('.domain').remove())
     .call((g) => g.selectAll('.tick line').clone()
       .attr('x2', width - margin * 2)

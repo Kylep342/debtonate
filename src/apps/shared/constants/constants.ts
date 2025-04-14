@@ -6,12 +6,12 @@ const BTN_CREATE = 'Create';
 const BTN_DELETE = 'Delete';
 const BTN_DETAILS = 'Details';
 const BTN_EDIT = 'Edit';
-const BTN_FOCUS = 'Focus';
 const BTN_LOAD = 'Load';
 const BTN_MENU = 'Menu';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
+const BTN_PIVOT = 'Pivot';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUDGET = 'Budget';
@@ -93,12 +93,12 @@ export default Object.freeze({
   BTN_DELETE,
   BTN_DETAILS,
   BTN_EDIT,
-  BTN_FOCUS,
   BTN_LOAD,
   BTN_MENU,
   BTN_OFF,
   BTN_ON,
   BTN_OPTIONS,
+  BTN_PIVOT,
   BTN_SAVE,
   BTN_SELECT,
   BUDGET,

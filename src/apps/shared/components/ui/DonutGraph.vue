@@ -61,25 +61,25 @@ const initializeChart = () => {
     // .attr("stroke", "white")
     .style("stroke-width", "2px")
     .style("opacity", 0.8)
-    .on("mouseover", (event, d) => {
-      tooltipPosition.value = smartPosition(tooltipRef, event.x, event.y);
-      tooltipContent.value = HoverTemplate;
-      tooltipProps.value = {
-        tooltipConfig: {
-          xLabel: props.config.xLabel(),
-          xFormat: props.config.xFormat,
-          yFormat: props.config.yFormat,
-          lines: { [d.data.label]: [{ x: 0, y: d.data.value }] },
-          color: () => d.data.color || color(d.data.label),
-          lineName: () => d.data.label,
-        },
-        index: 1,
-        updateTooltipSize,
-      };
-    })
-    .on("mouseout", () => {
-      tooltipContent.value = null;
-    });
+    // .on("mouseover", (event, d) => {
+    //   tooltipPosition.value = smartPosition(tooltipRef, event.x, event.y);
+    //   tooltipContent.value = HoverTemplate;
+    //   tooltipProps.value = {
+    //     tooltipConfig: {
+    //       xLabel: props.config.xLabel(),
+    //       xFormat: props.config.xFormat,
+    //       yFormat: props.config.yFormat,
+    //       lines: { [d.data.label]: [{ x: 0, y: d.data.value }] },
+    //       color: () => d.data.color || color(d.data.label),
+    //       lineName: () => d.data.label,
+    //     },
+    //     index: 1,
+    //     updateTooltipSize,
+    //   };
+    // })
+    // .on("mouseout", () => {
+    //   tooltipContent.value = null;
+    // });
 };
 
 

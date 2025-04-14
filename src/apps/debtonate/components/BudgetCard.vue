@@ -63,7 +63,7 @@ const getButtons = (budgetId): Array<Button> => (
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getBudgetName(budget.id) }}
           </h2>
-          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
         </div>
       </div>
     </template>

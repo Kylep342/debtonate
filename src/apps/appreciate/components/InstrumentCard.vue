@@ -51,7 +51,7 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getInstrumentName(instrument.id) }}
           </h2>
-          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(instrument.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(instrument.id)" />
         </div>
       </div>
     </template>

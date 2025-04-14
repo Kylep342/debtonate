@@ -572,8 +572,8 @@ export default defineStore('debtonateCore', () => {
       monthlyBudgets.value.forEach((budget) => {
         const totalsPaymentSummary = getPaymentSchedule(loan.id, budget.id);
         config[loan.id][budget.id] = [
-          { label: 'Interest', value: totalsPaymentSummary.lifetimeInterest },
-          { label: 'Principal', value: totalsPaymentSummary.lifetimePrincipal },
+          { label: 'Interest', value: totalsPaymentSummary.lifetimeInterest, color: constants.COLORS[0] },
+          { label: 'Principal', value: totalsPaymentSummary.lifetimePrincipal, color: constants.COLORS[2] },
         ];
       });
     });

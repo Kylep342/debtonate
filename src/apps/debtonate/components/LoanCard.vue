@@ -62,7 +62,7 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getLoanName(loan.id) }}
           </h2>
-          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
         </div>
       </div>
     </template>
