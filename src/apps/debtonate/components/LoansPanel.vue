@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { Button } from '@/apps/shared/types/app';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useResize } from '@/apps/shared/composables/useResize';
@@ -17,10 +19,12 @@ const {
 
 const { scrollContainer } = useResize('resizeLoansPanel');
 
-const budgetSelectors: Array<Button> = state.monthlyBudgets.map((budget) => ({
-  text: state.getBudgetName(budget.id),
-  onClick: () => setViewedBudgetId(budget.id),
-}));
+const budgetSelectors = computed<Array<Button>>(
+  () => (state.monthlyBudgets.map((budget) => ({
+    text: state.getBudgetName(budget.id),
+    onClick: () => setViewedBudgetId(budget.id),
+  }))),
+);
 
 const buttons: Array<Button> = [
   {

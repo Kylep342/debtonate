@@ -20,10 +20,12 @@ const {
 
 const { scrollContainer } = useResize('resizeBudgetsPanel');
 
-const loanSelectors: Array<Button> = state.loansWithTotals.map((loan) => ({
-  text: state.getLoanName(loan.id),
-  onClick: () => setViewedLoanId(loan.id),
-}));
+const loanSelectors = computed<Array<Button>>(
+  () => (state.loansWithTotals.map((loan) => ({
+    text: state.getLoanName(loan.id),
+    onClick: () => setViewedLoanId(loan.id),
+  }))),
+);
 
 const buttons: Array<Button> = [
   {
