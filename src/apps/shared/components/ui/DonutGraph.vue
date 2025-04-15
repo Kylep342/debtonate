@@ -19,15 +19,15 @@ const tooltipId = `${elId}-tooltip`;
 
 const chart = shallowReactive(<GraphConfig>{});
 
-const tooltipContent = shallowRef(null);
-const tooltipPosition = ref({ left: 0, top: 0 });
-const tooltipProps = ref(null);
-const tooltipRef = ref(null);
-const tooltipSize = ref({ width: 0, height: 0 });
+// const tooltipContent = shallowRef(null);
+// const tooltipPosition = ref({ left: 0, top: 0 });
+// const tooltipProps = ref(null);
+// const tooltipRef = ref(null);
+// const tooltipSize = ref({ width: 0, height: 0 });
 
-const updateTooltipSize = (size) => {
-  tooltipSize.value = size;
-};
+// const updateTooltipSize = (size) => {
+//   tooltipSize.value = size;
+// };
 
 const initializeChart = () => {
   const width = 300;
@@ -82,7 +82,6 @@ const initializeChart = () => {
     // });
 };
 
-
 onMounted(() => {
   if (props.graph) {
     Object.assign(chart, props.graph);
@@ -106,13 +105,13 @@ watch(
   <div>
     <!-- <h1>{{ config.header() }}</h1> -->
     <svg :id="elId" width="300" height="300"></svg>
-    <div :id="tooltipId" ref="tooltipRef" :style="{
+    <!-- <div :id="tooltipId" ref="tooltipRef" :style="{
       left: tooltipPosition.left + 'px',
       top: tooltipPosition.top + 'px',
       opacity: tooltipContent ? 1 : 0
     }">
       <component :is="tooltipContent" v-bind="tooltipProps" />
-    </div>
+    </div> -->
   </div>
 </template>
 

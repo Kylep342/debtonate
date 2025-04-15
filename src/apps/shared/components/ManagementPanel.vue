@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Button } from '../types/app';
+import { Button, Menu } from '@/apps/shared/types/app';
 
 const props = defineProps<{
-  buttons: Array<Button>,
+  button: Button,
   title: string,
+  menu: Menu,
 }>();
 </script>
 
@@ -13,11 +14,10 @@ const props = defineProps<{
       <h2>{{ props.title }}</h2>
     </div>
     <div :class="['flex-none']">
-      <div v-for="(button) in buttons" :key="button.text">
-        <base-button :class="button.classes" @click="button.onClick">
-          {{ button.text }}
-        </base-button>
-      </div>
+      <base-menu :text="menu.text" :buttons="menu.buttons" />
+      <base-button :class="button.classes" @click="button.onClick">
+        {{ button.text }}
+      </base-button>
     </div>
   </div>
 </template>
