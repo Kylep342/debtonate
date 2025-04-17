@@ -52,7 +52,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
 <template>
   <base-card :id="'budgetManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
-      <ManagementPanel :button="button" :menu="menu" :title="constants.BUDGETS" :class="['sticky', 'fixed', 'border-b-2']" />
+      <ManagementPanel :button="button" :menu="menu" :title="constants.BUDGETS" :class="['border-b-2']" />
     </template>
     <template #cardBody>
       <div ref="scrollContainer" :class="[

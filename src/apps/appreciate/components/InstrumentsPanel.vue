@@ -22,7 +22,7 @@ const buttons: Array<Button> = [
 <template>
   <base-card :id="'instrumentManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
-      <ManagementPanel :buttons="buttons" :title="constants.INSTRUMENTS" :class="['sticky', 'fixed', 'border-b-2']" />
+      <ManagementPanel :buttons="buttons" :title="constants.INSTRUMENTS" :class="['border-b-2']" />
     </template>
     <template #cardBody>
       <div ref="scrollContainer" :class="[
