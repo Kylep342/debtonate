@@ -36,7 +36,6 @@ const menu = reactive<Menu>({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
 });
-
 </script>
 
 <template>

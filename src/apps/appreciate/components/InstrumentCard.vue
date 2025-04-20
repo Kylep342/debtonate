@@ -8,7 +8,8 @@ import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
-  instrument: IInstrument
+  instrument: IInstrument,
+  viewedBudgetId: string,
 }>();
 
 const globalOptions = useGlobalOptionsStore();
@@ -18,6 +19,8 @@ const instrumentCurrentBalance = computed<string>(() => `${globalOptions.Money(p
 const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
 const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
 const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
+
+const graph = computed(() => state.cardGraphs[props.instrument.id][props.viewedBudgetId])
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -56,6 +59,12 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
       </div>
     </template>
     <template #cardBody>
+      <donut-graph
+        v-if="state.instruments.length"
+        :config="state.instrumentCardGraphConfig"
+        :graph="graph"
+        :anchorId="instrument.id"
+      />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

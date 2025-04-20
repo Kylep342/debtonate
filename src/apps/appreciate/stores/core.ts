@@ -12,6 +12,7 @@ import {
 } from '@/apps/appreciate/types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
+  Arc,
   Graph,
   GraphConfig,
   Graphs,
@@ -450,6 +451,54 @@ export default defineStore('appreciateCore', () => {
     return config;
   });
 
+
+  const budgetCardGraphConfig = computed(() => ({
+    id: 'BudgetCardSummary',
+    color: getBudgetColor,
+    header: instrumentId => `Cost Breakdown - ${getInstrumentName(instrumentId)}`,
+    lineName: getBudgetName,
+    subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const instrumentCardGraphConfig = computed(() => ({
+    id: 'InstrumentCardSummary',
+    color: () => '#FFFFFF',
+    header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
+    lineName: getBudgetName,
+    subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const cardGraphs = computed<Record<string, Record<string, Arc[]>>>(() => {
+    const config = <Record<string, Record<string, Arc[]>>>{};
+    instrumentsWithTotals.value.forEach((instrument) => {
+      config[instrument.id] = <Record<string, Arc[]>>{};
+      monthlyBudgets.value.forEach((budget) => {
+        const totalsContributionSummary = getContributionSchedule(instrument.id, budget.id);
+        config[instrument.id][budget.id] = [
+          { label: 'Growth', value: totalsContributionSummary.lifetimeGrowth, color: constants.COLORS[0] },
+          { label: 'Contribution', value: totalsContributionSummary.lifetimeContribution, color: constants.COLORS[2] },
+        ];
+      });
+    });
+    return config;
+  });
+
   const purchasingPowerGraphs = computed<GraphConfig>(() => {
     const config = <GraphConfig>{
       id: 'PurchasingPower',
@@ -536,6 +585,7 @@ export default defineStore('appreciateCore', () => {
   return {
     accrueBeforeContribution,
     avalanche,
+    budgetCardGraphConfig,
     budgetDetailsPanelActive,
     budgetFormActive,
     budgetFormTitle,
@@ -543,6 +593,7 @@ export default defineStore('appreciateCore', () => {
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
     buildInstrumentSubtitle,
+    cardGraphs,
     clearState,
     contributionScenarios,
     contributionSchedules,
@@ -573,6 +624,7 @@ export default defineStore('appreciateCore', () => {
     getNumContributions,
     graphs,
     inflationFactor,
+    instrumentCardGraphConfig,
     instrumentDetailsPanelActive,
     instrumentFormActive,
     instrumentFormTitle,
