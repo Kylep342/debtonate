@@ -25,8 +25,8 @@ const buttons: Array<Button> = Object.keys(state.graphs).map((graphId) => ({
 }));
 
 watch(() => state.loans, async (loans) => {
-  if (!loans.map((loan) => loan.id).includes(viewedItemId.value)) {
-    setViewedItemId(constants.TOTALS);
+  if (!loans.map((loan) => loan.id).includes(viewedLoanId.value)) {
+    setViewedLoanId(constants.TOTALS);
   }
 });
 </script>
@@ -52,3 +52,11 @@ watch(() => state.loans, async (loans) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.chart-container {
+  position: relative;
+  padding-left: 2rem; /* room for Y axis */
+  overflow: visible;
+}
+</style>

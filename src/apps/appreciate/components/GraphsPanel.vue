@@ -9,7 +9,11 @@ import useAppreciateCoreStore from '../stores/core';
 
 const state = useAppreciateCoreStore();
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+const {
+  viewedItemId: viewedInstrumentId,
+  isViewedItemId: isViewedInstrumentId,
+  setViewedItemId: setViewedInstrumentId
+} = usePivot(constants.TOTALS);
 
 const viewedGraphId = ref<string>(constants.GRAPH_BALANCES_OVER_TIME);
 const activeGraph = computed<GraphConfig>(() => state.graphs[viewedGraphId.value]);
@@ -21,8 +25,8 @@ const buttons: Array<Button> = Object.keys(state.graphs).map((graphId) => ({
 }));
 
 watch(() => state.instruments, async (instruments) => {
-  if (!instruments.map((instrument) => instrument.id).includes(viewedItemId.value)) {
-    setViewedItemId(constants.TOTALS);
+  if (!instruments.map((instrument) => instrument.id).includes(viewedInstrumentId.value)) {
+    setViewedInstrumentId(constants.TOTALS);
   }
 });
 </script>
@@ -39,11 +43,19 @@ watch(() => state.instruments, async (instruments) => {
     </div>
     <div :class="['tabframe', 'w-fit']">
       <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
-        :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
+        :is-viewed-item-id="isViewedInstrumentId" :set-viewed-item-id="setViewedInstrumentId">
         <template #tabContent>
-          <base-graph :key="viewedItemId" :graph="activeGraph" :anchor-id="viewedItemId" />
+          <base-graph :key="viewedInstrumentId" :graph="activeGraph" :anchor-id="viewedInstrumentId" />
         </template>
       </base-tabs>
     </div>
   </div>
 </template>
+
+<style scoped>
+.chart-container {
+  position: relative;
+  padding-left: 2rem; /* room for Y axis */
+  overflow: visible;
+}
+</style>

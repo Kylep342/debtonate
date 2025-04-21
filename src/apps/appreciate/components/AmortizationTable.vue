@@ -52,7 +52,7 @@ const paymentHeader = computed<string>(() => (globalOptions.periodsAsDates ? 'Pa
         </template>
         <template #body>
           <tbody>
-            <tr v-for="(record, rowno) in contributionSchedule.amortizationSchedule" :key="rowno">
+            <tr v-for="(record) in contributionSchedule.amortizationSchedule" :key="record.period">
               <td :class="['text-center']">
                 {{ globalOptions.Period(record.period, true) }}
               </td>

@@ -491,8 +491,8 @@ export default defineStore('appreciateCore', () => {
       monthlyBudgets.value.forEach((budget) => {
         const totalsContributionSummary = getContributionSchedule(instrument.id, budget.id);
         config[instrument.id][budget.id] = [
-          { label: 'Growth', value: totalsContributionSummary.lifetimeGrowth, color: constants.COLORS[0] },
-          { label: 'Contribution', value: totalsContributionSummary.lifetimeContribution, color: constants.COLORS[2] },
+          { label: 'Lifetime Growth', value: totalsContributionSummary.lifetimeGrowth, color: constants.COLORS[0] },
+          { label: 'Lifetime Contribution', value: totalsContributionSummary.lifetimeContribution, color: constants.COLORS[2] },
         ];
       });
     });

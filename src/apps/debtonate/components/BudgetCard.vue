@@ -3,10 +3,10 @@ import { computed } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
-import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   budget: MonthlyBudget,
@@ -84,21 +84,21 @@ const getButtons = (budgetId): Array<Button> => (
               </td>
             </tr>
             <tr>
+              <td>{{ paymentsLabel }}</td>
+              <td :class="['text-right']">
+                <b>{{ budgetPayments }}</b>
+              </td>
+            </tr>
+            <tr>
               <td>Total Paid</td>
               <td :class="['text-right']">
                 <b>{{ budgetTotalPaid }}</b>
               </td>
             </tr>
-            <tr>
-              <td>Interest Paid</td>
+            <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
               <td :class="['text-right']">
-                <b>{{ budgetTotalInterest }}</b>
-              </td>
-            </tr>
-            <tr>
-              <td>{{ paymentsLabel }}</td>
-              <td :class="['text-right']">
-                <b>{{ budgetPayments }}</b>
+                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>

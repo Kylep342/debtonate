@@ -4,6 +4,7 @@ import { ILoan } from 'moneyfunx';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 
@@ -14,8 +15,6 @@ const props = defineProps<{
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
-
-const totalsPaymentSummary = computed(() => state.getPaymentSchedule(props.loan.id, constants.DEFAULT));
 
 const loanCurrentBalance = computed<string>(() => `${globalOptions.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed<string>(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
@@ -110,6 +109,12 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
               <td>Fees</td>
               <td :class="['text-right']">
                 <b>{{ loanFees }}</b>
+              </td>
+            </tr>
+            <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>

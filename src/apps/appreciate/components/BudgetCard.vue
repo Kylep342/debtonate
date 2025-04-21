@@ -3,10 +3,10 @@ import { computed } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
-import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   budget: MonthlyBudget,
@@ -89,15 +89,15 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
               </td>
             </tr>
             <tr>
-              <td>Total Contributed</td>
-              <td :class="['text-right']">
-                <b>{{ budgetContributionTotals }}</b>
-              </td>
-            </tr>
-            <tr>
               <td>{{ netWorthLabel }}</td>
               <td :class="['text-right']">
                 <b>{{ budgetNetWorth }}</b>
+              </td>
+            </tr>
+            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>

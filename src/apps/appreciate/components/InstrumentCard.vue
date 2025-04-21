@@ -2,9 +2,10 @@
 import { computed } from 'vue';
 import { IInstrument } from 'moneyfunx';
 
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { Button } from '@/apps/shared/types/app';
 import constants from '@/apps/shared/constants/constants';
-import useAppreciateCoreStore from '../stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
@@ -90,6 +91,12 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
               <td>Max Contribution</td>
               <td :class="['text-right']">
                 <b>{{ instrumentMaxMonthlyContribution }}</b>
+              </td>
+            </tr>
+            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>
