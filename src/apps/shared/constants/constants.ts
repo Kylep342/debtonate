@@ -11,6 +11,7 @@ const BTN_MENU = 'Menu';
 const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
+const BTN_PIVOT = 'Pivot';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BUDGET = 'Budget';
@@ -97,6 +98,7 @@ export default Object.freeze({
   BTN_OFF,
   BTN_ON,
   BTN_OPTIONS,
+  BTN_PIVOT,
   BTN_SAVE,
   BTN_SELECT,
   BUDGET,

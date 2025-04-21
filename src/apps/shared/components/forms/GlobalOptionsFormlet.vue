@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 
 import htmlid from '../../constants/elementIds';
-import constants from '../../constants/constants';
-import useGlobalOptionsStore from '../../stores/globalOptions';
+import constants from '@/apps/shared/constants/constants';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
 
@@ -23,7 +23,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
     <collapsible-card>
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-          Periods As Dates
+          Periods as Dates
         </h3>
       </template>
       <template #cardTitleActions>

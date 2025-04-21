@@ -2,17 +2,20 @@
 import { computed } from 'vue';
 import { ILoan } from 'moneyfunx';
 
-import { Button } from '@/apps/shared/types/app';
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
 
 const props = defineProps<{
-  loan: ILoan
+  loan: ILoan,
+  viewedBudgetId: string,
 }>();
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
+
+const totalsPaymentSummary = computed(() => state.getPaymentSchedule(props.loan.id, constants.DEFAULT));
 
 const loanCurrentBalance = computed<string>(() => `${globalOptions.Money(props.loan.currentBalance)}`);
 const loanInterestRate = computed<string>(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
@@ -20,6 +23,8 @@ const loanMinPayment = computed<string>(() => `${globalOptions.Money(props.loan.
 const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.principal)}`);
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
+
+const graph = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetId])
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
@@ -33,7 +38,6 @@ const baseButtons = computed<Array<Button>>(() => ([
     onClick: () => state.loans.length ? state.refinanceLoan(props.loan.id) : alertButtonIsDisabled(),
   },
 ]));
-
 
 const editButtons = computed<Array<Button>>(() => ([
   ...baseButtons.value,
@@ -58,11 +62,17 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getLoanName(loan.id) }}
           </h2>
-          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
         </div>
       </div>
     </template>
     <template #cardBody>
+      <donut-graph
+        v-if="state.loans.length"
+        :config="state.loanCardGraphConfig"
+        :graph="graph"
+        :anchorId="loan.id"
+      />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

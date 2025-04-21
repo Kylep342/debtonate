@@ -11,6 +11,9 @@ export default defineConfig({
     },
     extensions: ['.js', '.ts', '.json'],
   },
+  server: {
+    host: true,
+  },
   test: {
     coverage: {
       provider: 'v8',

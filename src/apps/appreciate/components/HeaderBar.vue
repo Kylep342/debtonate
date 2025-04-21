@@ -30,6 +30,6 @@ const buttons: Array<Button> = [
       <img src="/icon.png">
       <h1>Appreciate</h1>
     </div>
-    <base-menu :menu="constants.BTN_MENU" :buttons="buttons" />
+    <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
   </header>
 </template>

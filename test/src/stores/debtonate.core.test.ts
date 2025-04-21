@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
-import sharedKeys from '@/apps/shared/constants/keys';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import sharedKeys from '@/apps/shared/constants/keys';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Loans = () => [
@@ -46,7 +46,7 @@ describe('Debtonate Core Store', () => {
     const state = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
-    state.sortWith();
+    state.sortLoans();
 
     expect(
       state.loansWithTotals.map((loan) => loan.name)
@@ -211,7 +211,7 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
       expect(state.snowballSort).toBe(false);
 
-      state.sortWith();
+      state.sortLoans();
       expect(
         state.loans.map((loan) => loan.name)
       ).toStrictEqual(["e-car", "house", "tau"]);
@@ -237,7 +237,7 @@ describe('Debtonate Core Store', () => {
       expect(state.getLoanName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_LOAN);
       expect(state.getLoanIndex(firstLoanId)).toBe(1);
       expect(state.getLoanName(firstLoanId)).toBe("house");
-      state.sortWith();
+      state.sortLoans();
       expect(state.getLoanIndex(firstLoanId)).toBe(2);
     });
   });
@@ -356,8 +356,7 @@ describe('Debtonate Core Store', () => {
   it('manages component states', async () => {
     const state = useDebtonateCoreStore();
     state.budgets = Budgets();
-    // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
-    const firstBudgetId = state.monthlyBudgets[1].id;
+    const firstBudgetId = state.budgets[0].id;
     state.loans = Loans();
     const firstLoanId = state.loans[0].id;
 

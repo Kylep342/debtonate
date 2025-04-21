@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import constants from '@/apps/appreciate/constants/constants';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
-import constants from '../constants/constants';
-import useAppreciateCoreStore from '../stores/core';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { Arc } from '@/apps/shared/types/graph';
 
-const props = defineProps<{ budget: MonthlyBudget }>();
+const props = defineProps<{
+  budget: MonthlyBudget,
+  viewedInstrumentId: string,
+}>();
 
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
@@ -29,6 +33,8 @@ const budgetContributionTotals = computed<number>(() => globalOptions.Money(tota
 const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
 
 const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
+
+const graph = computed(() => state.cardGraphs[props.viewedInstrumentId][props.budget.id])
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
@@ -62,11 +68,17 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
             {{ state.getBudgetName(budget.id) }}
           </h2>
-          <base-menu :menu="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
         </div>
       </div>
     </template>
     <template #cardBody>
+      <donut-graph
+        v-if="state.instruments.length"
+        :config="state.budgetCardGraphConfig"
+        :graph="graph"
+        :anchorId="budget.id"
+      />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>

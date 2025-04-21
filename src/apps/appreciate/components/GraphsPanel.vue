@@ -34,7 +34,7 @@ watch(() => state.instruments, async (instruments) => {
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ constants.GRAPHS }} - {{ viewedGraphId }}
         </h2>
-        <base-menu :menu="constants.BTN_SELECT" :buttons="buttons" />
+        <base-menu :text="constants.BTN_SELECT" :buttons="buttons" />
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">

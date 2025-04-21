@@ -12,6 +12,7 @@ import {
 } from '../types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
+  Arc,
   Graph,
   GraphConfig,
   Graphs,
@@ -400,18 +401,18 @@ export default defineStore('debtonateCore', () => {
 
   // dependent methods
 
-  const sortWith = () => {
+  const sortLoans = () => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
 
   const toggleAvalancheSort = () => {
     snowballSort.value = false;
-    sortWith();
+    sortLoans();
   };
 
   const toggleSnowballSort = () => {
     snowballSort.value = true;
-    sortWith();
+    sortLoans();
   };
 
   const createBudget = (proposedBudget: number): string => {
@@ -442,7 +443,7 @@ export default defineStore('debtonateCore', () => {
       currentLoanId.value = null;
     };
     loans.value.push(loan);
-    sortWith();
+    sortLoans();
     return loan.id;
   };
 
@@ -532,6 +533,53 @@ export default defineStore('debtonateCore', () => {
     return config;
   });
 
+  const budgetCardGraphConfig = computed(() => ({
+    id: 'BudgetCardSummary',
+    color: getBudgetColor,
+    header: loanId => `Cost Breakdown - ${getLoanName(loanId)}`,
+    lineName: getBudgetName,
+    subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const loanCardGraphConfig = computed(() => ({
+    id: 'LoanCardSummary',
+    color: () => '#FFFFFF',
+    header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
+    lineName: getBudgetName,
+    subheader: loanId => buildLoanSubtitle(getLoan(loanId)!),
+    x: globalOptions.Period,
+    xFormat: (x) => globalOptions.Period(x, true),
+    xLabel: () => globalOptions.Time,
+    xScale: graphXScale.value,
+    y: y => y,
+    yFormat: globalOptions.Money,
+    yLabel: () => 'Amount',
+    yScale: d3.scaleLinear,
+  }));
+
+  const cardGraphs = computed<Record<string, Record<string, Arc[]>>>(() => {
+    const config = <Record<string, Record<string, Arc[]>>>{};
+    loansWithTotals.value.forEach((loan) => {
+      config[loan.id] = <Record<string, Arc[]>>{};
+      monthlyBudgets.value.forEach((budget) => {
+        const totalsPaymentSummary = getPaymentSchedule(loan.id, budget.id);
+        config[loan.id][budget.id] = [
+          { label: 'Interest', value: totalsPaymentSummary.lifetimeInterest, color: constants.COLORS[0] },
+          { label: 'Principal', value: totalsPaymentSummary.lifetimePrincipal, color: constants.COLORS[2] },
+        ];
+      });
+    });
+    return config;
+  });
+
   const interestSavedGraphs = computed<GraphConfig>(() => {
     const config = {
       id: 'InterestSaved',
@@ -591,6 +639,7 @@ export default defineStore('debtonateCore', () => {
       yScale: d3.scaleLinear,
     };
 
+    // idea; toggle presence of lines as data with boolean k-v
     loansWithTotals.value.forEach((loan) => {
       config.graphs[loan.id] = <Graph>{
         config: {
@@ -618,6 +667,7 @@ export default defineStore('debtonateCore', () => {
 
   return {
     avalanche,
+    budgetCardGraphConfig,
     budgetDetailsPanelActive,
     budgetFormActive,
     budgetFormTitle,
@@ -625,6 +675,7 @@ export default defineStore('debtonateCore', () => {
     buildAmortizationTableSubtitle,
     buildAmortizationTableTitle,
     buildLoanSubtitle,
+    cardGraphs,
     clearState,
     createBudget,
     createLoan,
@@ -654,6 +705,7 @@ export default defineStore('debtonateCore', () => {
     graphs,
     graphXScale,
     loadState,
+    loanCardGraphConfig,
     loanDetailsPanelActive,
     loanFormActive,
     loanFormTitle,
@@ -682,7 +734,7 @@ export default defineStore('debtonateCore', () => {
     setRoundingScale,
     snowball,
     snowballSort,
-    sortWith,
+    sortLoans,
     toggleAvalancheSort,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,

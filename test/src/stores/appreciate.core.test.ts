@@ -4,14 +4,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
-import sharedKeys from '@/apps/shared/constants/keys';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import sharedKeys from '@/apps/shared/constants/keys';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Instruments = () => [
   new Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
-  new Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
   new Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
+  new Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
 ];
 
 const Budgets = () => [
@@ -29,6 +29,7 @@ describe('Appreciate Core Store', () => {
     const state = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
+    state.sortInstruments();
 
     expect(
       state.instrumentsWithTotals.map((instrument) => instrument.name)
@@ -146,6 +147,7 @@ describe('Appreciate Core Store', () => {
     it('deletes an instrument', async () => {
       const state = useAppreciateCoreStore();
       state.instruments = Instruments();
+      state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
       expect(state.instruments.length).toBe(3);
 
@@ -157,6 +159,7 @@ describe('Appreciate Core Store', () => {
     it('edits an instrument', async () => {
       const state = useAppreciateCoreStore();
       state.instruments = Instruments();
+      state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
       const firstInstrument = state.getInstrument(firstInstrumentId);
       expect(state.currentInstrumentId).toBe(null);
@@ -181,6 +184,7 @@ describe('Appreciate Core Store', () => {
     it('gets intstrument attributes', async () => {
       const state = useAppreciateCoreStore();
       state.instruments = Instruments();
+      state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
       expect(state.getInstrumentIndex(constants.TOTALS)).toBe(0);
       expect(state.getInstrumentName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_AN_INSTRUMENT);
@@ -317,6 +321,7 @@ describe('Appreciate Core Store', () => {
     const state = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
+    state.sortInstruments();
     const firstBudgetId = state.monthlyBudgets[0].id;
     const firstInstrumentId = state.instruments[0].id;
     expect(state.buildInstrumentSubtitle(state.getInstrument(firstInstrumentId))).toBe(
@@ -409,5 +414,28 @@ describe('Appreciate Core Store', () => {
         constants.GRAPH_PURCHASING_POWER_OVER_TIME,
       ]);
     });
+
+    it('computs balances over time graphs', async () => {
+      const state = useAppreciateCoreStore();
+      state.budgets = Budgets(); state.loans = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument) => instrument.id)
+      );
+    });
+
+    it('computs purchasing power over time graphs', async () => {
+      const state = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs)
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument) => instrument.id)
+      );
+    })
   });
 });

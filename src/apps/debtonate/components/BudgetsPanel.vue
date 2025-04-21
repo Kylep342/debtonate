@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 
-import { Button } from '@/apps/shared/types/app';
+import { Button, Menu } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useResize } from '@/apps/shared/composables/useResize';
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
 import constants from '@/apps/shared/constants/constants';
@@ -11,15 +12,31 @@ import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
 
+const {
+  viewedItemId: viewedLoanId,
+  isViewedItemId: isViewedLoanId,
+  setViewedItemId: setViewedLoanId
+} = usePivot(constants.TOTALS);
+
 const { scrollContainer } = useResize('resizeBudgetsPanel');
 
-const buttons: Array<Button> = [
-  {
-    text: constants.BTN_CREATE,
-    onClick: state.openBudgetForm,
-    classes: ['btn-success', 'text-center'],
-  },
-];
+const loanSelectors = computed<Array<Button>>(
+  () => (state.loansWithTotals.map((loan) => ({
+    text: state.getLoanName(loan.id),
+    onClick: () => setViewedLoanId(loan.id),
+  })))
+);
+
+const button = <Button>{
+  text: constants.BTN_CREATE,
+  onClick: state.openBudgetForm,
+  classes: ['btn-success', 'text-center'],
+};
+
+const menu = reactive<Menu>({
+  text: constants.BTN_PIVOT,
+  buttons: loanSelectors,
+});
 
 const defaultBudgetIndex = computed<number>(
   () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
@@ -35,7 +52,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
 <template>
   <base-card :id="'budgetManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
-      <ManagementPanel :buttons="buttons" :title="constants.BUDGETS" :class="['sticky', 'fixed', 'border-b-2']" />
+      <ManagementPanel :button="button" :menu="menu" :title="constants.BUDGETS" :class="['border-b-2']" />
     </template>
     <template #cardBody>
       <div ref="scrollContainer" :class="[
@@ -47,7 +64,7 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
       ]">
         <ul>
           <li v-for="(budget) in orderedBudgets" :key="budget.id">
-            <BudgetCard :budget="budget" />
+            <BudgetCard :budget="budget" :viewedLoanId="viewedLoanId"/>
           </li>
         </ul>
       </div>
