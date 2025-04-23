@@ -53,7 +53,10 @@ const createBudget = () => {
       <h2>{{ state.budgetFormTitle }}</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="exit">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="exit"
+      >
         x
       </base-button>
     </template>
@@ -62,12 +65,21 @@ const createBudget = () => {
         <div :class="['label']">
           <span :class="['label-text']">{{ constants.BUDGET }}</span>
         </div>
-        <input :id="`${constants.BUDGET_FORM_ID}-amount`" v-model.number="amount"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Budget">
+        <input
+          :id="`${constants.BUDGET_FORM_ID}-amount`"
+          v-model.number="amount"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          label="Budget"
+        >
       </div>
     </template>
     <template #actions>
-      <base-button :disabled="!createButtonEnabled" :class="'btn-success'" @click="createBudget">
+      <base-button
+        :disabled="!createButtonEnabled"
+        :class="'btn-success'"
+        @click="createBudget"
+      >
         {{ createBudgetButtonText }}
       </base-button>
     </template>

@@ -60,6 +60,7 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
       </div>
     </template>
     <template #cardBody>
+      <h3 v-if="state.instruments.length">{{ state.instrumentCardGraphConfig.header(viewedBudgetId) }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.instrumentCardGraphConfig"
@@ -69,6 +70,12 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
+            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
+              </td>
+            </tr>
             <tr>
               <td>Current Balance</td>
               <td :class="['text-right']">
@@ -91,12 +98,6 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
               <td>Max Contribution</td>
               <td :class="['text-right']">
                 <b>{{ instrumentMaxMonthlyContribution }}</b>
-              </td>
-            </tr>
-            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>
