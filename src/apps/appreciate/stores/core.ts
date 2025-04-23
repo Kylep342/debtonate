@@ -536,47 +536,9 @@ export default defineStore('appreciateCore', () => {
     return config;
   });
 
-  // const growthContributionRationGraphs = computed<GraphConfig>(() => {
-  //   const config = {
-  //     id: 'GrowthToContribution',
-  //     color: getBudgetColor,
-  //     graphs: <Graphs>{},
-  //     header: instrumentId => `Growth/Contribution Ratio over Time by Budget - ${getInstrumentName(instrumentId)}`,
-  //     lineName: getBudgetName,
-  //     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
-  //     x: globalOptions.Period,
-  //     xFormat: (x) => globalOptions.Period(x, true),
-  //     xLabel: () => globalOptions.Time,
-  //     xScale: graphXScale.value,
-  //     y: y => y,
-  //     yFormat: y => y,
-  //     yLabel: () => 'Ratio',
-  //     yScale: d3.scaleLinear,
-  //   };
-
-  //   instrumentsWithTotals.value.forEach((instrument) => {
-  //     config.graphs[instrument.id] = {
-  //       config: {
-  //         maxX: getNumContributions(instrument.id, constants.DEFAULT),
-  //         maxY: getMaxGrowthBalanceRatio(instrument.id),
-  //       },
-  //       lines: <Record<string, Point[]>>{},
-  //     };
-  //     budgets.value.forEach((budget) => {
-  //       const line: Point[] = [];
-  //       getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
-  //         line.push({ x: record.period, y: getGrowthUpToPeriod(instrument.id, budget.id, record.period) / record.currentBalance });
-  //       });
-  //       config.graphs[instrument.id].lines[budget.id] = line;
-  //     });
-  //   });
-  //   return config;
-  // });
-
   const graphs = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
-    // [constants.GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME]: growthContributionRationGraphs.value,
   }));
 
 

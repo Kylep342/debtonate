@@ -12,12 +12,18 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
-  <base-modal :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
+  <base-modal
+    :body-classes="['overflow-y-auto']"
+    @exit="state.exitOptionsForm"
+  >
     <template #header>
       <h2>Options</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="state.exitOptionsForm">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="state.exitOptionsForm"
+      >
         x
       </base-button>
     </template>
@@ -35,7 +41,10 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(state.accrueBeforeContribution)" @click="state.toggleAccrueBeforeContribution">
+              <base-button
+                :class="buttonStyle(state.accrueBeforeContribution)"
+                @click="state.toggleAccrueBeforeContribution"
+              >
                 {{ buttonText(state.accrueBeforeContribution) }}
               </base-button>
             </div>
@@ -63,10 +72,18 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
               <div :class="['label']">
                 <span :class="['label-text']">factor:</span>
               </div>
-              <input :id="`${constants.OPTIONS_FORM_ID}-inflation-factor`" v-model.number="state.inflationFactor"
-                :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="inflationFactor">
-              <base-button :class="buttonStyle(state.deflateAllMoney)"
-                @click="state.toggleDeflateAllMoney(state.inflationFactor)">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-inflation-factor`"
+                v-model.number="state.inflationFactor"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="inflationFactor"
+              >
+              <base-button
+                :class="buttonStyle(state.deflateAllMoney)"
+                @click="state.toggleDeflateAllMoney(state.inflationFactor)"
+              >
                 {{ buttonText(state.deflateAllMoney) }}
               </base-button>
             </div>
@@ -91,8 +108,14 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           </template>
           <template #cardTitleActions>
             <div :class="['flex', 'flex-row']">
-              <input :id="`${constants.OPTIONS_FORM_ID}-years-to-contribute`" v-model.number="state.yearsToContribute"
-                :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="yearsToContribute">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-years-to-contribute`"
+                v-model.number="state.yearsToContribute"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="yearsToContribute"
+              >
             </div>
           </template>
           <template #cardBody>
@@ -111,8 +134,14 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           </template>
           <template #cardTitleActions>
             <div :class="['flex', 'flex-row']">
-              <input :id="`${constants.OPTIONS_FORM_ID}-years-to-spend`" v-model.number="state.yearsToSpend"
-                :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="yearsToSpend">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-years-to-spend`"
+                v-model.number="state.yearsToSpend"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="yearsToSpend"
+              >
             </div>
           </template>
           <template #cardBody>

@@ -28,7 +28,10 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </template>
       <template #cardTitleActions>
         <div>
-          <base-button :class="buttonStyle(globalOptions.periodsAsDates)" @click="globalOptions.togglePeriodsAsDates">
+          <base-button
+            :class="buttonStyle(globalOptions.periodsAsDates)"
+            @click="globalOptions.togglePeriodsAsDates"
+          >
             {{ buttonText(globalOptions.periodsAsDates) }}
           </base-button>
         </div>
@@ -52,9 +55,16 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </template>
       <template #cardTitleActions>
         <div>
-          <select :id="`${htmlid.GLOBAL_OPTIONS_ID}-currency`" v-model="globalOptions.currency"
-            class="select select-bordered w-full max-w-xs">
-            <option v-for="currency in sortedCurrencies" :key="currency" :value="currency">
+          <select
+            :id="`${htmlid.GLOBAL_OPTIONS_ID}-currency`"
+            v-model="globalOptions.currency"
+            class="select select-bordered w-full max-w-xs"
+          >
+            <option
+              v-for="currency in sortedCurrencies"
+              :key="currency"
+              :value="currency"
+            >
               {{ currency }}
             </option>
           </select>
@@ -72,9 +82,16 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </template>
       <template #cardTitleActions>
         <div>
-          <select :id="`${htmlid.GLOBAL_OPTIONS_ID}-language`" v-model="globalOptions.language"
-            class="select select-bordered w-full max-w-xs">
-            <option v-for="language in sortedLanguages" :key="language" :value="language">
+          <select
+            :id="`${htmlid.GLOBAL_OPTIONS_ID}-language`"
+            v-model="globalOptions.language"
+            class="select select-bordered w-full max-w-xs"
+          >
+            <option
+              v-for="language in sortedLanguages"
+              :key="language"
+              :value="language"
+            >
               {{ language }}
             </option>
           </select>

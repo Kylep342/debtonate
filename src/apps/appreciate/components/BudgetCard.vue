@@ -73,6 +73,7 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
       </div>
     </template>
     <template #cardBody>
+      <h3 v-if="state.instruments.length">{{ state.budgetCardGraphConfig.header(viewedInstrumentId) }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.budgetCardGraphConfig"
@@ -82,6 +83,12 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
+            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
+              </td>
+            </tr>
             <tr>
               <td>Amount</td>
               <td :class="['text-right']">
@@ -92,12 +99,6 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
               <td>{{ netWorthLabel }}</td>
               <td :class="['text-right']">
                 <b>{{ budgetNetWorth }}</b>
-              </td>
-            </tr>
-            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>

@@ -68,6 +68,7 @@ const getButtons = (budgetId): Array<Button> => (
       </div>
     </template>
     <template #cardBody>
+      <h3 v-if="state.loans.length">{{ state.budgetCardGraphConfig.header(viewedLoanId) }}</h3>
       <donut-graph
         v-if="state.loans.length"
         :config="state.budgetCardGraphConfig"
@@ -77,6 +78,12 @@ const getButtons = (budgetId): Array<Button> => (
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
+            <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
+              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(datum.value) }}</b>
+              </td>
+            </tr>
             <tr>
               <td>Amount</td>
               <td :class="['text-right']">
@@ -93,12 +100,6 @@ const getButtons = (budgetId): Array<Button> => (
               <td>Total Paid</td>
               <td :class="['text-right']">
                 <b>{{ budgetTotalPaid }}</b>
-              </td>
-            </tr>
-            <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
           </tbody>
