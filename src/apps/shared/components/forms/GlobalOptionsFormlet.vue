@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import htmlid from '../../constants/elementIds';
+import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 

@@ -133,51 +133,51 @@ export default defineStore('debtonateCore', () => {
 
   // total values across all instruments
 
-  const rawTotalMinPayment = computed(
+  const rawTotalMinPayment = computed<number>(
     () => loans.value.reduce(
       (minPayment, loan) => minPayment + loan.minPayment,
       0,
     ),
   );
 
-  const roundedTotalMinPayment = computed(
+  const roundedTotalMinPayment = computed<number>(
     () => rawTotalMinPayment.value
       + (roundingScale.value - (rawTotalMinPayment.value % roundingScale.value)),
   );
 
-  const totalMaxPeriods = computed(() => loans.value.reduce(
+  const totalMaxPeriods = computed<number>(() => loans.value.reduce(
     (curMax, loan) => Math.max(curMax, loan.periodsPerYear * loan.termInYears),
     0,
   ));
 
-  const totalMaxPeriodsPerYear = computed(
+  const totalMaxPeriodsPerYear = computed<number>(
     () => loans.value.reduce((curMax, loan) => Math.max(curMax, loan.periodsPerYear), 0),
   );
 
-  const totalMaxTermInYears = computed(
+  const totalMaxTermInYears = computed<number>(
     () => loans.value.reduce((curMax, loan) => Math.max(curMax, loan.termInYears), 0),
   );
 
-  const totalMinPayment = computed(
+  const totalMinPayment = computed<number>(
     () => (roundingEnabled.value ? roundedTotalMinPayment.value : rawTotalMinPayment.value),
   );
 
-  const totalPrincipal = computed(() => loans.value.reduce(
+  const totalPrincipal = computed<number>(() => loans.value.reduce(
     (totalPrincipal, loan) => totalPrincipal + loan.principal,
     0,
   ));
 
-  const totalCurrentBalance = computed(() => loans.value.reduce(
+  const totalCurrentBalance = computed<number>(() => loans.value.reduce(
     (totalBalance, loan) => totalBalance + loan.currentBalance,
     0,
   ));
 
-  const totalEffectiveInterestRate = computed(() => loans.value.reduce(
+  const totalEffectiveInterestRate = computed<number>(() => loans.value.reduce(
     (weightedRate, loan) => weightedRate + loan.annualRate * (loan.currentBalance / totalCurrentBalance.value),
     0,
   ));
 
-  const totalFees = computed(() => loans.value.reduce(
+  const totalFees = computed<number>(() => loans.value.reduce(
     (totalFees, loan) => totalFees + loan.fees,
     0,
   ));
@@ -209,46 +209,46 @@ export default defineStore('debtonateCore', () => {
 
   const getBudget = (id: string): Budget|undefined => monthlyBudgets.value.find((budget) => budget.id === id);
 
-  const openBudgetForm = () => {
+  const openBudgetForm = (): void => {
     budgetFormActive.value = true;
   };
-  const openLoanForm = () => {
+  const openLoanForm = (): void => {
     loanFormActive.value = true;
   };
-  const openOptionsForm = () => {
+  const openOptionsForm = (): void => {
     optionsFormActive.value = true;
   };
-  const refinanceLoan = (id: string) => {
+  const refinanceLoan = (id: string): void => {
     currentLoanId.value = id;
     refinancingFormActive.value = true;
   }
-  const exitBudgetForm = () => {
+  const exitBudgetForm = (): void => {
     budgetFormActive.value = false;
     currentBudgetId.value = null;
   };
-  const exitLoanForm = () => {
+  const exitLoanForm = (): void => {
     loanFormActive.value = false;
     currentLoanId.value = null;
   };
-  const exitOptionsForm = () => {
+  const exitOptionsForm = (): void => {
     optionsFormActive.value = false;
   };
-  const exitRefinancingForm = () => {
+  const exitRefinancingForm = (): void => {
     refinancingFormActive.value = false;
     currentLoanId.value = null;
   };
-  const setRoundingScale = (newScale: number) => {
+  const setRoundingScale = (newScale: number): void => {
     if (!Number.isNaN(newScale) && newScale > 0) {
       roundingScale.value = newScale;
     }
   };
-  const toggleReducePayments = () => {
+  const toggleReducePayments = (): void => {
     reducePayments.value = !reducePayments.value;
   };
-  const toggleRefinancingUseHighestPayment = () => {
+  const toggleRefinancingUseHighestPayment = (): void => {
     refinancingUseHighestPayment.value = !refinancingUseHighestPayment.value;
   };
-  const toggleRounding = (scale: number) => {
+  const toggleRounding = (scale: number): void => {
     roundingEnabled.value = !roundingEnabled.value;
     if (roundingEnabled.value) {
       setRoundingScale(scale);
@@ -263,10 +263,10 @@ export default defineStore('debtonateCore', () => {
     moneyfunx.snowball,
   );
 
-  const deleteLoan = (id: string) => {
+  const deleteLoan = (id: string): void => {
     loans.value = loans.value.filter((loan) => loan.id !== id);
   };
-  const editLoan = (id: string) => {
+  const editLoan = (id: string): void => {
     currentLoanId.value = id;
     openLoanForm();
   };
@@ -276,7 +276,7 @@ export default defineStore('debtonateCore', () => {
     loanDetailsPanelActive.value = false;
     currentLoanId.value = null;
   };
-  const viewLoan = (id: string) => {
+  const viewLoan = (id: string): void => {
     currentLoanId.value = id;
     loanDetailsPanelActive.value = true;
   };
@@ -312,7 +312,7 @@ export default defineStore('debtonateCore', () => {
     refinancingScenarios.value[parentLoanId] = refinancingScenarios.value[parentLoanId].filter((scenario) => scenario.id !== scenarioId)
   };
 
-  const refinancingSchedules = computed(() => {
+  const refinancingSchedules = computed<Record<string, Record<string, PaymentScenario>>>(() => {
     const schedules = {}
     Object.entries(refinancingScenarios.value).forEach(([parentLoanId, scenarios]) => {
       const parentLoan = getLoan(parentLoanId)!;
@@ -330,12 +330,12 @@ export default defineStore('debtonateCore', () => {
     return schedules
   });
 
-  const deleteBudget = (id: string) => {
+  const deleteBudget = (id: string): void => {
     budgets.value = budgets.value.filter(
       (budget) => budget.id !== id && budget.id !== constants.DEFAULT,
     );
   };
-  const editBudget = (id: string) => {
+  const editBudget = (id: string): void => {
     currentBudgetId.value = id;
     openBudgetForm();
   };
@@ -346,26 +346,26 @@ export default defineStore('debtonateCore', () => {
       ? constants.NAME_MIN_BUDGET
       : `${constants.BUDGET} ${getBudgetIndex(id)}`
   );
-  const unviewBudget = () => {
+  const unviewBudget = (): void => {
     budgetDetailsPanelActive.value = false;
     currentBudgetId.value = null;
   };
-  const viewBudget = (id: string) => {
+  const viewBudget = (id: string): void => {
     currentBudgetId.value = id;
     budgetDetailsPanelActive.value = true;
   };
 
   // dependent computed values/methods
 
-  const budgetFormTitle = computed(() => (currentBudgetId.value && budgetFormActive.value
+  const budgetFormTitle = computed<string>(() => (currentBudgetId.value && budgetFormActive.value
     ? `Editing ${getBudgetName(currentBudgetId.value)}`
     : 'Creating a Budget'));
 
-  const loanFormTitle = computed(() => (currentLoanId.value && loanFormActive.value
+  const loanFormTitle = computed<string>(() => (currentLoanId.value && loanFormActive.value
     ? `Editing ${getLoanName(currentLoanId.value)}`
     : 'Creating a Loan'));
 
-  const refinancingFormTitle = computed(() => (currentLoanId.value && refinancingFormActive.value
+  const refinancingFormTitle = computed<string>(() => (currentLoanId.value && refinancingFormActive.value
     ? `Refinancing ${getLoanName(currentLoanId.value)}`
     : 'Refinancing'));
 
@@ -401,16 +401,16 @@ export default defineStore('debtonateCore', () => {
 
   // dependent methods
 
-  const sortLoans = () => {
+  const sortLoans = (): void => {
     loans.value = snowballSort.value === true ? snowball() : avalanche();
   };
 
-  const toggleAvalancheSort = () => {
+  const toggleAvalancheSort = (): void => {
     snowballSort.value = false;
     sortLoans();
   };
 
-  const toggleSnowballSort = () => {
+  const toggleSnowballSort = (): void => {
     snowballSort.value = true;
     sortLoans();
   };
@@ -449,7 +449,7 @@ export default defineStore('debtonateCore', () => {
 
   // ease-of-use getters over computed values
 
-  const getPaymentSchedule = (loanId: string, budgetId: string) => paymentSchedules.value[loanId][budgetId];
+  const getPaymentSchedule = (loanId: string, budgetId: string): moneyfunx.PaymentSchedule => paymentSchedules.value[loanId][budgetId];
 
   const getNumPayments = (
     loanId: string,
@@ -659,7 +659,7 @@ export default defineStore('debtonateCore', () => {
     return config;
   });
 
-  const graphs = computed(() => ({
+  const graphs = computed<Record<string, GraphConfig>>(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
     [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]: percentOfPaymentAsPrincaplGraphs.value,
