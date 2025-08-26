@@ -16,11 +16,11 @@ import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 
 export default defineStore('globalOptions', () => {
-  const baseDate = ref(Date.now()); // TODO: consider letting users modify the base date
-  const currencies = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
-  const currency = ref(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
-  const language = ref(navigator.language);
-  const languages = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
+  const baseDate = ref<number>(Date.now()); // TODO: consider letting users modify the base date
+  const currencies: Array<string> = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
+  const currency = ref<string>(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
+  const language = ref<string>(navigator.language);
+  const languages: Array<string> = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const periodsAsDates = ref<boolean>(false);
 
   // independent functions/computed values
@@ -30,7 +30,7 @@ export default defineStore('globalOptions', () => {
   /**
    * Resets modifiable state to initial state
    */
-  const clearState = () => {
+  const clearState = (): void => {
     currency.value = constants.LOCALE_CURRENCY[navigator.language];
     language.value = navigator.language;
     periodsAsDates.value = false;
@@ -40,7 +40,7 @@ export default defineStore('globalOptions', () => {
    * Loads state from browser Local Storage
    * See keys.ts for naming structure
    */
-  const loadState = () => {
+  const loadState = (): void => {
     currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
     language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
     periodsAsDates.value = JSON.parse(
@@ -52,7 +52,7 @@ export default defineStore('globalOptions', () => {
    * Saves state to browser Local Storage
    * see keys.ts for naming structure
    */
-  const saveState = () => {
+  const saveState = (): void => {
     localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
     localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
     localStorage.setItem(
@@ -65,7 +65,7 @@ export default defineStore('globalOptions', () => {
    * Exports state as an in-memory Object
    * @returns {Object} The current state
    */
-  const exportState = () => ({
+  const exportState = (): Record<string, any> => ({
     [keys.LS_CURRENCY]: currency.value,
     [keys.LS_LANGUAGE]: language.value,
     [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
@@ -110,7 +110,7 @@ export default defineStore('globalOptions', () => {
    * @param {boolean} asStr Flag to return as a locale-aware string (default=false)
    * @returns {Date | string} The date converted from `period`
    */
-  const Period = (period: number, asStr: boolean = false) => {
+  const Period = (period: number, asStr: boolean = false): string|number|Date => {
     if (periodsAsDates.value) {
       const anchorDate = new Date(baseDate.value);
       const relativeDate = new Date(
@@ -124,7 +124,7 @@ export default defineStore('globalOptions', () => {
   };
 
   /** state-aware label for periods in either period or date format */
-  const Time = computed(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
+  const Time = computed<string>(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
 
   // Computed values
 
@@ -132,7 +132,7 @@ export default defineStore('globalOptions', () => {
    * Returns the current currency symbol
    * defaults to '$'
    */
-  const currencySymbol = computed(() => {
+  const currencySymbol = computed<string>(() => {
     // fixed to a style that leads with a symbol
     const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -151,7 +151,7 @@ export default defineStore('globalOptions', () => {
    * Sets the current currency
    * @param {string} newCurrency browser-standard currency name
    */
-  const setCurrency = (newCurrency: string) => {
+  const setCurrency = (newCurrency: string): void => {
     currency.value = newCurrency;
   };
 
@@ -159,14 +159,14 @@ export default defineStore('globalOptions', () => {
    * Sets the current language
    * @param {string} newLanguage browser-standard language name
    */
-  const setLanguage = (newLanguage: string) => {
+  const setLanguage = (newLanguage: string): void => {
     language.value = newLanguage;
   };
 
   /**
    * Toggles displaying periods as dates or integers
    */
-  const togglePeriodsAsDates = () => {
+  const togglePeriodsAsDates = (): void => {
     periodsAsDates.value = !periodsAsDates.value;
   };
 

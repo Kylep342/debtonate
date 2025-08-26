@@ -492,7 +492,7 @@ export default defineStore('debtonateCore', () => {
 
   /** Graphing */
 
-  const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
+  const graphXScale = computed<Function>(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
 
   // graph data
 
