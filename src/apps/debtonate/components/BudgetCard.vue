@@ -20,10 +20,12 @@ const totalsPaymentSummary = computed(() => state.getPaymentSchedule(constants.T
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
 const budgetPayments = computed<number>(() => globalOptions.Period(totalsPaymentSummary.value.amortizationSchedule.length, true));
-const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest)}`);
+// const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest)}`);
 const budgetTotalPaid = computed<string>(() => `${globalOptions.Money(totalsPaymentSummary.value.lifetimeInterest + totalsPaymentSummary.value.lifetimePrincipal)}`);
 
 const paymentsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
+const budgetName = computed<string>(() => state.getBudgetName(props.budget.id));
+const header = computed<string>(() => state.budgetCardGraphConfig.header(props.viewedLoanId));
 
 const graph = computed(() => state.cardGraphs[props.viewedLoanId][props.budget.id])
 
@@ -48,11 +50,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const getButtons = (budgetId): Array<Button> => (
-  budgetId === constants.DEFAULT
-    ? baseButtons.value
-    : editButtons.value
-  );
+const buttons = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -61,14 +59,14 @@ const getButtons = (budgetId): Array<Button> => (
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ state.getBudgetName(budget.id) }}
+            {{ budgetName }}
           </h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.loans.length">{{ state.budgetCardGraphConfig.header(viewedLoanId) }}</h3>
+      <h3 v-if="state.loans.length">{{ header }}</h3>
       <donut-graph
         v-if="state.loans.length"
         :config="state.budgetCardGraphConfig"

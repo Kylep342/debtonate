@@ -15,12 +15,57 @@ const props = defineProps<{
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
-const parentLoan = computed(() => state.getLoan(props.parentId))
+const parentLoan = computed<Loan>(() => state.getLoan(props.parentId));
+const title = computed<string>(() => `Refinancing Scenarios - ${parentLoan.value?.name ?? ''}`);
 
-const buildRefinancingTableTitle = (loan) => `Refinancing Scenarios - ${state.getLoanName(loan.id)}`;
-const title = computed(() => buildRefinancingTableTitle(state.getLoan(props.parentId)))
+type TableRow = {
+  id: string;
+  isParent: boolean;
+  name: string;
+  interestRate: string;
+  term: number;
+  monthlyPayment: string;
+  lifetimeInterest: string;
+  fees: string;
+  totalPremium: string;
+  totalPayments: number;
+}
 
-const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lifetimeInterest
+const tableRows = computed<TableRow[]>(() => {
+  if (!parentLoan.value) return [];
+
+  const parentRow: TableRow = {
+    id: parentLoan.value.id,
+    isParent: true,
+    name: state.getLoanName(parentLoan.value.id),
+    interestRate: globalOptions.Percent(parentLoan.value.annualRate * 100),
+    term: parentLoan.value.termInYears,
+    monthlyPayment: globalOptions.Money(parentLoan.value.minPayment),
+    lifetimeInterest: globalOptions.Money(state.getLifetimeInterest(parentLoan.value.id, constants.DEFAULT)),
+    fees: globalOptions.Money(parentLoan.value.fees),
+    totalPremium: globalOptions.Money(state.getLifetimeInterest(parentLoan.value.id, constants.DEFAULT) + parentLoan.value.fees),
+    totalPayments: state.getNumPayments(parentLoan.value.id, constants.DEFAULT),
+  };
+
+  const scenarioRows = props.scenarios.map((scenario): TableRow => {
+    const schedule = props.schedules[scenario.id];
+    const lifetimeInterest = schedule.paymentSchedule.lifetimeInterest;
+    return <TableRow>{
+      id: scenario.id,
+      isParent: false,
+      name: scenario.name,
+      interestRate: globalOptions.Percent(scenario.annualRate * 100),
+      term: scenario.termInYears,
+      monthlyPayment: globalOptions.Money(schedule.paymentAmount),
+      lifetimeInterest: globalOptions.Money(lifetimeInterest),
+      fees: globalOptions.Money(scenario.fees),
+      totalPremium: globalOptions.Money(lifetimeInterest + scenario.fees),
+      totalPayments: schedule.paymentSchedule.amortizationSchedule.length,
+    };
+  });
+
+  return [parentRow, ...scenarioRows];
+});
 </script>
 
 <template>
@@ -35,75 +80,35 @@ const interest = (scenarioId) => props.schedules[scenarioId].paymentSchedule.lif
         <template #header>
           <thead>
             <tr>
-              <th>
-                <b>Scenario Name</b>
-              </th>
-              <th>
-                <b>Interest Rate</b>
-              </th>
-              <th>
-                <b>Term</b>
-              </th>
-              <th>
-                <b>Monthly Payment</b>
-              </th>
-              <th :class="['text-right']">
-                <b>Lifetime Interest</b>
-              </th>
-              <th :class="['text-right']">
-                <b>Fees</b>
-              </th>
-              <th :class="['text-right']">
-                <b>Total Premium</b>
-              </th>
-              <th :class="['text-right']">
-                <b>Total Payments</b>
-              </th>
-              <th>
-                <b>Actions</b>
-              </th>
+              <th><b>Scenario Name</b></th>
+              <th><b>Interest Rate</b></th>
+              <th><b>Term</b></th>
+              <th><b>Monthly Payment</b></th>
+              <th :class="['text-right']"><b>Lifetime Interest</b></th>
+              <th :class="['text-right']"><b>Fees</b></th>
+              <th :class="['text-right']"><b>Total Premium</b></th>
+              <th :class="['text-right']"><b>Total Payments</b></th>
+              <th><b>Actions</b></th>
             </tr>
           </thead>
         </template>
         <template #body>
           <tbody>
-            <tr>
-              <td>{{ state.getLoanName(parentLoan.id) }}</td>
-              <td>{{ globalOptions.Percent(parentLoan.annualRate * 100) }}</td>
-              <td>{{ parentLoan.termInYears }}</td>
-              <td>{{ globalOptions.Money(parentLoan.minPayment) }}</td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT)) }}
-              </td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(parentLoan.fees) }}
-              </td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(state.getLifetimeInterest(parentLoan.id, constants.DEFAULT) + parentLoan.fees) }}
-              </td>
-              <td :class="['text-right']">
-                {{ state.getNumPayments(parentLoan.id, constants.DEFAULT) }}
-              </td>
-            </tr>
-            <tr v-for="(scenario) in scenarios" :key="scenario.id">
-              <td>{{ scenario.name }}</td>
-              <td>{{ globalOptions.Percent(scenario.annualRate * 100) }}</td>
-              <td>{{ scenario.termInYears }}</td>
-              <td>{{ globalOptions.Money(schedules[scenario.id].paymentAmount) }}</td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(interest(scenario.id)) }}
-              </td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(scenario.fees) }}
-              </td>
-              <td :class="['text-right']">
-                {{ globalOptions.Money(interest(scenario.id) + scenario.fees) }}
-              </td>
-              <td :class="['text-right']">
-                {{ schedules[scenario.id].paymentSchedule.amortizationSchedule.length }}
-              </td>
+            <tr v-for="row in tableRows" :key="row.id">
+              <td>{{ row.name }}</td>
+              <td>{{ row.interestRate }}</td>
+              <td>{{ row.term }}</td>
+              <td>{{ row.monthlyPayment }}</td>
+              <td :class="['text-right']">{{ row.lifetimeInterest }}</td>
+              <td :class="['text-right']">{{ row.fees }}</td>
+              <td :class="['text-right']">{{ row.totalPremium }}</td>
+              <td :class="['text-right']">{{ row.totalPayments }}</td>
               <td>
-                <base-button :class="['btn-error']" @click="state.deleteRefinancingScenario(parentId, scenario.id)">
+                <base-button
+                  v-if="!row.isParent"
+                  :class="['btn-error']"
+                  @click="state.deleteRefinancingScenario(parentId, row.id)"
+                >
                   {{ constants.BTN_DELETE }}
                 </base-button>
               </td>

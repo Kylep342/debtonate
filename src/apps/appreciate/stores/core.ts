@@ -455,7 +455,7 @@ export default defineStore('appreciateCore', () => {
   const budgetCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'BudgetCardSummary',
     color: getBudgetColor,
-    header: instrumentId => `Cost Breakdown - ${getInstrumentName(instrumentId)}`,
+    header: instrumentId => `Yield Breakdown - ${getInstrumentName(instrumentId)}`,
     lineName: getBudgetName,
     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
     x: globalOptions.Period,
@@ -471,7 +471,7 @@ export default defineStore('appreciateCore', () => {
   const instrumentCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'InstrumentCardSummary',
     color: () => '#FFFFFF',
-    header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
+    header: budgetId => `Yield Breakdown - ${getBudgetName(budgetId)}`,
     lineName: getBudgetName,
     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
     x: globalOptions.Period,

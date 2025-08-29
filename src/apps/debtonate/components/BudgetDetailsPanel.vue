@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PaymentSchedule } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
 import { MonthlyBudget } from '@/apps/shared/types/core';
@@ -11,9 +12,25 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
-const currentBudget = ref<MonthlyBudget>();
-
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+
+const currentBudget = ref<MonthlyBudget>();
+const currentLoan = computed(() => state.getLoan(viewedItemId.value));
+
+const paymentSchedule = computed(() => {
+  if (!currentBudget.value) return null;
+  return state.getPaymentSchedule(viewedItemId.value, currentBudget.value.id);
+});
+
+const amortizationTitle = computed(() => {
+  if (!currentLoan.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableTitle(currentLoan.value, currentBudget.value);
+});
+
+const amortizationSubtitle = computed(() => {
+  if (!currentLoan.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableSubtitle(currentLoan.value, currentBudget.value);
+});
 
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
@@ -49,13 +66,11 @@ watch(
         <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="state.getPaymentSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
-              state.getLoan(viewedItemId),
-              currentBudget,
-            )" :subtitle="state.buildAmortizationTableSubtitle(
-                state.getLoan(viewedItemId),
-                currentBudget,
-              )" />
+            <AmortizationTable
+              :payment-schedule="paymentSchedule"
+              :title="amortizationTitle"
+              :subtitle="amortizationSubtitle"
+            />
           </template>
         </base-tabs>
       </div>

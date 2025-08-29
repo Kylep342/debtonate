@@ -47,10 +47,13 @@ watch(
         <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :contribution-schedule="state.getContributionSchedule(currentInstrument.id, viewedItemId)" :title="state.buildAmortizationTableTitle(
-              currentInstrument,
-              state.getBudget(viewedItemId),
-            )" :subtitle="state.buildAmortizationTableSubtitle(
+            <AmortizationTable
+              :contribution-schedule="state.getContributionSchedule(currentInstrument.id, viewedItemId)"
+              :title="state.buildAmortizationTableTitle(
+                currentInstrument,
+                state.getBudget(viewedItemId),
+              )"
+              :subtitle="state.buildAmortizationTableSubtitle(
                 currentInstrument,
                 state.getBudget(viewedItemId),
               )" />

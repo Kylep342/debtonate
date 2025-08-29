@@ -18,11 +18,11 @@ import useAppreciateCoreStore from './stores/core';
 
 const state = useAppreciateCoreStore();
 
-useModal(computed(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
-useModal(computed(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
-useModal(computed(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
-useModal(computed(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
-useModal(computed(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
+useModal(computed<Boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
+useModal(computed<Boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
+useModal(computed<Boolean>(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
+useModal(computed<Boolean>(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
+useModal(computed<Boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
 </script>
 
 <template>

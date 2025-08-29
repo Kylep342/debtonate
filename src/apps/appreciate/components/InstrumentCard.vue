@@ -21,6 +21,9 @@ const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(p
 const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
 const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
 
+const instrumentName = computed<string>(() => state.getInstrumentName(props.instrument.id));
+const header = computed<string>(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
+
 const graph = computed(() => state.cardGraphs[props.instrument.id][props.viewedBudgetId])
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
@@ -44,7 +47,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const getButtons = (instrumentId): Array<Button> => instrumentId === constants.TOTALS ? baseButtons.value : editButtons.value;
+const buttons = computed<Array<Button>>(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -53,14 +56,14 @@ const getButtons = (instrumentId): Array<Button> => instrumentId === constants.T
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ state.getInstrumentName(instrument.id) }}
+            {{ instrumentName }}
           </h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(instrument.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length">{{ state.instrumentCardGraphConfig.header(viewedBudgetId) }}</h3>
+      <h3 v-if="state.instruments.length">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.instrumentCardGraphConfig"
