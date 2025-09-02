@@ -12,9 +12,10 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
 
+const currentBudget = ref<MonthlyBudget>();
+
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
-const currentBudget = ref<MonthlyBudget>();
 const currentLoan = computed(() => state.getLoan(viewedItemId.value));
 
 const paymentSchedule = computed(() => {
