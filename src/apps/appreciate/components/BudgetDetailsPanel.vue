@@ -15,11 +15,11 @@ const currentBudget = ref<MonthlyBudget>();
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
-const currentInstrument = computed(() => state.getInstrument(viewedItemId));
+const currentInstrument = computed(() => state.getInstrument(viewedItemId.value));
 
 const contributionSchedule = computed(() => {
-  if (!currentInstrument.value) return null;
-  return state.getContributionSchedule(currentInstrument.value.id, viewedItemId.value)
+  if (!currentBudget.value) return null;
+  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
 });
 
 const amortizationTitle = computed(() => {

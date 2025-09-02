@@ -14,7 +14,7 @@ const currentInstrument = ref<IInstrument>();
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(shared_constants.DEFAULT);
 
-const currentBudget = computed(() => state.getBudget(viewedItemId));
+const currentBudget = computed(() => state.getBudget(viewedItemId.value));
 
 const contributionSchedule = computed(() => {
   if (!currentInstrument.value) return null;

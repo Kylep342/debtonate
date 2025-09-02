@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { PaymentSchedule } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
 import { MonthlyBudget } from '@/apps/shared/types/core';

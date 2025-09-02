@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ContributionSchedule, IInstrument } from 'moneyfunx';
+import { ContributionSchedule  } from 'moneyfunx';
 
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
-  // instrument: IInstrument,
   contributionSchedule: ContributionSchedule,
   title: string,
   subtitle: string,
@@ -39,12 +38,8 @@ const tableTotals = computed(() => {
 <template>
   <div>
     <div>
-      <h3 :class="['text-center']">
-        {{ title }}
-      </h3>
-      <h5 :class="['text-center']">
-        {{ subtitle }}
-      </h5>
+      <h3 :class="['text-center']">{{ title }}</h3>
+      <h5 :class="['text-center']">{{ subtitle }}</h5>
     </div>
     <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto']">
       <base-table :class="['table-sm']">
