@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ContributionSchedule  } from 'moneyfunx';
+import { ContributionSchedule } from 'moneyfunx';
 
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
