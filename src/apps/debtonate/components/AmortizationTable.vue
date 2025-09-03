@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { PaymentSchedule } from 'moneyfunx';
+import { PaymentRecord, PaymentSchedule } from 'moneyfunx';
 
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
@@ -14,8 +14,9 @@ const globalOptions = useGlobalOptionsStore();
 
 const paymentHeader = computed<string>(() => (globalOptions.periodsAsDates ? 'Payment Date' : 'Payment Number'));
 
+// amortizationRows pre-foromats rendered rows
 const amortizationRows = computed(() => {
-  return props.paymentSchedule.amortizationSchedule.map(record => ({
+  return props.paymentSchedule.amortizationSchedule.map((record: PaymentRecord) => ({
     period: globalOptions.Period(record.period, true),
     amountPaid: globalOptions.Money(record.interest + record.principal),
     principalPaid: globalOptions.Money(record.principal),
@@ -24,6 +25,7 @@ const amortizationRows = computed(() => {
   }));
 });
 
+// tableTotals pre-formats the totals summary row
 const tableTotals = computed(() => {
   const { lifetimePrincipal, lifetimeInterest } = props.paymentSchedule;
   return {

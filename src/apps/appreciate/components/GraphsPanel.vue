@@ -42,10 +42,18 @@ watch(() => state.instruments, async (instruments) => {
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">
-      <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
-        :is-viewed-item-id="isViewedInstrumentId" :set-viewed-item-id="setViewedInstrumentId">
+      <base-tabs
+        :get-item-name="state.getInstrumentName"
+        :pivot="state.instrumentsWithTotals"
+        :is-viewed-item-id="isViewedInstrumentId"
+        :set-viewed-item-id="setViewedInstrumentId"
+      >
         <template #tabContent>
-          <base-graph :key="viewedInstrumentId" :graph="activeGraph" :anchor-id="viewedInstrumentId" />
+          <base-graph
+            :key="viewedInstrumentId"
+            :graph="activeGraph"
+            :anchor-id="viewedInstrumentId"
+          />
         </template>
       </base-tabs>
     </div>

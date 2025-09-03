@@ -42,10 +42,18 @@ watch(() => state.loans, async (loans) => {
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">
-      <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
-        :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
+      <base-tabs
+        :get-item-name="state.getLoanName"
+        :pivot="state.loansWithTotals"
+        :is-viewed-item-id="isViewedLoanId"
+        :set-viewed-item-id="setViewedLoanId"
+      >
         <template #tabContent>
-          <base-graph :key="viewedLoanId" :graph="activeGraph" :anchor-id="viewedLoanId" />
+          <base-graph
+            :key="viewedLoanId"
+            :graph="activeGraph"
+            :anchor-id="viewedLoanId"
+          />
         </template>
       </base-tabs>
     </div>

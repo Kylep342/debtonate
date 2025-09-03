@@ -1,3 +1,9 @@
+export type TableHeader = {
+  key: string;
+  label: string;
+  class?: string;
+}
+
 export type Button = {
   text: string
   onClick: Function
