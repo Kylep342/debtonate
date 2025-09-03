@@ -15,6 +15,23 @@ const currentBudget = ref<MonthlyBudget>();
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
+const currentInstrument = computed(() => state.getInstrument(viewedItemId.value));
+
+const contributionSchedule = computed(() => {
+  if (!currentBudget.value) return null;
+  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
+});
+
+const amortizationTitle = computed(() => {
+  if (!currentInstrument.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableTitle(currentInstrument.value, currentBudget.value);
+});
+
+const amortizationSubtitle = computed(() => {
+  if (!currentInstrument.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableSubtitle(currentInstrument.value, currentBudget.value);
+});
+
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
   + `${globalOptions.Money(monthlyBudget.absolute)}/month `
@@ -49,13 +66,11 @@ watch(
         <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :contribution-schedule="state.getContributionSchedule(viewedItemId, currentBudget.id)" :title="state.buildAmortizationTableTitle(
-              state.getInstrument(viewedItemId),
-              currentBudget,
-            )" :subtitle="state.buildAmortizationTableSubtitle(
-                state.getInstrument(viewedItemId),
-                currentBudget,
-              )" />
+            <AmortizationTable
+              :contribution-schedule="contributionSchedule"
+              :title="amortizationTitle"
+              :subtitle="amortizationSubtitle"
+            />
           </template>
         </base-tabs>
       </div>

@@ -9,8 +9,26 @@ import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
-const currentLoan = ref<ILoan>();
+
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
+
+const currentLoan = ref<ILoan>();
+const currentBudget = computed(() => state.getBudget(viewedItemId.value));
+
+const paymentSchedule = computed(() => {
+  if (!currentLoan.value) return null;
+  return state.getPaymentSchedule(currentLoan.value.id, viewedItemId.value);
+});
+
+const amortizationTitle = computed(() => {
+  if (!currentLoan.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableTitle(currentLoan.value, currentBudget.value);
+});
+
+const amortizationSubtitle = computed(() => {
+  if (!currentLoan.value || !currentBudget.value) return '';
+  return state.buildAmortizationTableSubtitle(currentLoan.value, currentBudget.value);
+});
 
 const buildLoanDetailsTitle = (loan: ILoan): string => loan
   ? `Loan Details - ${state.getLoanName(loan.id)} | `
@@ -48,13 +66,11 @@ watch(
         <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
           :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
           <template #tabContent>
-            <AmortizationTable :payment-schedule="state.getPaymentSchedule(currentLoan.id, viewedItemId)" :title="state.buildAmortizationTableTitle(
-              currentLoan,
-              state.getBudget(viewedItemId),
-            )" :subtitle="state.buildAmortizationTableSubtitle(
-                currentLoan,
-                state.getBudget(viewedItemId),
-              )" />
+            <AmortizationTable
+              :payment-schedule="paymentSchedule"
+              :title="amortizationTitle"
+              :subtitle="amortizationSubtitle"
+            />
           </template>
         </base-tabs>
       </div>

@@ -23,6 +23,10 @@ const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.p
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
+const buttons = computed<Array<Button>>(() => props.loan.id === constants.TOTALS ? baseButtons.value : editButtons.value);
+const header = computed<string>(() => state.loanCardGraphConfig.header(props.viewedBudgetId));
+const loanName = computed<string>(() => state.getLoanName(props.loan.id));
+
 const graph = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetId])
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
@@ -49,8 +53,6 @@ const editButtons = computed<Array<Button>>(() => ([
     onClick: () => state.deleteLoan(props.loan.id),
   },
 ]));
-
-const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? baseButtons.value : editButtons.value;
 </script>
 
 <template>
@@ -59,14 +61,14 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ state.getLoanName(loan.id) }}
+            {{ loanName }}
           </h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(loan.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.loans.length">{{ state.loanCardGraphConfig.header(viewedBudgetId) }}</h3>
+      <h3 v-if="state.loans.length">{{ header }}</h3>
       <donut-graph
         v-if="state.loans.length"
         :config="state.loanCardGraphConfig"
@@ -84,39 +86,27 @@ const getButtons = (loanId): Array<Button> => loanId === constants.TOTALS ? base
             </tr>
             <tr>
               <td>Principal</td>
-              <td :class="['text-right']">
-                <b>{{ loanPrincipal }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanPrincipal }}</b></td>
             </tr>
             <tr>
               <td>Interest Rate</td>
-              <td :class="['text-right']">
-                <b>{{ loanInterestRate }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanInterestRate }}</b></td>
             </tr>
             <tr>
               <td>Term</td>
-              <td :class="['text-right']">
-                <b>{{ loanTermInYears }} years</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanTermInYears }} years</b></td>
             </tr>
             <tr>
               <td>Minimum Payment</td>
-              <td :class="['text-right']">
-                <b>{{ loanMinPayment }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanMinPayment }}</b></td>
             </tr>
             <tr v-if="loanPrincipal !== loanCurrentBalance">
               <td>Current Balance</td>
-              <td :class="['text-right']">
-                <b>{{ loanCurrentBalance }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanCurrentBalance }}</b></td>
             </tr>
             <tr v-if="loanFees">
               <td>Fees</td>
-              <td :class="['text-right']">
-                <b>{{ loanFees }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ loanFees }}</b></td>
             </tr>
           </tbody>
         </template>

@@ -98,7 +98,7 @@ export default defineStore('appreciateCore', () => {
     localStorage.setItem(keys.LS_YEARS_TO_SPEND, JSON.stringify(yearsToSpend.value));
   };
 
-  const exportState = () => ({
+  const exportState = (): Record<string, any> => ({
     ...globalOptions.exportState(),
 
     [keys.LS_ACCRUE_BEFORE_CONTRIBUTION]: accrueBeforeContribution.value,
@@ -351,7 +351,7 @@ export default defineStore('appreciateCore', () => {
 
   // ease-of-use getters over computed values
 
-  const getContributionSchedule = (instrumentId: string, budgetId: string) => contributionSchedules.value[instrumentId][budgetId];
+  const getContributionSchedule = (instrumentId: string, budgetId: string): moneyfunx.ContributionSchedule => contributionSchedules.value[instrumentId][budgetId];
 
   const getNumContributions = (
     instrumentId: string,
@@ -410,7 +410,7 @@ export default defineStore('appreciateCore', () => {
 
   /** Graphing */
 
-  const graphXScale = computed(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
+  const graphXScale = computed<Function>(() => globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear);
 
   // graph data
 
@@ -452,10 +452,10 @@ export default defineStore('appreciateCore', () => {
   });
 
 
-  const budgetCardGraphConfig = computed(() => ({
+  const budgetCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'BudgetCardSummary',
     color: getBudgetColor,
-    header: instrumentId => `Cost Breakdown - ${getInstrumentName(instrumentId)}`,
+    header: instrumentId => `Yield Breakdown - ${getInstrumentName(instrumentId)}`,
     lineName: getBudgetName,
     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
     x: globalOptions.Period,
@@ -468,10 +468,10 @@ export default defineStore('appreciateCore', () => {
     yScale: d3.scaleLinear,
   }));
 
-  const instrumentCardGraphConfig = computed(() => ({
+  const instrumentCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'InstrumentCardSummary',
     color: () => '#FFFFFF',
-    header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
+    header: budgetId => `Yield Breakdown - ${getBudgetName(budgetId)}`,
     lineName: getBudgetName,
     subheader: instrumentId => buildInstrumentSubtitle(getInstrument(instrumentId)!),
     x: globalOptions.Period,
@@ -536,7 +536,7 @@ export default defineStore('appreciateCore', () => {
     return config;
   });
 
-  const graphs = computed(() => ({
+  const graphs = computed<Record<string, GraphConfig>>(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
   }));

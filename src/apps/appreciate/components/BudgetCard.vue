@@ -28,11 +28,11 @@ const netWorth = computed<number>(() => state.deflateAllMoney
 const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
-const budgetContributionTotals = computed<number>(() => globalOptions.Money(totalsContributionSummary.value.amortizationSchedule.length * props.budget.absolute));
 const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
 
 const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
+const budgetName = computed<string>(() => state.getBudgetName(props.budget.id));
+const header = computed<string>(() => state.budgetCardGraphConfig.header(props.viewedInstrumentId));
 
 const graph = computed(() => state.cardGraphs[props.viewedInstrumentId][props.budget.id])
 
@@ -57,7 +57,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ? baseButtons.value : editButtons.value;
+const buttons = computed<Array<Button>>(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -66,14 +66,14 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ state.getBudgetName(budget.id) }}
+            {{ budgetName }}
           </h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="getButtons(budget.id)" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length">{{ state.budgetCardGraphConfig.header(viewedInstrumentId) }}</h3>
+      <h3 v-if="state.instruments.length">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.budgetCardGraphConfig"
@@ -94,6 +94,9 @@ const getButtons = (budgetId): Array<Button> => budgetId === constants.DEFAULT ?
               <td :class="['text-right']">
                 <b>{{ budgetAmount }}</b>
               </td>
+            </tr>
+            <tr>
+              <td>{{ contributionsLabel }}</td>
             </tr>
             <tr>
               <td>{{ netWorthLabel }}</td>

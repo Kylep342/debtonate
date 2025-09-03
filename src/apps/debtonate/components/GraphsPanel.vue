@@ -45,7 +45,6 @@ watch(() => state.loans, async (loans) => {
       <base-tabs :get-item-name="state.getLoanName" :pivot="state.loansWithTotals"
         :is-viewed-item-id="isViewedLoanId" :set-viewed-item-id="setViewedLoanId">
         <template #tabContent>
-          <!-- TODO: Move to split config/lines model -->
           <base-graph :key="viewedLoanId" :graph="activeGraph" :anchor-id="viewedLoanId" />
         </template>
       </base-tabs>
@@ -56,7 +55,7 @@ watch(() => state.loans, async (loans) => {
 <style scoped>
 .chart-container {
   position: relative;
-  padding-left: 2rem; /* room for Y axis */
+  padding-left: 4rem; /* room for Y axis */
   overflow: visible;
 }
 </style>
