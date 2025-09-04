@@ -12,7 +12,7 @@ const state = useDebtonateCoreStore();
     :pivot-items="state.loansWithTotals"
     :watched-items="state.loans"
     :get-item-name="state.getLoanName"
-    :constants="constants"
+    :initial-item-id="constants.TOTALS"
     :initial-graph-id="constants.GRAPH_BALANCES_OVER_TIME"
   />
 </template>

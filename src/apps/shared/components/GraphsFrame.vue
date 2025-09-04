@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
+import constants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 import { GraphConfig } from '@/apps/shared/types/graph';
 import { usePivot } from '@/apps/shared/composables/usePivot';
@@ -10,7 +11,7 @@ const props = defineProps<{
   pivotItems: any[];
   watchedItems: any[];
   getItemName: (id: string) => string;
-  constants: { TOTALS: string; GRAPHS: string; BTN_SELECT: string };
+  initialItemId: string;
   initialGraphId: string;
 }>();
 
@@ -18,7 +19,7 @@ const {
   viewedItemId,
   isViewedItemId,
   setViewedItemId
-} = usePivot(props.constants.TOTALS);
+} = usePivot(props.initialItemId);
 
 const viewedGraphId = ref<string>(props.initialGraphId);
 const activeGraph = computed<GraphConfig>(() => props.graphs[viewedGraphId.value]);
@@ -31,7 +32,7 @@ const buttons = computed<Button[]>(() => Object.keys(props.graphs).map((graphId)
 
 watch(() => props.watchedItems, (newItems) => {
   if (!newItems.map((item) => item.id).includes(viewedItemId.value)) {
-    setViewedItemId(props.constants.TOTALS);
+    setViewedItemId(props.initialItemId);
   }
 });
 </script>
