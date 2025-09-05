@@ -60,9 +60,7 @@ const editButtons = computed<Array<Button>>(() => ([
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ loanName }}
-          </h2>
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ loanName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>

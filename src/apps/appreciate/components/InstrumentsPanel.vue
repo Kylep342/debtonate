@@ -1,27 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { Button } from '@/apps/shared/types/app';
+import { Button, Menu } from '@/apps/shared/types/app';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import { useResize } from '@/apps/shared/composables/useResize';
 import constants from '@/apps/appreciate/constants/constants';
 import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
-import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import ListPanel from '@/apps/shared/components/ListPanel.vue';
 
 const state = useAppreciateCoreStore();
 
 const {
   viewedItemId: viewedBudgetId,
-  isViewedItemId: isViewedBudgetId,
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
-
-const { scrollContainer } = useResize('resizeInstrumentsPanel');
-
-/**
- * Local state
- */
 
 const budgetSelectors = computed<Array<Button>>(
   () => (state.monthlyBudgets.map((budget) => ({
@@ -30,37 +22,26 @@ const budgetSelectors = computed<Array<Button>>(
   })))
 );
 
-const button = <Button>{
-  text: constants.BTN_CREATE,
-  onClick: state.openInstrumentForm,
-  classes: ['btn-success', 'text-center'],
-};
-
-const menu = reactive<Menu>({
+const pivotMenu = reactive<Menu>({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
 });
 </script>
 
 <template>
-  <base-card :id="'instrumentManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
-    <template #cardTitle>
-      <ManagementPanel :button="button" :menu="menu" :title="constants.INSTRUMENTS" :class="['border-b-2']" />
+  <ListPanel
+    panel-id="instrumentManagementPanel"
+    :title="constants.INSTRUMENTS"
+    :items="state.instrumentsWithTotals"
+    :create-item="state.openInstrumentForm"
+    :pivot-menu="pivotMenu"
+    :create-text="constants.BTN_CREATE"
+  >
+    <template #item="{ item }">
+      <InstrumentCard
+        :instrument="item"
+        :viewed-budget-id="viewedBudgetId"
+      />
     </template>
-    <template #cardBody>
-      <div ref="scrollContainer" :class="[
-        'border-r-2',
-        'overflow-y-auto',
-        'flex',
-        'flex-col',
-        'min-h-0'
-      ]">
-        <ul>
-          <li v-for="(instrument) in state.instrumentsWithTotals" :key="instrument.id">
-            <InstrumentCard :instrument="instrument" :viewedBudgetId="viewedBudgetId" />
-          </li>
-        </ul>
-      </div>
-    </template>
-  </base-card>
+  </ListPanel>
 </template>

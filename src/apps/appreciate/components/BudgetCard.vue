@@ -28,6 +28,7 @@ const netWorth = computed<number>(() => state.deflateAllMoney
 const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
 const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
+const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
 const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
 
 const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
@@ -65,9 +66,7 @@ const buttons = computed<Array<Button>>(() => props.budget.id === constants.DEFA
     <template #cardTitle>
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ budgetName }}
-          </h2>
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
@@ -85,24 +84,19 @@ const buttons = computed<Array<Button>>(() => props.budget.id === constants.DEFA
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
             <tr>
               <td>Amount</td>
-              <td :class="['text-right']">
-                <b>{{ budgetAmount }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ budgetAmount }}</b></td>
             </tr>
             <tr>
               <td>{{ contributionsLabel }}</td>
+              <td :class="['text-right']"><b>{{ budgetContributions }}</b></td>
             </tr>
             <tr>
               <td>{{ netWorthLabel }}</td>
-              <td :class="['text-right']">
-                <b>{{ budgetNetWorth }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ budgetNetWorth }}</b></td>
             </tr>
           </tbody>
         </template>

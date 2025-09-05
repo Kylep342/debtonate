@@ -1,24 +1,20 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { Button } from '@/apps/shared/types/app';
-import { MonthlyBudget } from '@/apps/shared/types/core';
+import BudgetCard from '@/apps/appreciate/components/BudgetCard.vue';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import { useResize } from '@/apps/shared/composables/useResize';
-import BudgetCard from './BudgetCard.vue';
 import constants from '@/apps/shared/constants/constants';
-import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
-import useAppreciateCoreStore from '../stores/core';
+import { Button, Menu } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const state = useAppreciateCoreStore();
 
 const {
   viewedItemId: viewedInstrumentId,
-  isViewedItemId: isViewedInstrumentId,
   setViewedItemId: setViewedInstrumentId
 } = usePivot(constants.TOTALS);
-
-const { scrollContainer } = useResize('resizeAppreciateBudgetsPanel');
 
 const instrumentSelectors = computed<Array<Button>>(
   () => (state.instrumentsWithTotals.map((instrument) => ({
@@ -27,13 +23,7 @@ const instrumentSelectors = computed<Array<Button>>(
   })))
 );
 
-const button = <Button>{
-  text: constants.BTN_CREATE,
-  onClick: state.openBudgetForm,
-  classes: ['btn-success', 'text-center'],
-};
-
-const menu = reactive<Menu>({
+const pivotMenu = reactive<Menu>({
   text: constants.BTN_PIVOT,
   buttons: instrumentSelectors,
 });
@@ -42,7 +32,7 @@ const defaultBudgetIndex = computed<number>(
   () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
 );
 
-const orderedBudgets = computed<MonthlyBudget[]>(() => [
+const orderedBudgets = computed<Array<MonthlyBudget>>(() => [
   state.monthlyBudgets[defaultBudgetIndex.value],
   ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
@@ -50,24 +40,19 @@ const orderedBudgets = computed<MonthlyBudget[]>(() => [
 </script>
 
 <template>
-  <base-card :id="'budgetManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
-    <template #cardTitle>
-      <ManagementPanel :button="button" :menu="menu" :title="constants.BUDGETS" :class="['border-b-2']" />
+  <ListPanel
+    panel-id="budgetManagementPanel"
+    :title="constants.BUDGETS"
+    :items="orderedBudgets"
+    :create-item="state.openBudgetForm"
+    :pivot-menu="pivotMenu"
+    :create-text="constants.BTN_CREATE"
+  >
+    <template #item="{ item }">
+      <BudgetCard
+        :budget="item"
+        :viewed-instrument-id="viewedInstrumentId"
+      />
     </template>
-    <template #cardBody>
-      <div ref="scrollContainer" :class="[
-        'border-r-2',
-        'overflow-y-auto',
-        'flex',
-        'flex-col',
-        'min-h-0'
-      ]">
-        <ul>
-          <li v-for="(budget) in orderedBudgets" :key="budget.id">
-            <BudgetCard :budget="budget" :viewedInstrumentId="viewedInstrumentId" />
-          </li>
-        </ul>
-      </div>
-    </template>
-  </base-card>
+  </ListPanel>
 </template>

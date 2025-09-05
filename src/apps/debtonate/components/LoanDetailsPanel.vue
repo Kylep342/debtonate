@@ -2,11 +2,11 @@
 import { ILoan } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
-import { usePivot } from '@/apps/shared/composables/usePivot';
 import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
-import constants from '@/apps/debtonate/constants/constants';
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
+import constants from '@/apps/debtonate/constants/constants';
 
 const state = useDebtonateCoreStore();
 
@@ -49,7 +49,7 @@ watch(
 </script>
 
 <template>
-  <base-modal @exit="state.unviewLoan">
+  <base-modal :id="constants.LOAN_DETAILS_ID" @exit="state.unviewLoan">
     <template #header>
       <h2>{{ title }}</h2>
     </template>
@@ -60,11 +60,18 @@ watch(
     </template>
     <template #body>
       <div v-if="currentLoan" :class="['tabframe', 'w-auto']">
-        <RefinancingTable v-if="state.refinancingScenarios[currentLoan.id]?.length" :parent-id="currentLoan.id"
+        <RefinancingTable
+          v-if="state.refinancingScenarios[currentLoan.id]?.length"
+          :parent-id="currentLoan.id"
           :scenarios="state.refinancingScenarios[currentLoan.id]"
-          :schedules="state.refinancingSchedules[currentLoan.id]" />
-        <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
-          :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
+          :schedules="state.refinancingSchedules[currentLoan.id]"
+        />
+        <base-tabs
+          :get-item-name="state.getBudgetName"
+          :pivot="state.monthlyBudgets"
+          :is-viewed-item-id="isViewedItemId"
+          :set-viewed-item-id="setViewedItemId"
+        >
           <template #tabContent>
             <AmortizationTable
               :payment-schedule="paymentSchedule"

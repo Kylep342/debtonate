@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { Button, Menu } from '@/apps/shared/types/app';
-import { usePivot } from '@/apps/shared/composables/usePivot';
-import { useResize } from '@/apps/shared/composables/useResize';
-import constants from '@/apps/debtonate/constants/constants';
 import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
-import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import ListPanel from '@/apps/shared/components/ListPanel.vue';
+import { usePivot } from '@/apps/shared/composables/usePivot';
+import constants from '@/apps/debtonate/constants/constants';
+import { Button, Menu } from '@/apps/shared/types/app';
 
 const state = useDebtonateCoreStore();
 
 const {
   viewedItemId: viewedBudgetId,
-  isViewedItemId: isViewedBudgetId,
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
-
-const { scrollContainer } = useResize('resizeLoansPanel');
 
 const budgetSelectors = computed<Array<Button>>(
   () => (state.monthlyBudgets.map((budget) => ({
@@ -26,37 +22,26 @@ const budgetSelectors = computed<Array<Button>>(
   })))
 );
 
-const button = <Button>{
-  text: constants.BTN_CREATE,
-  onClick: state.openLoanForm,
-  classes: ['btn-success', 'text-center'],
-};
-
-const menu = reactive<Menu>({
+const pivotMenu = reactive<Menu>({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
 });
 </script>
 
 <template>
-  <base-card :id="'loanManagementPanel'" :class="['bg-base-100', 'w-90', 'flex-none']">
-    <template #cardTitle>
-      <ManagementPanel :button="button" :menu="menu" :title="constants.LOANS" :class="['border-b-2']" />
+  <ListPanel
+    panel-id="loanManagementPanel"
+    :title="constants.LOANS"
+    :items="state.loansWithTotals"
+    :create-item="state.openLoanForm"
+    :pivot-menu="pivotMenu"
+    :create-text="constants.BTN_CREATE"
+  >
+    <template #item="{ item }">
+      <LoanCard
+        :loan="item"
+        :viewed-budget-id="viewedBudgetId"
+      />
     </template>
-    <template #cardBody>
-      <div ref="scrollContainer" :class="[
-        'border-r-2',
-        'overflow-y-auto',
-        'flex',
-        'flex-col',
-        'min-h-0'
-      ]">
-        <ul>
-          <li v-for="(loan) in state.loansWithTotals" :key="loan.id">
-            <LoanCard :loan="loan" :viewedBudgetId="viewedBudgetId" />
-          </li>
-        </ul>
-      </div>
-    </template>
-  </base-card>
+  </ListPanel>
 </template>
