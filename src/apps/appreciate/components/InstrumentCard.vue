@@ -55,9 +55,7 @@ const buttons = computed<Array<Button>>(() => props.instrument.id === constants.
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ instrumentName }}
-          </h2>
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ instrumentName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
@@ -75,33 +73,23 @@ const buttons = computed<Array<Button>>(() => props.instrument.id === constants.
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
             <tr>
               <td>Current Balance</td>
-              <td :class="['text-right']">
-                <b>{{ instrumentCurrentBalance }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ instrumentCurrentBalance }}</b></td>
             </tr>
             <tr>
               <td>Interest Rate</td>
-              <td :class="['text-right']">
-                <b>{{ instrumentInterestRate }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ instrumentInterestRate }}</b></td>
             </tr>
             <tr v-if="instrument.annualLimit">
               <td>Annual Limit</td>
-              <td :class="['text-right']">
-                <b>{{ instrumentAnnualLimit }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ instrumentAnnualLimit }}</b></td>
             </tr>
             <tr v-if="instrument.annualLimit">
               <td>Max Contribution</td>
-              <td :class="['text-right']">
-                <b>{{ instrumentMaxMonthlyContribution }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
             </tr>
           </tbody>
         </template>

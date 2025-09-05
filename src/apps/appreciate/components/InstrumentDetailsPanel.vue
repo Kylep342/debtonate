@@ -2,11 +2,11 @@
 import { IInstrument } from 'moneyfunx';
 import { computed, ref, watch } from 'vue';
 
-import AmortizationTable from './AmortizationTable.vue';
-import { usePivot } from '@/apps/shared/composables/usePivot';
+import AmortizationTable from '@/apps/appreciate/components/AmortizationTable.vue';
 import constants from '@/apps/appreciate/constants/constants';
-import shared_constants from '@/apps/shared/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
+import shared_constants from '@/apps/shared/constants/constants';
 
 const state = useAppreciateCoreStore();
 
@@ -61,8 +61,12 @@ watch(
     </template>
     <template #body>
       <div v-if="currentInstrument" :class="['tabframe', 'w-auto']">
-        <base-tabs :get-item-name="state.getBudgetName" :pivot="state.monthlyBudgets"
-          :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
+        <base-tabs
+          :get-item-name="state.getBudgetName"
+          :pivot="state.monthlyBudgets"
+          :is-viewed-item-id="isViewedItemId"
+          :set-viewed-item-id="setViewedItemId"
+        >
           <template #tabContent>
             <AmortizationTable
               :contribution-schedule="contributionSchedule"

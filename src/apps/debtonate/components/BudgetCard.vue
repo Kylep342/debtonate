@@ -58,9 +58,7 @@ const buttons = computed(() => props.budget.id === constants.DEFAULT ? baseButto
     <template #cardTitle>
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-            {{ budgetName }}
-          </h2>
+          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
         </div>
       </div>
@@ -78,27 +76,19 @@ const buttons = computed(() => props.budget.id === constants.DEFAULT ? baseButto
           <tbody>
             <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
-                <b>{{ globalOptions.Money(datum.value) }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
             <tr>
               <td>Amount</td>
-              <td :class="['text-right']">
-                <b>{{ budgetAmount }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ budgetAmount }}</b></td>
             </tr>
             <tr>
               <td>{{ paymentsLabel }}</td>
-              <td :class="['text-right']">
-                <b>{{ budgetPayments }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ budgetPayments }}</b></td>
             </tr>
             <tr>
               <td>Total Paid</td>
-              <td :class="['text-right']">
-                <b>{{ budgetTotalPaid }}</b>
-              </td>
+              <td :class="['text-right']"><b>{{ budgetTotalPaid }}</b></td>
             </tr>
           </tbody>
         </template>

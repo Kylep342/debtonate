@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import { MonthlyBudget } from '@/apps/shared/types/core';
-import { usePivot } from '@/apps/shared/composables/usePivot';
-import AmortizationTable from './AmortizationTable.vue';
+import AmortizationTable from '@/apps/appreciate/components/AmortizationTable.vue';
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
@@ -63,8 +63,12 @@ watch(
     </template>
     <template #body>
       <div v-if="currentBudget" :class="['tabframe', 'w-auto']">
-        <base-tabs :get-item-name="state.getInstrumentName" :pivot="state.instrumentsWithTotals"
-          :is-viewed-item-id="isViewedItemId" :set-viewed-item-id="setViewedItemId">
+        <base-tabs
+          :get-item-name="state.getInstrumentName"
+          :pivot="state.instrumentsWithTotals"
+          :is-viewed-item-id="isViewedItemId"
+          :set-viewed-item-id="setViewedItemId"
+        >
           <template #tabContent>
             <AmortizationTable
               :contribution-schedule="contributionSchedule"

@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { ContributionRecord, ContributionSchedule } from 'moneyfunx';
 
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import AmortizationTableFrame from '@/apps/shared/components/AmortizationTableFrame.vue'; // Import the new component
+import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   contributionSchedule: ContributionSchedule,

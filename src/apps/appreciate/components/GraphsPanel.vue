@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import constants from '@/apps/Appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/Appreciate/stores/core';
+import constants from '@/apps/appreciate/constants/constants';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import GraphsFrame from '@/apps/shared/components/GraphsFrame.vue';
 
 const state = useAppreciateCoreStore();
