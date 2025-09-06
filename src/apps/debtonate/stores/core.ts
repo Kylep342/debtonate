@@ -3,13 +3,13 @@ import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import constants from '../constants/constants';
-import keys from '../constants/keys';
+import constants from '@/apps/debtonate/constants/constants';
+import keys from '@/apps/debtonate/constants/keys';
 import {
   Budget,
   MonthlyBudget,
   PaymentScenario,
-} from '../types/core';
+} from '@/apps/debtonate/types/core';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 import {
   Arc,
@@ -387,11 +387,11 @@ export default defineStore('debtonateCore', () => {
   const paymentSchedules = computed<Record<string, Record<string, moneyfunx.PaymentSchedule>>>(() => {
     const schedules: Record<string, Record<string, moneyfunx.PaymentSchedule>> = {};
 
-    loansWithTotals.value.forEach((loan) => {
+    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       schedules[loan.id] = {};
     });
 
-    Object.keys(schedules).forEach((loanId) => {
+    Object.keys(schedules).forEach((loanId: string) => {
       Object.keys(paymentScenarios.value).forEach((budgetId) => {
         const schedule = paymentScenarios.value[budgetId];
         schedules[loanId][budgetId] = {...schedule.paymentSchedule[loanId]}});
@@ -497,7 +497,7 @@ export default defineStore('debtonateCore', () => {
   // graph data
 
   const balancesGraphs = computed<GraphConfig>(() => {
-    const config = {
+    const config = <GraphConfig>{
       id: 'Balances',
       color: getBudgetColor,
       graphs: <Graphs>{},
@@ -514,7 +514,7 @@ export default defineStore('debtonateCore', () => {
       yScale: d3.scaleLinear,
     };
 
-    loansWithTotals.value.forEach((loan) => {
+    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -522,7 +522,7 @@ export default defineStore('debtonateCore', () => {
         },
         lines: <Record<string, Point[]>>{},
       };
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
         getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.PaymentRecord) => {
           line.push({ x: record.period, y: record.principalRemaining });
@@ -533,7 +533,7 @@ export default defineStore('debtonateCore', () => {
     return config;
   });
 
-  const budgetCardGraphConfig = computed(() => ({
+  const budgetCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'BudgetCardSummary',
     color: getBudgetColor,
     header: loanId => `Cost Breakdown - ${getLoanName(loanId)}`,
@@ -549,7 +549,7 @@ export default defineStore('debtonateCore', () => {
     yScale: d3.scaleLinear,
   }));
 
-  const loanCardGraphConfig = computed(() => ({
+  const loanCardGraphConfig = computed<GraphConfig>(() => ({
     id: 'LoanCardSummary',
     color: () => '#FFFFFF',
     header: budgetId => `Cost Breakdown - ${getBudgetName(budgetId)}`,
@@ -567,9 +567,9 @@ export default defineStore('debtonateCore', () => {
 
   const cardGraphs = computed<Record<string, Record<string, Arc[]>>>(() => {
     const config = <Record<string, Record<string, Arc[]>>>{};
-    loansWithTotals.value.forEach((loan) => {
+    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       config[loan.id] = <Record<string, Arc[]>>{};
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const totalsPaymentSummary = getPaymentSchedule(loan.id, budget.id);
         config[loan.id][budget.id] = [
           { label: 'Lifetime Interest', value: totalsPaymentSummary.lifetimeInterest, color: constants.COLORS[0] },
@@ -581,7 +581,7 @@ export default defineStore('debtonateCore', () => {
   });
 
   const interestSavedGraphs = computed<GraphConfig>(() => {
-    const config = {
+    const config = <GraphConfig>{
       id: 'InterestSaved',
       color: getBudgetColor,
       graphs: <Graphs>{},
@@ -598,7 +598,7 @@ export default defineStore('debtonateCore', () => {
       yScale: d3.scaleLinear,
     };
 
-    loansWithTotals.value.forEach((loan) => {
+    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -606,7 +606,7 @@ export default defineStore('debtonateCore', () => {
         },
         lines: <Record<string, Point[]>>{},
       }
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
         getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
           line.push({
@@ -622,7 +622,7 @@ export default defineStore('debtonateCore', () => {
   });
 
   const percentOfPaymentAsPrincaplGraphs = computed<GraphConfig>(() => {
-    const config = {
+    const config = <GraphConfig>{
       id: 'PercentOfPaymentAsPrincipal',
       color: getBudgetColor,
       graphs: <Graphs>{},

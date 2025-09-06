@@ -432,7 +432,7 @@ export default defineStore('appreciateCore', () => {
       yScale: d3.scaleLinear,
     };
 
-    instrumentsWithTotals.value.forEach((instrument) => {
+    instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
       config.graphs[instrument.id] = <Graph>{
         config: {
           maxX: getNumContributions(instrument.id, constants.DEFAULT),
@@ -440,7 +440,7 @@ export default defineStore('appreciateCore', () => {
         },
         lines: <Record<string, Point[]>>{},
       };
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
         getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
           line.push({ x: record.period, y: record.currentBalance });
@@ -517,7 +517,7 @@ export default defineStore('appreciateCore', () => {
       yScale: d3.scaleLinear,
     };
 
-    instrumentsWithTotals.value.forEach((instrument) => {
+    instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
       config.graphs[instrument.id] = <Graph>{
         config: {
           maxX: getNumContributions(instrument.id, constants.DEFAULT),
@@ -525,7 +525,7 @@ export default defineStore('appreciateCore', () => {
         },
         lines: <Record<string, Point[]>>{},
       };
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
         getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.ContributionRecord) => {
           line.push({ x: record.period, y: deflate(record.currentBalance, record.period) });
