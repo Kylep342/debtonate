@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
