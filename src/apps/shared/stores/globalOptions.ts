@@ -31,8 +31,8 @@ export default defineStore('globalOptions', () => {
    * Resets modifiable state to initial state
    */
   const clearState = (): void => {
-    currency.value = constants.LOCALE_CURRENCY[navigator.language];
-    language.value = navigator.language;
+    currency.value = constants.LOCALE_CURRENCY[navigator.language] || 'USD';
+    language.value = navigator.language || 'en-US';
     periodsAsDates.value = false;
   };
 

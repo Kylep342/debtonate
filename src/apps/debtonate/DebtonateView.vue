@@ -50,12 +50,10 @@ useModal(computed(() => state.refinancingFormActive), constants.REFINANCING_FORM
           v-else
           :class="[]"
         >
-          <div :class="['flex-grow']">
-            <div :class="['header']">
-              <h2>Repayment Analysis</h2>
-            </div>
-            <GraphsPanel />
+          <div :class="['header']">
+            <h2>Repayment Analysis</h2>
           </div>
+          <GraphsPanel />
           <div>
             <BudgetDetailsPanel :id="constants.BUDGET_DETAILS_ID" />
             <LoanDetailsPanel :id="constants.LOAN_DETAILS_ID" />

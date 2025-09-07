@@ -28,33 +28,34 @@ const initializeChart = () => {
   const graph = chart.graphs[props.anchorId];
   const width = 800;
   const height = 500;
-  const margin = 50;
+  const oldMargin = 50;
+  const margin = {x: 40, y: 50}
   const svg = d3.select('#graph').attr('width', width).attr('height', height);
 
   svg.selectAll('*').remove();
 
   const x = chart.xScale()
     .domain([chart.x(0), chart.x(graph.config.maxX)])
-    .range([0, width - margin * 2]);
+    .range([0, width - oldMargin * 2]);
 
   const y = chart.yScale()
     .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
-    .range([height - margin, 0]);
+    .range([height - oldMargin, 0]);
 
   const draw = d3.line()
     .x((point) => x(chart.x(point.x)))
     .y((point) => y(chart.y(point.y)));
 
   svg.append('g')
-    .attr('transform', `translate(${margin},${height - margin})`)
+    .attr('transform', `translate(${oldMargin},${height - oldMargin})`)
     .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
 
   svg.append('g')
-    .attr('transform', `translate(${margin},0)`)
+    .attr('transform', `translate(${oldMargin},0)`)
     .call(d3.axisLeft(y).ticks(height / 40).tickFormat(chart.yFormat))
     .call((g) => g.select('.domain').remove())
     .call((g) => g.selectAll('.tick line').clone()
-      .attr('x2', width - margin * 2)
+      .attr('x2', width - oldMargin * 2)
       .attr('stroke-opacity', 0.1));
 
   Object.entries(graph.lines).forEach(([id, line]) => {
@@ -63,12 +64,12 @@ const initializeChart = () => {
       .attr('fill', 'none')
       .attr('stroke', chart.color(id))
       .attr('stroke-width', 1.5)
-      .attr('transform', `translate(${margin},0)`)
+      .attr('transform', `translate(${oldMargin},0)`)
       .attr('d', draw);
 
     line.forEach((point) => {
       svg.append('circle')
-        .attr('cx', x(chart.x(point.x)) + margin)
+        .attr('cx', x(chart.x(point.x)) + oldMargin)
         .attr('cy', y(chart.y(point.y)))
         .attr('r', 4)
         .style('opacity', 0)
@@ -79,7 +80,7 @@ const initializeChart = () => {
 
           tooltipContent.value = HoverTemplate;
           tooltipProps.value = {
-            tooltipConfig: {
+            tooltipConfig: <TooltipConfig>{
               xLabel: chart.xLabel(),
               xFormat: chart.xFormat,
               lines: graph.lines,
