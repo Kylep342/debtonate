@@ -1,11 +1,12 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router';
 
-import DebtonateView from "@/apps/debtonate/DebtonateView.vue";
-import AppreciateView from "@/apps/appreciate/AppreciateView.vue";
+import DebtonateView from '@/apps/debtonate/DebtonateView.vue';
+import AppreciateView from '@/apps/appreciate/AppreciateView.vue';
+import paths from '@/apps/shared/constants/routes';
 
 const routes = [
-  { path: "/", component: DebtonateView },
-  { path: "/appreciate", component: AppreciateView },
+  { path: paths.ROUTE_DEBTONATE, component: DebtonateView },
+  { path: paths.ROUTE_APPRECIATE, component: AppreciateView },
 ];
 
 const router = createRouter({

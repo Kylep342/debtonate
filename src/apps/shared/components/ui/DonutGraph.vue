@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
 import {
-  onMounted, ref, shallowReactive, watch,
+  onMounted, shallowReactive, watch,
 } from 'vue';
 
 import { Arc, GraphConfig } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   config: any,
-  graph: Arc[],
+  graph: Array<Arc>,
   anchorId: string,
 }>();
 

@@ -1,4 +1,4 @@
-const ROUTE_APPRECIATE = 'appreciate';
+const ROUTE_APPRECIATE = '/appreciate';
 const ROUTE_DEBTONATE = '/';
 
 export default Object.freeze({
