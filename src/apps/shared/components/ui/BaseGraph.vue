@@ -26,58 +26,62 @@ const updateTooltipSize = (size) => {
 
 const initializeChart = () => {
   const graph = chart.graphs[props.anchorId];
-  const width = 800;
-  const height = 500;
-  const oldMargin = 50;
-  const margin = {x: 40, y: 50}
-  const svg = d3.select('#graph').attr('width', width).attr('height', height);
+  const totalWidth = 800;
+  const totalHeight = 500;
+
+  const margin = { top: 20, right: 50, bottom: 40, left: 70 };
+
+  const innerWidth = totalWidth - margin.left - margin.right;
+  const innerHeight = totalHeight - margin.top - margin.bottom;
+
+  const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
 
   svg.selectAll('*').remove();
 
+  // Create a group element that will contain the chart, translated by the margin.
+  const g = svg.append('g')
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
   const x = chart.xScale()
     .domain([chart.x(0), chart.x(graph.config.maxX)])
-    .range([0, width - oldMargin * 2]);
+    .range([0, innerWidth]);
 
   const y = chart.yScale()
     .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
-    .range([height - oldMargin, 0]);
+    .range([innerHeight, 0]);
 
   const draw = d3.line()
     .x((point) => x(chart.x(point.x)))
     .y((point) => y(chart.y(point.y)));
 
-  svg.append('g')
-    .attr('transform', `translate(${oldMargin},${height - oldMargin})`)
-    .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
+  g.append('g')
+    .attr('transform', `translate(0, ${innerHeight})`)
+    .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0));
 
-  svg.append('g')
-    .attr('transform', `translate(${oldMargin},0)`)
-    .call(d3.axisLeft(y).ticks(height / 40).tickFormat(chart.yFormat))
+  g.append('g')
+    .call(d3.axisLeft(y).ticks(innerHeight / 40).tickFormat(chart.yFormat))
     .call((g) => g.select('.domain').remove())
     .call((g) => g.selectAll('.tick line').clone()
-      .attr('x2', width - oldMargin * 2)
+      .attr('x2', innerWidth)
       .attr('stroke-opacity', 0.1));
 
   Object.entries(graph.lines).forEach(([id, line]) => {
-    svg.append('path')
+    g.append('path')
       .datum(line)
       .attr('fill', 'none')
       .attr('stroke', chart.color(id))
       .attr('stroke-width', 1.5)
-      .attr('transform', `translate(${oldMargin},0)`)
       .attr('d', draw);
 
     line.forEach((point) => {
-      svg.append('circle')
-        .attr('cx', x(chart.x(point.x)) + oldMargin)
+      g.append('circle')
+        .attr('cx', x(chart.x(point.x)))
         .attr('cy', y(chart.y(point.y)))
         .attr('r', 4)
         .style('opacity', 0)
         .attr('fill', chart.color(id))
         .on('mouseover', (event) => {
-
           tooltipPosition.value = smartPosition(tooltipRef, event.x, event.y);
-
           tooltipContent.value = HoverTemplate;
           tooltipProps.value = {
             tooltipConfig: <TooltipConfig>{
