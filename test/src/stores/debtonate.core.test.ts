@@ -1,6 +1,7 @@
-import { Loan } from "moneyfunx";
-import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it } from "vitest";
+import * as d3 from 'd3';
+import { Loan } from 'moneyfunx';
+import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
@@ -9,9 +10,9 @@ import sharedKeys from '@/apps/shared/constants/keys';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const Loans = () => [
-  new Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, "house"),
-  new Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, "e-car", 23456.78, 200),
-  new Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, "tau", 6283.19 ),
+  new Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, 'house'),
+  new Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, 'e-car', 23456.78, 200),
+  new Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, 'tau', 6283.19 ),
 ];
 
 const Budgets = () => [
@@ -26,14 +27,14 @@ const RefinancingScenarios = (loan) => [
     loan.annualRate - 0.0075,
     constants.PERIODS_PER_YEAR,
     loan.termInYears + 1,
-    "lower rate longer term",
+    'lower rate longer term',
   ),
   new Loan(
     loan.currentBalance,
     loan.annualRate + 0.0150,
     constants.PERIODS_PER_YEAR,
     Math.max(loan.termInYears - 2, 2),
-    "higher rate shorter term",
+    'higher rate shorter term',
   ),
 ];
 
@@ -50,7 +51,7 @@ describe('Debtonate Core Store', () => {
 
     expect(
       state.loansWithTotals.map((loan) => loan.name)
-    ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, "e-car", "house", "tau"]);
+    ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, 'e-car', 'house', 'tau']);
 
     expect(
       state.monthlyBudgets.map((budget) => budget.relative)
@@ -141,7 +142,7 @@ describe('Debtonate Core Store', () => {
       expect(state.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
       expect(state.getBudgetIndex(firstBudgetId)).toBe(1);
       expect(state.getBudgetColor(firstBudgetId)).toBe(constants.COLORS[1]);
-      expect(state.getBudgetName(firstBudgetId)).toBe("Budget 1");
+      expect(state.getBudgetName(firstBudgetId)).toBe('Budget 1');
     });
   });
 
@@ -161,13 +162,13 @@ describe('Debtonate Core Store', () => {
       expect(
         state.loans.map((loan) => loan.name)
       ).toStrictEqual(
-        ["house"]
+        ['house']
       );
 
       expect(
         state.loansWithTotals.map((loan) => loan.name)
       ).toStrictEqual(
-        [constants.NAME_TOTALS_AS_LOAN, "house"]
+        [constants.NAME_TOTALS_AS_LOAN, 'house']
       );
     });
 
@@ -179,7 +180,7 @@ describe('Debtonate Core Store', () => {
 
       state.deleteLoan(firstLoanId);
       expect(state.loans.length).toBe(2);
-      expect(state.loans.map((loan) => loan.name)).toStrictEqual(["e-car", "tau"]);
+      expect(state.loans.map((loan) => loan.name)).toStrictEqual(['e-car', 'tau']);
     });
 
     it('edits a loan', async () => {
@@ -214,19 +215,19 @@ describe('Debtonate Core Store', () => {
       state.sortLoans();
       expect(
         state.loans.map((loan) => loan.name)
-      ).toStrictEqual(["e-car", "house", "tau"]);
+      ).toStrictEqual(['e-car', 'house', 'tau']);
 
       state.toggleSnowballSort();
       expect(state.snowballSort).toBe(true);
       expect(
         state.loans.map((loan) => loan.name)
-      ).toStrictEqual(["tau", "e-car", "house"]);
+      ).toStrictEqual(['tau', 'e-car', 'house']);
 
       state.toggleAvalancheSort();
       expect(state.snowballSort).toBe(false);
       expect(
         state.loans.map((loan) => loan.name)
-      ).toStrictEqual(["e-car", "house", "tau"]);
+      ).toStrictEqual(['e-car', 'house', 'tau']);
     });
 
     it('gets loan attributes', async () => {
@@ -236,7 +237,7 @@ describe('Debtonate Core Store', () => {
       expect(state.getLoanIndex(constants.TOTALS)).toBe(0);
       expect(state.getLoanName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_LOAN);
       expect(state.getLoanIndex(firstLoanId)).toBe(1);
-      expect(state.getLoanName(firstLoanId)).toBe("house");
+      expect(state.getLoanName(firstLoanId)).toBe('house');
       state.sortLoans();
       expect(state.getLoanIndex(firstLoanId)).toBe(2);
     });
@@ -319,7 +320,13 @@ describe('Debtonate Core Store', () => {
 
     state.budgets = Budgets();
     state.loans = Loans();
+
+    expect(state.totalMinPayment).toBe(state.rawTotalMinPayment);
+
     state.toggleRounding(200);
+
+    expect(state.totalMinPayment).toBe(state.roundedTotalMinPayment);
+
     state.toggleReducePayments();
     globalOptions.setCurrency('JPY');
     globalOptions.setLanguage('en-GB');
@@ -520,8 +527,15 @@ describe('Debtonate Core Store', () => {
   describe('with graphing', () => {
     it('configures graphs', async () => {
       const state = useDebtonateCoreStore();
+      const globalOptions = useGlobalOptionsStore();
+
+      expect(state.graphXScale).toStrictEqual(d3.scaleLinear);
+
       state.budgets = Budgets();
       state.loans = Loans();
+
+      const firstBudgetId = state.budgets[0].id;
+      const firstLoanId = state.loans[0].id;
 
       expect(
         Object.keys(state.graphs)
@@ -530,6 +544,43 @@ describe('Debtonate Core Store', () => {
         constants.GRAPH_INTEREST_SAVED_OVER_TIME,
         constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
       ]);
+
+      globalOptions.togglePeriodsAsDates();
+      expect(state.graphXScale).toStrictEqual(d3.scaleTime);
+
+      const l1B1Interest = state.cardGraphs[firstLoanId][firstBudgetId][0]
+      const l1B1Principal = state.cardGraphs[firstLoanId][firstBudgetId][1]
+
+      expect(Object.keys(l1B1Interest)).toStrictEqual([
+        'label',
+        'value',
+        'color',
+      ]);
+
+      expect(Object.keys(l1B1Principal)).toStrictEqual([
+        'label',
+        'value',
+        'color',
+      ]);
+
+      [
+        state.budgetCardGraphConfig,
+        state.loanCardGraphConfig,
+      ].forEach((config) => expect(Object.keys(config)).toStrictEqual([
+        'id',
+        'color',
+        'header',
+        'lineName',
+        'subheader',
+        'x',
+        'xFormat',
+        'xLabel',
+        'xScale',
+        'y',
+        'yFormat',
+        'yLabel',
+        'yScale',
+      ]));
     });
 
     it('computes balances over time graph inputs', async () => {

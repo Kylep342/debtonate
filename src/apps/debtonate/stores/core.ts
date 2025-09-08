@@ -570,10 +570,10 @@ export default defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       config[loan.id] = <Record<string, Arc[]>>{};
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
-        const totalsPaymentSummary = getPaymentSchedule(loan.id, budget.id);
+        const paymentSchedule = getPaymentSchedule(loan.id, budget.id);
         config[loan.id][budget.id] = [
-          { label: 'Lifetime Interest', value: totalsPaymentSummary.lifetimeInterest, color: constants.COLORS[0] },
-          { label: 'Lifetime Principal', value: totalsPaymentSummary.lifetimePrincipal, color: constants.COLORS[2] },
+          { label: 'Lifetime Interest', value: paymentSchedule.lifetimeInterest, color: constants.COLORS[0] },
+          { label: 'Lifetime Principal', value: paymentSchedule.lifetimePrincipal, color: constants.COLORS[2] },
         ];
       });
     });

@@ -358,11 +358,6 @@ export default defineStore('appreciateCore', () => {
     budgetId: string
   ): number => getContributionSchedule(instrumentId, budgetId).amortizationSchedule.length;
 
-  const getLifetimeGrowth = (
-    instrumentId: string,
-    budgetId: string
-  ): number => getContributionSchedule(instrumentId, budgetId).lifetimeGrowth;
-
   // budgets is sorted on every create; order preserved on delete
   const getMaxMoney = (
     instrumentId: string
@@ -370,28 +365,6 @@ export default defineStore('appreciateCore', () => {
     const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
     return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth
   };
-
-  // const getMaxGrowthBalanceRatio = (
-  //   instrumentId: string
-  // ): number => {
-  //   const bestSchedule = getContributionSchedule(instrumentId, monthlyBudgets.value[0].id)
-  //   return bestSchedule.lifetimeGrowth / (bestSchedule.lifetimeContribution + 1)
-  // };
-
-  const getGrowthUpToPeriod = (
-    instrumentId: string,
-    budgetId: string,
-    period: number
-  ): number => getContributionSchedule(
-    instrumentId,
-    budgetId
-  ).amortizationSchedule.slice(
-    0,
-    period
-  ).reduce(
-    (acc, record) => acc + record.growth,
-    0
-  );
 
   // title building functions
 
@@ -578,13 +551,12 @@ export default defineStore('appreciateCore', () => {
     getBudgetIndex,
     getBudgetName,
     getContributionSchedule,
-    getGrowthUpToPeriod,
     getInstrument,
     getInstrumentIndex,
     getInstrumentName,
-    getLifetimeGrowth,
     getNumContributions,
     graphs,
+    graphXScale,
     inflationFactor,
     instrumentCardGraphConfig,
     instrumentDetailsPanelActive,

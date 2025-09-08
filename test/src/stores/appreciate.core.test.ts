@@ -1,6 +1,7 @@
-import { Instrument } from "moneyfunx";
-import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it } from "vitest";
+import * as d3 from 'd3';
+import { Instrument } from 'moneyfunx';
+import { createPinia, setActivePinia } from 'pinia';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
@@ -33,7 +34,7 @@ describe('Appreciate Core Store', () => {
 
     expect(
       state.instrumentsWithTotals.map((instrument) => instrument.name)
-    ).toStrictEqual([constants.NAME_TOTALS_AS_AN_INSTRUMENT, "IRA", "401(K)", "ABC"]);
+    ).toStrictEqual([constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA', '401(K)', 'ABC']);
 
     expect(
       state.monthlyBudgets.map((budget) => budget.relative)
@@ -116,7 +117,7 @@ describe('Appreciate Core Store', () => {
       expect(state.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
       expect(state.getBudgetIndex(firstBudgetId)).toBe(1);
       expect(state.getBudgetColor(firstBudgetId)).toBe(constants.COLORS[1]);
-      expect(state.getBudgetName(firstBudgetId)).toBe("Budget 1");
+      expect(state.getBudgetName(firstBudgetId)).toBe('Budget 1');
     });
   });
 
@@ -134,13 +135,13 @@ describe('Appreciate Core Store', () => {
       expect(
         state.instruments.map((instrument) => instrument.name)
       ).toStrictEqual(
-        ["IRA"]
+        ['IRA']
       );
 
       expect(
         state.instrumentsWithTotals.map((instrument) => instrument.name)
       ).toStrictEqual(
-        [constants.NAME_TOTALS_AS_AN_INSTRUMENT, "IRA"]
+        [constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA']
       );
     });
 
@@ -153,7 +154,7 @@ describe('Appreciate Core Store', () => {
 
       state.deleteInstrument(firstInstrumentId);
       expect(state.instruments.length).toBe(2);
-      expect(state.instruments.map((instrument) => instrument.name)).toStrictEqual(["401(K)", "ABC"]);
+      expect(state.instruments.map((instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
     });
 
     it('edits an instrument', async () => {
@@ -404,8 +405,15 @@ describe('Appreciate Core Store', () => {
   describe('with graphing', () => {
     it('configures graphs', async () => {
       const state = useAppreciateCoreStore();
+      const globalOptions = useGlobalOptionsStore();
+
+      expect(state.graphXScale).toStrictEqual(d3.scaleLinear);
+
       state.budgets = Budgets();
       state.instruments = Instruments();
+
+      const firstBudgetId = state.budgets[0].id;
+      const firstInstrumentId = state.instruments[0].id;
 
       expect(
         Object.keys(state.graphs)
@@ -413,6 +421,43 @@ describe('Appreciate Core Store', () => {
         constants.GRAPH_BALANCES_OVER_TIME,
         constants.GRAPH_PURCHASING_POWER_OVER_TIME,
       ]);
+
+      globalOptions.togglePeriodsAsDates();
+      expect(state.graphXScale).toStrictEqual(d3.scaleTime);
+
+      const i1B1Interest = state.cardGraphs[firstInstrumentId][firstBudgetId][0]
+      const i1B1Contribution = state.cardGraphs[firstInstrumentId][firstBudgetId][1]
+
+      expect(Object.keys(i1B1Interest)).toStrictEqual([
+        'label',
+        'value',
+        'color',
+      ]);
+
+      expect(Object.keys(i1B1Contribution)).toStrictEqual([
+        'label',
+        'value',
+        'color',
+      ]);
+
+      [
+        state.budgetCardGraphConfig,
+        state.instrumentCardGraphConfig,
+      ].forEach((config) => expect(Object.keys(config)).toStrictEqual([
+        'id',
+        'color',
+        'header',
+        'lineName',
+        'subheader',
+        'x',
+        'xFormat',
+        'xLabel',
+        'xScale',
+        'y',
+        'yFormat',
+        'yLabel',
+        'yScale',
+      ]));
     });
 
     it('computs balances over time graphs', async () => {

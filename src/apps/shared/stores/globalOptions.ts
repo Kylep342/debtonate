@@ -19,7 +19,7 @@ export default defineStore('globalOptions', () => {
   const baseDate = ref<number>(Date.now()); // TODO: consider letting users modify the base date
   const currencies: Array<string> = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
   const currency = ref<string>(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
-  const language = ref<string>(navigator.language);
+  const language = ref<string>(navigator.language || 'en-US');
   const languages: Array<string> = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const periodsAsDates = ref<boolean>(false);
 

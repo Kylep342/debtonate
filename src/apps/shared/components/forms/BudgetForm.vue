@@ -2,8 +2,8 @@
 // NOTE: Explore dependency injection of store instantiation to make this a shared form; all else that is same looks valid
 import { computed, ref, watch } from 'vue';
 
-import constants from '../../constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import constants from '@/apps/shared/constants/constants';
 
 // defineProps<Function>({budgetStore: Object})()
 

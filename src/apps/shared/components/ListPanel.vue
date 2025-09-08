@@ -25,16 +25,16 @@ const createButton = computed<Button>(() => ({
 <template>
   <base-card :id="panelId" :class="['bg-base-100', 'w-90', 'flex-none']">
     <template #cardTitle>
-      <ManagementPanel 
-        :button="createButton" 
-        :menu="pivotMenu" 
-        :title="title" 
-        :class="['border-b-2']" 
+      <ManagementPanel
+        :button="createButton"
+        :menu="pivotMenu"
+        :title="title"
+        :class="['border-b-2']"
       />
     </template>
     <template #cardBody>
-      <div 
-        ref="scrollContainer" 
+      <div
+        ref="scrollContainer"
         :class="['border-r-2', 'overflow-y-auto', 'flex', 'flex-col', 'min-h-0']"
       >
         <ul>

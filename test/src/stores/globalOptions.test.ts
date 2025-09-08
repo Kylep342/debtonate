@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
@@ -95,5 +95,34 @@ describe('Global Options Store', () => {
     expect(globalOptions.currency).toBe(changedState[keys.LS_CURRENCY]);
     expect(globalOptions.language).toBe(changedState[keys.LS_LANGUAGE]);
     expect(globalOptions.periodsAsDates).toBe(changedState[keys.LS_PERIODS_AS_DATES]);
+  });
+
+  it('uses default currency and language when navigator.language is unrecognized', () => {
+    // Mock the 'language' property on the global navigator object
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('');
+
+    const globalOptions = useGlobalOptionsStore();
+
+    expect(globalOptions.language).toBe('en-US');
+    expect(globalOptions.currency).toBe('USD');
+
+    globalOptions.setLanguage('de-DE');
+    globalOptions.setCurrency('EUR');
+
+    expect(globalOptions.language).toBe('de-DE');
+    expect(globalOptions.currency).toBe('EUR');
+
+    globalOptions.clearState();
+
+    expect(globalOptions.language).toBe('en-US');
+    expect(globalOptions.currency).toBe('USD');
+  });
+
+  it('uses a default currency symbol when the symbol cannot be determined', () => {
+    const globalOptions = useGlobalOptionsStore();
+
+    globalOptions.setCurrency('WTF');
+
+    expect(globalOptions.currencySymbol).toBe('$');
   });
 });

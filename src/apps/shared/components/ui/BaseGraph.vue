@@ -8,15 +8,21 @@ import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
 import { smartPosition } from '@/apps/shared/functions/viewport';
 import { GraphConfig, TooltipConfig } from '@/apps/shared/types/graph';
 
+type TooltipProps = {
+  TooltipConfig,
+  index: number,
+  updateTooltipSize: (_: number) => void,
+}
+
 const props = defineProps<{
   graph: GraphConfig,
   anchorId: string
 }>();
 
 const chart = shallowReactive(<GraphConfig>{});
-const tooltipContent = shallowRef(null);
+const tooltipContent = shallowRef<HoverTemplate>(null);
 const tooltipPosition = ref({ left: 0, top: 0 });
-const tooltipProps = ref(null);
+const tooltipProps = ref<TooltipProps|null>(null);
 const tooltipRef = ref(null);
 const tooltipSize = ref({ width: 0, height: 0 });
 
@@ -29,7 +35,7 @@ const initializeChart = () => {
   const totalWidth = 800;
   const totalHeight = 500;
 
-  const margin = { top: 20, right: 50, bottom: 40, left: 70 };
+  const margin = { top: 20, right: 20, bottom: 40, left: 80 };
 
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
