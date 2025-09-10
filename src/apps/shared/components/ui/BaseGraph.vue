@@ -11,7 +11,7 @@ import { GraphConfig, TooltipConfig } from '@/apps/shared/types/graph';
 type TooltipProps = {
   TooltipConfig,
   index: number,
-  updateTooltipSize: (_: number) => void,
+  updateTooltipSize: (size: number) => void,
 }
 
 const props = defineProps<{

@@ -7,8 +7,8 @@ vi.mock('@/apps/shared/functions/viewport', () => ({
   fillHeight: vi.fn(),
 }));
 
-import { fillHeight } from '@/apps/shared/functions/viewport';
 import { useResize } from '@/apps/shared/composables/useResize';
+import { fillHeight } from '@/apps/shared/functions/viewport';
 
 const mountComposable = (callback: () => any) => {
   const TestComponent = defineComponent({
