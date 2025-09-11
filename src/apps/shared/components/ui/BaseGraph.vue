@@ -5,13 +5,13 @@ import {
 } from 'vue';
 
 import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
-import { smartPosition } from '@/apps/shared/functions/viewport';
+import { smartTransform } from '@/apps/shared/functions/viewport';
 import { GraphConfig, TooltipConfig } from '@/apps/shared/types/graph';
 
 type TooltipProps = {
-  TooltipConfig,
+  tooltipConfig: TooltipConfig,
   index: number,
-  updateTooltipSize: (size: number) => void,
+  updateTooltipSize: (size: { width: number, height: number }) => void,
 }
 
 const props = defineProps<{
@@ -20,31 +20,39 @@ const props = defineProps<{
 }>();
 
 const chart = shallowReactive(<GraphConfig>{});
-const tooltipContent = shallowRef<HoverTemplate>(null);
+const tooltipContent = shallowRef<typeof HoverTemplate | null>(null);
 const tooltipPosition = ref({ left: 0, top: 0 });
-const tooltipProps = ref<TooltipProps|null>(null);
-const tooltipRef = ref(null);
+const tooltipTransform = ref('translateX(0%) translateY(0%)');
+const tooltipProps = ref<TooltipProps | null>(null);
 const tooltipSize = ref({ width: 0, height: 0 });
 
 const updateTooltipSize = (size) => {
   tooltipSize.value = size;
 };
 
+// This watcher sets the CSS transform to move the HoverTemplate
+watch(tooltipSize, (newSize) => {
+  if (tooltipContent.value) {
+    tooltipTransform.value = smartTransform(
+      newSize,
+      tooltipPosition.value.left,
+      tooltipPosition.value.top
+    );
+  }
+}, { deep: true });
+
+
 const initializeChart = () => {
   const graph = chart.graphs[props.anchorId];
   const totalWidth = 800;
   const totalHeight = 500;
-
-  const margin = { top: 20, right: 20, bottom: 40, left: 80 };
-
+  const margin = { top: 20, right: 50, bottom: 40, left: 70 };
   const innerWidth = totalWidth - margin.left - margin.right;
   const innerHeight = totalHeight - margin.top - margin.bottom;
 
   const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
-
   svg.selectAll('*').remove();
 
-  // Create a group element that will contain the chart, translated by the margin.
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
@@ -87,7 +95,8 @@ const initializeChart = () => {
         .style('opacity', 0)
         .attr('fill', chart.color(id))
         .on('mouseover', (event) => {
-          tooltipPosition.value = smartPosition(tooltipRef, event.x, event.y);
+          tooltipPosition.value = { left: event.x, top: event.y };
+
           tooltipContent.value = HoverTemplate;
           tooltipProps.value = {
             tooltipConfig: <TooltipConfig>{
@@ -137,9 +146,10 @@ watch(
       {{ chart.subheader(anchorId) }}
     </h2>
     <svg id="graph" />
-    <div id="tooltip" ref="tooltipRef" :style="{
+    <div id="tooltip" :style="{
       left: tooltipPosition.left + 'px',
       top: tooltipPosition.top + 'px',
+      transform: tooltipTransform,
       opacity: tooltipContent ? 1 : 0
     }">
       <component :is="tooltipContent" v-bind="tooltipProps" />
@@ -151,6 +161,6 @@ watch(
 #tooltip {
   pointer-events: none;
   position: absolute;
-  transition: transform 0.1s ease;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out;
 }
 </style>

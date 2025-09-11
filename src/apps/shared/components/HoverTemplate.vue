@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { onUpdated, ref } from 'vue';
-
+import { onMounted, onUpdated, ref } from 'vue';
 import { TooltipConfig } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   tooltipConfig: TooltipConfig,
   index: number,
-  updateTooltipSize: Function,
+  updateTooltipSize: (size: { width: number, height: number }) => void,
 }>();
 
 const templateRef = ref(null);
 
-onUpdated(() => {
-  const rect = templateRef.value.getBoundingClientRect();
-  props.updateTooltipSize({ width: rect.width, height: rect.height });
-})
+const reportSize = () => {
+  if (templateRef.value?.$el) {
+    const rect = templateRef.value.$el.getBoundingClientRect();
+    props.updateTooltipSize({ width: rect.width, height: rect.height });
+  }
+};
+
+onMounted(reportSize);
+onUpdated(reportSize);
 </script>
 
 <template>
