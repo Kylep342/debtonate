@@ -145,6 +145,18 @@ export default defineStore('globalOptions', () => {
     return match ? match[0] : '$';
   });
 
+  const CurrencySymbol = (currency, code: string): string => {
+       const formatted = new Intl.NumberFormat(code, {
+      style: 'currency',
+      currency: currency,
+    }).format(1);
+
+    // Capture only the currency symbol
+    const match = formatted.match(/[\p{Sc}]+/u);
+
+    return match ? match[0] : '$';
+  }
+
   // setters
 
   /**
@@ -176,6 +188,7 @@ export default defineStore('globalOptions', () => {
     currencies,
     currency,
     currencySymbol,
+    CurrencySymbol,
     exportState,
     language,
     languages,

@@ -13,7 +13,7 @@ const props = defineProps<{
   createText: string;
 }>();
 
-const { scrollContainer } = useResize(props.panelId);
+const { scrollContainer } = useResize();
 
 const createButton = computed<Button>(() => ({
   text: props.createText,

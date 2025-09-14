@@ -166,11 +166,6 @@ export default defineStore('appreciateCore', () => {
     0,
   ));
 
-  // const totalEffectiveInterestRate = computed<number>(() => instruments.value.reduce(
-  //   (interestRate, instrument) => ,
-  //   0,
-  // ))
-
   const totalMaxPeriodsPerYear = computed<number>(
     () => instruments.value.reduce((curMax, instrument) => Math.max(curMax, instrument.periodsPerYear), 0),
   );
@@ -459,9 +454,9 @@ export default defineStore('appreciateCore', () => {
 
   const cardGraphs = computed<Record<string, Record<string, Arc[]>>>(() => {
     const config = <Record<string, Record<string, Arc[]>>>{};
-    instrumentsWithTotals.value.forEach((instrument) => {
+    instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
       config[instrument.id] = <Record<string, Arc[]>>{};
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const totalsContributionSummary = getContributionSchedule(instrument.id, budget.id);
         config[instrument.id][budget.id] = [
           { label: 'Lifetime Growth', value: totalsContributionSummary.lifetimeGrowth, color: constants.COLORS[0] },

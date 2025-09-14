@@ -9,6 +9,7 @@ const BUDGET_DETAILS_ID = 'budgetDetails';
 const BUDGET_FORM_ID = 'budgetForm';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
+const GRAPH_PAYMENT_BREAKDOWN = 'Payment | Time'
 const GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL = 'Percent of Payment as Principal | Time'
 const LOAN = 'Loan';
 const LOAN_DETAILS_ID = 'loanDetails';
@@ -28,6 +29,7 @@ export default Object.freeze({
   BUDGET_FORM_ID,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,
+  GRAPH_PAYMENT_BREAKDOWN,
   GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
   LOAN_DETAILS_ID,
   LOAN_DETAILS,

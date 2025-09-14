@@ -30,7 +30,7 @@ describe('useResize composable (with real useEvent)', () => {
     const MOCK_HEIGHT = 500;
     fillHeight.mockReturnValue(MOCK_HEIGHT);
 
-    const wrapper = mountComposable(() => useResize('resize'));
+    const wrapper = mountComposable(() => useResize());
 
     expect(fillHeight).toHaveBeenCalledTimes(1);
     expect(wrapper.vm.scrollContainer.style.maxHeight).toBe(`${MOCK_HEIGHT}px`);
@@ -44,7 +44,7 @@ describe('useResize composable (with real useEvent)', () => {
 
     fillHeight.mockReturnValue(INITIAL_HEIGHT);
 
-    const wrapper = mountComposable(() => useResize('resize'));
+    const wrapper = mountComposable(() => useResize());
 
     expect(wrapper.vm.scrollContainer.style.maxHeight).toBe(`${INITIAL_HEIGHT}px`);
 

@@ -608,7 +608,7 @@ export default defineStore('debtonateCore', () => {
       }
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
-        getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach((record, index) => {
+        getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach((record: moneyfunx.PaymentRecord, index: number) => {
           line.push({
             x: record.period,
             y: getInterestUpToPeriod(loan.id, constants.DEFAULT, index) -
@@ -640,7 +640,7 @@ export default defineStore('debtonateCore', () => {
     };
 
     // idea; toggle presence of lines as data with boolean k-v
-    loansWithTotals.value.forEach((loan) => {
+    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
       config.graphs[loan.id] = <Graph>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -648,9 +648,9 @@ export default defineStore('debtonateCore', () => {
         },
         lines: <Record<string, Point[]>>{},
       }
-      monthlyBudgets.value.forEach((budget) => {
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
-        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record) => {
+        getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach((record: moneyfunx.PaymentRecord) => {
           line.push({ x: record.period, y: (record.principal * 100) / (record.principal + record.interest) });
         });
         config.graphs[loan.id].lines[budget.id] = line;
