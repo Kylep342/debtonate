@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { useModal } from '@/apps/shared/composables/useModal';
-import BudgetDetailsPanel from './components/BudgetDetailsPanel.vue';
-import BudgetForm from '@/apps/shared/components/forms/BudgetForm.vue';
-import BudgetsPanel from './components/BudgetsPanel.vue';
-import constants from './constants/constants';
+import BudgetDetailsPanel from '@/apps/appreciate/components/BudgetDetailsPanel.vue';
+import BudgetForm from '@/apps/appreciate/components/forms/BudgetForm.vue';
+import BudgetsPanel from '@/apps/appreciate/components/BudgetsPanel.vue';
+import constants from '@/apps/appreciate/constants/constants';
 import FooterBar from '@/apps/shared/components/FooterBar.vue';
-import GraphsPanel from './components/GraphsPanel.vue';
-import HeaderBar from './components/HeaderBar.vue';
-import InstrumentDetailsPanel from './components/InstrumentDetailsPanel.vue';
-import InstrumentForm from './components/forms/InstrumentForm.vue';
-import InstrumentsPanel from './components/InstrumentsPanel.vue';
-import OptionsForm from './components/forms/OptionsForm.vue';
-import SiteIntro from './components/SiteIntro.vue';
-import useAppreciateCoreStore from './stores/core';
+import GraphsPanel from '@/apps/appreciate/components/GraphsPanel.vue';
+import HeaderBar from '@/apps/appreciate/components/HeaderBar.vue';
+import InstrumentDetailsPanel from '@/apps/appreciate/components/InstrumentDetailsPanel.vue';
+import InstrumentForm from '@/apps/appreciate/components/forms/InstrumentForm.vue';
+import InstrumentsPanel from '@/apps/appreciate/components/InstrumentsPanel.vue';
+import OptionsForm from '@/apps/appreciate/components/forms/OptionsForm.vue';
+import SiteIntro from '@/apps/appreciate/components/SiteIntro.vue';
+import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useModal } from '@/apps/shared/composables/useModal';
 
 const state = useAppreciateCoreStore();
 

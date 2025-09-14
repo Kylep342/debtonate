@@ -7,12 +7,28 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
 
-const sortedCurrencies = computed<Array<string>>(() => globalOptions.currencies.toSorted());
+type CurrencyCode = {
+  code: string,
+  label: string,
+}
+
 const sortedLanguages = computed<Array<string>>(() => globalOptions.languages.toSorted());
-const currenciesWithSymbols = computed<Record<string, string>>(() => {
-  const records = <Record<string, string>>{}
-  Object.entries(constants.LOCALE_CURRENCY).map(([code, currency]) => records[currency] = globalOptions.CurrencySymbol(currency, code))
-  return records
+const sortedCurrencies = computed<Array<CurrencyCode>>(() => {
+  const options = globalOptions.currencies.map(currencyCode => {
+    const locale = Object.keys(constants.LOCALE_CURRENCY).find(
+      locale => constants.LOCALE_CURRENCY[locale] === currencyCode
+    );
+
+    // returns a default of '$'
+    const symbol = globalOptions.CurrencySymbol(currencyCode, locale)
+
+    return {
+      code: currencyCode,
+      label: `${currencyCode} (${symbol})`,
+    };
+  });
+
+  return options.sort((a, b) => a.code.localeCompare(b.code));
 });
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -65,14 +81,12 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             v-model="globalOptions.currency"
             class="select select-bordered w-full max-w-xs"
           >
-              <!-- v-for="(symbol, currency) in currenciesWithSymbols" -->
             <option
-              v-for="currency in sortedCurrencies"
-              :key="currency"
-              :value="currency"
+              v-for="option in sortedCurrencies"
+              :key="option.code"
+              :value="option.code"
             >
-              {{ currency }}
-              <!-- {{ currency }} - {{ symbol }} -->
+              {{ option.label }}
             </option>
           </select>
         </div>

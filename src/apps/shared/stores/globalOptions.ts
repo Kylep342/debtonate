@@ -127,26 +127,8 @@ export default defineStore('globalOptions', () => {
   const Time = computed<string>(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
 
   // Computed values
-
-  /**
-   * Returns the current currency symbol
-   * defaults to '$'
-   */
-  const currencySymbol = computed<string>(() => {
-    // fixed to a style that leads with a symbol
-    const formatted = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency.value,
-    }).format(1);
-
-    // Capture only the currency symbol
-    const match = formatted.match(/[\p{Sc}]+/u);
-
-    return match ? match[0] : '$';
-  });
-
-  const CurrencySymbol = (currency, code: string): string => {
-       const formatted = new Intl.NumberFormat(code, {
+  const CurrencySymbol = (currency, locale: string): string => {
+       const formatted = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currency,
     }).format(1);
@@ -187,7 +169,6 @@ export default defineStore('globalOptions', () => {
     clearState,
     currencies,
     currency,
-    currencySymbol,
     CurrencySymbol,
     exportState,
     language,

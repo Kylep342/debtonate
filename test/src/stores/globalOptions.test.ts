@@ -18,7 +18,7 @@ describe('Global Options Store', () => {
 
       expect(globalOptions.currency).toBe('USD');
       expect(globalOptions.language).toBe('en-US');
-      expect(globalOptions.currencySymbol).toBe('$');
+      expect(globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.locale)).toBe('$');
       expect(globalOptions.Money(100)).toBe('$100.00');
 
       globalOptions.setLanguage('de-DE');
@@ -26,7 +26,7 @@ describe('Global Options Store', () => {
 
       expect(globalOptions.language).toBe('de-DE');
       expect(globalOptions.currency).toBe('EUR');
-      expect(globalOptions.currencySymbol).toBe('€');
+      expect(globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.language)).toBe('€');
     });
 
     it('styles percentages', async () => {
@@ -123,6 +123,6 @@ describe('Global Options Store', () => {
 
     globalOptions.setCurrency('WTF');
 
-    expect(globalOptions.currencySymbol).toBe('$');
+    expect(globalOptions.CurrencySymbol('WTF', globalOptions.locale)).toBe('$');
   });
 });
