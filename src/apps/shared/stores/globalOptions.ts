@@ -14,14 +14,15 @@ import { computed, ref } from 'vue';
 
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
+import { Locale } from '@/apps/shared/types/app';
 
 export default defineStore('globalOptions', () => {
   const baseDate = ref<number>(Date.now()); // TODO: consider letting users modify the base date
-  const currencies: Array<string> = [...new Set(Object.values(constants.LOCALE_CURRENCY))];
-  const currency = ref<string>(constants.LOCALE_CURRENCY[navigator.language] || 'USD');
-  const language = ref<string>(navigator.language || 'en-US');
-  const languages: Array<string> = [...new Set(Object.keys(constants.LOCALE_CURRENCY))];
   const periodsAsDates = ref<boolean>(false);
+  const locales: Array<Locale> = constants.LOCALES;
+  const locale: Locale = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
+  const currency = ref<string>(locale.currency);
+  const language = ref<string>(locale.code);
 
   // independent functions/computed values
 
@@ -31,8 +32,9 @@ export default defineStore('globalOptions', () => {
    * Resets modifiable state to initial state
    */
   const clearState = (): void => {
-    currency.value = constants.LOCALE_CURRENCY[navigator.language] || 'USD';
-    language.value = navigator.language || 'en-US';
+    locale.value = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
+    currency.value = locale.currency;
+    language.value = locale.code;
     periodsAsDates.value = false;
   };
 
@@ -167,13 +169,12 @@ export default defineStore('globalOptions', () => {
   return {
     baseDate,
     clearState,
-    currencies,
     currency,
     CurrencySymbol,
     exportState,
     language,
-    languages,
     loadState,
+    locales,
     Money,
     Percent,
     Period,

@@ -4,31 +4,40 @@ import { computed } from 'vue';
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
 import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions = useGlobalOptionsStore();
 
-type CurrencyCode = {
+type Currency = {
   code: string,
   label: string,
 }
 
-const sortedLanguages = computed<Array<string>>(() => globalOptions.languages.toSorted());
-const sortedCurrencies = computed<Array<CurrencyCode>>(() => {
-  const options = globalOptions.currencies.map(currencyCode => {
-    const locale = Object.keys(constants.LOCALE_CURRENCY).find(
-      locale => constants.LOCALE_CURRENCY[locale] === currencyCode
-    );
+type Language = {
+  code: string,
+  label: string
+}
 
-    // returns a default of '$'
-    const symbol = globalOptions.CurrencySymbol(currencyCode, locale)
+const sortedCurrencies = computed<Array<Currency>>(() => {
+  const options = globalOptions.locales.map((locale: Locale) => {
+    // const symbol = globalOptions.CurrencySymbol(locale.currency, locale.code)
 
-    return {
-      code: currencyCode,
-      label: `${currencyCode} (${symbol})`,
+    return <Currency>{
+      code: locale.currency,
+      label: `${locale.currency} (${locale.flag})`,
     };
   });
 
-  return options.sort((a, b) => a.code.localeCompare(b.code));
+  return options.sort((a, b: Currency) => a.code.localeCompare(b.code));
+});
+const sortedLanguages = computed<Array<Language>>(() => {
+  const options = globalOptions.locales.map((locale: Locale) => {
+    return <Language>{
+      code: locale.code,
+      label: `${locale.code} (${locale.flag})`
+    };
+  });
+  return options.sort((a, b: Language) => a.code.localeCompare(b.code));
 });
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -109,11 +118,11 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             class="select select-bordered w-full max-w-xs"
           >
             <option
-              v-for="language in sortedLanguages"
-              :key="language"
-              :value="language"
+              v-for="option in sortedLanguages"
+              :key="option.code"
+              :value="option.code"
             >
-              {{ language }}
+              {{ option.label }}
             </option>
           </select>
         </div>
