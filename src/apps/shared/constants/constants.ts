@@ -1,5 +1,18 @@
+/**
+ * Shared constants across apps
+ *
+ */
 import { TOTALS } from 'moneyfunx';
 
+import { Locale } from '@/apps/shared/types/app';
+
+// constant values for:
+//  buttons
+//  colors
+//  locales
+//  cross-app keywords
+
+// Buttons
 const BTN_CLEAR = 'Clear';
 const BTN_COPY = 'Copy';
 const BTN_CREATE = 'Create';
@@ -14,11 +27,17 @@ const BTN_OPTIONS = 'Options';
 const BTN_PIVOT = 'Pivot';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
+
+// Budgets
 const BUDGET = 'Budget';
 const BUDGET_DETAILS = 'Budget Details';
 const BUDGET_FORM_ID = 'budgetForm'
 const BUDGETS = 'Budgets';
+
+// User feedback Google form
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
+
+// App color scheme
 const COLORS = [
   'oklch(80.74% 0.0525 159.09)',
   'oklch(76.87% 0.1041 22.66)',
@@ -29,56 +48,59 @@ const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPHS = 'Graphs';
 
-const LOCALE_CURRENCY = {
-  'ar-AE': 'AED', // UAE Dirham
-  'ar-EG': 'EGP', // Egyptian Pound
-  'ar-SA': 'SAR', // Saudi Riyal
-  'bg-BG': 'BGN', // Bulgarian Lev
-  'cs-CZ': 'CZK', // Czech Koruna
-  'da-DK': 'DKK', // Danish Krone
-  'de-DE': 'EUR', // Euro (Germany)
-  'en-AU': 'AUD', // Australian Dollar
-  'en-CA': 'CAD', // Canadian Dollar
-  'en-GB': 'GBP', // British Pound Sterling
-  'en-NG': 'NGN', // Nigerian Naira
-  'en-NZ': 'NZD', // New Zealand Dollar
-  'en-SG': 'SGD', // Singapore Dollar
-  'en-US': 'USD', // United States Dollar
-  'en-ZA': 'ZAR', // South African Rand
-  'es-AR': 'ARS', // Argentine Peso
-  'es-CL': 'CLP', // Chilean Peso
-  'es-CO': 'COP', // Colombian Peso
-  'es-ES': 'EUR', // Euro (Spain)
-  'es-MX': 'MXN', // Mexican Peso
-  'es-PE': 'PEN', // Peruvian Sol
-  'es-UY': 'UYU', // Uruguayan Peso
-  'es-VE': 'VES', // Venezuelan Bolívar
-  'fi-FI': 'EUR', // Euro (Finland)
-  'fr-CA': 'CAD', // Canadian Dollar (French)
-  'fr-FR': 'EUR', // Euro (France)
-  'he-IL': 'ILS', // Israeli New Shekel
-  'hi-IN': 'INR', // Indian Rupee
-  'hu-HU': 'HUF', // Hungarian Forint
-  'id-ID': 'IDR', // Indonesian Rupiah
-  'it-IT': 'EUR', // Euro (Italy)
-  'ja-JP': 'JPY', // Japanese Yen
-  'ko-KR': 'KRW', // South Korean Won
-  'ms-MY': 'MYR', // Malaysian Ringgit
-  'nl-NL': 'EUR', // Euro (Netherlands)
-  'no-NO': 'NOK', // Norwegian Krone
-  'pl-PL': 'PLN', // Polish Złoty
-  'pt-BR': 'BRL', // Brazilian Real
-  'pt-PT': 'EUR', // Euro (Portugal)
-  'ro-RO': 'RON', // Romanian Leu
-  'ru-RU': 'RUB', // Russian Ruble
-  'sv-SE': 'SEK', // Swedish Krona
-  'th-TH': 'THB', // Thai Baht
-  'uk-UA': 'UAH', // Ukrainian Hryvnia
-  'vi-VN': 'VND', // Vietnamese Dong
-  'zh-CN': 'CNY', // Chinese Yuan
-  'zh-HK': 'HKD', // Hong Kong Dollar
-  'zh-TW': 'TWD', // New Taiwan Dollar
-};
+// Internationalization metadata
+//  for formatting money, percents, dates
+const LOCALES = <Array<Locale>>[
+  { code: 'ar-AE', currency: 'AED', flag: '🇦🇪' }, // UAE Dirham
+  { code: 'ar-EG', currency: 'EGP', flag: '🇪🇬' }, // Egyptian Pound
+  { code: 'ar-SA', currency: 'SAR', flag: '🇸🇦' }, // Saudi Riyal
+  { code: 'bg-BG', currency: 'BGN', flag: '🇧🇬' }, // Bulgarian Lev
+  { code: 'cs-CZ', currency: 'CZK', flag: '🇨🇿' }, // Czech Koruna
+  { code: 'da-DK', currency: 'DKK', flag: '🇩🇰' }, // Danish Krone
+  { code: 'de-DE', currency: 'EUR', flag: '🇩🇪' }, // Euro (Germany)
+  { code: 'en-AU', currency: 'AUD', flag: '🇦🇺' }, // Australian Dollar
+  { code: 'en-CA', currency: 'CAD', flag: '🇨🇦' }, // Canadian Dollar
+  { code: 'en-GB', currency: 'GBP', flag: '🇬🇧' }, // British Pound Sterling
+  { code: 'en-NG', currency: 'NGN', flag: '🇳🇬' }, // Nigerian Naira
+  { code: 'en-NZ', currency: 'NZD', flag: '🇳🇿' }, // New Zealand Dollar
+  { code: 'en-SG', currency: 'SGD', flag: '🇸🇬' }, // Singapore Dollar
+  { code: 'en-US', currency: 'USD', flag: '🇺🇸' }, // United States Dollar
+  { code: 'en-ZA', currency: 'ZAR', flag: '🇿🇦' }, // South African Rand
+  { code: 'es-AR', currency: 'ARS', flag: '🇦🇷' }, // Argentine Peso
+  { code: 'es-CL', currency: 'CLP', flag: '🇨🇱' }, // Chilean Peso
+  { code: 'es-CO', currency: 'COP', flag: '🇨🇴' }, // Colombian Peso
+  { code: 'es-ES', currency: 'EUR', flag: '🇪🇸' }, // Euro (Spain)
+  { code: 'es-MX', currency: 'MXN', flag: '🇲🇽' }, // Mexican Peso
+  { code: 'es-PE', currency: 'PEN', flag: '🇵🇪' }, // Peruvian Sol
+  { code: 'es-UY', currency: 'UYU', flag: '🇺🇾' }, // Uruguayan Peso
+  { code: 'es-VE', currency: 'VES', flag: '🇻🇪' }, // Venezuelan Bolívar
+  { code: 'fi-FI', currency: 'EUR', flag: '🇫🇮' }, // Euro (Finland)
+  { code: 'fr-CA', currency: 'CAD', flag: '🇨🇦' }, // Canadian Dollar (French)
+  { code: 'fr-FR', currency: 'EUR', flag: '🇫🇷' }, // Euro (France)
+  { code: 'he-IL', currency: 'ILS', flag: '🇮🇱' }, // Israeli New Shekel
+  { code: 'hi-IN', currency: 'INR', flag: '🇮🇳' }, // Indian Rupee
+  { code: 'hu-HU', currency: 'HUF', flag: '🇭🇺' }, // Hungarian Forint
+  { code: 'id-ID', currency: 'IDR', flag: '🇮🇩' }, // Indonesian Rupiah
+  { code: 'it-IT', currency: 'EUR', flag: '🇮🇹' }, // Euro (Italy)
+  { code: 'ja-JP', currency: 'JPY', flag: '🇯🇵' }, // Japanese Yen
+  { code: 'ko-KR', currency: 'KRW', flag: '🇰🇷' }, // South Korean Won
+  { code: 'ms-MY', currency: 'MYR', flag: '🇲🇾' }, // Malaysian Ringgit
+  { code: 'nl-NL', currency: 'EUR', flag: '🇳🇱' }, // Euro (Netherlands)
+  { code: 'no-NO', currency: 'NOK', flag: '🇳🇴' }, // Norwegian Krone
+  { code: 'pl-PL', currency: 'PLN', flag: '🇵🇱' }, // Polish Złoty
+  { code: 'pt-BR', currency: 'BRL', flag: '🇧🇷' }, // Brazilian Real
+  { code: 'pt-PT', currency: 'EUR', flag: '🇵🇹' }, // Euro (Portugal)
+  { code: 'ro-RO', currency: 'RON', flag: '🇷🇴' }, // Romanian Leu
+  { code: 'ru-RU', currency: 'RUB', flag: '🇷🇺' }, // Russian Ruble
+  { code: 'sv-SE', currency: 'SEK', flag: '🇸🇪' }, // Swedish Krona
+  { code: 'th-TH', currency: 'THB', flag: '🇹🇭' }, // Thai Baht
+  { code: 'uk-UA', currency: 'UAH', flag: '🇺🇦' }, // Ukrainian Hryvnia
+  { code: 'vi-VN', currency: 'VND', flag: '🇻🇳' }, // Vietnamese Dong
+  { code: 'zh-CN', currency: 'CNY', flag: '🇨🇳' }, // Chinese Yuan
+  { code: 'zh-HK', currency: 'HKD', flag: '🇭🇰' }, // Hong Kong Dollar
+  { code: 'zh-TW', currency: 'TWD', flag: '🇹🇼' }, // New Taiwan Dollar
+];
+
 const NAME_APPRECIATE = 'Appreciate';
 const NAME_DEBTONATE = 'Debtonate';
 const NAME_MIN_BUDGET = 'Minimum Budget';
@@ -110,7 +132,7 @@ export default Object.freeze({
   DATE,
   DEFAULT,
   GRAPHS,
-  LOCALE_CURRENCY,
+  LOCALES,
   NAME_APPRECIATE,
   NAME_DEBTONATE,
   NAME_MIN_BUDGET,
