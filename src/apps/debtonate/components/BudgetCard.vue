@@ -31,14 +31,14 @@ const graph = computed(() => state.cardGraphs[props.viewedLoanId][props.budget.i
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed<Array<Button>>(() => ([
+const baseButtons = computed<Button[]>(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.loans.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
 
-const editButtons = computed<Array<Button>>(() => ([
+const editButtons = computed<Button[]>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,

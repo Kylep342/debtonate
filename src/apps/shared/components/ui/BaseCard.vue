@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ bodyClasses?: Array<string> }>();
+defineProps<{ bodyClasses?: string[] }>();
 </script>
 
 <template>

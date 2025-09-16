@@ -50,7 +50,7 @@ const GRAPHS = 'Graphs';
 
 // Internationalization metadata
 //  for formatting money, percents, dates
-const LOCALES = <Array<Locale>>[
+const LOCALES = <Locale[]>[
   { code: 'ar-AE', currency: 'AED', flag: '🇦🇪' }, // UAE Dirham
   { code: 'ar-EG', currency: 'EGP', flag: '🇪🇬' }, // Egyptian Pound
   { code: 'ar-SA', currency: 'SAR', flag: '🇸🇦' }, // Saudi Riyal

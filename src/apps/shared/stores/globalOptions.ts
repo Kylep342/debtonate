@@ -19,7 +19,7 @@ import { Locale } from '@/apps/shared/types/app';
 export default defineStore('globalOptions', () => {
   const baseDate = ref<number>(Date.now()); // TODO: consider letting users modify the base date
   const periodsAsDates = ref<boolean>(false);
-  const locales: Array<Locale> = constants.LOCALES;
+  const locales: Locale[] = constants.LOCALES;
   const locale: Locale = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
   const currency = ref<string>(locale.currency);
   const language = ref<string>(locale.code);

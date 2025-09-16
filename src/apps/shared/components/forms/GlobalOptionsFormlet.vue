@@ -8,36 +8,30 @@ import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions = useGlobalOptionsStore();
 
-type Currency = {
-  code: string,
-  label: string,
-}
-
-type Language = {
-  code: string,
+type Option = {
+  option: string,
   label: string
 }
 
-const sortedCurrencies = computed<Array<Currency>>(() => {
+const sortedCurrencies = computed<Option[]>(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
-    // const symbol = globalOptions.CurrencySymbol(locale.currency, locale.code)
 
-    return <Currency>{
-      code: locale.currency,
+    return <Option>{
+      option: locale.currency,
       label: `${locale.currency} (${locale.flag})`,
     };
   });
 
-  return options.sort((a, b: Currency) => a.code.localeCompare(b.code));
+  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
 });
-const sortedLanguages = computed<Array<Language>>(() => {
+const sortedLanguages = computed<Option[]>(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
-    return <Language>{
-      code: locale.code,
+    return <Option>{
+      option: locale.code,
       label: `${locale.code} (${locale.flag})`
     };
   });
-  return options.sort((a, b: Language) => a.code.localeCompare(b.code));
+  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
 });
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
@@ -91,11 +85,11 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             class="select select-bordered w-full max-w-xs"
           >
             <option
-              v-for="option in sortedCurrencies"
-              :key="option.code"
-              :value="option.code"
+              v-for="currency in sortedCurrencies"
+              :key="currency.option"
+              :value="currency.option"
             >
-              {{ option.label }}
+              {{ currency.label }}
             </option>
           </select>
         </div>
@@ -118,11 +112,11 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             class="select select-bordered w-full max-w-xs"
           >
             <option
-              v-for="option in sortedLanguages"
-              :key="option.code"
-              :value="option.code"
+              v-for="language in sortedLanguages"
+              :key="language.option"
+              :value="language.option"
             >
-              {{ option.label }}
+              {{ language.label }}
             </option>
           </select>
         </div>

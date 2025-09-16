@@ -28,14 +28,14 @@ const graph = computed(() => state.cardGraphs[props.instrument.id][props.viewedB
 
 const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
 
-const baseButtons = computed<Array<Button>>(() => ([
+const baseButtons = computed<Button[]>(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.instruments.length ? state.viewInstrument(props.instrument.id) : alertButtonIsDisabled(),
   },
 ]));
 
-const editButtons = computed<Array<Button>>(() => ([
+const editButtons = computed<Button[]>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -47,7 +47,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const buttons = computed<Array<Button>>(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
+const buttons = computed<Button[]>(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
 </script>
 
 <template>

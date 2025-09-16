@@ -29,14 +29,14 @@ export default defineStore('appreciateCore', () => {
   const accrueBeforeContribution = ref<boolean>(false);
   const budgetDetailsPanelActive = ref<boolean>(false);
   const budgetFormActive = ref<boolean>(false);
-  const budgets = ref<Array<Budget>>([]);
+  const budgets = ref<Budget[]>([]);
   const currentBudgetId = ref<string|null>(null);
   const currentInstrumentId = ref<string|null>(null);
   const deflateAllMoney = ref<boolean>(false);
   const inflationFactor = ref<number>(constants.DEFAULT_INFLATION_FACTOR);
   const instrumentDetailsPanelActive = ref<boolean>(false);
   const instrumentFormActive = ref<boolean>(false);
-  const instruments = ref<Array<moneyfunx.Instrument>>([]);
+  const instruments = ref<moneyfunx.Instrument[]>([]);
   const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
   const yearsToContribute = ref<number>(constants.DEFAULT_YEARS_TO_CONTRIBUTE);
@@ -141,7 +141,7 @@ export default defineStore('appreciateCore', () => {
     }
   };
 
-  const avalanche = (): Array<moneyfunx.Instrument> => moneyfunx.sortWith(
+  const avalanche = (): moneyfunx.Instrument[] => moneyfunx.sortWith(
     moneyfunx.sortWith(instruments.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
@@ -208,7 +208,7 @@ export default defineStore('appreciateCore', () => {
     annualLimit: totalAnnualLimit.value,
   }));
 
-  const instrumentsWithTotals = computed<Array<moneyfunx.IInstrument>>(() => [totalsAsAnInstrument.value, ...instruments.value]);
+  const instrumentsWithTotals = computed<moneyfunx.IInstrument[]>(() => [totalsAsAnInstrument.value, ...instruments.value]);
 
   const getInstrument = (id: string): moneyfunx.IInstrument|undefined => instrumentsWithTotals.value.find((instrument) => instrument.id === id);
 
@@ -233,7 +233,7 @@ export default defineStore('appreciateCore', () => {
 
   /** Budgets */
 
-  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
+  const monthlyBudgets = computed<MonthlyBudget[]>(() => ([...budgets.value, minimumBudget].map((budget) => ({
     ...budget,
     absolute: budget.relative,
   }))));

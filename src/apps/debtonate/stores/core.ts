@@ -28,12 +28,12 @@ export default defineStore('debtonateCore', () => {
 
   const budgetDetailsPanelActive = ref<boolean>(false);
   const budgetFormActive = ref<boolean>(false);
-  const budgets = ref<Array<Budget>>([]);
+  const budgets = ref<Budget[]>([]);
   const currentBudgetId = ref<string|null>(null);
   const currentLoanId = ref<string|null>(null);
   const loanDetailsPanelActive = ref(false);
   const loanFormActive = ref<boolean>(false);
-  const loans = ref<Array<moneyfunx.Loan>>([]);
+  const loans = ref<moneyfunx.Loan[]>([]);
   const minimumBudget: Budget = {id: constants.DEFAULT, relative: 0};
   const optionsFormActive = ref<boolean>(false);
   const reducePayments = ref<boolean>(true);
@@ -198,11 +198,11 @@ export default defineStore('debtonateCore', () => {
     fees: totalFees.value,
   }));
 
-  const loansWithTotals = computed<Array<moneyfunx.ILoan>>(() => [totalsAsALoan.value, ...loans.value]);
+  const loansWithTotals = computed<moneyfunx.ILoan[]>(() => [totalsAsALoan.value, ...loans.value]);
 
   const getLoan = (id: string): moneyfunx.ILoan|undefined => loansWithTotals.value.find((loan) => loan.id === id);
 
-  const monthlyBudgets = computed<Array<MonthlyBudget>>(() => ([...budgets.value, minimumBudget].map((budget) => ({
+  const monthlyBudgets = computed<MonthlyBudget[]>(() => ([...budgets.value, minimumBudget].map((budget) => ({
       ...budget,
       absolute: budget.relative + totalMinPayment.value,
     }))));
@@ -254,11 +254,11 @@ export default defineStore('debtonateCore', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+  const avalanche = (): moneyfunx.Loan[] => moneyfunx.sortWith(
     moneyfunx.sortWith(loans.value, moneyfunx.snowball),
     moneyfunx.avalanche,
   );
-  const snowball = (): Array<moneyfunx.Loan> => moneyfunx.sortWith(
+  const snowball = (): moneyfunx.Loan[] => moneyfunx.sortWith(
     moneyfunx.sortWith(loans.value, moneyfunx.avalanche),
     moneyfunx.snowball,
   );

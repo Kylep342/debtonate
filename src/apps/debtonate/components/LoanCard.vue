@@ -23,7 +23,7 @@ const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.p
 const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
 const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
 
-const buttons = computed<Array<Button>>(() => props.loan.id === constants.TOTALS ? baseButtons.value : editButtons.value);
+const buttons = computed<Button[]>(() => props.loan.id === constants.TOTALS ? baseButtons.value : editButtons.value);
 const header = computed<string>(() => state.loanCardGraphConfig.header(props.viewedBudgetId));
 const loanName = computed<string>(() => state.getLoanName(props.loan.id));
 
@@ -31,7 +31,7 @@ const graph = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetI
 
 const alertButtonIsDisabled = () => alert('Create a loan to use this action');
 
-const baseButtons = computed<Array<Button>>(() => ([
+const baseButtons = computed<Button[]>(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.loans.length ? state.viewLoan(props.loan.id) : alertButtonIsDisabled(),
@@ -42,7 +42,7 @@ const baseButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const editButtons = computed<Array<Button>>(() => ([
+const editButtons = computed<Button[]>(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,

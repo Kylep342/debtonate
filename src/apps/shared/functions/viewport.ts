@@ -12,16 +12,6 @@ export const fillWidth = (componentRef, rightDelta=0) => {
   return availableWidth;
 };
 
-//
-export const smartPosition = (componentRef, hOffset=0, vOffset=0) => {
-  const cRef = componentRef.value.getBoundingClientRect();
-  const height = cRef.height;
-  const width = cRef.width;
-  const xScale = Math.sign(window.innerWidth - (Math.max(hOffset, 0) + width));
-  const yScale = Math.sign(window.innerHeight - (Math.max(vOffset, 0) + height));
-  return { left: hOffset + (xScale * width), top: vOffset + (yScale * height) }
-};
-
 /**
  * Calculates the optimal CSS transform to keep a tooltip within the viewport.
  *

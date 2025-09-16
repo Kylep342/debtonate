@@ -15,7 +15,7 @@ const {
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
 
-const budgetSelectors = computed<Array<Button>>(
+const budgetSelectors = computed<Button[]>(
   () => (state.monthlyBudgets.map((budget) => ({
     text: state.getBudgetName(budget.id),
     onClick: () => setViewedBudgetId(budget.id),

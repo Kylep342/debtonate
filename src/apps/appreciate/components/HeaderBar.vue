@@ -14,7 +14,7 @@ const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())
 );
 
-const buttons: Array<Button> = [
+const buttons: Button[] = [
   { text: constants.BTN_OPTIONS, onClick: state.openOptionsForm },
   { text: constants.BTN_LOAD, onClick: state.loadState },
   { text: constants.BTN_SAVE, onClick: state.saveState },

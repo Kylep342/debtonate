@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import { fillHeight, fillWidth, smartPosition } from '@/apps/shared/functions/viewport';
+import { fillHeight, fillWidth, smartTransform } from '@/apps/shared/functions/viewport';
 import LoansPanel from '@/apps/debtonate/components/LoansPanel.vue';
 
 

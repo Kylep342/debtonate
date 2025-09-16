@@ -16,7 +16,7 @@ const {
   setViewedItemId: setViewedLoanId
 } = usePivot(constants.TOTALS);
 
-const loanSelectors = computed<Array<Button>>(
+const loanSelectors = computed<Button[]>(
   () => (state.loansWithTotals.map((loan) => ({
     text: state.getLoanName(loan.id),
     onClick: () => setViewedLoanId(loan.id),
@@ -32,7 +32,7 @@ const defaultBudgetIndex = computed<number>(
   () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
 );
 
-const orderedBudgets = computed<Array<MonthlyBudget>>(() => [
+const orderedBudgets = computed<MonthlyBudget[]>(() => [
   state.monthlyBudgets[defaultBudgetIndex.value],
   ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
