@@ -12,10 +12,6 @@ const state = useDebtonateCoreStore();
 const cardRefs = ref([]);
 const allCollapsed = ref<boolean>(false);
 
-onBeforeUpdate(() => {
-  cardRefs.value = [];
-});
-
 const toggleAllCards = () => {
   allCollapsed.value = !allCollapsed.value;
   cardRefs.value.forEach(card => {
@@ -26,6 +22,10 @@ const toggleAllCards = () => {
     }
   });
 };
+
+onBeforeUpdate(() => {
+  cardRefs.value = [];
+});
 
 const reducePaymentsExample = computed<string>(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),

@@ -12,9 +12,7 @@ const state = useAppreciateCoreStore();
 const cardRefs = ref([]);
 const allCollapsed = ref<boolean>(false);
 
-onBeforeUpdate(() => {
-  cardRefs.value = [];
-});
+const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
 const toggleAllCards = () => {
   allCollapsed.value = !allCollapsed.value;
@@ -27,7 +25,9 @@ const toggleAllCards = () => {
   });
 };
 
-const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor * 100)} per year`)
+onBeforeUpdate(() => {
+  cardRefs.value = [];
+});
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
