@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onBeforeUpdate } from 'vue';
 
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
@@ -8,6 +8,26 @@ import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions = useGlobalOptionsStore();
 
+const cardRefs = ref([]);
+
+onBeforeUpdate(() => {
+  cardRefs.value = [];
+});
+
+const collapseAll = () => {
+  cardRefs.value.forEach(card => card.collapse());
+};
+
+const expandAll = () => {
+  cardRefs.value.forEach(card => card.expand());
+};
+
+defineExpose({
+  collapseAll,
+  expandAll,
+});
+
+
 type Option = {
   option: string,
   label: string
@@ -15,13 +35,11 @@ type Option = {
 
 const sortedCurrencies = computed<Option[]>(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
-
     return <Option>{
       option: locale.currency,
       label: `${locale.currency} (${locale.flag})`,
     };
   });
-
   return options.sort((a, b: Option) => a.option.localeCompare(b.option));
 });
 const sortedLanguages = computed<Option[]>(() => {
@@ -44,7 +62,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
   <hr>
   <br>
   <div :class="['formInputs']">
-    <collapsible-card>
+    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Periods as Dates
@@ -71,7 +89,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
         </div>
       </template>
     </collapsible-card>
-    <collapsible-card>
+    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Currency
@@ -98,7 +116,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
         <p>Money: {{ globalOptions.Money(100) }}</p>
       </template>
     </collapsible-card>
-    <collapsible-card>
+    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Locale

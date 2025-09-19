@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, onBeforeUpdate, ref } from 'vue';
+
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
@@ -6,6 +8,26 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
+
+const cardRefs = ref([]);
+const allCollapsed = ref<boolean>(false);
+
+onBeforeUpdate(() => {
+  cardRefs.value = [];
+});
+
+const toggleAllCards = () => {
+  allCollapsed.value = !allCollapsed.value;
+  cardRefs.value.forEach(card => {
+    if (allCollapsed.value) {
+      card.collapse();
+    } else {
+      card.expand();
+    }
+  });
+};
+
+const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor * 100)} per year`)
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
@@ -28,12 +50,20 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </base-button>
     </template>
     <template #body>
-      <h3>Appreciate Options</h3>
+      <div class="flex justify-between items-center">
+        <h3>Appreciate Options</h3>
+        <base-button
+          :class="['btn-sm']"
+          @click="toggleAllCards"
+        >
+          {{ allCollapsed ? 'All +' : 'All -' }}
+        </base-button>
+      </div>
       <br>
       <hr>
       <br>
       <div :class="['formInputs']">
-        <collapsible-card>
+        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Accrue Before Contribution
@@ -61,7 +91,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Inflation
@@ -91,7 +121,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
-                When enabled this deflates <b><i>all</i></b> future money to current year money (CYM) at a rate of {{ globalOptions.Percent(state.inflationFactor) }} per year
+                {{ deflationExample }}
               </p>
               <br>
               <p>
@@ -100,7 +130,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Years to Contribute
@@ -126,7 +156,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Years to Spend

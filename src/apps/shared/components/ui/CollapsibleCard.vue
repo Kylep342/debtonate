@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 
 defineProps<{ bodyClasses?: string[] }>();
@@ -9,6 +8,19 @@ const isCollapsed = ref<boolean>(false);
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
 };
+
+const collapse = () => {
+  isCollapsed.value = true;
+};
+
+const expand = () => {
+  isCollapsed.value = false;
+};
+
+defineExpose({
+  collapse,
+  expand,
+});
 </script>
 
 <template>
