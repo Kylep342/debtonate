@@ -146,7 +146,7 @@ export default defineStore('appreciateCore', () => {
     moneyfunx.avalanche,
   );
 
-  const deflate = (amount: number, periods: number): number => (amount * ((1 - inflationFactor.value / constants.PERIODS_PER_YEAR) ** periods));
+  const deflate = (amount: number, periods: number): number => (amount * ((1 - inflationRate.value / constants.PERIODS_PER_YEAR) ** periods));
 
   const sortInstruments = () => {
     instruments.value = avalanche();
@@ -155,6 +155,8 @@ export default defineStore('appreciateCore', () => {
   /** dependent computed options/functions */
 
   // total values across all instruments
+
+  const inflationRate = computed<number>(() => inflationFactor.value / 100);
 
   const totalAnnualLimit = computed<number>(() => instruments.value.reduce(
     (annualLimit, instrument) => annualLimit + instrument.annualLimit,
@@ -553,6 +555,7 @@ export default defineStore('appreciateCore', () => {
     graphs,
     graphXScale,
     inflationFactor,
+    inflationRate,
     instrumentCardGraphConfig,
     instrumentDetailsPanelActive,
     instrumentFormActive,

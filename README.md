@@ -15,16 +15,21 @@ In a shell of your choice, from project root:
 ```
 
 View the app [in your browser](http://localhost:5173)
+
 ** If the link above does not work, localhost:5173 is already in use **
+
 ** Check process logs to see where vite serves the app **
 
 
 ### Upcoming
-
-2.0 - Appreciate: The investment side of personal finance
 
 Shared idea: "(focused) time travel view" - show cards 'at period X' in addtion to present value
  - visual table with selectable 'at period X'
  - essentially (maybe?) permanent HoverTemplate
 
  flag to always meet annual maximums across instruments (i.e. set minimum budget to 0 or instruments.reduce((instrument, accumulator) => instrument.annualLimit + accumulator, 0))
+
+
+Want to have a comparison/summary page
+
+e.g. for X (Instrument) show effects of each Y (Budget) side-by-side

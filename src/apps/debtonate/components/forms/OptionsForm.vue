@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
@@ -8,6 +8,34 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 
 const globalOptions = useGlobalOptionsStore();
 const state = useDebtonateCoreStore();
+
+const repaymentCardRef = ref(null);
+const reducePaymentsCardRef = ref(null);
+const refinancingCardRef = ref(null);
+const roundingCardRef = ref(null);
+
+const globalOptionsFormletRef = ref(null);
+
+const cardRefs = computed(() => [
+  repaymentCardRef.value,
+  reducePaymentsCardRef.value,
+  refinancingCardRef.value,
+  roundingCardRef.value,
+].filter(Boolean));
+
+const allCollapsed = ref<boolean>(false);
+
+const toggleAllCards = (): void => {
+  allCollapsed.value = !allCollapsed.value;
+  const action = allCollapsed.value ? 'collapse' : 'expand';
+  const childAction = allCollapsed.value ? 'collapseAll' : 'expandAll';
+
+  cardRefs.value.forEach(card => card[action]());
+
+  if (globalOptionsFormletRef.value) {
+    globalOptionsFormletRef.value[childAction]();
+  }
+};
 
 const reducePaymentsExample = computed<string>(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),
@@ -41,12 +69,17 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </base-button>
     </template>
     <template #body>
-      <h3>Debtonate Options</h3>
+      <div class="flex justify-between items-center">
+        <h3>Debtonate Options</h3>
+        <base-button :class="['btn-sm']" @click="toggleAllCards">
+          {{ allCollapsed ? '+' : '-' }}
+        </base-button>
+      </div>
       <br>
       <hr>
       <br>
       <div :class="['formInputs']">
-        <collapsible-card>
+        <collapsible-card ref="repaymentCardRef">
           <template #cardTitle>
             <div :class="['flex', 'flex-row']">
               <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
@@ -75,7 +108,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card ref="reducePaymentsCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Reduce Payments
@@ -102,7 +135,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card ref="refinancingCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Refinancing - Use Highest Payment
@@ -132,7 +165,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card>
+        <collapsible-card ref="roundingCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Rounding
@@ -167,7 +200,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
         <br>
         <hr>
         <br>
-        <global-options-formlet />
+        <global-options-formlet ref="globalOptionsFormletRef" />
       </div>
     </template>
   </base-modal>
