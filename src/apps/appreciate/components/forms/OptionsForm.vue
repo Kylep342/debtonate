@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUpdate, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
@@ -9,25 +9,36 @@ import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
 const globalOptions = useGlobalOptionsStore();
 const state = useAppreciateCoreStore();
 
-const cardRefs = ref([]);
+const accrualCardRef = ref(null);
+const inflationCardRef = ref(null);
+const yearsToContributeCardRef= ref(null);
+const yearsToSPendCardRef = ref(null);
+
+const globalOptionsFormletRef = ref(null);
+
+const cardRefs = computed(() => [
+  accrualCardRef.value,
+  inflationCardRef.value,
+  yearsToContributeCardRef.value,
+  yearsToSPendCardRef.value,
+].filter(Boolean));
+
 const allCollapsed = ref<boolean>(false);
 
-const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
-const toggleAllCards = () => {
+const toggleAllCards = (): void => {
   allCollapsed.value = !allCollapsed.value;
-  cardRefs.value.forEach(card => {
-    if (allCollapsed.value) {
-      card.collapse();
-    } else {
-      card.expand();
-    }
-  });
-};
+  const action = allCollapsed.value ? 'collapse' : 'expand';
+  const childAction = allCollapsed.value ? 'collapseAll' : 'expandAll';
 
-onBeforeUpdate(() => {
-  cardRefs.value = [];
-});
+  cardRefs.value.forEach(card => card[action]());
+
+  if (globalOptionsFormletRef.value) {
+    globalOptionsFormletRef.value[childAction]();
+  }
+}
+
+const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
 const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
@@ -56,14 +67,14 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           :class="['btn-sm']"
           @click="toggleAllCards"
         >
-          {{ allCollapsed ? 'All +' : 'All -' }}
+          {{ allCollapsed ? '+' : '-' }}
         </base-button>
       </div>
       <br>
       <hr>
       <br>
       <div :class="['formInputs']">
-        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+        <collapsible-card ref="accrualCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Accrue Before Contribution
@@ -91,7 +102,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+        <collapsible-card ref="inflationCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Inflation
@@ -130,7 +141,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+        <collapsible-card ref="yearsToContributeCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Years to Contribute
@@ -156,7 +167,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+        <collapsible-card ref="yearsToSPendCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Years to Spend
@@ -185,7 +196,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
         <br>
         <hr>
         <br>
-        <global-options-formlet />
+        <global-options-formlet ref="globalOptionsFormletRef" />
       </div>
     </template>
   </base-modal>
