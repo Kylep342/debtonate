@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  ref,
-  onBeforeUpdate,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, onBeforeUpdate, ComputedRef } from 'vue';
 
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';

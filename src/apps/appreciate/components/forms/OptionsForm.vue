@@ -40,8 +40,8 @@ const toggleAllCards = (): void => {
 
 const deflationExample: ComputedRef<string> = computed(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
-const buttonStyle = (flag: string) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag: string) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const buttonStyle = (flag: boolean) => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
@@ -61,7 +61,7 @@ const buttonText = (flag: string) => (flag ? constants.BTN_ON : constants.BTN_OF
       </base-button>
     </template>
     <template #body>
-      <div class="card-actions">
+      <div class="flex justify-between items-center">
         <h3>Appreciate Options</h3>
         <base-button
           :class="['btn-sm']"
@@ -199,11 +199,3 @@ const buttonText = (flag: string) => (flag ? constants.BTN_ON : constants.BTN_OF
     </template>
   </base-modal>
 </template>
-
-<style scoped>
-.card-actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-</style>

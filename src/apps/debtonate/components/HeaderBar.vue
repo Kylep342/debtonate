@@ -6,9 +6,8 @@ import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stor
 import { Button } from '@/apps/shared/types/app';
 import routes from '@/apps/shared/constants/routes';
 
-const state: DebtonateCoreStore = useDebtonateCoreStore();
-
 const router: Router = useRouter();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())
