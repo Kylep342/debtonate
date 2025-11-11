@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUpdate } from 'vue';
+import { computed, ref, onBeforeUpdate, ComputedRef } from 'vue';
 
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Locale } from '@/apps/shared/types/app';
 
-const globalOptions = useGlobalOptionsStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
 const cardRefs = ref([]);
 
@@ -33,27 +33,27 @@ type Option = {
   label: string
 }
 
-const sortedCurrencies = computed<Option[]>(() => {
+const sortedCurrencies: ComputedRef<Option[]> = computed(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
     return <Option>{
       option: locale.currency,
       label: `${locale.currency} (${locale.flag})`,
     };
   });
-  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
+  return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
 });
-const sortedLanguages = computed<Option[]>(() => {
+const sortedLanguages: ComputedRef<Option[]> = computed(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
     return <Option>{
       option: locale.code,
       label: `${locale.code} (${locale.flag})`
     };
   });
-  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
+  return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
 });
 
-const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>

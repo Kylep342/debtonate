@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 
 import App from '@/App.vue';
 import router from '@/apps/router';
+import DataTable from '@/apps/shared/components/DataTable.vue';
 import BaseAlert from '@/apps/shared/components/ui/BaseAlert.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
@@ -29,6 +30,7 @@ app.component('BaseModal', BaseModal);
 app.component('BaseTable', BaseTable);
 app.component('BaseTabs', BaseTabs);
 app.component('CollapsibleCard', CollapsibleCard);
+app.component('DataTable', DataTable);
 app.component('DonutGraph', DonutGraph);
 
 app.use(pinia);

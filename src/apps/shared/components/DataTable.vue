@@ -12,10 +12,10 @@ defineProps<{
 
 <template>
   <div>
-    <div>
+    <header>
       <h3 :class="['text-center']">{{ title }}</h3>
       <h5 :class="['text-center']">{{ subtitle }}</h5>
-    </div>
+    </header>
     <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto']">
       <base-table :class="['table-sm']">
         <template #header>
@@ -39,8 +39,7 @@ defineProps<{
         <template #footer>
           <tfoot>
             <tr>
-              <td :class="['textLeft']"><b>Totals:</b></td>
-              <td v-for="header in headers.slice(1)" :key="header.key" :class="header.class || 'text-right'">
+              <td v-for="header in headers" :key="header.key" :class="header.class || 'text-right'">
                 <b>{{ totals[header.key] }}</b>
               </td>
             </tr>

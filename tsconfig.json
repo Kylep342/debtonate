@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    // --- Project Setup ---
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    // --- Vue/TSX Integration ---
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+
+    // --- VITE ALIAS RESOLUTION ---
+    // Sets the base folder for module lookups to 'src'
+    "baseUrl": "./src",
+    "paths": {
+      // Maps '@/' alias from vite.config.js to relative path in baseUrl
+      "@/*": ["*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    // Include the entire test directory for global type awareness
+    "test/**/*.ts"
+  ],
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ]
+}

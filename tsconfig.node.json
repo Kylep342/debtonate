@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    // --- Node Environment Setup ---
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // Explicitly include Node and Vitest types for test and config files
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    // Node configuration file (even if it's currently a .js file)
+    "vite.config.js",
+
+    // All test files
+    "test/**/*.ts"
+  ]
+}

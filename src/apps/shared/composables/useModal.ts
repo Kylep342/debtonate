@@ -1,4 +1,4 @@
-import { watch } from "vue";
+import { watch, ComputedRef } from "vue";
 
 /**
  * Registers a watcher to show/close a modal dialog element.
@@ -6,8 +6,8 @@ import { watch } from "vue";
  * @param {boolean} flag - A reactive boolean controlling the modal's visibility.
  * @param {string} domId - The ID of the modal dialog element.
  */
-export function useModal(flag: boolean, domId: string): void {
-  watch(flag, async (value) => {
+export function useModal(flag: ComputedRef<boolean>, domId: string): void {
+  watch(flag, async (value: boolean) => {
     const modal = document.getElementById(domId) as HTMLDialogElement | null;
 
     // check to ensure modal element is on page

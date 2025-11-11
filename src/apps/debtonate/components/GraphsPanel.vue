@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import GraphsFrame from '@/apps/shared/components/GraphsFrame.vue';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ComputedRef } from 'vue';
 import { Button, Menu } from '@/apps/shared/types/app';
 import { useResize } from '@/apps/shared/composables/useResize';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';
@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const { scrollContainer } = useResize();
 
-const createButton = computed<Button>(() => ({
+const createButton: ComputedRef<Button> = computed(() => ({
   text: props.createText,
   onClick: props.createItem,
   classes: ['btn-success', 'text-center'],

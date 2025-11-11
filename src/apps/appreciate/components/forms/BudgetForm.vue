@@ -1,19 +1,19 @@
 <script setup lang="ts">
 // NOTE: Explore dependency injection of store instantiation to make this a shared form; all else that is same looks valid
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 
-const state = useAppreciateCoreStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const amount = ref<number | null>(null);
+const amount: Ref<number | null> = ref(null);
 
-const createButtonEnabled = computed<boolean>(
-  () => !Number.isNaN(amount.value) && amount.value > 0
+const createButtonEnabled: ComputedRef<boolean> = computed(
+  () => !Number.isNaN(amount.value) && amount.value !== null && amount.value > 0
 );
 
-const createBudgetButtonText = computed<string>(() => (
+const createBudgetButtonText: ComputedRef<string> = computed(() => (
   state.currentBudgetId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
@@ -23,7 +23,7 @@ watch(
   () => state.currentBudgetId,
   (newId) => {
     if (newId && state.budgetFormActive) {
-      const currentBudget = state.getBudget(newId);
+      const currentBudget = state.getBudget(newId)!;
       amount.value = currentBudget.relative;
     }
   },
@@ -40,7 +40,7 @@ const exit = () => {
 };
 
 const createBudget = () => {
-  state.createBudget(amount.value);
+  state.createBudget(amount.value!);
   exit();
 };
 </script>

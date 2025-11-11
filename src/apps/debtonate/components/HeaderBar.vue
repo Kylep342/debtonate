@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter, Router } from 'vue-router';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '@/apps/debtonate/constants/constants';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { Button } from '@/apps/shared/types/app';
-import constants from '@/apps/shared/constants/constants';
 import routes from '@/apps/shared/constants/routes';
 
-const state = useDebtonateCoreStore();
-
-const router = useRouter();
+const router: Router = useRouter();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
-const globalOptions = useGlobalOptionsStore();
-const state = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const accrualCardRef = ref(null);
 const inflationCardRef = ref(null);
@@ -23,7 +23,7 @@ const cardRefs = computed(() => [
   yearsToSPendCardRef.value,
 ].filter(Boolean));
 
-const allCollapsed = ref<boolean>(false);
+const allCollapsed: Ref<boolean> = ref(false);
 
 
 const toggleAllCards = (): void => {
@@ -38,10 +38,10 @@ const toggleAllCards = (): void => {
   }
 }
 
-const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
+const deflationExample: ComputedRef<string> = computed(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
-const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const buttonStyle = (flag: boolean) => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
@@ -70,8 +70,6 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           {{ allCollapsed ? '+' : '-' }}
         </base-button>
       </div>
-      <br>
-      <hr>
       <br>
       <div :class="['formInputs']">
         <collapsible-card ref="accrualCardRef">

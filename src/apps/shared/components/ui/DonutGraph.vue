@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
-import {
-  onMounted, shallowReactive, watch,
-} from 'vue';
+import { onMounted, shallowReactive, watch, ShallowReactive } from 'vue';
 
 import { Arc, GraphConfig } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   config: any,
-  graph: Array<Arc>,
+  graph: Arc[],
   anchorId: string,
 }>();
 
 const elId = `donut-graph-${props.anchorId}`;
 
-const chart = shallowReactive(<GraphConfig>{});
+const chart: ShallowReactive<GraphConfig> = shallowReactive({});
 
 const initializeChart = () => {
   const width = 300;

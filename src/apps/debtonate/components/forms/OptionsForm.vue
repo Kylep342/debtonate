@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
-const globalOptions = useGlobalOptionsStore();
-const state = useDebtonateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const repaymentCardRef = ref(null);
 const reducePaymentsCardRef = ref(null);
@@ -23,7 +24,7 @@ const cardRefs = computed(() => [
   roundingCardRef.value,
 ].filter(Boolean));
 
-const allCollapsed = ref<boolean>(false);
+const allCollapsed: Ref<boolean> = ref(false);
 
 const toggleAllCards = (): void => {
   allCollapsed.value = !allCollapsed.value;
@@ -37,10 +38,10 @@ const toggleAllCards = (): void => {
   }
 };
 
-const reducePaymentsExample = computed<string>(
+const reducePaymentsExample: ComputedRef<string> = computed(
   () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),
 );
-const refinancingUseHighestPaymentExample = computed<string>(() => {
+const refinancingUseHighestPaymentExample: ComputedRef<string> = computed(() => {
   if (state.loans.length) {
     const firstLoan = state.loans[0]
     const basePayment = firstLoan.minPayment;
@@ -50,12 +51,12 @@ const refinancingUseHighestPaymentExample = computed<string>(() => {
   }
   return '';
 });
-const repaymentPriorityExample = computed<string>(
-  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
+const repaymentPriorityExample: ComputedRef<string> = computed(
+  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: moneyfunx.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
 );
 
-const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>

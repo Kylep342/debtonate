@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 describe('Global Options Store', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Global Options Store', () => {
 
   describe('with global options', () => {
     it('styles currency', async () => {
-      const globalOptions = useGlobalOptionsStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       globalOptions.setCurrency('USD');
       globalOptions.setLanguage('en-US');
 
@@ -30,7 +30,7 @@ describe('Global Options Store', () => {
     });
 
     it('styles percentages', async () => {
-      const globalOptions = useGlobalOptionsStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       globalOptions.setLanguage('en-US');
 
       expect(globalOptions.language).toBe('en-US');
@@ -42,7 +42,7 @@ describe('Global Options Store', () => {
     });
 
     it('styles dates', async () => {
-      const globalOptions = useGlobalOptionsStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       const baseDate = new Date(globalOptions.baseDate)
       globalOptions.setLanguage('en-US');
 
@@ -69,7 +69,7 @@ describe('Global Options Store', () => {
   });
 
   it('handles internal globalOptions', async () => {
-    const globalOptions = useGlobalOptionsStore();
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
     const initialState = globalOptions.exportState();
 
     expect(Object.keys(initialState)).toStrictEqual([
@@ -101,7 +101,7 @@ describe('Global Options Store', () => {
     // Mock the 'language' property on the global navigator object
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('');
 
-    const globalOptions = useGlobalOptionsStore();
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
     expect(globalOptions.language).toBe('en-US');
     expect(globalOptions.currency).toBe('USD');
@@ -119,7 +119,7 @@ describe('Global Options Store', () => {
   });
 
   it('uses a default currency symbol when the symbol cannot be determined', () => {
-    const globalOptions = useGlobalOptionsStore();
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
     globalOptions.setCurrency('WTF');
 

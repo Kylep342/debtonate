@@ -1,21 +1,22 @@
 import * as d3 from 'd3';
-import { Instrument } from 'moneyfunx';
+import * as moneyfunx from 'moneyfunx';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const Instruments = () => [
-  new Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
-  new Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
-  new Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
+const Instruments = (): moneyfunx.Instrument[] => [
+  new moneyfunx.Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
+  new moneyfunx.Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
+  new moneyfunx.Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
 ];
 
-const Budgets = () => [
+const Budgets = (): MonthlyBudget[] => [
   { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
@@ -27,17 +28,17 @@ describe('Appreciate Core Store', () => {
   });
 
   it('has correct total values', async () => {
-    const state = useAppreciateCoreStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
     state.sortInstruments();
 
     expect(
-      state.instrumentsWithTotals.map((instrument) => instrument.name)
+      state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.name)
     ).toStrictEqual([constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA', '401(K)', 'ABC']);
 
     expect(
-      state.monthlyBudgets.map((budget) => budget.relative)
+      state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
     ).toStrictEqual([1200, 555, 200, 0]);
 
     expect(state.totalAnnualLimit).toBe(30000);
@@ -46,10 +47,10 @@ describe('Appreciate Core Store', () => {
 
   describe('with budgets', async () => {
     it('creates a budget', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.createBudget(100);
       expect(
-        state.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.absolute.toFixed(2))
       ).toStrictEqual(['100.00', '0.00']);
 
       state.instruments = Instruments();
@@ -57,27 +58,27 @@ describe('Appreciate Core Store', () => {
 
       state.createBudget(200);
       expect(
-        state.monthlyBudgets.map((budget) => budget.absolute.toFixed(2))
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.absolute.toFixed(2))
       ).toStrictEqual(['200.00', '100.00', '0.00']);
     });
 
     it('deletes a budget', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       expect(
-        state.monthlyBudgets.map((budget) => budget.relative)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
       ).toStrictEqual([1200, 555, 200, 0]);
 
       const firstBudgetId = state.monthlyBudgets[0].id;
       const firstBudget = state.getBudget(firstBudgetId);
       state.deleteBudget(firstBudget.id);
       expect(
-        state.monthlyBudgets.map((budget) => budget.relative)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
       ).toStrictEqual([555, 200, 0]);
     });
 
     it('edits a budget', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
       const firstBudget = state.getBudget(firstBudgetId);
@@ -96,20 +97,20 @@ describe('Appreciate Core Store', () => {
     });
 
     it('sorts budgets', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       expect(
-        state.monthlyBudgets.map((budget) => budget.relative)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
       ).toStrictEqual([1200, 555, 200, 0]);
 
       state.createBudget(350);
       expect(
-        state.monthlyBudgets.map((budget) => budget.relative)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
       ).toStrictEqual([1200, 555, 350, 200, 0]);
     });
 
     it('gets budget attributes', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
       expect(state.getBudgetIndex(constants.DEFAULT)).toBe(4);
@@ -123,7 +124,7 @@ describe('Appreciate Core Store', () => {
 
   describe('with instruments', async () => {
     it('creates an instrument', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       const firstInstrumentDummy = Instruments()[0]
       state.createInstrument(
         firstInstrumentDummy.currentBalance,
@@ -133,20 +134,20 @@ describe('Appreciate Core Store', () => {
       );
 
       expect(
-        state.instruments.map((instrument) => instrument.name)
+        state.instruments.map((instrument: moneyfunx.Instrument) => instrument.name)
       ).toStrictEqual(
         ['IRA']
       );
 
       expect(
-        state.instrumentsWithTotals.map((instrument) => instrument.name)
+        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.name)
       ).toStrictEqual(
         [constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA']
       );
     });
 
     it('deletes an instrument', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.instruments = Instruments();
       state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
@@ -154,11 +155,11 @@ describe('Appreciate Core Store', () => {
 
       state.deleteInstrument(firstInstrumentId);
       expect(state.instruments.length).toBe(2);
-      expect(state.instruments.map((instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
+      expect(state.instruments.map((instrument: moneyfunx.Instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
     });
 
     it('edits an instrument', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.instruments = Instruments();
       state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
@@ -183,7 +184,7 @@ describe('Appreciate Core Store', () => {
     });
 
     it('gets intstrument attributes', async () => {
-      const state = useAppreciateCoreStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.instruments = Instruments();
       state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
@@ -195,8 +196,8 @@ describe('Appreciate Core Store', () => {
   });
 
   it('handles internal state', async () => {
-    const state = useAppreciateCoreStore();
-    const globalOptions = useGlobalOptionsStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
     const initialState = state.exportState();
     expect(Object.keys(initialState)).toStrictEqual([
@@ -228,9 +229,9 @@ describe('Appreciate Core Store', () => {
 
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument) => instrument.name)
+      (instrument: moneyfunx.Instrument) => instrument.name)
     ).toStrictEqual(initialState[keys.LS_INSTRUMENTS].map(
-      (instrument) => instrument.name
+      (instrument: moneyfunx.Instrument) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(initialState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(initialState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -243,9 +244,9 @@ describe('Appreciate Core Store', () => {
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument) => instrument.name
+      (instrument: moneyfunx.Instrument) => instrument.name
     )).toStrictEqual(changedState[keys.LS_INSTRUMENTS].map(
-      (instrument) => instrument.name
+      (instrument: moneyfunx.Instrument) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(changedState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(changedState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -257,7 +258,7 @@ describe('Appreciate Core Store', () => {
   });
 
   it('manages component states', async () => {
-    const state = useAppreciateCoreStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
     // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
     const firstBudgetId = state.monthlyBudgets[1].id;
@@ -319,7 +320,7 @@ describe('Appreciate Core Store', () => {
   });
 
   it('builds titles', async () => {
-    const state = useAppreciateCoreStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
     state.sortInstruments();
@@ -358,21 +359,21 @@ describe('Appreciate Core Store', () => {
   });
 
   it('computes contribution schedules', async () => {
-    const state = useAppreciateCoreStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
 
     expect(
       Object.keys(state.contributionScenarios)
     ).toStrictEqual(
-      state.monthlyBudgets.map((budget) => budget.id)
+      state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
     );
 
-    state.monthlyBudgets.forEach((budget) => {
+    state.monthlyBudgets.forEach((budget: MonthlyBudget) => {
       expect(
         Object.keys(state.contributionScenarios[budget.id].contributionSchedule)
       ).toStrictEqual(
-        [...state.instruments.map((instrument) => instrument.id), constants.TOTALS]
+        [...state.instruments.map((instrument: moneyfunx.Instrument) => instrument.id), constants.TOTALS]
       );
       expect(
         state.contributionScenarios[budget.id].contributionAmount
@@ -383,29 +384,29 @@ describe('Appreciate Core Store', () => {
   });
 
   it('computes contribution summaries', async () => {
-    const state = useAppreciateCoreStore();
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
     state.instruments = Instruments();
 
     expect(
       Object.keys(state.contributionSchedules)
     ).toStrictEqual(
-      state.instrumentsWithTotals.map((instrument) => instrument.id)
+      state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
     );
 
     Object.keys(state.contributionSchedules).forEach((instrumentId) => {
       expect(
         Object.keys(state.contributionSchedules[instrumentId])
       ).toStrictEqual(
-        state.monthlyBudgets.map((budget) => budget.id)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
       );
     });
   });
 
   describe('with graphing', () => {
     it('configures graphs', async () => {
-      const state = useAppreciateCoreStore();
-      const globalOptions = useGlobalOptionsStore();
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
       expect(state.graphXScale).toStrictEqual(d3.scaleLinear);
 
@@ -445,6 +446,7 @@ describe('Appreciate Core Store', () => {
         state.instrumentCardGraphConfig,
       ].forEach((config) => expect(Object.keys(config)).toStrictEqual([
         'id',
+        'type',
         'color',
         'header',
         'lineName',
@@ -460,26 +462,26 @@ describe('Appreciate Core Store', () => {
       ]));
     });
 
-    it('computs balances over time graphs', async () => {
-      const state = useAppreciateCoreStore();
+    it('computs balances over time graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets(); state.loans = Instruments();
 
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument) => instrument.id)
+        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
       );
     });
 
-    it('computs purchasing power over time graphs', async () => {
-      const state = useAppreciateCoreStore();
+    it('computs purchasing power over time graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       state.instruments = Instruments();
 
       expect(
         Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument) => instrument.id)
+        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
       );
     })
   });

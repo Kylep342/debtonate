@@ -10,31 +10,66 @@
  *
  */
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 import { Locale } from '@/apps/shared/types/app';
 
-export default defineStore('globalOptions', () => {
-  const baseDate = ref<number>(Date.now()); // TODO: consider letting users modify the base date
-  const periodsAsDates = ref<boolean>(false);
+
+// --- Types --- //
+
+type CurrencyCode = (typeof constants.LOCALES)[number]['currency'];
+type LanguageCode = (typeof constants.LOCALES)[number]['code'];
+
+export interface GlobalOptionsState {
+  baseDate: Ref<number>;
+  currency: Ref<CurrencyCode>;
+  language: Ref<LanguageCode>;
+  locales: Locale[];
+  periodsAsDates: Ref<boolean>;
+};
+
+export interface GlobalOptionsGetters {
+  /** State-aware label for periods in either period or date format */
+  Time: ComputedRef<string>;
+};
+
+export interface GlobalOptionsActions {
+  clearState: () => void;
+  CurrencySymbol: (currency: CurrencyCode, localeCode: LanguageCode) => string;
+  exportState: () => Record<string, string | boolean>;
+  loadState: () => void;
+  Money: (amount: number) => string;
+  Percent: (amount: number) => string;
+  Period: (period: number, asStr?: boolean) => string | number | Date;
+  saveState: () => void;
+  setCurrency: (newCurrency: CurrencyCode) => void;
+  setLanguage: (newLanguage: LanguageCode) => void;
+  togglePeriodsAsDates: () => void;
+};
+
+// --- Store --- //
+
+export const useGlobalOptionsStore = defineStore('globalOptions', () => {
+
+  /** STATE */
+
+  const baseDate: Ref<number> = ref(Date.now()); // TODO: consider letting users modify the base date
+  const periodsAsDates: Ref<boolean> = ref(false);
   const locales: Locale[] = constants.LOCALES;
-  const locale: Locale = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
-  const currency = ref<string>(locale.currency);
-  const language = ref<string>(locale.code);
+  const defaultLocale: Locale = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
+  const currency: Ref<CurrencyCode> = ref(defaultLocale.currency);
+  const language: Ref<LanguageCode> = ref(defaultLocale.code);
 
-  // independent functions/computed values
 
-  // The state functions below are for user-modifiable state only
+  /** ACTIONS */
 
-  /**
-   * Resets modifiable state to initial state
-   */
+  // state management
+
   const clearState = (): void => {
-    locale.value = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
-    currency.value = locale.currency;
-    language.value = locale.code;
+    currency.value = defaultLocale.currency;
+    language.value = defaultLocale.code;
     periodsAsDates.value = false;
   };
 
@@ -43,9 +78,13 @@ export default defineStore('globalOptions', () => {
    * See keys.ts for naming structure
    */
   const loadState = (): void => {
-    currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
-    language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
-    periodsAsDates.value = JSON.parse(
+    const storedCurrency = localStorage.getItem(keys.LS_CURRENCY);
+    const storedLanguage = localStorage.getItem(keys.LS_LANGUAGE);
+    const storedPeriodsAsDates = localStorage.getItem(keys.LS_PERIODS_AS_DATES);
+
+    if (storedCurrency) currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
+    if (storedLanguage) language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
+    if (storedPeriodsAsDates) periodsAsDates.value = JSON.parse(
       localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
     );
   };
@@ -65,7 +104,7 @@ export default defineStore('globalOptions', () => {
 
   /**
    * Exports state as an in-memory Object
-   * @returns {Object} The current state
+   * @returns {Object} The current user-modifiable state
    */
   const exportState = (): Record<string, any> => ({
     [keys.LS_CURRENCY]: currency.value,
@@ -125,12 +164,14 @@ export default defineStore('globalOptions', () => {
     return period;
   };
 
-  /** state-aware label for periods in either period or date format */
-  const Time = computed<string>(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
-
-  // Computed values
-  const CurrencySymbol = (currency, locale: string): string => {
-       const formatted = new Intl.NumberFormat(locale, {
+/**
+ * Returns the symbol for a provided currency and locale code
+ * @param {CurrencyCode} currency browser-standard currency name
+ * @param {LanguageCode} localeCode browser-standard language name
+ * @returns {string} the formatted currency symbol or '$'
+ */
+  const CurrencySymbol = (currency: CurrencyCode, localeCode: LanguageCode): string => {
+       const formatted = new Intl.NumberFormat(localeCode, {
       style: 'currency',
       currency: currency,
     }).format(1);
@@ -145,17 +186,17 @@ export default defineStore('globalOptions', () => {
 
   /**
    * Sets the current currency
-   * @param {string} newCurrency browser-standard currency name
+   * @param {CurrencyCode} newCurrency browser-standard currency name
    */
-  const setCurrency = (newCurrency: string): void => {
+  const setCurrency = (newCurrency: CurrencyCode): void => {
     currency.value = newCurrency;
   };
 
   /**
    * Sets the current language
-   * @param {string} newLanguage browser-standard language name
+   * @param {LanguageCode} newLanguage browser-standard language name
    */
-  const setLanguage = (newLanguage: string): void => {
+  const setLanguage = (newLanguage: LanguageCode): void => {
     language.value = newLanguage;
   };
 
@@ -165,6 +206,12 @@ export default defineStore('globalOptions', () => {
   const togglePeriodsAsDates = (): void => {
     periodsAsDates.value = !periodsAsDates.value;
   };
+
+  /** GETTERS */
+
+  /** state-aware label for periods in either period or date format */
+  const Time: ComputedRef<string> = computed(() => periodsAsDates.value ? constants.DATE : constants.PERIOD)
+
 
   return {
     baseDate,
@@ -186,3 +233,5 @@ export default defineStore('globalOptions', () => {
     togglePeriodsAsDates,
   };
 });
+
+export type GlobalOptionsStore = ReturnType<typeof useGlobalOptionsStore>;

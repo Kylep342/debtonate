@@ -1,38 +1,39 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '@/apps/debtonate/constants/constants';
+import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/shared/constants/constants';
 import { Button, Menu } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const {
   viewedItemId: viewedLoanId,
   setViewedItemId: setViewedLoanId
 } = usePivot(constants.TOTALS);
 
-const loanSelectors = computed<Button[]>(
-  () => (state.loansWithTotals.map((loan) => ({
+const loanSelectors: ComputedRef<Button[]> = computed(
+  () => (state.loansWithTotals.map((loan: moneyfunx.ILoan) => ({
     text: state.getLoanName(loan.id),
     onClick: () => setViewedLoanId(loan.id),
   })))
 );
 
-const pivotMenu = reactive<Menu>({
+const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: loanSelectors,
 });
 
-const defaultBudgetIndex = computed<number>(
-  () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
+const defaultBudgetIndex: ComputedRef<number> = computed(
+  () => state.monthlyBudgets.findIndex((budget: MonthlyBudget) => budget.id === constants.DEFAULT)
 );
 
-const orderedBudgets = computed<MonthlyBudget[]>(() => [
+const orderedBudgets: ComputedRef<MonthlyBudget[]> = computed(() => [
   state.monthlyBudgets[defaultBudgetIndex.value],
   ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),

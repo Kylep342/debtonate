@@ -1,41 +1,42 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { IInstrument } from 'moneyfunx';
+import * as moneyfunx from 'moneyfunx';
+import { computed, ComputedRef } from 'vue';
 
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
+import constants from '@/apps/appreciate/constants/constants';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
-import constants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { DonutGraphContent } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
-  instrument: IInstrument,
+  instrument: moneyfunx.IInstrument,
   viewedBudgetId: string,
 }>();
 
-const globalOptions = useGlobalOptionsStore();
-const state = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const instrumentCurrentBalance = computed<string>(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
-const instrumentInterestRate = computed<string>(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
-const instrumentAnnualLimit = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
-const instrumentMaxMonthlyContribution = computed<string>(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
+const instrumentCurrentBalance: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
+const instrumentInterestRate: ComputedRef<string> = computed(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
+const instrumentAnnualLimit: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
+const instrumentMaxMonthlyContribution: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
 
-const instrumentName = computed<string>(() => state.getInstrumentName(props.instrument.id));
-const header = computed<string>(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
+const instrumentName: ComputedRef<string> = computed(() => state.getInstrumentName(props.instrument.id));
+const header: ComputedRef<string> = computed(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
 
-const graph = computed(() => state.cardGraphs[props.instrument.id][props.viewedBudgetId])
+const graphContent: ComputedRef<DonutGraphContent> = computed(() => state.cardGraphs[props.instrument.id][props.viewedBudgetId])
 
-const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
+const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
-const baseButtons = computed<Button[]>(() => ([
+const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.instruments.length ? state.viewInstrument(props.instrument.id) : alertButtonIsDisabled(),
   },
 ]));
 
-const editButtons = computed<Button[]>(() => ([
+const editButtons: ComputedRef<Button[]> = computed(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -47,7 +48,7 @@ const editButtons = computed<Button[]>(() => ([
   },
 ]));
 
-const buttons = computed<Button[]>(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -65,13 +66,13 @@ const buttons = computed<Button[]>(() => props.instrument.id === constants.TOTAL
       <donut-graph
         v-if="state.instruments.length"
         :config="state.instrumentCardGraphConfig"
-        :graph="graph"
+        :graph="graphContent"
         :anchorId="instrument.id"
       />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
-            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+            <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
               <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from 'vue';
-import { TooltipConfig } from '@/apps/shared/types/graph';
+import { TooltipConfig, TooltipSize } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   tooltipConfig: TooltipConfig,
   index: number,
-  updateTooltipSize: (size: { width: number, height: number }) => void,
+  updateTooltipSize: (size: TooltipSize) => void,
 }>();
 
 const templateRef = ref(null);

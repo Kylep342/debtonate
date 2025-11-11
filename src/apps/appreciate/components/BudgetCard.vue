@@ -1,52 +1,54 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import { computed, ComputedRef } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { DonutGraphContent } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   budget: MonthlyBudget,
   viewedInstrumentId: string,
 }>();
 
-const globalOptions = useGlobalOptionsStore();
-const state = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const totalsContributionSummary = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
+const totalsContributionSummary: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
 
-const netWorth = computed<number>(() => state.deflateAllMoney
+const netWorth: ComputedRef<number> = computed(() => state.deflateAllMoney
   ? state.deflate(
     totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
     state.getNumContributions(constants.TOTALS, props.budget.id)
   )
   : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
 );
-const netWorthLabel = computed<string>(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
+const netWorthLabel: ComputedRef<string> = computed(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
-const budgetAmount = computed<string>(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetContributions = computed<number>(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
-const budgetNetWorth = computed<string>(() => `${globalOptions.Money(netWorth.value)}`);
+const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
+const budgetContributions: ComputedRef<number> = computed(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
+const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
-const contributionsLabel = computed<string>(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
-const budgetName = computed<string>(() => state.getBudgetName(props.budget.id));
-const header = computed<string>(() => state.budgetCardGraphConfig.header(props.viewedInstrumentId));
+const contributionsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
+const budgetName: ComputedRef<string> = computed(() => state.getBudgetName(props.budget.id));
+const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.header(props.viewedInstrumentId));
 
-const graph = computed(() => state.cardGraphs[props.viewedInstrumentId][props.budget.id])
+const graphContent: ComputedRef<DonutGraphContent> = computed(() => state.cardGraphs[props.viewedInstrumentId][props.budget.id])
 
-const alertButtonIsDisabled = () => alert('Create an instrument to use this action');
+const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
-const baseButtons = computed<Array<Button>>(() => ([
+const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.instruments.length ? state.viewBudget(props.budget.id) : alertButtonIsDisabled(),
   },
 ]));
 
-const editButtons = computed<Array<Button>>(() => ([
+const editButtons: ComputedRef<Button[]> = computed(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -58,7 +60,7 @@ const editButtons = computed<Array<Button>>(() => ([
   },
 ]));
 
-const buttons = computed<Array<Button>>(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -76,13 +78,13 @@ const buttons = computed<Array<Button>>(() => props.budget.id === constants.DEFA
       <donut-graph
         v-if="state.instruments.length"
         :config="state.budgetCardGraphConfig"
-        :graph="graph"
+        :graph="graphContent"
         :anchorId="budget.id"
       />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
-            <tr v-if="state.instruments.length" v-for="(datum) in graph" :key="datum.label">
+            <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
               <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>

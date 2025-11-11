@@ -1,38 +1,39 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/appreciate/components/BudgetCard.vue';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import constants from '@/apps/appreciate/constants/constants';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/shared/constants/constants';
 import { Button, Menu } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useAppreciateCoreStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const {
   viewedItemId: viewedInstrumentId,
   setViewedItemId: setViewedInstrumentId
 } = usePivot(constants.TOTALS);
 
-const instrumentSelectors = computed<Button[]>(
-  () => (state.instrumentsWithTotals.map((instrument) => ({
+const instrumentSelectors: ComputedRef<Button[]> = computed(
+  () => (state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => ({
     text: state.getInstrumentName(instrument.id),
     onClick: () => setViewedInstrumentId(instrument.id),
   })))
 );
 
-const pivotMenu = reactive<Menu>({
+const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: instrumentSelectors,
 });
 
-const defaultBudgetIndex = computed<number>(
-  () => state.monthlyBudgets.findIndex((budget) => budget.id === constants.DEFAULT)
+const defaultBudgetIndex: ComputedRef<number> = computed(
+  () => state.monthlyBudgets.findIndex((budget: MonthlyBudget) => budget.id === constants.DEFAULT)
 );
 
-const orderedBudgets = computed<MonthlyBudget[]>(() => [
+const orderedBudgets: ComputedRef<MonthlyBudget[]> = computed(() => [
   state.monthlyBudgets[defaultBudgetIndex.value],
   ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
   ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),

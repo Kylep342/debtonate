@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, Ref } from 'vue';
 
 import { useModal } from '@/apps/shared/composables/useModal';
 
@@ -25,7 +25,7 @@ describe('useModal composable', () => {
   });
 
   it('should call showModal when the reactive flag becomes true', async () => {
-    const showFlag = ref(false);
+    const showFlag: Ref<boolean> = ref(false);
     const showModalSpy = vi.spyOn(modalElement, 'showModal');
     const closeModalSpy = vi.spyOn(modalElement, 'close');
 
@@ -41,7 +41,7 @@ describe('useModal composable', () => {
 
   it('should call close when the reactive flag becomes false', async () => {
     // Start with the flag as true to test toggling it off
-    const showFlag = ref(true);
+    const showFlag: Ref<boolean> = ref(true);
     const closeModalSpy = vi.spyOn(modalElement, 'close');
 
     useModal(showFlag, MODAL_ID);
@@ -53,7 +53,7 @@ describe('useModal composable', () => {
   });
 
   it('should warn and do nothing if the modal element does not exist', async () => {
-    const showFlag = ref(false);
+    const showFlag: Ref<boolean> = ref(false);
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}); // Spy on console.warn
 
     useModal(showFlag, 'non-existent-id');

@@ -12,6 +12,7 @@ const GRAPH_BALANCES_OVER_TIME = 'Balances | Time';
 const GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME = 'Growth/Contribution | Time';
 const GRAPH_PURCHASING_POWER_OVER_TIME = 'Purchasing Power | Time';
 const INSTRUMENT_DETAILS_ID = "instrumentDetails";
+const INSTRUMENT_DETAILS = 'Instrument Details';
 const INSTRUMENT_FORM_ID = "instrumentForm";
 const INSTRUMENTS = "Instruments";
 const MAX_DELTA_FACTOR = 30; // used for both growth and inflation
@@ -28,6 +29,7 @@ export default Object.freeze({
   GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME,
   GRAPH_PURCHASING_POWER_OVER_TIME,
   INSTRUMENT_DETAILS_ID,
+  INSTRUMENT_DETAILS,
   INSTRUMENT_FORM_ID,
   INSTRUMENTS,
   MAX_DURATION_YEARS,

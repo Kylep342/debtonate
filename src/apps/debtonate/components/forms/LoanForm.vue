@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const principal = ref<number | null>(null);
-const interestRate = ref<number | null>(null);
-const termInYears = ref<number | null>(null);
-const name = ref<string | null>(null);
-const currentBalance = ref<number | null>(null);
-const fees = ref<number | null>(null);
+const principal: Ref<number | null> = ref(null);
+const interestRate: Ref<number | null> = ref(null);
+const termInYears: Ref<number | null> = ref(null);
+const name: Ref<string | null> = ref(null);
+const currentBalance: Ref<number | null> = ref(null);
+const fees: Ref<number | null> = ref(null);
 
-const createButtonEnabled = computed<boolean>(
+const createButtonEnabled: ComputedRef<boolean> = computed(
   () => [principal.value, interestRate.value, termInYears.value].every(
-    (input) => !Number.isNaN(input) && input > 0,
+    (input) => input !== null && !Number.isNaN(input) && input > 0,
   ),
 );
 
-const createLoanButtonText = computed<string>(() => (
+const createLoanButtonText: ComputedRef<string> = computed(() => (
   state.currentLoanId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
@@ -29,7 +29,7 @@ watch(
   () => state.currentLoanId,
   (newId) => {
     if (newId && state.loanFormActive) {
-      const currentLoan = state.getLoan(newId);
+      const currentLoan = state.getLoan(newId)!;
       principal.value = currentLoan.principal;
       interestRate.value = currentLoan.annualRate * 100;
       termInYears.value = currentLoan.termInYears;

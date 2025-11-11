@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, Ref } from 'vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 
 defineProps<{ bodyClasses?: string[] }>();
-const isCollapsed = ref<boolean>(false);
+const isCollapsed: Ref<boolean> = ref(false);
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
