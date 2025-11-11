@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import {
-  computed,
-  reactive,
-  type ComputedRef,
-  type Reactive,
-} from 'vue';
+import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, type AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { Button, Menu } from '@/apps/shared/types/app';

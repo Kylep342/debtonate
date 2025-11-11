@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useRouter, type Router } from 'vue-router';
+import { useRouter, Router } from 'vue-router';
 
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { Button } from '@/apps/shared/types/app';
 import routes from '@/apps/shared/constants/routes';
 
-const state: AppreciateCoreStore = useAppreciateCoreStore();
-
 const router: Router = useRouter();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())

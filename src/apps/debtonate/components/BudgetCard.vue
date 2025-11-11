@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import { computed, type ComputedRef } from 'vue';
+import { computed, ComputedRef } from 'vue';
 
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { DonutGraphContent } from '@/apps/shared/types/graph';
@@ -21,7 +21,7 @@ const state: DebtonateCoreStore = useDebtonateCoreStore();
 const totalsPaymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
 
 const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetPayments: ComputedRef<number> = computed(() => globalOptions.Period(totalsPaymentSchedule.value.amortizationSchedule.length, true));
+const budgetPayments: ComputedRef<string> = computed(() => globalOptions.Period(totalsPaymentSchedule.value.amortizationSchedule.length, true));
 // const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSchedule.value.lifetimeInterest)}`);
 const budgetTotalPaid: ComputedRef<string> = computed(() => `${globalOptions.Money(totalsPaymentSchedule.value.lifetimeInterest + totalsPaymentSchedule.value.lifetimePrincipal)}`);
 

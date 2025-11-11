@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type ComputedRef } from 'vue';
+import { computed, ComputedRef } from 'vue';
 import { Button, Menu } from '@/apps/shared/types/app';
 import { useResize } from '@/apps/shared/composables/useResize';
 import ManagementPanel from '@/apps/shared/components/ManagementPanel.vue';

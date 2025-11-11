@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useRouter, type Router } from 'vue-router';
+import { useRouter, Router } from 'vue-router';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { Button } from '@/apps/shared/types/app';
 import routes from '@/apps/shared/constants/routes';
 

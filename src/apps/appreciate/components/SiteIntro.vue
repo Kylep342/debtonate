@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore()
 </script>

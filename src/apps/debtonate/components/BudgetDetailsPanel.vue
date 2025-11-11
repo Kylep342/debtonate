@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import {
-  computed,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, type DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
@@ -21,10 +15,13 @@ const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
-const currentLoan: ComputedRef<moneyfunx.ILoan> = computed(() => state.getLoan(viewedItemId.value));
+const currentLoan: ComputedRef<moneyfunx.ILoan|null> = computed(() => {
+  if (!viewedItemId.value) return null;
+  return state.getLoan(viewedItemId.value)!;
+});
 
 const paymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => {
-  if (!currentBudget.value || !viewedItemId.value) return null;
+  if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.PaymentSchedule>{};
   return state.getPaymentSchedule(viewedItemId.value, currentBudget.value.id);
 });
 

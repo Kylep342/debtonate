@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import { computed, ref, type ComputedRef, type Ref } from 'vue';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();

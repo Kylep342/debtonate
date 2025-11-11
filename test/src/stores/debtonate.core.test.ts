@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
-import { useDebtonateCoreStore, type DebtonatecoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonatecoreStore } from '@/apps/debtonate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const Loans = (): moneyfunx.Loan[] => [
@@ -525,15 +525,15 @@ describe('Debtonate Core Store', () => {
     });
   });
 
-  it('generates amortization table content', async () => {
-    const state = useDebtonateCoreStore()
-    state.budgets = Budgets();
-    state.loans = Loans();
+  // it('generates amortization table content', async () => {
+  //   const state = useDebtonateCoreStore()
+  //   state.budgets = Budgets();
+  //   state.loans = Loans();
 
-    Object.keys(state.paymentSchedules).forEach((loanId) => {
+  //   Object.keys(state.paymentSchedules).forEach((loanId) => {
 
-    })
-  })
+  //   })
+  // })
 
   describe('with graphing', () => {
     it('configures graphs', async () => {

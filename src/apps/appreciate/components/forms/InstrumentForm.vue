@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
@@ -25,9 +25,9 @@ const createInstrumentButtonText: ComputedRef<string> = computed(() => (
 
 watch(
   () => state.currentInstrumentId,
-  (newId: string) => {
+  (newId) => {
     if (newId && state.instrumentFormActive) {
-      const currentInstrument = state.getInstrument(newId);
+      const currentInstrument = state.getInstrument(newId)!;
       annualLimit.value = currentInstrument.annualLimit;
       currentBalance.value = currentInstrument.currentBalance;
       interestRate.value = currentInstrument.annualRate * 100;
@@ -51,10 +51,10 @@ const exit = () => {
 
 const createInstrument = () => {
   state.createInstrument(
-    currentBalance.value,
+    currentBalance.value!,
     interestRate.value! / 100,
-    name.value,
-    annualLimit.value
+    name.value!,
+    annualLimit.value!
   );
   exit();
 };

@@ -1,28 +1,26 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import {
-  computed,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
-import { useDebtonateCoreStore, type DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
+const currentLoan: Ref<moneyfunx.ILoan|null> = ref(null);
+
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
-const currentLoan: Ref<moneyfunx.ILoan|null> = ref(null);
-const currentBudget: ComputedRef<MonthlyBudget> = computed(() => state.getBudget(viewedItemId.value));
+const currentBudget: ComputedRef<MonthlyBudget> = computed(() => {
+  if (!viewedItemId.value) return null;
+  return state.getBudget(viewedItemId.value)!;
+});
 
 const paymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => {
-  if (!currentLoan.value) return null;
+  if (!currentLoan.value || !viewedItemId.value) return <moneyfunx.PaymentSchedule>{};
   return state.getPaymentSchedule(currentLoan.value.id, viewedItemId.value);
 });
 

@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import {
-  computed,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref
-} from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import { MonthlyBudget } from '@/apps/shared/types/core';
+import { Budget } from '@/apps/shared/types/core';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
@@ -19,10 +13,13 @@ const currentInstrument: Ref<moneyfunx.IInstrument|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
-const currentBudget: ComputedRef<MonthlyBudget> = computed(() => state.getBudget(viewedItemId.value));
+const currentBudget: ComputedRef<Budget|null> = computed(() => {
+  if (!viewedItemId.value) return null;
+  return state.getBudget(viewedItemId.value)!;
+});
 
 const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
-  if (!currentInstrument.value || !viewedItemId.value) return null;
+  if (!currentInstrument.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
   return state.getContributionSchedule(currentInstrument.value.id, viewedItemId.value)
 });
 
@@ -46,11 +43,10 @@ const tableFooter: ComputedRef<{}> = computed(() => {
   return state.amortizationTableTotals(contributionSchedule.value)
 });
 
-
 const buildInstrumentDetailsTitle = (instrument: moneyfunx.IInstrument): string => instrument
   ? `Instrument Details - ${state.getInstrumentName(instrument.id)} | `
     + `${state.buildInstrumentSubtitle(instrument)}`
-  : constants.LOAN_DETAILS;
+  : constants.INSTRUMENT_DETAILS;
 
 const title: ComputedRef<string> = computed(() => buildInstrumentDetailsTitle(currentInstrument.value!));
 
@@ -58,7 +54,7 @@ watch(
   () => state.currentInstrumentId,
   (newId) => {
     if (newId && state.instrumentDetailsPanelActive) {
-      currentInstrument.value = state.getInstrument(newId);
+      currentInstrument.value = state.getInstrument(newId) || null;
     }
   },
   { immediate: true },

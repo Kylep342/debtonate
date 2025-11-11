@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue';
+import { ref, Ref } from 'vue';
 
 import { useEvent} from '@/apps/shared/composables/useEvent';
 import { fillHeight } from '@/apps/shared/functions/viewport';

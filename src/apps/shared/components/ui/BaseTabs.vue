@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type ComputedRef } from 'vue';
+import { computed, ComputedRef } from 'vue';
 
 const props = defineProps<{
   getItemName: (id: string) => string,

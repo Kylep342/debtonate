@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import {
-  computed,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const loanId: Ref<string | null> = ref(null);
 const currentBalance: Ref<number | null> = ref(null);

@@ -1,6 +1,6 @@
-import { ref, type Ref } from 'vue';
+import { ref, Ref } from 'vue';
 
-export function usePivot(initialId = null) {
+export function usePivot(initialId: string|null = null) {
   const viewedItemId: Ref<string|null> = ref(initialId);
 
   const isViewedItemId = (id: string) => id === viewedItemId.value;

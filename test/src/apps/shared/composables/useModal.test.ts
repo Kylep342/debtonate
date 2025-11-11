@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref, nextTick, type Ref } from 'vue';
+import { ref, nextTick, Ref } from 'vue';
 
 import { useModal } from '@/apps/shared/composables/useModal';
 

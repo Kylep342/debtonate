@@ -1,21 +1,21 @@
 import * as d3 from 'd3';
 import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
-import { computed, ref, type ComputedRef, type Ref } from 'vue';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
+import { ContributionScenario } from '@/apps/appreciate/types/core';
+import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import {
   Budget,
   MonthlyBudget,
-  ContributionScenario,
-} from '@/apps/appreciate/types/core';
-import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+} from '@/apps/shared/types/core';
 import {
   Arc,
-  ChartData,
+  ChartSeries,
   DonutGraphContent,
-  Graph,
+  // Graph,
   GraphConfig,
   Graphs,
   LineGraphContent,
@@ -47,7 +47,7 @@ export interface AppreciateCoreGetters {
   balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   budgetCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   budgetFormTitle: ComputedRef<string>;
-  cardGraphs: ComputedRef<Graph<DonutGraphContent>>;
+  cardGraphs: ComputedRef<DonutGraphContent>;
   contributionScenarios: ComputedRef<Record<string, ContributionScenario>>;
   contributionSchedules: ComputedRef<
     Record<string, Record<string, moneyfunx.ContributionSchedule>>
@@ -309,12 +309,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       };
 
       instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
-        config.graphs[instrument.id] = <Graph<LineGraphContent>>{
+        config.graphs[instrument.id] = <LineGraphContent>{
           config: {
             maxX: getNumContributions(instrument.id, constants.DEFAULT),
             maxY: getMaxMoney(instrument.id) * 1.1,
           },
-          lines: <ChartData<Point>>{},
+          lines: <ChartSeries<Point>>{},
         };
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
@@ -334,6 +334,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     () => ({
       id: 'BudgetCardSummary',
       type: 'donut',
+      // graphs: balancesGraphs,
       color: getBudgetColor,
       header: (instrumentId: string) =>
         `Yield Breakdown - ${getInstrumentName(instrumentId)}`,
@@ -371,10 +372,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       yScale: d3.scaleLinear,
     }));
 
-  const cardGraphs: ComputedRef<Graph<DonutGraphContent>> = computed(() => {
-    const config = <Graph<DonutGraphContent>>{};
+  const cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>> = computed(() => {
+    const config = <Record<string, Record<string, DonutGraphContent>>>{};
     instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
-      config[instrument.id] = <DonutGraphContent>{};
+      config[instrument.id] = <Record<string, DonutGraphContent>>{};
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const totalsContributionSummary = getContributionSchedule(
           instrument.id,
@@ -422,7 +423,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       };
 
       instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
-        config.graphs[instrument.id] = <Graph<LineGraphContent>>{
+        config.graphs[instrument.id] = <LineGraphContent>{
           config: {
             maxX: getNumContributions(instrument.id, constants.DEFAULT),
             maxY: deflate(
@@ -430,7 +431,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
               getNumContributions(instrument.id, constants.DEFAULT)
             ),
           },
-          lines: <ChartData<Point>>{},
+          lines: <ChartSeries<Point>>{},
         };
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];

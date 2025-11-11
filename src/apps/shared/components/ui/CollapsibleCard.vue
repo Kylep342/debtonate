@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { ref, Ref } from 'vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 
 defineProps<{ bodyClasses?: string[] }>();

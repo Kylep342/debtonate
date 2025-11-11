@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ref, type Ref } from 'vue';
+import { ref, Ref } from 'vue';
 
 import { usePivot } from '@/apps/shared/composables/usePivot';
 

@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
-import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const Instruments = (): moneyfunx.Instrument[] => [

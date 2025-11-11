@@ -3,12 +3,12 @@ import {
   computed,
   ref,
   watch,
-  type ComputedRef,
-  type Ref,
+  ComputedRef,
+  Ref,
 } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 

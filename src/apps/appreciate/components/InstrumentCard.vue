@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import { computed, type ComputedRef } from 'vue';
+import { computed, ComputedRef } from 'vue';
 
-import { useAppreciateCoreStore, type AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
 import constants from '@/apps/appreciate/constants/constants';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { DonutGraphContent } from '@/apps/shared/types/graph';
 

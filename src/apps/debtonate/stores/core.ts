@@ -1,26 +1,17 @@
 import * as d3 from 'd3';
 import * as moneyfunx from 'moneyfunx';
 import { defineStore } from 'pinia';
-import {
-  computed,
-  ref,
-  type Ref,
-  type ComputedRef
-} from 'vue';
+import { computed, ref, Ref, ComputedRef } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
-import {
-  Budget,
-  MonthlyBudget,
-  PaymentScenario,
-} from '@/apps/debtonate/types/core';
+import { PaymentScenario } from '@/apps/debtonate/types/core';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
 import {
   Arc,
-  ChartData,
+  ChartSeries,
   DonutGraphContent,
-  Graph,
   GraphConfig,
   Graphs,
   LineGraphContent,
@@ -417,7 +408,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLoan(loan.id)!.currentBalance,
           },
-          lines: <ChartData<Point>>{},
+          lines: <ChartSeries<Point>>{},
         };
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
@@ -523,7 +514,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
           },
-          lines: <ChartData<Point>>{},
+          lines: <ChartSeries<Point>>{},
         };
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
@@ -574,7 +565,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
         },
-        lines: <ChartData<Point>>{},
+        lines: <ChartSeries<Point>>{},
       };
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];

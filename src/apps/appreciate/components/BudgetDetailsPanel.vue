@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import {
-  computed,
-  ref,
-  watch,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
@@ -21,10 +15,13 @@ const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
-const currentInstrument: ComputedRef<moneyfunx.IInstrument> = computed(() => state.getInstrument(viewedItemId.value));
+const currentInstrument: ComputedRef<moneyfunx.IInstrument|null> = computed(() => {
+  if (!viewedItemId.value) return null;
+  return state.getInstrument(viewedItemId.value)!;
+});
 
 const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
-  if (!currentBudget.value || !viewedItemId.value) return null;
+  if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
   return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
 });
 

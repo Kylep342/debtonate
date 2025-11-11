@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import * as moneyfunx from 'moneyfunx';
-import { computed, type ComputedRef } from 'vue';
+import { computed, ComputedRef } from 'vue';
 
-import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import constants from '@/apps/debtonate/constants/constants';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   parentId: string,
@@ -15,7 +15,7 @@ const props = defineProps<{
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const parentLoan: ComputedRef<moneyfunx.Loan> = computed(() => state.getLoan(props.parentId));
+const parentLoan: ComputedRef<moneyfunx.ILoan> = computed(() => state.getLoan(props.parentId));
 const title: ComputedRef<string> = computed(() => `Refinancing Scenarios - ${parentLoan.value?.name ?? ''}`);
 
 type TableRow = {

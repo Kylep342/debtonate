@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, type Ref } from 'vue';
+import { ref, Ref } from 'vue';
 
 export interface UIState {
   budgetDetailsPanelActive: Ref<boolean>;
@@ -10,7 +10,7 @@ export interface UIState {
   loanFormActive: Ref<boolean>; // For Debtonate
   optionsFormActive: Ref<boolean>;
   refinancingFormActive: Ref<boolean>; // For Debtonate
-  
+
   // IDs can stay here or be passed, but often easier to manage centrally if multiple UIs use them
   currentBudgetId: Ref<string | null>;
   currentInstrumentId: Ref<string | null>; // For Appreciate
@@ -27,7 +27,7 @@ export const useAppUIStore = defineStore('appUI', () => {
   const loanFormActive: Ref<boolean> = ref(false);
   const optionsFormActive: Ref<boolean> = ref(false);
   const refinancingFormActive: Ref<boolean> = ref(false);
-  
+
   const currentBudgetId: Ref<string | null> = ref(null);
   const currentInstrumentId: Ref<string | null> = ref(null);
   const currentLoanId: Ref<string | null> = ref(null);
@@ -38,7 +38,7 @@ export const useAppUIStore = defineStore('appUI', () => {
   // Generic Open/Exit actions for Budgets
   const openBudgetForm = () => { budgetFormActive.value = true; };
   const exitBudgetForm = () => { budgetFormActive.value = false; currentBudgetId.value = null; };
-  
+
   // Generic Open/Exit actions for Options
   const openOptionsForm = () => { optionsFormActive.value = true; };
   const exitOptionsForm = () => { optionsFormActive.value = false; };
@@ -48,13 +48,13 @@ export const useAppUIStore = defineStore('appUI', () => {
   const exitInstrumentForm = () => { instrumentFormActive.value = false; currentInstrumentId.value = null; };
   const viewInstrument = (id: string) => { currentInstrumentId.value = id; instrumentDetailsPanelActive.value = true; };
   const unviewInstrument = () => { instrumentDetailsPanelActive.value = false; currentInstrumentId.value = null; };
-  
+
   // Loan-specific actions (Debtonate)
   const openLoanForm = () => { loanFormActive.value = true; };
   const exitLoanForm = () => { loanFormActive.value = false; currentLoanId.value = null; };
   const viewLoan = (id: string) => { currentLoanId.value = id; loanDetailsPanelActive.value = true; };
   const unviewLoan = () => { loanDetailsPanelActive.value = false; currentLoanId.value = null; };
-  
+
   // Refinancing-specific actions (Debtonate)
   const refinanceLoan = (id: string) => { currentLoanId.value = id; refinancingFormActive.value = true; };
   const exitRefinancingForm = () => { refinancingFormActive.value = false; currentLoanId.value = null; };
@@ -67,11 +67,11 @@ export const useAppUIStore = defineStore('appUI', () => {
     // STATE
     budgetDetailsPanelActive,
     budgetFormActive,
-    instrumentDetailsPanelActive, 
+    instrumentDetailsPanelActive,
     instrumentFormActive,
     loanDetailsPanelActive,
     loanFormActive,
-    optionsFormActive, 
+    optionsFormActive,
     refinancingFormActive,
     currentBudgetId,
     currentInstrumentId,
@@ -80,7 +80,7 @@ export const useAppUIStore = defineStore('appUI', () => {
     openBudgetForm,
     exitBudgetForm,
     openOptionsForm,
-    exitOptionsForm, 
+    exitOptionsForm,
     openInstrumentForm,
     exitInstrumentForm,
     viewInstrument,

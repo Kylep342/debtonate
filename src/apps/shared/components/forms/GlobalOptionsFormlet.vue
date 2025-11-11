@@ -9,7 +9,7 @@ import {
 
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
-import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
