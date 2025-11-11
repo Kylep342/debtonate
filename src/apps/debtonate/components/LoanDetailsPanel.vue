@@ -1,41 +1,58 @@
 <script setup lang="ts">
-import { ILoan } from 'moneyfunx';
-import { computed, ref, watch } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import {
+  computed,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from 'vue';
 
-import AmortizationTable from '@/apps/debtonate/components/AmortizationTable.vue';
-import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import { usePivot } from '@/apps/shared/composables/usePivot';
 import constants from '@/apps/debtonate/constants/constants';
+import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
+import { useDebtonateCoreStore, type DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { usePivot } from '@/apps/shared/composables/usePivot';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
-const currentLoan = ref<ILoan>();
-const currentBudget = computed(() => state.getBudget(viewedItemId.value));
+const currentLoan: Ref<moneyfunx.ILoan|null> = ref(null);
+const currentBudget: ComputedRef<MonthlyBudget> = computed(() => state.getBudget(viewedItemId.value));
 
-const paymentSchedule = computed(() => {
+const paymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => {
   if (!currentLoan.value) return null;
   return state.getPaymentSchedule(currentLoan.value.id, viewedItemId.value);
 });
 
-const amortizationTitle = computed(() => {
+const amortizationTitle: ComputedRef<string> = computed(() => {
   if (!currentLoan.value || !currentBudget.value) return '';
   return state.buildAmortizationTableTitle(currentLoan.value, currentBudget.value);
 });
 
-const amortizationSubtitle = computed(() => {
+const amortizationSubtitle: ComputedRef<string> = computed(() => {
   if (!currentLoan.value || !currentBudget.value) return '';
   return state.buildAmortizationTableSubtitle(currentLoan.value, currentBudget.value);
 });
 
-const buildLoanDetailsTitle = (loan: ILoan): string => loan
+const tableRows: ComputedRef<{}[]> = computed(() => {
+  if (!paymentSchedule.value) return [];
+  return state.amortizationTableRows(paymentSchedule.value)
+});
+
+const tableFooter: ComputedRef<{}> = computed(() => {
+  if (!paymentSchedule.value) return [];
+  return state.amortizationTableTotals(paymentSchedule.value)
+});
+
+
+const buildLoanDetailsTitle = (loan: moneyfunx.ILoan): string => loan
   ? `Loan Details - ${state.getLoanName(loan.id)} | `
   + `${state.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;
 
-const title = computed<string>(() => buildLoanDetailsTitle(currentLoan.value!));
+const title: ComputedRef<string> = computed(() => buildLoanDetailsTitle(currentLoan.value!));
 
 watch(
   () => state.currentLoanId,
@@ -73,10 +90,12 @@ watch(
           :set-viewed-item-id="setViewedItemId"
         >
           <template #tabContent>
-            <AmortizationTable
-              :payment-schedule="paymentSchedule"
+            <data-table
               :title="amortizationTitle"
               :subtitle="amortizationSubtitle"
+              :headers="state.amortizationTableHeaders"
+              :rows="tableRows"
+              :totals="tableFooter"
             />
           </template>
         </base-tabs>

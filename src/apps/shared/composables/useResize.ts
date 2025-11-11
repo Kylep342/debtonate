@@ -1,10 +1,10 @@
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 import { useEvent} from '@/apps/shared/composables/useEvent';
 import { fillHeight } from '@/apps/shared/functions/viewport';
 
 export function useResize(callOnMount: boolean=true) {
-  const scrollContainer = ref(null);
+  const scrollContainer: Ref = ref(null);
 
   const resize = () => {
     scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;

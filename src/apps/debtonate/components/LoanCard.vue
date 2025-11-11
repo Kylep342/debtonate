@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { ILoan } from 'moneyfunx';
+import * as moneyfunx from 'moneyfunx';
+import { computed, type ComputedRef } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
+import { DonutGraphContent } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
-  loan: ILoan,
+  loan: moneyfunx.ILoan,
   viewedBudgetId: string,
 }>();
 
-const globalOptions = useGlobalOptionsStore();
-const state = useDebtonateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const loanCurrentBalance = computed<string>(() => `${globalOptions.Money(props.loan.currentBalance)}`);
-const loanInterestRate = computed<string>(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
-const loanMinPayment = computed<string>(() => `${globalOptions.Money(props.loan.minPayment)}/month`);
-const loanPrincipal = computed<string>(() => `${globalOptions.Money(props.loan.principal)}`);
-const loanTermInYears = computed<string>(() => `${props.loan.termInYears}`);
-const loanFees = computed<string | null>(() => props.loan.fees ? `${globalOptions.Money(props.loan.fees)}` : null);
+const loanCurrentBalance: ComputedRef<string> = computed(() => `${globalOptions.Money(props.loan.currentBalance)}`);
+const loanInterestRate: ComputedRef<string> = computed(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
+const loanMinPayment: ComputedRef<string> = computed(() => `${globalOptions.Money(props.loan.minPayment)}/month`);
+const loanPrincipal: ComputedRef<string> = computed(() => `${globalOptions.Money(props.loan.principal)}`);
+const loanTermInYears: ComputedRef<string> = computed(() => `${props.loan.termInYears}`);
+const loanFees: ComputedRef<string | null> = computed(() => props.loan.fees ? `${state.Money(props.loan.fees)}` : null);
 
-const buttons = computed<Button[]>(() => props.loan.id === constants.TOTALS ? baseButtons.value : editButtons.value);
-const header = computed<string>(() => state.loanCardGraphConfig.header(props.viewedBudgetId));
-const loanName = computed<string>(() => state.getLoanName(props.loan.id));
+const header: ComputedRef<string> = computed(() => state.loanCardGraphConfig.header(props.viewedBudgetId));
+const loanName: ComputedRef<string> = computed(() => state.getLoanName(props.loan.id));
 
-const graph = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetId])
+const graphContent: ComputedRef<DonutGraphContent> = computed(() => state.cardGraphs[props.loan.id][props.viewedBudgetId])
 
-const alertButtonIsDisabled = () => alert('Create a loan to use this action');
+const alertButtonIsDisabled = (): void => alert('Create a loan to use this action');
 
-const baseButtons = computed<Button[]>(() => ([
+const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
     onClick: () => state.loans.length ? state.viewLoan(props.loan.id) : alertButtonIsDisabled(),
@@ -42,7 +42,7 @@ const baseButtons = computed<Button[]>(() => ([
   },
 ]));
 
-const editButtons = computed<Button[]>(() => ([
+const editButtons: ComputedRef<Button[]> = computed(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
@@ -53,6 +53,7 @@ const editButtons = computed<Button[]>(() => ([
     onClick: () => state.deleteLoan(props.loan.id),
   },
 ]));
+const buttons: ComputedRef<Button[]> = computed(() => props.loan.id === constants.TOTALS ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -70,13 +71,13 @@ const editButtons = computed<Button[]>(() => ([
       <donut-graph
         v-if="state.loans.length"
         :config="state.loanCardGraphConfig"
-        :graph="graph"
+        :graph="graphContent"
         :anchorId="loan.id"
       />
       <base-table :class="['table-sm']">
         <template #body>
           <tbody>
-            <tr v-if="state.loans.length" v-for="(datum) in graph" :key="datum.label">
+            <tr v-if="state.loans.length" v-for="(datum) in graphContent" :key="datum.label">
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
               <td :class="['text-right']">
                 <b>{{ globalOptions.Money(datum.value) }}</b>

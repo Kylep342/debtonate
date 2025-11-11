@@ -1,27 +1,33 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import {
+  computed,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
 
-const loanId = ref<string | null>(null);
-const currentBalance = ref<number | null>(null);
-const interestRate = ref<number | null>(null);
-const termInYears = ref<number | null>(null);
-const name = ref<string | null>(null);
-const fees = ref<number | null>(null);
+const loanId: Ref<string | null> = ref(null);
+const currentBalance: Ref<number | null> = ref(null);
+const interestRate: Ref<number | null> = ref(null);
+const termInYears: Ref<number | null> = ref(null);
+const name: Ref<string | null> = ref(null);
+const fees: Ref<number | null> = ref(null);
 
-const createButtonEnabled = computed<boolean>(
+const createButtonEnabled: ComputedRef<boolean> = computed(
   () => [currentBalance.value, interestRate.value, termInYears.value].every(
-    (input) => !Number.isNaN(input) && input > 0,
+    (input) => input !== null && !Number.isNaN(input) && input > 0,
   ),
 );
 
 watch(
   () => state.currentLoanId,
-  (newId) => {
+  (newId: string) => {
     if (newId && state.refinancingFormActive) {
       loanId.value = newId;
       const currentLoan = state.getLoan(loanId.value);

@@ -1,28 +1,34 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+  computed,
+  reactive,
+  type ComputedRef,
+  type Reactive
+} from 'vue';
 
 import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import constants from '@/apps/debtonate/constants/constants';
+import { useDebtonateCoreStore, type DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/debtonate/constants/constants';
 import { Button, Menu } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const {
   viewedItemId: viewedBudgetId,
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
 
-const budgetSelectors = computed<Button[]>(
-  () => (state.monthlyBudgets.map((budget) => ({
+const budgetSelectors: ComputedRef<Button[]> = computed(
+  () => (state.monthlyBudgets.map((budget: MonthlyBudget) => ({
     text: state.getBudgetName(budget.id),
     onClick: () => setViewedBudgetId(budget.id),
   })))
 );
 
-const pivotMenu = reactive<Menu>({
+const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
 });

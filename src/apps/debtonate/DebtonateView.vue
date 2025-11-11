@@ -14,17 +14,17 @@ import OptionsForm from '@/apps/debtonate/components/forms/OptionsForm.vue';
 import RefinancingForm from '@/apps/debtonate/components/forms/RefinancingForm.vue';
 import SiteIntro from '@/apps/debtonate/components/SiteIntro.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useModal } from '@/apps/shared/composables/useModal';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-useModal(computed(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
-useModal(computed(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
-useModal(computed(() => state.loanDetailsPanelActive), constants.LOAN_DETAILS_ID);
-useModal(computed(() => state.loanFormActive), constants.LOAN_FORM_ID);
-useModal(computed(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
-useModal(computed(() => state.refinancingFormActive), constants.REFINANCING_FORM_ID);
+useModal(computed<boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
+useModal(computed<boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
+useModal(computed<boolean>(() => state.loanDetailsPanelActive), constants.LOAN_DETAILS_ID);
+useModal(computed<boolean>(() => state.loanFormActive), constants.LOAN_FORM_ID);
+useModal(computed<boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
+useModal(computed<boolean>(() => state.refinancingFormActive), constants.REFINANCING_FORM_ID);
 </script>
 
 <template>

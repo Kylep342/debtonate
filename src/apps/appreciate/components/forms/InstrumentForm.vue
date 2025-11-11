@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 
-const state = useAppreciateCoreStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const annualLimit = ref<number | null>(null);
-const currentBalance = ref<number | null>(null);
-const interestRate = ref<number | null>(null);
-const name = ref<string | null>(null);
+const annualLimit: Ref<number | null> = ref(null);
+const currentBalance: Ref<number | null> = ref(null);
+const interestRate: Ref<number | null> = ref(null);
+const name: Ref<string | null> = ref(null);
 
-const createButtonEnabled = computed<boolean>(
+const createButtonEnabled: ComputedRef<boolean> = computed(
   () => [currentBalance.value, interestRate.value].every(
-    (input) => !Number.isNaN(input) && input > 0,
+    (input) => !Number.isNaN(input) && input !== null && input > 0,
   ),
 );
 
-const createInstrumentButtonText = computed<string>(() => (
+const createInstrumentButtonText: ComputedRef<string> = computed(() => (
   state.currentInstrumentId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
@@ -25,7 +25,7 @@ const createInstrumentButtonText = computed<string>(() => (
 
 watch(
   () => state.currentInstrumentId,
-  (newId) => {
+  (newId: string) => {
     if (newId && state.instrumentFormActive) {
       const currentInstrument = state.getInstrument(newId);
       annualLimit.value = currentInstrument.annualLimit;

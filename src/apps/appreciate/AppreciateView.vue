@@ -13,16 +13,16 @@ import InstrumentForm from '@/apps/appreciate/components/forms/InstrumentForm.vu
 import InstrumentsPanel from '@/apps/appreciate/components/InstrumentsPanel.vue';
 import OptionsForm from '@/apps/appreciate/components/forms/OptionsForm.vue';
 import SiteIntro from '@/apps/appreciate/components/SiteIntro.vue';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { useModal } from '@/apps/shared/composables/useModal';
 
-const state = useAppreciateCoreStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-useModal(computed<Boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
-useModal(computed<Boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
-useModal(computed<Boolean>(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
-useModal(computed<Boolean>(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
-useModal(computed<Boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
+useModal(computed<boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
+useModal(computed<boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
+useModal(computed<boolean>(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
+useModal(computed<boolean>(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
+useModal(computed<boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
 </script>
 
 <template>

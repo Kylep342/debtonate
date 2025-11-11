@@ -39,6 +39,7 @@ describe('useEvent composable', () => {
   });
 
   it('should call the callback on mount when callOnMount is true', () => {
+    // locally scoped to isolate call counts
     const callbackSpy = vi.fn();
 
     mountComposable(() => {
@@ -49,6 +50,7 @@ describe('useEvent composable', () => {
   });
 
   it('should NOT call the callback on mount when callOnMount is false or omitted', () => {
+    // locally scoped to isolate call counts
     const callbackSpy = vi.fn();
 
     mountComposable(() => {

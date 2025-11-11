@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, type ComputedRef, type Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, type AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
-const globalOptions = useGlobalOptionsStore();
-const state = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const accrualCardRef = ref(null);
 const inflationCardRef = ref(null);
@@ -23,7 +23,7 @@ const cardRefs = computed(() => [
   yearsToSPendCardRef.value,
 ].filter(Boolean));
 
-const allCollapsed = ref<boolean>(false);
+const allCollapsed: Ref<boolean> = ref(false);
 
 
 const toggleAllCards = (): void => {
@@ -38,10 +38,10 @@ const toggleAllCards = (): void => {
   }
 }
 
-const deflationExample = computed<string>(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
+const deflationExample: ComputedRef<string> = computed(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
-const buttonStyle = (flag) => (flag ? 'btn-success' : 'btn-error');
-const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const buttonStyle = (flag: string) => (flag ? 'btn-success' : 'btn-error');
+const buttonText = (flag: string) => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
@@ -61,7 +61,7 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
       </base-button>
     </template>
     <template #body>
-      <div class="flex justify-between items-center">
+      <div class="card-actions">
         <h3>Appreciate Options</h3>
         <base-button
           :class="['btn-sm']"
@@ -70,8 +70,6 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
           {{ allCollapsed ? '+' : '-' }}
         </base-button>
       </div>
-      <br>
-      <hr>
       <br>
       <div :class="['formInputs']">
         <collapsible-card ref="accrualCardRef">
@@ -201,3 +199,11 @@ const buttonText = (flag) => (flag ? constants.BTN_ON : constants.BTN_OFF);
     </template>
   </base-modal>
 </template>
+
+<style scoped>
+.card-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+</style>

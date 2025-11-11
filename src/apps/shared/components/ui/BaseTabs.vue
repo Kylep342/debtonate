@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, type ComputedRef } from 'vue';
 
 const props = defineProps<{
   getItemName: (id: string) => string,
@@ -8,8 +8,8 @@ const props = defineProps<{
   setViewedItemId: (id: string) => void,
 }>();
 
-const flexBasis = computed(() => props.pivot ? `basis-1/${props.pivot!.length}` : 'basis-1');
-const tabStyle = (id) => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';
+const flexBasis: ComputedRef<string> = computed(() => props.pivot ? `basis-1/${props.pivot!.length}` : 'basis-1');
+const tabStyle = (id: string): string => props.isViewedItemId(id) ? 'btn-secondary' : 'btn-ghost';
 </script>
 
 <template>

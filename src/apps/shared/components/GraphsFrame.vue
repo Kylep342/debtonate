@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import {
+  computed,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from 'vue';
 
 import constants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
@@ -21,11 +27,11 @@ const {
   setViewedItemId
 } = usePivot(props.initialItemId);
 
-const viewedGraphId = ref<string>(props.initialGraphId);
-const activeGraph = computed<GraphConfig>(() => props.graphs[viewedGraphId.value]);
+const viewedGraphId: Ref<string> = ref(props.initialGraphId);
+const activeGraph: ComputedRef<GraphConfig> = computed(() => props.graphs[viewedGraphId.value]);
 const setViewedGraphId = (graphId: string) => viewedGraphId.value = graphId;
 
-const buttons = computed<Button[]>(() => Object.keys(props.graphs).map((graphId) => ({
+const buttons: ComputedRef<Button[]> = computed(() => Object.keys(props.graphs).map((graphId) => ({
   text: graphId,
   onClick: () => setViewedGraphId(graphId),
 })));

@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import {
+  computed,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const amount = ref<number | null>(null);
+const amount: Ref<number | null> = ref(null);
 
-const createButtonEnabled = computed<boolean>(
-  () => !Number.isNaN(amount.value) && amount.value > 0
+const createButtonEnabled: ComputedRef<boolean> = computed(
+  () => amount.value !== null && !Number.isNaN(amount.value) && amount.value > 0
 );
 
-const createBudgetButtonText = computed<string>(() => (
+const createBudgetButtonText: ComputedRef<string> = computed(() => (
   state.currentBudgetId
     ? constants.BTN_SAVE
     : constants.BTN_CREATE
@@ -20,7 +26,7 @@ const createBudgetButtonText = computed<string>(() => (
 
 watch(
   () => state.currentBudgetId,
-  (newId) => {
+  (newId: string) => {
     if (newId && state.budgetFormActive) {
       const currentBudget = state.getBudget(newId);
       amount.value = currentBudget.relative;

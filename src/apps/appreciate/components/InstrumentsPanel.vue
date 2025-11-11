@@ -1,28 +1,34 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+  computed,
+  reactive,
+  type ComputedRef,
+  type Reactive,
+} from 'vue';
 
-import { Button, Menu } from '@/apps/shared/types/app';
-import { usePivot } from '@/apps/shared/composables/usePivot';
-import constants from '@/apps/appreciate/constants/constants';
 import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
-import useAppreciateCoreStore from '@/apps/appreciate/stores/core';
+import constants from '@/apps/appreciate/constants/constants';
+import { useAppreciateCoreStore, type AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
+import { usePivot } from '@/apps/shared/composables/usePivot';
+import { Button, Menu } from '@/apps/shared/types/app';
+import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const state = useAppreciateCoreStore();
+const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const {
   viewedItemId: viewedBudgetId,
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
 
-const budgetSelectors = computed<Button[]>(
-  () => (state.monthlyBudgets.map((budget) => ({
+const budgetSelectors: ComputedRef<Button[]> = computed(
+  () => (state.monthlyBudgets.map((budget: MonthlyBudget) => ({
     text: state.getBudgetName(budget.id),
     onClick: () => setViewedBudgetId(budget.id),
   })))
 );
 
-const pivotMenu = reactive<Menu>({
+const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
 });

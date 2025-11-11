@@ -1,32 +1,42 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
 import {
-  onMounted, ref, shallowReactive, shallowRef, watch,
+  onMounted,
+  ref,
+  shallowReactive,
+  shallowRef,
+  watch,
+  type Ref,
+  type ShallowReactive,
+  type ShallowRef,
 } from 'vue';
 
 import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
 import { smartTransform } from '@/apps/shared/functions/viewport';
-import { GraphConfig, TooltipConfig } from '@/apps/shared/types/graph';
+import { GraphConfig, Point, TooltipConfig } from '@/apps/shared/types/graph';
 
 type TooltipProps = {
   tooltipConfig: TooltipConfig,
   index: number,
-  updateTooltipSize: (size: { width: number, height: number }) => void,
+  updateTooltipSize: (size: TooltipSize) => void,
 }
+
+type TooltipPosition = { left: number, top: number };
+type TooltipSize = { width: number, height: number };
 
 const props = defineProps<{
   graph: GraphConfig,
   anchorId: string
 }>();
 
-const chart = shallowReactive(<GraphConfig>{});
-const tooltipContent = shallowRef<typeof HoverTemplate | null>(null);
-const tooltipPosition = ref({ left: 0, top: 0 });
-const tooltipTransform = ref('translateX(0%) translateY(0%)');
-const tooltipProps = ref<TooltipProps | null>(null);
-const tooltipSize = ref({ width: 0, height: 0 });
+const chart: ShallowReactive<GraphConfig> = shallowReactive({});
+const tooltipContent: ShallowRef<HoverTemplate|null> = shallowRef(null);
+const tooltipPosition: Ref<TooltipPosition> = ref({ left: 0, top: 0 });
+const tooltipTransform: Ref<string> = ref('translateX(0%) translateY(0%)');
+const tooltipProps: Ref<TooltipProps|null> = ref(null);
+const tooltipSize: Ref<TooltipSize> = ref({ width: 0, height: 0 });
 
-const updateTooltipSize = (size) => {
+const updateTooltipSize = (size: TooltipSize) => {
   tooltipSize.value = size;
 };
 
@@ -65,8 +75,8 @@ const initializeChart = () => {
     .range([innerHeight, 0]);
 
   const draw = d3.line()
-    .x((point) => x(chart.x(point.x)))
-    .y((point) => y(chart.y(point.y)));
+    .x((point: Point) => x(chart.x(point.x)))
+    .y((point: Point) => y(chart.y(point.y)));
 
   g.append('g')
     .attr('transform', `translate(0, ${innerHeight})`)
@@ -87,7 +97,7 @@ const initializeChart = () => {
       .attr('stroke-width', 1.5)
       .attr('d', draw);
 
-    line.forEach((point) => {
+    line.forEach((point: Point) => {
       g.append('circle')
         .attr('cx', x(chart.x(point.x)))
         .attr('cy', y(chart.y(point.y)))

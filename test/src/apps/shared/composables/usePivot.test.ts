@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 import { usePivot } from '@/apps/shared/composables/usePivot';
 
 
 describe('usePivot composable', () => {
   it('works as intended', async () => {
-    const items = ref(['dog', 'cat', 'fish', 'bird', 'bear', 'monkey']);
+    const items: Ref<string[]> = ref(['dog', 'cat', 'fish', 'bird', 'bear', 'monkey']);
     const {
       viewedItemId: viewedAnimal,
       isViewedItemId: isViewedAnimal,

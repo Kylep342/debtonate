@@ -25,6 +25,7 @@ const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_PIVOT = 'Pivot';
+const BTN_REFINANCE = 'Refinance';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 
@@ -121,6 +122,7 @@ export default Object.freeze({
   BTN_ON,
   BTN_OPTIONS,
   BTN_PIVOT,
+  BTN_REFINANCE,
   BTN_SAVE,
   BTN_SELECT,
   BUDGET,

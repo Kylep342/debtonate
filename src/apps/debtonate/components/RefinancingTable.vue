@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { Loan, LoansPaymentSchedule } from 'moneyfunx';
-import { computed } from 'vue';
+import * as moneyfunx from 'moneyfunx';
+import { computed, type ComputedRef } from 'vue';
 
-import useDebtonateCoreStore from '@/apps/debtonate/stores/core';
-import constants from '@/apps/shared/constants/constants';
-import useGlobalOptionsStore from '@/apps/shared/stores/globalOptions';
+import { useDebtonateCoreStore, type DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import constants from '@/apps/debtonate/constants/constants';
+import { useGlobalOptionsStore, type GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 const props = defineProps<{
   parentId: string,
-  scenarios: Array<Loan>,
-  schedules: Record<string, LoansPaymentSchedule>,
+  scenarios: moneyfunx.Loan[],
+  schedules: Record<string, moneyfunx.LoansPaymentSchedule>,
 }>();
 
-const globalOptions = useGlobalOptionsStore();
-const state = useDebtonateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const parentLoan = computed<Loan>(() => state.getLoan(props.parentId));
-const title = computed<string>(() => `Refinancing Scenarios - ${parentLoan.value?.name ?? ''}`);
+const parentLoan: ComputedRef<moneyfunx.Loan> = computed(() => state.getLoan(props.parentId));
+const title: ComputedRef<string> = computed(() => `Refinancing Scenarios - ${parentLoan.value?.name ?? ''}`);
 
 type TableRow = {
   id: string;
@@ -31,7 +31,7 @@ type TableRow = {
   totalPayments: number;
 }
 
-const tableRows = computed<TableRow[]>(() => {
+const tableRows: ComputedRef<TableRow[]> = computed(() => {
   if (!parentLoan.value) return [];
 
   const parentRow: TableRow = {
