@@ -14,10 +14,10 @@ import OptionsForm from '@/apps/debtonate/components/forms/OptionsForm.vue';
 import RefinancingForm from '@/apps/debtonate/components/forms/RefinancingForm.vue';
 import SiteIntro from '@/apps/debtonate/components/SiteIntro.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useModal } from '@/apps/shared/composables/useModal';
 
-const state = useDebtonateCoreStore();
+const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 useModal(computed<boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
 useModal(computed<boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);

@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
-import {
-  onMounted,
-  shallowReactive,
-  watch,
-  type ShallowReactive,
-} from 'vue';
+import { onMounted, shallowReactive, watch, ShallowReactive } from 'vue';
 
 import { Arc, GraphConfig } from '@/apps/shared/types/graph';
 

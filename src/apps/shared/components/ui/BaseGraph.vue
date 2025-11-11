@@ -6,23 +6,20 @@ import {
   shallowReactive,
   shallowRef,
   watch,
-  type Ref,
-  type ShallowReactive,
-  type ShallowRef,
+  Ref,
+  ShallowReactive,
+  ShallowRef,
 } from 'vue';
 
 import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
 import { smartTransform } from '@/apps/shared/functions/viewport';
-import { GraphConfig, Point, TooltipConfig } from '@/apps/shared/types/graph';
+import { GraphConfig, Point, TooltipConfig, TooltipPosition, TooltipSize } from '@/apps/shared/types/graph';
 
 type TooltipProps = {
   tooltipConfig: TooltipConfig,
   index: number,
   updateTooltipSize: (size: TooltipSize) => void,
 }
-
-type TooltipPosition = { left: number, top: number };
-type TooltipSize = { width: number, height: number };
 
 const props = defineProps<{
   graph: GraphConfig,

@@ -70,3 +70,6 @@ export type TooltipConfig = {
   lineName: (id: string) => string;
   yFormat: (value: number) => string;
 };
+
+export type TooltipPosition = { left: number, top: number };
+export type TooltipSize = { width: number, height: number };

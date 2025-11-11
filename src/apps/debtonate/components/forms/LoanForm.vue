@@ -27,9 +27,9 @@ const createLoanButtonText: ComputedRef<string> = computed(() => (
 
 watch(
   () => state.currentLoanId,
-  (newId: string) => {
+  (newId) => {
     if (newId && state.loanFormActive) {
-      const currentLoan = state.getLoan(newId);
+      const currentLoan = state.getLoan(newId)!;
       principal.value = currentLoan.principal;
       interestRate.value = currentLoan.annualRate * 100;
       termInYears.value = currentLoan.termInYears;

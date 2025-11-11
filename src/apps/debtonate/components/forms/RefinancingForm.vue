@@ -21,10 +21,10 @@ const createButtonEnabled: ComputedRef<boolean> = computed(
 
 watch(
   () => state.currentLoanId,
-  (newId: string) => {
+  (newId) => {
     if (newId && state.refinancingFormActive) {
       loanId.value = newId;
-      const currentLoan = state.getLoan(loanId.value);
+      const currentLoan = state.getLoan(loanId.value)!;
       currentBalance.value = currentLoan.currentBalance;
     }
   },

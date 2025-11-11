@@ -10,12 +10,7 @@
  *
  */
 import { defineStore } from 'pinia';
-import {
-  computed,
-  ref,
-  type ComputedRef,
-  type Ref,
-} from 'vue';
+import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
