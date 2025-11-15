@@ -50,7 +50,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
     @exit="state.exitOptionsForm"
   >
     <template #header>
-      <h2>Options</h2>
+      <h2 :class="['pl-4']">Options</h2>
     </template>
     <template #headerActions>
       <base-button
@@ -62,7 +62,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
     </template>
     <template #body>
       <div class="flex justify-between items-center">
-        <h3>Appreciate Options</h3>
+        <h3 :class="['pl-4']">Appreciate Options</h3>
         <base-button
           :class="['btn-sm']"
           @click="toggleAllCards"

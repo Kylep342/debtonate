@@ -62,7 +62,7 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
 <template>
   <base-modal :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
     <template #header>
-      <h2>Options</h2>
+      <h2 :class="['pl-4']">Options</h2>
     </template>
     <template #headerActions>
       <base-button :class="['btn btn-circle btn-ghost']" @click="state.exitOptionsForm">
@@ -71,7 +71,7 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
     </template>
     <template #body>
       <div class="flex justify-between items-center">
-        <h3>Debtonate Options</h3>
+        <h3 :class="['pl-4']">Debtonate Options</h3>
         <base-button :class="['btn-sm']" @click="toggleAllCards">
           {{ allCollapsed ? '+' : '-' }}
         </base-button>

@@ -12,7 +12,7 @@ describe('useModal composable', () => {
     modalElement = document.createElement('dialog');
     modalElement.id = MODAL_ID;
 
-    // Mock the .showModal() and .close() methods with empty functions.
+    // mock DOM events
     modalElement.showModal = vi.fn();
     modalElement.close = vi.fn();
 

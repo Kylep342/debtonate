@@ -449,7 +449,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       return config;
     });
 
-  const graphs: ComputedRef<Record<string, GraphConfig>> = computed(() => ({
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
   }));

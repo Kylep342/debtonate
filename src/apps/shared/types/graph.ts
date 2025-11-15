@@ -46,7 +46,7 @@ export type DrawerFunction<TGraphContent extends GraphContent> = (
 export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   id: string;
   type: GraphType;
-  drawer: DrawerFunction<TGraphContent>;
+  drawer?: DrawerFunction<TGraphContent>;
   color: (id: string) => string;
   graphs?: Graphs<TGraphContent>;
   header: (id: string) => string;

@@ -51,7 +51,7 @@ const createBudget = () => {
     @exit="exit"
   >
     <template #header>
-      <h2>{{ state.budgetFormTitle }}</h2>
+      <h2 :class="['pl-4']">{{ state.budgetFormTitle }}</h2>
     </template>
     <template #headerActions>
       <base-button

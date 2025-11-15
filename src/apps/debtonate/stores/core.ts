@@ -583,7 +583,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     return config;
   });
 
-  const graphs: ComputedRef<Record<string, GraphConfig>> = computed(() => ({
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
     [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]:
