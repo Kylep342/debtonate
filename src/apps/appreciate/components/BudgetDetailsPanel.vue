@@ -22,7 +22,7 @@ const currentInstrument: ComputedRef<moneyfunx.IInstrument|null> = computed(() =
 
 const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
   if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
-  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
+  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id);
 });
 
 const amortizationTitle: ComputedRef<string> = computed(() => {

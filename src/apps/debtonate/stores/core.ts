@@ -121,7 +121,7 @@ export interface DebtonateCoreActions {
   exitOptionsForm: () => void;
   exitRefinancingForm: () => void;
   exportState: () => Record<string, any>;
-  getBudget: (id: string) => Budget | undefined;
+  getBudget: (id: string) => MonthlyBudget | undefined;
   getBudgetColor: (id: string) => string;
   getBudgetIndex: (id: string) => number;
   getBudgetName: (id: string) => string;
@@ -768,7 +768,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   };
 
   // Budgets
-  const getBudget = (id: string): Budget | undefined =>
+  const getBudget = (id: string): MonthlyBudget | undefined =>
     monthlyBudgets.value.find((budget) => budget.id === id);
 
   const deleteBudget = (id: string): void => {
