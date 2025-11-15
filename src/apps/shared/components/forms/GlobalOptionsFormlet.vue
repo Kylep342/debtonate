@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUpdate, ComputedRef } from 'vue';
 
+import { useTheme } from '@/apps/shared/composables/useTheme';
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+
+const { themeIsDark, toggleTheme } = useTheme();
 
 const cardRefs = ref([]);
 
@@ -54,10 +57,11 @@ const sortedLanguages: ComputedRef<Option[]> = computed(() => {
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
 const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constants.BTN_OFF);
+const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark');
 </script>
 
 <template>
-  <h3>Global Options</h3>
+  <h3 :class="['pl-4']">Global Options</h3>
   <br>
   <hr>
   <br>
@@ -145,6 +149,24 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
         <p>Money: {{ globalOptions.Money(100) }}</p>
         <p>Next Period: {{ globalOptions.Period(1, true) }}</p>
         <p>Percent: {{ globalOptions.Percent(3.42) }}</p>
+      </template>
+    </collapsible-card>
+    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+      <template #cardTitle>
+        <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+          Theme
+        </h3>
+      </template>
+      <template #cardTitleActions>
+        <div>
+          <base-button
+            :class="buttonStyle(themeIsDark)"
+            @click="toggleTheme"
+          >{{ themeButtonText(themeIsDark) }}</base-button>
+        </div>
+      </template>
+      <template #cardBody>
+        <p>Switch theme to {{ themeIsDark ? 'light' : 'dark' }} mode</p>
       </template>
     </collapsible-card>
   </div>

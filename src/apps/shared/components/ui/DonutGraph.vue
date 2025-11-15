@@ -73,9 +73,9 @@ watch(
 </template>
 
 <style>
-{
+/* svg {
   pointer-events: none;
   position: absolute;
   transition: transform 0.1s ease;
-}
+} */
 </style>

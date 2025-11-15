@@ -121,7 +121,7 @@ export interface DebtonateCoreActions {
   exitOptionsForm: () => void;
   exitRefinancingForm: () => void;
   exportState: () => Record<string, any>;
-  getBudget: (id: string) => Budget | undefined;
+  getBudget: (id: string) => MonthlyBudget | undefined;
   getBudgetColor: (id: string) => string;
   getBudgetIndex: (id: string) => number;
   getBudgetName: (id: string) => string;
@@ -583,7 +583,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     return config;
   });
 
-  const graphs: ComputedRef<Record<string, GraphConfig>> = computed(() => ({
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
     [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]:
@@ -768,7 +768,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   };
 
   // Budgets
-  const getBudget = (id: string): Budget | undefined =>
+  const getBudget = (id: string): MonthlyBudget | undefined =>
     monthlyBudgets.value.find((budget) => budget.id === id);
 
   const deleteBudget = (id: string): void => {

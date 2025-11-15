@@ -10,13 +10,12 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    themes: ['retro'],
+    themes: ['retro', 'synthwave'],
     darkTheme: 'synthwave',
     base: true,
     styled: true,
     utils: true,
     prefix: '',
     logs: true,
-    themeRoot: '#app',
   },
 };

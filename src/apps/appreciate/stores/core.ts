@@ -101,7 +101,7 @@ export interface AppreciateCoreActions {
   exitInstrumentForm: () => void;
   exitOptionsForm: () => void;
   exportState: () => Record<string, any>;
-  getBudget: (id: string) => Budget | undefined;
+  getBudget: (id: string) => MonthlyBudget | undefined;
   getBudgetColor: (id: string) => string;
   getBudgetIndex: (id: string) => number;
   getBudgetName: (id: string) => string;
@@ -449,7 +449,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       return config;
     });
 
-  const graphs: ComputedRef<Record<string, GraphConfig>> = computed(() => ({
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
     [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
     [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
   }));
@@ -666,7 +666,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   // Budgets
-  const getBudget = (id: string): Budget | undefined =>
+  const getBudget = (id: string): MonthlyBudget | undefined =>
     monthlyBudgets.value.find((budget) => budget.id === id);
 
   const deleteBudget = (id: string): void => {

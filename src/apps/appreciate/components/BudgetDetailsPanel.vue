@@ -22,7 +22,7 @@ const currentInstrument: ComputedRef<moneyfunx.IInstrument|null> = computed(() =
 
 const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
   if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
-  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
+  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id);
 });
 
 const amortizationTitle: ComputedRef<string> = computed(() => {
@@ -67,7 +67,7 @@ watch(
 <template>
   <base-modal :id="constants.BUDGET_DETAILS_ID" @exit="state.unviewBudget">
     <template #header>
-      <h2>{{ title }}</h2>
+      <h2 :class="['pl-4']">{{ title }}</h2>
     </template>
     <template #headerActions>
       <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewBudget">

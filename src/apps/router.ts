@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 
 import AppreciateView from '@/apps/appreciate/AppreciateView.vue';
 import DebtonateView from '@/apps/debtonate/DebtonateView.vue';

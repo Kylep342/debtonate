@@ -7,5 +7,5 @@ export function usePivot(initialId: string|null = null) {
 
   const setViewedItemId = (id: string) => viewedItemId.value = id;
 
-  return { viewedItemId, isViewedItemId, setViewedItemId }
+  return { viewedItemId, isViewedItemId, setViewedItemId };
 }

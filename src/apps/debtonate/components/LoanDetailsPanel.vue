@@ -66,7 +66,7 @@ watch(
 <template>
   <base-modal :id="constants.LOAN_DETAILS_ID" @exit="state.unviewLoan">
     <template #header>
-      <h2>{{ title }}</h2>
+      <h2 :class="['pl-4']">{{ title }}</h2>
     </template>
     <template #headerActions>
       <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewLoan">

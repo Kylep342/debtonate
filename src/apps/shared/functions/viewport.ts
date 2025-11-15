@@ -1,12 +1,15 @@
-//
-export const fillHeight = (componentRef, bottomDelta=0) => {
+import { Ref } from 'vue';
+
+import { TooltipSize } from '@/apps/shared/types/graph';
+
+export const fillHeight = (componentRef: Ref, bottomDelta: number=0) => {
   const containerTop = componentRef.value.getBoundingClientRect().top;
   const availableHeight = window.innerHeight - (containerTop + bottomDelta);
   return availableHeight;
 };
 
 //
-export const fillWidth = (componentRef, rightDelta=0) => {
+export const fillWidth = (componentRef: Ref, rightDelta: number=0) => {
   const containerLeft = componentRef.value.getBoundingClientRect().left;
   const availableWidth = window.innerWidth - (containerLeft + rightDelta);
   return availableWidth;
@@ -21,7 +24,12 @@ export const fillWidth = (componentRef, rightDelta=0) => {
  * @param {number} offset - A small buffer to add between the cursor and the tooltip.
  * @returns {string} A CSS transform string (e.g., 'translateX(-100%) translateY(-100%)').
  */
-export function smartTransform(tooltipSize, cursorX, cursorY, offset = 15) {
+export function smartTransform(
+  tooltipSize: TooltipSize,
+  cursorX: number,
+  cursorY: number,
+  offset: number = 15
+) {
   let translateX = '0%';
   let translateY = '0%';
 

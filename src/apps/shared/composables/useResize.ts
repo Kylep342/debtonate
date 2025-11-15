@@ -6,7 +6,7 @@ import { fillHeight } from '@/apps/shared/functions/viewport';
 export function useResize(callOnMount: boolean=true) {
   const scrollContainer: Ref = ref(null);
 
-  const resize = () => {
+  const resize = (): void => {
     scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
   }
 
