@@ -1,7 +1,6 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { withMocks } from '../../helpers/withMocks';
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
