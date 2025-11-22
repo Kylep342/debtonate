@@ -9,17 +9,6 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 describe('Global Options Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    // withMocks(window, {
-    //   method: 'matchMedia',
-    //   implementation: (query) => ({
-    //     matches: false,
-    //     media: query,
-    //     onchange: null,
-    //     addEventListener: vi.fn(),
-    //     removeEventListener: vi.fn(),
-    //     dispatchEvent: vi.fn(),
-    //   }),
-    // });
   });
 
   describe('with global options', () => {
