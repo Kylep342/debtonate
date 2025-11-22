@@ -45,13 +45,25 @@ const COLORS = [
   'oklch(70.39% 0.1255 52.95)',
   'oklch(28.42% 0.0095 355.53)'
 ];
+const COLORS_SMART = [
+  'var(--sc)',
+  'var(--ac)',
+  'var(--b3)',
+  'var(--b2)'
+];
+const DARK_COLORS = [
+  'oklch(0.71 0.202 349.761)',
+  'oklch(0.82 0.111 230.318)',
+  'oklch(0.75 0.183 55.934)',
+  'oklch(0.45 0.24 277.023)',
+];
 const DATE = 'Date'
 const DEFAULT = 'default';
 const GRAPHS = 'Graphs';
 
 // Internationalization metadata
 //  for formatting money, percents, dates
-const LOCALES = <Locale[]>[
+const LOCALES: Locale[] = [
   { code: 'ar-AE', currency: 'AED', flag: '🇦🇪' }, // UAE Dirham
   { code: 'ar-EG', currency: 'EGP', flag: '🇪🇬' }, // Egyptian Pound
   { code: 'ar-SA', currency: 'SAR', flag: '🇸🇦' }, // Saudi Riyal
@@ -108,6 +120,8 @@ const NAME_MIN_BUDGET = 'Minimum Budget';
 const PERIOD = 'Period';
 const PERIODS_PER_YEAR = 12;
 const TABLES = 'Tables';
+const THEME = 'retro';
+const THEME_DARK = 'synthwave';
 
 export default Object.freeze({
   BTN_CLEAR,
@@ -131,6 +145,7 @@ export default Object.freeze({
   BUDGETS,
   BUG_FORM_LINK,
   COLORS,
+  DARK_COLORS,
   DATE,
   DEFAULT,
   GRAPHS,
@@ -141,5 +156,7 @@ export default Object.freeze({
   PERIOD,
   PERIODS_PER_YEAR,
   TABLES,
+  THEME,
+  THEME_DARK,
   TOTALS,
 });

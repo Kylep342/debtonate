@@ -474,12 +474,12 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
             <Arc>{
               label: 'Lifetime Interest',
               value: paymentSchedule.lifetimeInterest,
-              color: constants.COLORS[0],
+              color: globalOptions.colorPalate[0],
             },
             <Arc>{
               label: 'Lifetime Principal',
               value: paymentSchedule.lifetimePrincipal,
-              color: constants.COLORS[2],
+              color: globalOptions.colorPalate[2],
             },
           ];
         });
@@ -781,7 +781,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     openBudgetForm();
   };
   const getBudgetColor = (id: string): string =>
-    constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
+    globalOptions.colorPalate[getBudgetIndex(id) % globalOptions.colorPalate.length];
   const getBudgetIndex = (id: string): number =>
     monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
   const getBudgetName = (id: string): string =>

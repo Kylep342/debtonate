@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUpdate, ComputedRef } from 'vue';
 
-import { useTheme } from '@/apps/shared/composables/useTheme';
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
-
-const { themeIsDark, toggleTheme } = useTheme();
 
 const cardRefs = ref([]);
 
@@ -160,13 +157,13 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
       <template #cardTitleActions>
         <div>
           <base-button
-            :class="buttonStyle(themeIsDark)"
-            @click="toggleTheme"
-          >{{ themeButtonText(themeIsDark) }}</base-button>
+            :class="buttonStyle(globalOptions.darkMode)"
+            @click="globalOptions.toggleTheme"
+          >{{ themeButtonText(globalOptions.darkMode) }}</base-button>
         </div>
       </template>
       <template #cardBody>
-        <p>Switch theme to {{ themeIsDark ? 'light' : 'dark' }} mode</p>
+        <p>Switch theme to {{ globalOptions.darkMode ? 'light' : 'dark' }} mode</p>
       </template>
     </collapsible-card>
   </div>
