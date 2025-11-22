@@ -23,7 +23,8 @@ describe('useEvent composable', () => {
   it('should add an event listener on mount and remove it on unmount', () => {
     const addListenerSpy = vi.spyOn(window, 'addEventListener');
     const removeListenerSpy = vi.spyOn(window, 'removeEventListener');
-    const callback = vi.fn();
+    const matchMediaSpy = vi.spyOn(window, 'matchMedia');
+    const callback = vi.fn(() => true);
 
     const wrapper = mountComposable(() => {
       useEvent(window, 'resize', callback);
@@ -40,23 +41,23 @@ describe('useEvent composable', () => {
 
   it('should call the callback on mount when callOnMount is true', () => {
     // locally scoped to isolate call counts
-    const callbackSpy = vi.fn();
+    const callback= vi.fn(() => true);
 
     mountComposable(() => {
-      useEvent(window, 'resize', callbackSpy, true); // callOnMount is true
+      useEvent(window, 'resize', callback, true); // callOnMount is true
     });
 
-    expect(callbackSpy).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
   it('should NOT call the callback on mount when callOnMount is false or omitted', () => {
     // locally scoped to isolate call counts
-    const callbackSpy = vi.fn();
+    const callback = vi.fn(() => true);
 
     mountComposable(() => {
-      useEvent(window, 'resize', callbackSpy); // callOnMount is omitted (defaults to false)
+      useEvent(window, 'resize', callback); // callOnMount is omitted (defaults to false)
     });
 
-    expect(callbackSpy).not.toHaveBeenCalled();
+    expect(callback).not.toHaveBeenCalled();
   });
 });

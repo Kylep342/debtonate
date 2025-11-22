@@ -1,23 +1,23 @@
-import { MAX_DURATION_YEARS } from "moneyfunx";
+import { MAX_DURATION_YEARS } from 'moneyfunx';
 
 import sharedConstants from '@/apps/shared/constants/constants';
 
 //
 
-const BUDGET_DETAILS_ID = "appreciateBudgetDetails";
+const BUDGET_DETAILS_ID = 'appreciateBudgetDetails';
 const DEFAULT_INFLATION_FACTOR = 3;
 const DEFAULT_YEARS_TO_CONTRIBUTE = 25;
 const DEFAULT_YEARS_TO_SPEND = 40;
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time';
 const GRAPH_GROWTH_CONTRIBUTION_RATIO_OVER_TIME = 'Growth/Contribution | Time';
 const GRAPH_PURCHASING_POWER_OVER_TIME = 'Purchasing Power | Time';
-const INSTRUMENT_DETAILS_ID = "instrumentDetails";
+const INSTRUMENT_DETAILS_ID = 'instrumentDetails';
 const INSTRUMENT_DETAILS = 'Instrument Details';
-const INSTRUMENT_FORM_ID = "instrumentForm";
-const INSTRUMENTS = "Instruments";
+const INSTRUMENT_FORM_ID = 'instrumentForm';
+const INSTRUMENTS = 'Instruments';
 const MAX_DELTA_FACTOR = 30; // used for both growth and inflation
-const NAME_TOTALS_AS_AN_INSTRUMENT = "All Instruments";
-const OPTIONS_FORM_ID = "appreciateOptionsForm";
+const NAME_TOTALS_AS_AN_INSTRUMENT = 'All Instruments';
+const OPTIONS_FORM_ID = 'appreciateOptionsForm';
 
 export default Object.freeze({
   ...sharedConstants,

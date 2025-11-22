@@ -1,4 +1,4 @@
-import { watch, ComputedRef } from "vue";
+import { watch, ComputedRef } from 'vue';
 
 /**
  * Registers a watcher to show/close a modal dialog element.

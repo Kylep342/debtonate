@@ -1,29 +1,35 @@
-import { ref, watch, Ref, readonly } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref, readonly } from 'vue';
 
-const lightTheme = 'retro';
-const darkTheme = 'synthwave';
-const themeStorageKey = 'user-theme-preference'; // Key for local storage
+import constants from '@/apps/shared/constants/constants';
+import keys from '@/apps/shared/constants/keys';
 
-const themeIsDark: Ref<boolean> = ref(false);
+const darkMode: Ref<boolean> = ref(false);
+// const colorPalate: ComputedRef<string[]> = computed(() => darkMode.value ? constants.COLORS_DARK : constants.COLORS);
+const colorPalate = constants.COLORS_SMART
 
+// set initial theme on composable initalization
 if (typeof window !== 'undefined') {
-  const storedTheme = localStorage.getItem(themeStorageKey);
+  const storedTheme = localStorage.getItem(keys.LS_THEME);
 
   if (storedTheme) {
-    themeIsDark.value = (storedTheme === darkTheme);
+    darkMode.value = (storedTheme === constants.THEME_DARK);
+  } else if (window.matchMedia) {
+    const userPreference = !!window.matchMedia('(prefers-color-scheme: dark)').matches;
+    darkMode.value = userPreference;
   } else {
-    themeIsDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches || false;
+    darkMode.value = false;
   }
 }
 
+// register watcher to track user preference via darkMode
 watch(
-  () => themeIsDark.value,
+  () => darkMode.value,
   (newValue) => {
     if (typeof window === 'undefined') return;
 
-    const themeToSet = newValue ? darkTheme : lightTheme;
+    const themeToSet = newValue ? constants.THEME_DARK : constants.THEME;
 
-    localStorage.setItem(themeStorageKey, themeToSet);
+    localStorage.setItem(keys.LS_THEME, themeToSet);
 
     const root = document.querySelector('#app');
     if (root) {
@@ -39,11 +45,12 @@ watch(
 
 export function useTheme() {
   const toggleTheme = () => {
-    themeIsDark.value = !themeIsDark.value;
+    darkMode.value = !darkMode.value;
   };
 
   return {
-    themeIsDark: readonly(themeIsDark),
+    darkMode: readonly(darkMode),
+    colorPalate: readonly(colorPalate),
     toggleTheme
   };
-}
+};

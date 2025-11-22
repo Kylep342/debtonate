@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref, nextTick, Ref } from 'vue';
 
 import { useModal } from '@/apps/shared/composables/useModal';
+import { mockDialog } from '../../../../helpers/withMocks';
 
 const MODAL_ID = 'test-modal';
 
@@ -9,12 +10,9 @@ describe('useModal composable', () => {
   let modalElement: HTMLDialogElement;
 
   beforeEach(() => {
-    modalElement = document.createElement('dialog');
+    // create automocked HTML dialog
+    modalElement = mockDialog(document.createElement('dialog'));
     modalElement.id = MODAL_ID;
-
-    // mock DOM events
-    modalElement.showModal = vi.fn();
-    modalElement.close = vi.fn();
 
     document.body.appendChild(modalElement);
   });

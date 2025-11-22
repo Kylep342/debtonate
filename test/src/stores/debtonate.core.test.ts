@@ -136,13 +136,14 @@ describe('Debtonate Core Store', () => {
 
     it('gets budget attributes', async () => {
       const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
       expect(state.getBudgetIndex(constants.DEFAULT)).toBe(4);
-      expect(state.getBudgetColor(constants.DEFAULT)).toBe(constants.COLORS[4 % constants.COLORS.length]);
+      expect(state.getBudgetColor(constants.DEFAULT)).toBe(globalOptions.colorPalate[4 % globalOptions.colorPalate.length]);
       expect(state.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
       expect(state.getBudgetIndex(firstBudgetId)).toBe(1);
-      expect(state.getBudgetColor(firstBudgetId)).toBe(constants.COLORS[1]);
+      expect(state.getBudgetColor(firstBudgetId)).toBe(globalOptions.colorPalate[1]);
       expect(state.getBudgetName(firstBudgetId)).toBe('Budget 1');
     });
   });

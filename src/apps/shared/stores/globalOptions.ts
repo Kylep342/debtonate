@@ -12,6 +12,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref, ComputedRef, Ref } from 'vue';
 
+import { useTheme } from '@/apps/shared/composables/useTheme';
 import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 import { Locale } from '@/apps/shared/types/app';
@@ -24,7 +25,9 @@ type LanguageCode = (typeof constants.LOCALES)[number]['code'];
 
 export interface GlobalOptionsState {
   baseDate: Ref<number>;
+  colorPalate: ComputedRef<string[]>;
   currency: Ref<CurrencyCode>;
+  darkMode: Ref<boolean>;
   language: Ref<LanguageCode>;
   locales: Locale[];
   periodsAsDates: Ref<boolean>;
@@ -47,6 +50,7 @@ export interface GlobalOptionsActions {
   setCurrency: (newCurrency: CurrencyCode) => void;
   setLanguage: (newLanguage: LanguageCode) => void;
   togglePeriodsAsDates: () => void;
+  toggleTheme: () => void;
 };
 
 // --- Store --- //
@@ -62,6 +66,10 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   const currency: Ref<CurrencyCode> = ref(defaultLocale.currency);
   const language: Ref<LanguageCode> = ref(defaultLocale.code);
 
+
+  /** COMPOSABLES */
+
+  const { darkMode, colorPalate, toggleTheme } = useTheme();
 
   /** ACTIONS */
 
@@ -95,6 +103,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
    */
   const saveState = (): void => {
     localStorage.setItem(keys.LS_CURRENCY, JSON.stringify(currency.value));
+    // localStorage.setItem(keys.LS_THEME, JSON.stringify(darkMode.value));
     localStorage.setItem(keys.LS_LANGUAGE, JSON.stringify(language.value));
     localStorage.setItem(
       keys.LS_PERIODS_AS_DATES,
@@ -108,6 +117,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
    */
   const exportState = (): Record<string, any> => ({
     [keys.LS_CURRENCY]: currency.value,
+    // [keys.LS_THEME]: darkMode.value,
     [keys.LS_LANGUAGE]: language.value,
     [keys.LS_PERIODS_AS_DATES]: periodsAsDates.value,
   });
@@ -216,8 +226,10 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   return {
     baseDate,
     clearState,
+    colorPalate,
     currency,
     CurrencySymbol,
+    darkMode,
     exportState,
     language,
     loadState,
@@ -231,6 +243,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     setLanguage,
     Time,
     togglePeriodsAsDates,
+    toggleTheme,
   };
 });
 

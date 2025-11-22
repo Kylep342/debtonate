@@ -385,12 +385,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           <Arc>{
             label: 'Lifetime Growth',
             value: totalsContributionSummary.lifetimeGrowth,
-            color: constants.COLORS[0],
+            color: globalOptions.colorPalate[0],
           },
           <Arc>{
             label: 'Lifetime Contribution',
             value: totalsContributionSummary.lifetimeContribution,
-            color: constants.COLORS[2],
+            color: globalOptions.colorPalate[2],
           },
         ];
       });
@@ -679,7 +679,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     openBudgetForm();
   };
   const getBudgetColor = (id: string): string =>
-    constants.COLORS[getBudgetIndex(id) % constants.COLORS.length];
+    globalOptions.colorPalate[getBudgetIndex(id) % globalOptions.colorPalate.length];
   const getBudgetIndex = (id: string): number =>
     monthlyBudgets.value.findIndex((budget) => budget.id === id) + 1;
   const getBudgetName = (id: string): string =>
