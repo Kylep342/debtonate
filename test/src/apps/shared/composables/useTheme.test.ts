@@ -8,12 +8,14 @@ describe('useTheme composable', () => {
     const { darkMode, colorPalate, toggleTheme } = useTheme();
     // initialize as off
     expect(darkMode.value).toBe(false);
-    expect(colorPalate).toStrictEqual(constants.COLORS_SMART);
+    expect(colorPalate.value).toStrictEqual(constants.COLORS);
     // toggle on
     toggleTheme();
     expect(darkMode.value).toBe(true);
+    expect(colorPalate.value).toStrictEqual(constants.COLORS_DARK);
     // toggle back off
     toggleTheme();
     expect(darkMode.value).toBe(false);
+    expect(colorPalate.value).toStrictEqual(constants.COLORS);
   });
 });
