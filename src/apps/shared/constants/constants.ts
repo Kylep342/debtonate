@@ -38,24 +38,12 @@ const BUDGETS = 'Budgets';
 // User feedback Google form
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 
-// App color schemes
-const COLORS = [
-  'oklch(80.74% 0.0525 159.09)',
-  'oklch(76.87% 0.1041 22.66)',
-  'oklch(70.39% 0.1255 52.95)',
-  'oklch(28.42% 0.0095 355.53)'
-];
-const COLORS_DARK = [
-  'oklch(0.71 0.202 349.761)',
-  'oklch(0.82 0.111 230.318)',
-  'oklch(0.75 0.183 55.934)',
-  'oklch(0.45 0.24 277.023)',
-];
+// App color scheme
 const COLORS_SMART = [
-  'var(--sc)',
-  'var(--ac)',
-  'var(--b3)',
-  'var(--b2)'
+  'oklch(var(--s))',
+  'oklch(var(--p))',
+  'oklch(var(--a))',
+  'oklch(var(--n))'
 ];
 
 const DATE = 'Date'
@@ -145,8 +133,6 @@ export default Object.freeze({
   BUDGET_FORM_ID,
   BUDGETS,
   BUG_FORM_LINK,
-  COLORS,
-  COLORS_DARK,
   COLORS_SMART,
   DATE,
   DEFAULT,

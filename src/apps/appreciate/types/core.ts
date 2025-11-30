@@ -1,4 +1,4 @@
-import { InstrumentsContributionSchedule } from "moneyfunx";
+import { InstrumentsContributionSchedule } from 'moneyfunx';
 
 export type ContributionScenario = {
   contributionAmount: number

@@ -4,7 +4,7 @@ import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 
 const darkMode: Ref<boolean> = ref(false);
-const colorPalate: ComputedRef<string[]> = computed(() => darkMode.value ? constants.COLORS_DARK : constants.COLORS);
+const colorPalate: ComputedRef<string[]> = computed(() => constants.COLORS_SMART);
 
 // set initial theme on composable initalization
 if (typeof window !== 'undefined') {
@@ -15,9 +15,9 @@ if (typeof window !== 'undefined') {
   } else if (window.matchMedia) {
     const userPreference = !!window.matchMedia('(prefers-color-scheme: dark)').matches;
     darkMode.value = userPreference;
-  } else {
-    darkMode.value = false;
   }
+} else {
+  darkMode.value = false;
 }
 
 // register watcher to track user preference via darkMode
@@ -27,7 +27,6 @@ watch(
     if (typeof window === 'undefined') return;
 
     const themeToSet = newValue ? constants.THEME_DARK : constants.THEME;
-
     localStorage.setItem(keys.LS_THEME, themeToSet);
 
     const root = document.querySelector('#app');
@@ -49,7 +48,7 @@ export function useTheme() {
 
   return {
     darkMode: readonly(darkMode),
-    colorPalate: readonly(colorPalate),
+    colorPalate: colorPalate,
     toggleTheme
   };
 };
