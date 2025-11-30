@@ -18,7 +18,7 @@ describe('Global Options Store', () => {
 
       expect(globalOptions.currency).toBe('USD');
       expect(globalOptions.language).toBe('en-US');
-      expect(globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.locale)).toBe('$');
+      expect(globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.language)).toBe('$');
       expect(globalOptions.Money(100)).toBe('$100.00');
 
       globalOptions.setLanguage('de-DE');
