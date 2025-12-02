@@ -43,7 +43,7 @@ const COLORS_SMART = [
   'oklch(var(--s))',
   'oklch(var(--p))',
   'oklch(var(--a))',
-  'oklch(var(--n))'
+  'oklch(var(--bc))'
 ];
 
 const DATE = 'Date'
