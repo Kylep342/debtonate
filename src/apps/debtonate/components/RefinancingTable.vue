@@ -5,11 +5,12 @@ import { computed, ComputedRef } from 'vue';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import constants from '@/apps/debtonate/constants/constants';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { PaymentScenario } from '@/apps/debtonate/types/core';
 
 const props = defineProps<{
   parentId: string,
   scenarios: moneyfunx.Loan[],
-  schedules: Record<string, moneyfunx.LoansPaymentSchedule>,
+  schedules: Record<string, PaymentScenario>,
 }>();
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
@@ -48,19 +49,22 @@ const tableRows: ComputedRef<TableRow[]> = computed(() => {
   };
 
   const scenarioRows = props.scenarios.map((scenario): TableRow => {
-    const schedule = props.schedules[scenario.id];
-    const lifetimeInterest = schedule.paymentSchedule.lifetimeInterest;
+    const scenarioData = props.schedules[scenario.id];
+    const specificSchedule = scenarioData.paymentSchedule[scenario.id];
+
+    const lifetimeInterest = specificSchedule.lifetimeInterest;
+
     return <TableRow>{
       id: scenario.id,
       isParent: false,
       name: scenario.name,
       interestRate: globalOptions.Percent(scenario.annualRate * 100),
       term: scenario.termInYears,
-      monthlyPayment: globalOptions.Money(schedule.paymentAmount),
+      monthlyPayment: globalOptions.Money(scenarioData.paymentAmount),
       lifetimeInterest: globalOptions.Money(lifetimeInterest),
       fees: globalOptions.Money(scenario.fees),
       totalPremium: globalOptions.Money(lifetimeInterest + scenario.fees),
-      totalPayments: schedule.paymentSchedule.amortizationSchedule.length,
+      totalPayments: specificSchedule.amortizationSchedule.length,
     };
   });
 

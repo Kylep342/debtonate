@@ -53,7 +53,7 @@ export interface AppreciateCoreGetters {
     Record<string, Record<string, moneyfunx.ContributionSchedule>>
   >;
   graphs: ComputedRef<Record<string, GraphConfig>>;
-  graphXScale: ComputedRef<Function>;
+  graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>>;
   inflationRate: ComputedRef<number>;
   instrumentCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   instrumentFormTitle: ComputedRef<string>;
@@ -281,7 +281,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   ]);
 
   // Graphing
-  const graphXScale: ComputedRef<Function> = computed(() =>
+  const graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>> = computed(() =>
     globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear
   );
 

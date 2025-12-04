@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 
 // Core drawable types, one for each type of graph
 // Arc for DonutGraphContent
-export type Arc = {label: string; value: number; color?: string;};
+export type Arc = {label: string, value: number; color?: string};
 // Point for LineGraphContent
 export type Point = {x: number, y: number};
 
@@ -56,7 +56,7 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   yLabel: () => string;
   x: (value: any) => any;
   y: (value: any) => any;
-  xFormat: (value: number | Date) => string;
+  xFormat: (value: number) => string | number | Date;
   yFormat: (value: number) => string;
   xScale: () => d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>;
   yScale: () => d3.ScaleLinear<number, number>;

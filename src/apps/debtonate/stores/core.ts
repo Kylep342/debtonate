@@ -47,7 +47,7 @@ export interface DebtonateCoreGetters {
   budgetFormTitle: ComputedRef<string>;
   cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>>;
   graphs: ComputedRef<Record<string, GraphConfig>>;
-  graphXScale: ComputedRef<Function>;
+  graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>>;
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   loanCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   loanFormTitle: ComputedRef<string>;
@@ -294,7 +294,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           );
           schedules[parentLoanId][scenario.id] = <PaymentScenario>{
             paymentAmount: payment,
-            paymentSchedule: paymentSchedule[scenario.id],
+            paymentSchedule: paymentSchedule,
           };
         });
       }
@@ -376,7 +376,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   ]);
 
   // Graphing
-  const graphXScale: ComputedRef<Function> = computed(() =>
+  const graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>> = computed(() =>
     globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear
   );
 
@@ -403,7 +403,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       };
 
       loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-        config.graphs[loan.id] = <Graph<LineGraphContent>>{
+        config.graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLoan(loan.id)!.currentBalance,
@@ -509,7 +509,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       };
 
       loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-        config.graphs[loan.id] = <Graph<LineGraphContent>>{
+        config.graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
@@ -560,7 +560,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
 
     // idea; toggle presence of lines as data with boolean k-v
     loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-      config.graphs[loan.id] = <Graph<LineGraphContent>>{
+      config.graphs[loan.id] = <LineGraphContent>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,

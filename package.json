@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@pinia/testing": "^1.0.2",
+    "@types/d3": "^7.4.3",
     "@vitest/coverage-v8": "^2.1.8",
     "@vue/test-utils": "^2.4.6",
     "daisyui": "^4.12.23",
