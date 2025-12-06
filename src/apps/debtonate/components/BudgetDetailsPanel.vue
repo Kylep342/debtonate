@@ -3,7 +3,7 @@ import * as moneyfunx from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
@@ -57,7 +57,7 @@ watch(
   () => state.currentBudgetId,
   (newId) => {
     if (newId && state.budgetDetailsPanelActive) {
-      currentBudget.value = state.getBudget(newId);
+      currentBudget.value = state.getBudget(newId)!;
     }
   },
   { immediate: true },

@@ -57,7 +57,7 @@ watch(
   () => state.currentBudgetId,
   (newId) => {
     if (newId && state.budgetDetailsPanelActive) {
-      currentBudget.value = state.getBudget(newId);
+      currentBudget.value = state.getBudget(newId)!;
     }
   },
   { immediate: true },

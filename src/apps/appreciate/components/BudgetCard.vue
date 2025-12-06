@@ -3,7 +3,7 @@ import * as moneyfunx from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
-import { useAppreciateCoreStore, AppreciateCoreStore }  from '@/apps/appreciate/stores/core';
+import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';

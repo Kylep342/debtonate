@@ -4,7 +4,7 @@ import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
-import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
@@ -14,7 +14,7 @@ const currentLoan: Ref<moneyfunx.ILoan|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
-const currentBudget: ComputedRef<MonthlyBudget> = computed(() => {
+const currentBudget: ComputedRef<MonthlyBudget|null> = computed(() => {
   if (!viewedItemId.value) return null;
   return state.getBudget(viewedItemId.value)!;
 });

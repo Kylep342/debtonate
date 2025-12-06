@@ -4,7 +4,7 @@ import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
 import constants from '@/apps/debtonate/constants/constants';
-import { useDebtonateCoreStore, DebtonateCoreStore }  from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { Button, Menu } from '@/apps/shared/types/app';
