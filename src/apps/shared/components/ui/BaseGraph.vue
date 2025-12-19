@@ -2,6 +2,7 @@
 import * as d3 from 'd3';
 import {
   onMounted,
+  onUnmounted,
   ref,
   shallowReactive,
   shallowRef,
@@ -27,11 +28,15 @@ const props = defineProps<{
 }>();
 
 const chart: ShallowReactive<GraphConfig> = shallowReactive({});
-const tooltipContent: ShallowRef<HoverTemplate|null> = shallowRef(null);
+const tooltipContent: ShallowRef<typeof HoverTemplate|null> = shallowRef(null);
 const tooltipPosition: Ref<TooltipPosition> = ref({ left: 0, top: 0 });
 const tooltipTransform: Ref<string> = ref('translateX(0%) translateY(0%)');
 const tooltipProps: Ref<TooltipProps|null> = ref(null);
 const tooltipSize: Ref<TooltipSize> = ref({ width: 0, height: 0 });
+
+const containerRef = ref<HTMLDivElement | null>(null);
+const containerWidth = ref(0);
+let resizeObserver: ResizeObserver | null = null;
 
 const updateTooltipSize = (size: TooltipSize) => {
   tooltipSize.value = size;
@@ -50,15 +55,41 @@ watch(tooltipSize, (newSize) => {
 
 
 const initializeChart = () => {
+  if (!containerWidth.value) return;
+
   const graph = chart.graphs[props.anchorId];
-  const totalWidth = 800;
+  
+  const totalWidth = containerWidth.value;
   const totalHeight = 500;
+  
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
-  const innerWidth = totalWidth - margin.left - margin.right;
-  const innerHeight = totalHeight - margin.top - margin.bottom;
 
   const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
   svg.selectAll('*').remove();
+
+  // create a temporary Y scale to measure label width
+  const tempY = chart.yScale()
+    .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
+    .range([totalHeight - margin.top - margin.bottom, 0]);
+
+  const tempAxis = svg.append('g')
+    .attr('class', 'temp-axis')
+    .style('opacity', '0')
+    .call(d3.axisLeft(tempY).tickFormat(chart.yFormat));
+
+  // measure the widest tick label to adjust margin.left dynamically
+  let maxLabelWidth = 0;
+  tempAxis.selectAll('text').each(function() {
+    const bbox = (this as SVGTextElement).getBBox();
+    if (bbox.width > maxLabelWidth) maxLabelWidth = bbox.width;
+  });
+  
+  // Clean up temp axis && update left margin based on max width + padding
+  tempAxis.remove();
+  margin.left = Math.ceil(maxLabelWidth + 20);
+
+  const innerWidth = totalWidth - margin.left - margin.right;
+  const innerHeight = totalHeight - margin.top - margin.bottom;
 
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
@@ -126,10 +157,31 @@ const initializeChart = () => {
 };
 
 onMounted(() => {
+  // Observe container resizing to redraw graph responsively
+  if (containerRef.value) {
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        containerWidth.value = entry.contentRect.width;
+      }
+    });
+    resizeObserver.observe(containerRef.value);
+  }
+
   if (props.graph) {
     Object.assign(chart, props.graph);
-    initializeChart();
+    // Initial draw will happen when containerWidth is set by observer
   }
+});
+
+onUnmounted(() => {
+  if (resizeObserver && containerRef.value) {
+    resizeObserver.unobserve(containerRef.value);
+  }
+});
+
+// Watch containerWidth to trigger redraws on resize
+watch(containerWidth, () => {
+  if (props.graph) initializeChart();
 });
 
 watch(
@@ -145,7 +197,7 @@ watch(
 </script>
 
 <template>
-  <div class="chartWrapper">
+  <div class="chartWrapper" ref="containerRef">
     <h2 class="text-center">
       {{ chart.header(anchorId) }}
     </h2>
@@ -169,5 +221,10 @@ watch(
   pointer-events: none;
   position: absolute;
   transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+/* Ensure the wrapper takes full width so ResizeObserver works */
+.chartWrapper {
+  width: 100%; 
+  min-width: 800px;
 }
 </style>

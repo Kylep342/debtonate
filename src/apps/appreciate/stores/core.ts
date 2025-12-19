@@ -53,7 +53,7 @@ export interface AppreciateCoreGetters {
     Record<string, Record<string, moneyfunx.ContributionSchedule>>
   >;
   graphs: ComputedRef<Record<string, GraphConfig>>;
-  graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>>;
+  graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>>;
   inflationRate: ComputedRef<number>;
   instrumentCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   instrumentFormTitle: ComputedRef<string>;
@@ -270,29 +270,39 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     globalOptions.periodsAsDates ? 'Contribution Date' : 'Contribution Number'
   );
 
-  const amortizationTableHeaders: ComputedRef<
-    Record<string, string | ComputedRef<string>>[]
-  > = computed(() => [
-    { key: 'period', label: periodLabel },
-    { key: 'totalGrowth', label: 'Total Growth' },
-    { key: 'contribution', label: 'Contribution' },
-    { key: 'interest', label: 'Interest' },
-    { key: 'currentBalance', label: 'Current Balance' },
-  ]);
-
   // Graphing
-  const graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>> = computed(() =>
+  const graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>> = computed(() =>
     globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear
   );
 
   // graph data
   const balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
-      const config = <GraphConfig<LineGraphContent>>{
+      const graphs = <Graphs<LineGraphContent>>{};
+      instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
+        graphs[instrument.id] = <LineGraphContent>{
+          config: {
+            maxX: getNumContributions(instrument.id, constants.DEFAULT),
+            maxY: getMaxMoney(instrument.id) * 1.1,
+          },
+          lines: <ChartSeries<Point>>{},
+        };
+        monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+          const line: Point[] = [];
+          getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
+            (record: moneyfunx.ContributionRecord) => {
+              line.push({ x: record.period, y: record.currentBalance });
+            }
+          );
+          graphs[instrument.id].lines[budget.id] = line;
+        });
+      });
+
+      return <GraphConfig<LineGraphContent>>{
         id: 'Balances',
         type: 'line',
         color: getBudgetColor,
-        graphs: <Graphs<LineGraphContent>>{},
+        graphs: graphs,
         header: (instrumentId: string) =>
           `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getBudgetName,
@@ -307,26 +317,6 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         yLabel: () => 'Balance',
         yScale: d3.scaleLinear,
       };
-
-      instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
-        config.graphs[instrument.id] = <LineGraphContent>{
-          config: {
-            maxX: getNumContributions(instrument.id, constants.DEFAULT),
-            maxY: getMaxMoney(instrument.id) * 1.1,
-          },
-          lines: <ChartSeries<Point>>{},
-        };
-        monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
-          const line: Point[] = [];
-          getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
-            (record: moneyfunx.ContributionRecord) => {
-              line.push({ x: record.period, y: record.currentBalance });
-            }
-          );
-          config.graphs[instrument.id].lines[budget.id] = line;
-        });
-      });
-      return config;
     }
   );
 
@@ -400,30 +390,9 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
   const purchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>> =
     computed(() => {
-      const config = <GraphConfig<LineGraphContent>>{
-        id: 'PurchasingPower',
-        type: 'line',
-        color: getBudgetColor,
-        graphs: <Graphs<LineGraphContent>>{},
-        header: (instrumentId: string) =>
-          `Purchasing Power over Time by Budget - ${getInstrumentName(
-            instrumentId
-          )}`,
-        lineName: getBudgetName,
-        subheader: (instrumentId: string) =>
-          buildInstrumentSubtitle(getInstrument(instrumentId)!),
-        x: globalOptions.Period,
-        xFormat: (x: number) => globalOptions.Period(x, true),
-        xLabel: () => globalOptions.Time,
-        xScale: graphXScale.value,
-        y: (y: number) => y,
-        yFormat: globalOptions.Money,
-        yLabel: () => 'Balance',
-        yScale: d3.scaleLinear,
-      };
-
+      const graphs = <Graphs<LineGraphContent>>{};
       instrumentsWithTotals.value.forEach((instrument: moneyfunx.IInstrument) => {
-        config.graphs[instrument.id] = <LineGraphContent>{
+        graphs[instrument.id] = <LineGraphContent>{
           config: {
             maxX: getNumContributions(instrument.id, constants.DEFAULT),
             maxY: deflate(
@@ -443,10 +412,31 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
               });
             }
           );
-          config.graphs[instrument.id].lines[budget.id] = line;
+          graphs[instrument.id].lines[budget.id] = line;
         });
       });
-      return config;
+
+      return <GraphConfig<LineGraphContent>>{
+        id: 'PurchasingPower',
+        type: 'line',
+        color: getBudgetColor,
+        graphs: graphs,
+        header: (instrumentId: string) =>
+          `Purchasing Power over Time by Budget - ${getInstrumentName(
+            instrumentId
+          )}`,
+        lineName: getBudgetName,
+        subheader: (instrumentId: string) =>
+          buildInstrumentSubtitle(getInstrument(instrumentId)!),
+        x: globalOptions.Period,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Balance',
+        yScale: d3.scaleLinear,
+      };
     });
 
   const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
@@ -760,6 +750,16 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     );
     return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth;
   };
+
+  const amortizationTableHeaders: ComputedRef<
+    Record<string, string | ComputedRef<string>>[]
+  > = computed(() => [
+    { key: 'period', label: periodLabel },
+    { key: 'totalGrowth', label: 'Total Growth' },
+    { key: 'contribution', label: 'Contribution' },
+    { key: 'interest', label: 'Interest' },
+    { key: 'currentBalance', label: 'Current Balance' },
+  ]);
 
   const amortizationTableRows = (schedule: moneyfunx.ContributionSchedule) => {
     return schedule.amortizationSchedule.map(

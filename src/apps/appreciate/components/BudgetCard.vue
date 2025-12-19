@@ -18,19 +18,19 @@ const props = defineProps<{
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const totalsContributionSummary: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => state.getContributionSchedule(constants.TOTALS, props.budget.id));
+const viewedContributionSummary: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => state.getContributionSchedule(props.viewedInstrumentId, props.budget.id));
 
 const netWorth: ComputedRef<number> = computed(() => state.deflateAllMoney
   ? state.deflate(
-    totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth,
+    viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth,
     state.getNumContributions(constants.TOTALS, props.budget.id)
   )
-  : totalsContributionSummary.value.lifetimeContribution + totalsContributionSummary.value.lifetimeGrowth
+  : viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth
 );
 const netWorthLabel: ComputedRef<string> = computed(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
 const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetContributions: ComputedRef<number> = computed(() => globalOptions.Period(totalsContributionSummary.value.amortizationSchedule.length, true));
+const budgetContributions: ComputedRef<string|number|Date> = computed(() => globalOptions.Period(viewedContributionSummary.value.amortizationSchedule.length, true));
 const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
 const contributionsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
@@ -77,7 +77,6 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
       <h3 v-if="state.instruments.length">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
-        :config="state.budgetCardGraphConfig"
         :graph="graphContent"
         :anchorId="budget.id"
       />

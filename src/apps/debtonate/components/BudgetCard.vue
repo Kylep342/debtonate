@@ -18,12 +18,11 @@ const props = defineProps<{
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const totalsPaymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => state.getPaymentSchedule(constants.TOTALS, props.budget.id));
+const viewedPaymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => state.getPaymentSchedule(props.viewedLoanId, props.budget.id));
 
 const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetPayments: ComputedRef<string> = computed(() => globalOptions.Period(totalsPaymentSchedule.value.amortizationSchedule.length, true));
-// const budgetTotalInterest = computed<string>(() => `${globalOptions.Money(totalsPaymentSchedule.value.lifetimeInterest)}`);
-const budgetTotalPaid: ComputedRef<string> = computed(() => `${globalOptions.Money(totalsPaymentSchedule.value.lifetimeInterest + totalsPaymentSchedule.value.lifetimePrincipal)}`);
+const budgetPayments: ComputedRef<string|number> = computed(() => globalOptions.Period(viewedPaymentSchedule.value.amortizationSchedule.length, true));
+const budgetTotalPaid: ComputedRef<string> = computed(() => `${globalOptions.Money(viewedPaymentSchedule.value.lifetimeInterest + viewedPaymentSchedule.value.lifetimePrincipal)}`);
 
 const paymentsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 const budgetName: ComputedRef<string> = computed(() => state.getBudgetName(props.budget.id));

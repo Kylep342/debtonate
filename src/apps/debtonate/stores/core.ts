@@ -47,7 +47,7 @@ export interface DebtonateCoreGetters {
   budgetFormTitle: ComputedRef<string>;
   cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>>;
   graphs: ComputedRef<Record<string, GraphConfig>>;
-  graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>>;
+  graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>>;
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   loanCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   loanFormTitle: ComputedRef<string>;
@@ -365,45 +365,17 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     globalOptions.periodsAsDates ? 'Payment Date' : 'Payment Number'
   );
 
-  const amortizationTableHeaders: ComputedRef<
-    Record<string, string | ComputedRef<string>>[]
-  > = computed(() => [
-    { key: 'period', label: periodLabel },
-    { key: 'amountPaid', label: 'Total Payment' },
-    { key: 'principalPaid', label: 'Principal' },
-    { key: 'interestPaid', label: 'Interest' },
-    { key: 'principalRemaining', label: 'Principal Remaining' },
-  ]);
-
   // Graphing
-  const graphXScale: ComputedRef<d3.ScaleTime<number, number> | d3.ScaleLinear<number, number>> = computed(() =>
+  const graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>> = computed(() =>
     globalOptions.periodsAsDates ? d3.scaleTime : d3.scaleLinear
   );
 
   // graph data
   const balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
-      const config = <GraphConfig<LineGraphContent>>{
-        id: 'Balances',
-        type: 'line',
-        color: getBudgetColor,
-        graphs: <Graphs<LineGraphContent>>{},
-        header: (loanId: string) =>
-          `Balances over Time by Budget - ${getLoanName(loanId)}`,
-        lineName: getBudgetName,
-        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
-        x: globalOptions.Period,
-        xFormat: (x: number) => globalOptions.Period(x, true),
-        xLabel: () => globalOptions.Time,
-        xScale: graphXScale.value,
-        y: (y: number) => y,
-        yFormat: globalOptions.Money,
-        yLabel: () => 'Balance',
-        yScale: d3.scaleLinear,
-      };
-
+      const graphs = <Graphs<LineGraphContent>>{};
       loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-        config.graphs[loan.id] = <LineGraphContent>{
+        graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLoan(loan.id)!.currentBalance,
@@ -417,10 +389,28 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
               line.push({ x: record.period, y: record.principalRemaining });
             }
           );
-          config.graphs[loan.id].lines[budget.id] = line;
+          graphs[loan.id].lines[budget.id] = line;
         });
       });
-      return config;
+
+      return <GraphConfig<LineGraphContent>>{
+        id: 'Balances',
+        type: 'line',
+        color: getBudgetColor,
+        graphs: graphs,
+        header: (loanId: string) =>
+          `Balances over Time by Budget - ${getLoanName(loanId)}`,
+        lineName: getBudgetName,
+        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+        x: globalOptions.Period,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Balance',
+        yScale: d3.scaleLinear,
+      };
     }
   );
 
@@ -489,27 +479,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
 
   const interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>> =
     computed(() => {
-      const config = <GraphConfig<LineGraphContent>>{
-        id: 'InterestSaved',
-        type: 'line',
-        color: getBudgetColor,
-        graphs: <Graphs<LineGraphContent>>{},
-        header: (loanId: string) =>
-          `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
-        lineName: getBudgetName,
-        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
-        x: globalOptions.Period,
-        xFormat: (x: number) => globalOptions.Period(x, true),
-        xLabel: () => globalOptions.Time,
-        xScale: graphXScale.value,
-        y: (y: number) => y,
-        yFormat: globalOptions.Money,
-        yLabel: () => 'Interest Saved',
-        yScale: d3.scaleLinear,
-      };
+      const graphs = <Graphs<LineGraphContent>>{};
 
       loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-        config.graphs[loan.id] = <LineGraphContent>{
+        graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
@@ -528,39 +501,36 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
               });
             }
           );
-          config.graphs[loan.id].lines[budget.id] = line;
+          graphs[loan.id].lines[budget.id] = line;
         });
       });
-      return config;
+      return <GraphConfig<LineGraphContent>>{
+        id: 'InterestSaved',
+        type: 'line',
+        color: getBudgetColor,
+        graphs: graphs,
+        header: (loanId: string) =>
+          `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
+        lineName: getBudgetName,
+        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+        x: globalOptions.Period,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Interest Saved',
+        yScale: d3.scaleLinear,
+      };
     });
 
   const percentOfPaymentAsPrincaplGraphs: ComputedRef<
     GraphConfig<LineGraphContent>
   > = computed(() => {
-    const config = <GraphConfig<LineGraphContent>>{
-      id: 'PercentOfPaymentAsPrincipal',
-      type: 'line',
-      color: getBudgetColor,
-      graphs: <Graphs<LineGraphContent>>{},
-      header: (loanId: string) =>
-        `Percent of Payment as Principal over Time by Budget - ${getLoanName(
-          loanId
-        )}`,
-      lineName: getBudgetName,
-      subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
-      x: globalOptions.Period,
-      xFormat: (x: number) => globalOptions.Period(x, true),
-      xLabel: () => globalOptions.Time,
-      xScale: graphXScale.value,
-      y: (y: number) => y,
-      yLabel: () => 'Percent of Payemnt to Principal',
-      yFormat: globalOptions.Percent,
-      yScale: d3.scaleLinear,
-    };
-
+    const graphs: Graphs<LineGraphContent> = {};
     // idea; toggle presence of lines as data with boolean k-v
     loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-      config.graphs[loan.id] = <LineGraphContent>{
+      graphs[loan.id] = <LineGraphContent>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
@@ -577,10 +547,30 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
             });
           }
         );
-        config.graphs[loan.id].lines[budget.id] = line;
+        graphs[loan.id].lines[budget.id] = line;
       });
     });
-    return config;
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'PercentOfPaymentAsPrincipal',
+      type: 'line',
+      color: getBudgetColor,
+      graphs: graphs,
+      header: (loanId: string) =>
+        `Percent of Payment as Principal over Time by Budget - ${getLoanName(
+          loanId
+        )}`,
+      lineName: getBudgetName,
+      subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+      x: globalOptions.Period,
+      xFormat: (x: number) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yLabel: () => 'Percent of Payemnt to Principal',
+      yFormat: globalOptions.Percent,
+      yScale: d3.scaleLinear,
+    };
   });
 
   const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
@@ -930,10 +920,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const getNumPayments = (loanId: string, budgetId: string): number =>
     getPaymentSchedule(loanId, budgetId).amortizationSchedule.length;
 
-
   const getLifetimeInterest = (loanId: string, budgetId: string): number =>
     getPaymentSchedule(loanId, budgetId).lifetimeInterest;
-
 
   const getInterestUpToPeriod = (
     loanId: string,
@@ -943,6 +931,16 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     getPaymentSchedule(loanId, budgetId)
       .amortizationSchedule.slice(0, period)
       .reduce((acc, record) => acc + record.interest, 0);
+
+  const amortizationTableHeaders: ComputedRef<
+    Record<string, string | ComputedRef<string>>[]
+  > = computed(() => [
+    { key: 'period', label: periodLabel },
+    { key: 'amountPaid', label: 'Total Payment' },
+    { key: 'principalPaid', label: 'Principal' },
+    { key: 'interestPaid', label: 'Interest' },
+    { key: 'principalRemaining', label: 'Principal Remaining' },
+  ]);
 
   const amortizationTableRows = (schedule: moneyfunx.PaymentSchedule) => {
     return schedule.amortizationSchedule.map(

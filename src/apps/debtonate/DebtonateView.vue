@@ -39,7 +39,7 @@ useModal(computed<boolean>(() => state.refinancingFormActive), constants.REFINAN
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
       <LoansPanel />
       <BudgetsPanel />
-      <div :class="['m-4']">
+      <div :class="['m-4', 'flex-1', 'flex', 'flex-col', 'items-center']">
         <div
           v-if="!state.loans.length"
           :class="['text-wrap', 'text-pretty', 'w-30']"
