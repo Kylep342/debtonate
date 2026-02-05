@@ -103,7 +103,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
         <collapsible-card ref="inflationCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Inflation
+              Inflation (%)
             </h3>
           </template>
           <template #cardTitleActions>
@@ -160,7 +160,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
-                Sets the number of years to contribute to instruments
+                Sets the number of years to save for retirement
               </p>
             </div>
           </template>

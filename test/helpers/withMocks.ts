@@ -15,13 +15,7 @@ export function withMocks<T extends object>(
   ...mocks: MockDefinition<T>[]
 ) {
   mocks.forEach(({ method, implementation }) => {
-    // If it's already a spy/mock, just updating implementation might be safer,
-    // but for missing DOM methods, we often need to force assignment.
-
     const fn = implementation ? vi.fn(implementation) : vi.fn();
-
-    // We cast to 'any' here because we are often patching read-only DOM APIs
-    // or methods that don't technically exist in JSDOM types.
     (target as any)[method] = fn;
   });
 }
