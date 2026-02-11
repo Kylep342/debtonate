@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as moneyfunx from 'moneyfunx';
+import moneyfunx from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';

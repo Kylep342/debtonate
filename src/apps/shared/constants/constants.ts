@@ -2,7 +2,7 @@
  * Shared constants across apps
  *
  */
-import { TOTALS } from 'moneyfunx';
+import { constants } from 'moneyfunx';
 
 import { Locale } from '@/apps/shared/types/app';
 
@@ -146,5 +146,5 @@ export default Object.freeze({
   TABLES,
   THEME,
   THEME_DARK,
-  TOTALS,
+  ...constants,
 });

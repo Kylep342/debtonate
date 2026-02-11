@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as moneyfunx from 'moneyfunx';
+import moneyfunx from 'moneyfunx';
 import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/appreciate/components/BudgetCard.vue';

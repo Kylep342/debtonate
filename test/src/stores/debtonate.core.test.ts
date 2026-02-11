@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as moneyfunx from 'moneyfunx';
+import { loan } from 'moneyfunx';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -10,10 +10,10 @@ import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const Loans = (): moneyfunx.Loan[] => [
-  new moneyfunx.Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, 'house'),
-  new moneyfunx.Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, 'e-car', 23456.78, 200),
-  new moneyfunx.Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, 'tau', 6283.19 ),
+const Loans = (): loan.Loan[] => [
+  new loan.Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, 'house'),
+  new loan.Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, 'e-car', 23456.78, 200),
+  new loan.Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, 'tau', 6283.19 ),
 ];
 
 const Budgets = (): MonthlyBudget[] => [
@@ -22,19 +22,19 @@ const Budgets = (): MonthlyBudget[] => [
   { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
 ];
 
-const RefinancingScenarios = (loan: moneyfunx.ILoan): moneyfunx.Loan[] => [
-  new moneyfunx.Loan(
-    loan.currentBalance,
-    loan.annualRate - 0.0075,
+const RefinancingScenarios = (baseLoan: loan.ILoan): loan.Loan[] => [
+  new loan.Loan(
+    baseLoan.currentBalance,
+    baseLoan.annualRate - 0.0075,
     constants.PERIODS_PER_YEAR,
-    loan.termInYears + 1,
+    baseLoan.termInYears + 1,
     'lower rate longer term',
   ),
-  new moneyfunx.Loan(
-    loan.currentBalance,
-    loan.annualRate + 0.0150,
+  new loan.Loan(
+    baseLoan.currentBalance,
+    baseLoan.annualRate + 0.0150,
     constants.PERIODS_PER_YEAR,
-    Math.max(loan.termInYears - 2, 2),
+    Math.max(baseLoan.termInYears - 2, 2),
     'higher rate shorter term',
   ),
 ];
@@ -51,7 +51,7 @@ describe('Debtonate Core Store', () => {
     state.sortLoans();
 
     expect(
-      state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.name)
+      state.loansWithTotals.map((loan: loan.ILoan) => loan.name)
     ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, 'e-car', 'house', 'tau']);
 
     expect(
@@ -162,13 +162,13 @@ describe('Debtonate Core Store', () => {
       );
 
       expect(
-        state.loans.map((loan: moneyfunx.Loan) => loan.name)
+        state.loans.map((loan: loan.Loan) => loan.name)
       ).toStrictEqual(
         ['house']
       );
 
       expect(
-        state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.name)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.name)
       ).toStrictEqual(
         [constants.NAME_TOTALS_AS_LOAN, 'house']
       );
@@ -182,7 +182,7 @@ describe('Debtonate Core Store', () => {
 
       state.deleteLoan(firstLoanId);
       expect(state.loans.length).toBe(2);
-      expect(state.loans.map((loan: moneyfunx.Loan) => loan.name)).toStrictEqual(['e-car', 'tau']);
+      expect(state.loans.map((loan: loan.Loan) => loan.name)).toStrictEqual(['e-car', 'tau']);
     });
 
     it('edits a loan', async () => {
@@ -216,19 +216,19 @@ describe('Debtonate Core Store', () => {
 
       state.sortLoans();
       expect(
-        state.loans.map((loan: moneyfunx.Loan) => loan.name)
+        state.loans.map((loan: loan.Loan) => loan.name)
       ).toStrictEqual(['e-car', 'house', 'tau']);
 
       state.toggleSnowballSort();
       expect(state.snowballSort).toBe(true);
       expect(
-        state.loans.map((loan: moneyfunx.Loan) => loan.name)
+        state.loans.map((loan: loan.Loan) => loan.name)
       ).toStrictEqual(['tau', 'e-car', 'house']);
 
       state.toggleAvalancheSort();
       expect(state.snowballSort).toBe(false);
       expect(
-        state.loans.map((loan: moneyfunx.Loan) => loan.name)
+        state.loans.map((loan: loan.Loan) => loan.name)
       ).toStrictEqual(['e-car', 'house', 'tau']);
     });
 
@@ -267,7 +267,7 @@ describe('Debtonate Core Store', () => {
       );
       expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
       expect(Object.keys(state.refinancingSchedules)).toStrictEqual([firstLoanId]);
-      const firstRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario) => scenario.id === firstScenarioId);
+      const firstRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: loan.Loan) => scenario.id === firstScenarioId);
       expect(firstRefinanceScenario.name).toBe('Lower Rate Longer Term');
       expect(
         state.refinancingSchedules[firstLoanId][firstScenarioId].paymentAmount
@@ -292,13 +292,13 @@ describe('Debtonate Core Store', () => {
       );
       expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
       expect(Object.keys(state.refinancingSchedules)).toStrictEqual([firstLoanId]);
-      expect(state.refinancingScenarios[firstLoanId].map((scenario) => scenario.id)).toStrictEqual([firstScenarioId, secondScenarioId]);
-      const secondRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario) => scenario.id === secondScenarioId);
+      expect(state.refinancingScenarios[firstLoanId].map((scenario: loan.Loan) => scenario.id)).toStrictEqual([firstScenarioId, secondScenarioId]);
+      const secondRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: loan.Loan) => scenario.id === secondScenarioId);
       expect(secondRefinanceScenario.name).toBe('Scenario 2');
 
       state.deleteRefinancingScenario(firstLoanId, firstScenarioId);
       expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
-      expect(state.refinancingScenarios[firstLoanId].map((scenario) => scenario.id)).toStrictEqual([secondScenarioId]);
+      expect(state.refinancingScenarios[firstLoanId].map((scenario: loan.Loan) => scenario.id)).toStrictEqual([secondScenarioId]);
     });
   });
 
@@ -339,9 +339,9 @@ describe('Debtonate Core Store', () => {
 
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.loans.map(
-      (loan: moneyfunx.Loan) => loan.name)
+      (loan: loan.Loan) => loan.name)
     ).toStrictEqual(initialState[keys.LS_LOANS].map(
-      (loan: moneyfunx.Loan) => loan.name
+      (loan: loan.Loan) => loan.name
     ));
     expect(state.reducePayments).toBe(initialState[keys.LS_REDUCE_PAYMENTS]);
     expect(state.roundingEnabled).toBe(initialState[keys.LS_ROUNDING_ENABLED]);
@@ -352,9 +352,9 @@ describe('Debtonate Core Store', () => {
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.loans.map(
-      (loan: moneyfunx.Loan) => loan.name
+      (loan: loan.Loan) => loan.name
     )).toStrictEqual(changedState[keys.LS_LOANS].map(
-      (loan: moneyfunx.Loan) => loan.name
+      (loan: loan.Loan) => loan.name
     ));
     expect(state.roundingEnabled).toBe(changedState[keys.LS_ROUNDING_ENABLED]);
     expect(state.roundingScale).toBe(changedState[keys.LS_ROUNDING_SCALE]);
@@ -496,7 +496,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.paymentScenarios[budget.id].paymentSchedule)
       ).toStrictEqual(
-        [...state.loans.map((loan: moneyfunx.Loan) => loan.id), constants.TOTALS]
+        [...state.loans.map((loan: loan.Loan) => loan.id), constants.TOTALS]
       );
       expect(
         state.paymentScenarios[budget.id].paymentAmount
@@ -514,7 +514,7 @@ describe('Debtonate Core Store', () => {
     expect(
       Object.keys(state.paymentSchedules)
     ).toStrictEqual(
-      state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.id)
+      state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
     );
 
     Object.keys(state.paymentSchedules).forEach((loanId) => {
@@ -604,7 +604,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
       );
     });
 
@@ -616,7 +616,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
       );
     });
 
@@ -628,7 +628,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL].graphs)
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: moneyfunx.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
       );
     });
   });

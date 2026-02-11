@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as moneyfunx from 'moneyfunx';
+import moneyfunx from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';

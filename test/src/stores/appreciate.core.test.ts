@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as moneyfunx from 'moneyfunx';
+import { instrument } from 'moneyfunx';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -10,10 +10,10 @@ import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 
-const Instruments = (): moneyfunx.Instrument[] => [
-  new moneyfunx.Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
-  new moneyfunx.Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
-  new moneyfunx.Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
+const Instruments = (): instrument.Instrument[] => [
+  new instrument.Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
+  new instrument.Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
+  new instrument.Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
 ];
 
 const Budgets = (): MonthlyBudget[] => [
@@ -34,7 +34,7 @@ describe('Appreciate Core Store', () => {
     state.sortInstruments();
 
     expect(
-      state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.name)
+      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.name)
     ).toStrictEqual([constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA', '401(K)', 'ABC']);
 
     expect(
@@ -135,13 +135,13 @@ describe('Appreciate Core Store', () => {
       );
 
       expect(
-        state.instruments.map((instrument: moneyfunx.Instrument) => instrument.name)
+        state.instruments.map((instrument: instrument.Instrument) => instrument.name)
       ).toStrictEqual(
         ['IRA']
       );
 
       expect(
-        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.name)
+        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.name)
       ).toStrictEqual(
         [constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA']
       );
@@ -156,7 +156,7 @@ describe('Appreciate Core Store', () => {
 
       state.deleteInstrument(firstInstrumentId);
       expect(state.instruments.length).toBe(2);
-      expect(state.instruments.map((instrument: moneyfunx.Instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
+      expect(state.instruments.map((instrument: instrument.Instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
     });
 
     it('edits an instrument', async () => {
@@ -230,9 +230,9 @@ describe('Appreciate Core Store', () => {
 
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument: moneyfunx.Instrument) => instrument.name)
+      (instrument: instrument.Instrument) => instrument.name)
     ).toStrictEqual(initialState[keys.LS_INSTRUMENTS].map(
-      (instrument: moneyfunx.Instrument) => instrument.name
+      (instrument: instrument.Instrument) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(initialState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(initialState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -245,9 +245,9 @@ describe('Appreciate Core Store', () => {
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument: moneyfunx.Instrument) => instrument.name
+      (instrument: instrument.Instrument) => instrument.name
     )).toStrictEqual(changedState[keys.LS_INSTRUMENTS].map(
-      (instrument: moneyfunx.Instrument) => instrument.name
+      (instrument: instrument.Instrument) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(changedState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(changedState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -374,7 +374,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.contributionScenarios[budget.id].contributionSchedule)
       ).toStrictEqual(
-        [...state.instruments.map((instrument: moneyfunx.Instrument) => instrument.id), constants.TOTALS]
+        [...state.instruments.map((instrument: instrument.Instrument) => instrument.id), constants.TOTALS]
       );
       expect(
         state.contributionScenarios[budget.id].contributionAmount
@@ -392,7 +392,7 @@ describe('Appreciate Core Store', () => {
     expect(
       Object.keys(state.contributionSchedules)
     ).toStrictEqual(
-      state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
+      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
     );
 
     Object.keys(state.contributionSchedules).forEach((instrumentId) => {
@@ -470,7 +470,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
+        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
       );
     });
 
@@ -482,7 +482,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs)
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => instrument.id)
+        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
       );
     })
   });

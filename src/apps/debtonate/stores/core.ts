@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import * as moneyfunx from 'moneyfunx';
+import { loan, payments, paymentTypes, sorting } from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref, Ref, ComputedRef } from 'vue';
 
@@ -26,12 +26,12 @@ export interface DebtonateCoreState {
   currentLoanId: Ref<string | null>;
   loanDetailsPanelActive: Ref<boolean>;
   loanFormActive: Ref<boolean>;
-  loans: Ref<moneyfunx.Loan[]>;
+  loans: Ref<loan.Loan[]>;
   minimumBudget: Budget;
   optionsFormActive: Ref<boolean>;
   reducePayments: Ref<boolean>;
   refinancingFormActive: Ref<boolean>;
-  refinancingScenarios: Ref<Record<string, moneyfunx.Loan[]>>;
+  refinancingScenarios: Ref<Record<string, loan.Loan[]>>;
   refinancingUseHighestPayment: Ref<boolean>;
   roundingEnabled: Ref<boolean>;
   roundingScale: Ref<number>;
@@ -51,11 +51,11 @@ export interface DebtonateCoreGetters {
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   loanCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   loanFormTitle: ComputedRef<string>;
-  loansWithTotals: ComputedRef<moneyfunx.ILoan[]>;
+  loansWithTotals: ComputedRef<loan.ILoan[]>;
   monthlyBudgets: ComputedRef<MonthlyBudget[]>;
   paymentScenarios: ComputedRef<Record<string, PaymentScenario>>;
   paymentSchedules: ComputedRef<
-    Record<string, Record<string, moneyfunx.PaymentSchedule>>
+    Record<string, Record<string, paymentTypes.PaymentSchedule>>
   >;
   percentOfPaymentAsPrincaplGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   periodLabel: ComputedRef<string>;
@@ -73,26 +73,26 @@ export interface DebtonateCoreGetters {
   totalMaxTermInYears: ComputedRef<number>;
   totalMinPayment: ComputedRef<number>;
   totalPrincipal: ComputedRef<number>;
-  totalsAsALoan: ComputedRef<moneyfunx.ILoan>;
+  totalsAsALoan: ComputedRef<loan.ILoan>;
 }
 
 export interface DebtonateCoreActions {
   amortizationTableRows: (
-    schedule: moneyfunx.PaymentSchedule
+    schedule: paymentTypes.PaymentSchedule
   ) => Record<string, string>[];
   amortizationTableTotals: (
-    schedule: moneyfunx.PaymentSchedule
+    schedule: paymentTypes.PaymentSchedule
   ) => Record<string, string>;
-  avalanche: () => moneyfunx.Loan[];
+  avalanche: () => loan.Loan[];
   buildAmortizationTableSubtitle: (
-    loan: moneyfunx.ILoan,
+    loan: loan.ILoan,
     monthlyBudget: MonthlyBudget
   ) => string;
   buildAmortizationTableTitle: (
-    loan: moneyfunx.ILoan,
+    loan: loan.ILoan,
     monthlyBudget: MonthlyBudget
   ) => string;
-  buildLoanSubtitle: (loan: moneyfunx.ILoan) => string;
+  buildLoanSubtitle: (loan: loan.ILoan) => string;
   clearState: () => void;
   createBudget: (proposedBudget: number) => string;
   createLoan: (
@@ -131,14 +131,14 @@ export interface DebtonateCoreActions {
     period: number
   ) => number;
   getLifetimeInterest: (loanId: string, budgetId: string) => number;
-  getLoan: (id: string) => moneyfunx.ILoan | undefined;
+  getLoan: (id: string) => loan.ILoan | undefined;
   getLoanIndex: (id: string) => number;
   getLoanName: (id: string) => string;
   getNumPayments: (loanId: string, budgetId: string) => number;
   getPaymentSchedule: (
     loanId: string,
     budgetId: string
-  ) => moneyfunx.PaymentSchedule;
+  ) => paymentTypes.PaymentSchedule;
   loadState: () => void;
   openBudgetForm: () => void;
   openLoanForm: () => void;
@@ -146,12 +146,12 @@ export interface DebtonateCoreActions {
   refinanceLoan: (id: string) => void;
   refinancingScenarioName: (parentLoanId: string, name: string) => string;
   refinancingScenarioPayment: (
-    parentLoan: moneyfunx.ILoan,
-    loan: moneyfunx.ILoan
+    parentLoan: loan.ILoan,
+    loan: loan.ILoan
   ) => number;
   saveState: () => void;
   setRoundingScale: (newScale: number) => void;
-  snowball: () => moneyfunx.Loan[];
+  snowball: () => loan.Loan[];
   sortLoans: () => void;
   toggleAvalancheSort: () => void;
   toggleReducePayments: () => void;
@@ -178,12 +178,12 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const currentLoanId: Ref<string | null> = ref(null);
   const loanDetailsPanelActive: Ref<boolean> = ref(false);
   const loanFormActive: Ref<boolean> = ref(false);
-  const loans: Ref<moneyfunx.Loan[]> = ref([]);
+  const loans: Ref<loan.Loan[]> = ref([]);
   const minimumBudget: Budget = { id: constants.DEFAULT, relative: 0 };
   const optionsFormActive: Ref<boolean> = ref(false);
   const reducePayments: Ref<boolean> = ref(true);
   const refinancingFormActive: Ref<boolean> = ref(false);
-  const refinancingScenarios: Ref<Record<string, moneyfunx.Loan[]>> = ref({});
+  const refinancingScenarios: Ref<Record<string, loan.Loan[]>> = ref({});
   const refinancingUseHighestPayment: Ref<boolean> = ref(false);
   const roundingEnabled: Ref<boolean> = ref(false);
   const roundingScale: Ref<number> = ref(100);
@@ -249,7 +249,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   );
 
   // Loans
-  const totalsAsALoan: ComputedRef<moneyfunx.ILoan> = computed(() => ({
+  const totalsAsALoan: ComputedRef<loan.ILoan> = computed(() => ({
     id: constants.TOTALS,
     principal: totalPrincipal.value,
     annualRate: totalEffectiveInterestRate.value,
@@ -263,7 +263,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     fees: totalFees.value,
   }));
 
-  const loansWithTotals: ComputedRef<moneyfunx.ILoan[]> = computed(() => [
+  const loansWithTotals: ComputedRef<loan.ILoan[]> = computed(() => [
     totalsAsALoan.value,
     ...loans.value,
   ]);
@@ -287,7 +287,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         schedules[parentLoanId] = <Record<string, PaymentScenario>>{};
         scenarios.forEach((scenario) => {
           const payment = refinancingScenarioPayment(parentLoan, scenario);
-          const paymentSchedule = moneyfunx.payLoans(
+          const paymentSchedule = payments.payLoans(
             [scenario],
             payment,
             false
@@ -328,7 +328,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       monthlyBudgets.value.forEach((budget) => {
         scenarios[budget.id] = <PaymentScenario>{
           paymentAmount: budget.relative,
-          paymentSchedule: moneyfunx.payLoans(
+          paymentSchedule: payments.payLoans(
             loans.value,
             budget.absolute,
             reducePayments.value
@@ -340,15 +340,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   );
 
   const paymentSchedules: ComputedRef<
-    Record<string, Record<string, moneyfunx.PaymentSchedule>>
+    Record<string, Record<string, paymentTypes.PaymentSchedule>>
   > = computed(() => {
     const schedules: Record<
       string,
-      Record<string, moneyfunx.PaymentSchedule>
+      Record<string, paymentTypes.PaymentSchedule>
     > = {};
 
-    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
-      schedules[loan.id] = <Record<string, moneyfunx.PaymentSchedule>>{};
+    loansWithTotals.value.forEach((loan: loan.ILoan) => {
+      schedules[loan.id] = <Record<string, paymentTypes.PaymentSchedule>>{};
     });
 
     Object.keys(schedules).forEach((loanId: string) => {
@@ -374,7 +374,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
       const graphs = <Graphs<LineGraphContent>>{};
-      loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
+      loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -385,7 +385,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
           getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach(
-            (record: moneyfunx.PaymentRecord) => {
+            (record: paymentTypes.PaymentRecord) => {
               line.push({ x: record.period, y: record.principalRemaining });
             }
           );
@@ -456,7 +456,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>> =
     computed(() => {
       const config = <Record<string, Record<string, DonutGraphContent>>>{};
-      loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
+      loansWithTotals.value.forEach((loan: loan.ILoan) => {
         config[loan.id] = <Record<string, DonutGraphContent>>{};
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const paymentSchedule = getPaymentSchedule(loan.id, budget.id);
@@ -481,7 +481,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     computed(() => {
       const graphs = <Graphs<LineGraphContent>>{};
 
-      loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
+      loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
             maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -492,7 +492,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
           getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach(
-            (record: moneyfunx.PaymentRecord, index: number) => {
+            (record: paymentTypes.PaymentRecord, index: number) => {
               line.push({
                 x: record.period,
                 y:
@@ -529,7 +529,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   > = computed(() => {
     const graphs: Graphs<LineGraphContent> = {};
     // idea; toggle presence of lines as data with boolean k-v
-    loansWithTotals.value.forEach((loan: moneyfunx.ILoan) => {
+    loansWithTotals.value.forEach((loan: loan.ILoan) => {
       graphs[loan.id] = <LineGraphContent>{
         config: {
           maxX: getNumPayments(loan.id, constants.DEFAULT),
@@ -540,7 +540,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const line: Point[] = [];
         getPaymentSchedule(loan.id, budget.id).amortizationSchedule.forEach(
-          (record: moneyfunx.PaymentRecord) => {
+          (record: paymentTypes.PaymentRecord) => {
             line.push({
               x: record.period,
               y: (record.principal * 100) / (record.principal + record.interest),
@@ -614,15 +614,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     const storedLoans = localStorage.getItem(keys.LS_LOANS);
     if (storedLoans)
       loans.value = JSON.parse(storedLoans).map(
-        (loan: moneyfunx.ILoan) =>
-          new moneyfunx.Loan(
-            loan.principal,
-            loan.annualRate,
+        (storedLoan: loan.ILoan) =>
+          new loan.Loan(
+            storedLoan.principal,
+            storedLoan.annualRate,
             constants.PERIODS_PER_YEAR,
-            loan.termInYears,
-            loan.name,
-            loan.currentBalance,
-            loan.fees
+            storedLoan.termInYears,
+            storedLoan.name,
+            storedLoan.currentBalance,
+            storedLoan.fees
           )
       );
 
@@ -709,15 +709,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       setRoundingScale(scale);
     }
   };
-  const avalanche = (): moneyfunx.Loan[] =>
-    moneyfunx.sortWith(
-      moneyfunx.sortWith(loans.value, moneyfunx.snowball),
-      moneyfunx.avalanche
+  const avalanche = (): loan.Loan[] =>
+    sorting.sortWith(
+      sorting.sortWith(loans.value, sorting.snowball),
+      sorting.avalanche
     );
-  const snowball = (): moneyfunx.Loan[] =>
-    moneyfunx.sortWith(
-      moneyfunx.sortWith(loans.value, moneyfunx.avalanche),
-      moneyfunx.snowball
+  const snowball = (): loan.Loan[] =>
+    sorting.sortWith(
+      sorting.sortWith(loans.value, sorting.avalanche),
+      sorting.snowball
     );
 
   const sortLoans = (): void => {
@@ -735,7 +735,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   };
 
   // Loans
-  const getLoan = (id: string): moneyfunx.ILoan | undefined =>
+  const getLoan = (id: string): loan.ILoan | undefined =>
     loansWithTotals.value.find((loan) => loan.id === id);
 
   const deleteLoan = (id: string): void => {
@@ -819,8 +819,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
 
   // Refinancing scenarios
   const refinancingScenarioPayment = (
-    parentLoan: moneyfunx.ILoan,
-    loan: moneyfunx.ILoan
+    parentLoan: loan.ILoan,
+    loan: loan.ILoan
   ): number =>
     refinancingUseHighestPayment.value
       ? Math.max(loan.minPayment, parentLoan.minPayment)
@@ -841,7 +841,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     name: string,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(
+    const createdLoan = new loan.Loan(
       principal,
       interestRate,
       constants.PERIODS_PER_YEAR,
@@ -851,11 +851,11 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       fees
     );
     if (refinancingScenarios.value[parentLoanId]) {
-      refinancingScenarios.value[parentLoanId].push(loan);
+      refinancingScenarios.value[parentLoanId].push(createdLoan);
     } else {
-      refinancingScenarios.value[parentLoanId] = [loan];
+      refinancingScenarios.value[parentLoanId] = [createdLoan];
     }
-    return loan.id;
+    return createdLoan.id;
   };
 
   const deleteRefinancingScenario = (
@@ -893,7 +893,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     currentBalance: number,
     fees: number
   ): string => {
-    const loan = new moneyfunx.Loan(
+    const createdLoan = new loan.Loan(
       principal,
       interestRate,
       constants.PERIODS_PER_YEAR,
@@ -906,16 +906,16 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       deleteLoan(currentLoanId.value);
       currentLoanId.value = null;
     }
-    loans.value.push(loan);
+    loans.value.push(createdLoan);
     sortLoans();
-    return loan.id;
+    return createdLoan.id;
   };
 
   // ease-of-use getters over computed values
   const getPaymentSchedule = (
     loanId: string,
     budgetId: string
-  ): moneyfunx.PaymentSchedule => paymentSchedules.value[loanId][budgetId];
+  ): paymentTypes.PaymentSchedule => paymentSchedules.value[loanId][budgetId];
 
   const getNumPayments = (loanId: string, budgetId: string): number =>
     getPaymentSchedule(loanId, budgetId).amortizationSchedule.length;
@@ -942,9 +942,9 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     { key: 'principalRemaining', label: 'Principal Remaining' },
   ]);
 
-  const amortizationTableRows = (schedule: moneyfunx.PaymentSchedule) => {
+  const amortizationTableRows = (schedule: paymentTypes.PaymentSchedule) => {
     return schedule.amortizationSchedule.map(
-      (record: moneyfunx.PaymentRecord) => ({
+      (record: paymentTypes.PaymentRecord) => ({
         period: globalOptions.Period(record.period, true) as string,
         amountPaid: globalOptions.Money(record.interest + record.principal),
         principalPaid: globalOptions.Money(record.principal),
@@ -954,7 +954,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     );
   };
 
-  const amortizationTableTotals = (schedule: moneyfunx.PaymentSchedule) => {
+  const amortizationTableTotals = (schedule: paymentTypes.PaymentSchedule) => {
     const { lifetimePrincipal, lifetimeInterest } = schedule;
     return {
       period: 'Totals',
@@ -967,7 +967,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
 
   // title building functions
   const buildAmortizationTableTitle = (
-    loan: moneyfunx.ILoan,
+    loan: loan.ILoan,
     monthlyBudget: MonthlyBudget
   ): string =>
     `Amortization Table - ${getLoanName(loan.id)} | ${getBudgetName(
@@ -975,7 +975,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     )}`;
 
   const buildAmortizationTableSubtitle = (
-    loan: moneyfunx.ILoan,
+    loan: loan.ILoan,
     monthlyBudget: MonthlyBudget
   ): string =>
     `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(
@@ -984,7 +984,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       monthlyBudget.absolute
     )}/month | ${getNumPayments(loan.id, monthlyBudget.id)} Payments)`;
 
-  const buildLoanSubtitle = (loan: moneyfunx.ILoan): string =>
+  const buildLoanSubtitle = (loan: loan.ILoan): string =>
     `(${globalOptions.Money(loan.currentBalance)} | ${globalOptions.Percent(
       loan.annualRate * 100
     )} | ${loan.termInYears * loan.periodsPerYear} Payments)`;

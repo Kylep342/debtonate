@@ -1,4 +1,4 @@
-import { MAX_DURATION_YEARS } from 'moneyfunx';
+import { constants } from 'moneyfunx';
 
 import sharedConstants from '@/apps/shared/constants/constants';
 
@@ -16,6 +16,7 @@ const INSTRUMENT_DETAILS = 'Instrument Details';
 const INSTRUMENT_FORM_ID = 'instrumentForm';
 const INSTRUMENTS = 'Instruments';
 const MAX_DELTA_FACTOR = 30; // used for both growth and inflation
+const MAX_DURATION_YEARS = constants.MAX_DURATION_YEARS;
 const NAME_TOTALS_AS_AN_INSTRUMENT = 'All Instruments';
 const OPTIONS_FORM_ID = 'appreciateOptionsForm';
 
