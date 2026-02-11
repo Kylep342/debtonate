@@ -1,16 +1,14 @@
 /**
  * Shared constants across apps
  *
+ * buttons
+ * colors
+ * locales
+ * cross-app keywords
  */
 import { constants } from 'moneyfunx';
 
 import { Locale } from '@/apps/shared/types/app';
-
-// constant values for:
-//  buttons
-//  colors
-//  locales
-//  cross-app keywords
 
 // Buttons
 const BTN_CLEAR = 'Clear';

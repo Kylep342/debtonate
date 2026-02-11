@@ -848,7 +848,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       termInYears,
       refinancingScenarioName(parentLoanId, name),
       undefined,
-      fees
+      fees || undefined
     );
     if (refinancingScenarios.value[parentLoanId]) {
       refinancingScenarios.value[parentLoanId].push(createdLoan);
@@ -899,8 +899,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       constants.PERIODS_PER_YEAR,
       termInYears,
       name,
-      currentBalance,
-      fees
+      currentBalance || undefined,
+      fees || undefined
     );
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);
