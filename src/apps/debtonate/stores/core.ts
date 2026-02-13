@@ -935,21 +935,21 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const amortizationTableHeaders: ComputedRef<
     Record<string, string | ComputedRef<string>>[]
   > = computed(() => [
-    { key: 'period', label: periodLabel },
-    { key: 'amountPaid', label: 'Total Payment' },
-    { key: 'principalPaid', label: 'Principal' },
-    { key: 'interestPaid', label: 'Interest' },
-    { key: 'principalRemaining', label: 'Principal Remaining' },
+    { key: constants.TK_PERIOD, label: periodLabel },
+    { key: constants.TK_AMOUNT_PAID, label: 'Total Payment' },
+    { key: constants.TK_PRINCIPAL_PAID, label: 'Principal' },
+    { key: constants.TK_INTEREST_PAID, label: 'Interest' },
+    { key: constants.TK_PRINCIPAL_REMAINING, label: 'Principal Remaining' },
   ]);
 
   const amortizationTableRows = (schedule: paymentTypes.PaymentSchedule) => {
     return schedule.amortizationSchedule.map(
       (record: paymentTypes.PaymentRecord) => ({
-        period: globalOptions.Period(record.period, true) as string,
-        amountPaid: globalOptions.Money(record.interest + record.principal),
-        principalPaid: globalOptions.Money(record.principal),
-        interestPaid: globalOptions.Money(record.interest),
-        principalRemaining: globalOptions.Money(record.principalRemaining),
+        [constants.TK_PERIOD]: globalOptions.Period(record.period, true) as string,
+        [constants.TK_AMOUNT_PAID]: globalOptions.Money(record.interest + record.principal),
+        [constants.TK_PRINCIPAL_PAID]: globalOptions.Money(record.principal),
+        [constants.TK_INTEREST_PAID]: globalOptions.Money(record.interest),
+        [constants.TK_PRINCIPAL_REMAINING]: globalOptions.Money(record.principalRemaining),
       })
     );
   };
@@ -957,11 +957,11 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const amortizationTableTotals = (schedule: paymentTypes.PaymentSchedule) => {
     const { lifetimePrincipal, lifetimeInterest } = schedule;
     return {
-      period: 'Totals',
-      amountPaid: globalOptions.Money(lifetimePrincipal + lifetimeInterest),
-      principalPaid: globalOptions.Money(lifetimePrincipal),
-      interestPaid: globalOptions.Money(lifetimeInterest),
-      principalRemaining: globalOptions.Money(0),
+      [constants.TK_PERIOD]: 'Totals',
+      [constants.TK_AMOUNT_PAID]: globalOptions.Money(lifetimePrincipal + lifetimeInterest),
+      [constants.TK_PRINCIPAL_PAID]: globalOptions.Money(lifetimePrincipal),
+      [constants.TK_INTEREST_PAID]: globalOptions.Money(lifetimeInterest),
+      [constants.TK_PRINCIPAL_REMAINING]: globalOptions.Money(0),
     };
   };
 

@@ -19,6 +19,12 @@ const MAX_DELTA_FACTOR = 30; // used for both growth and inflation
 const MAX_DURATION_YEARS = constants.MAX_DURATION_YEARS;
 const NAME_TOTALS_AS_AN_INSTRUMENT = 'All Instruments';
 const OPTIONS_FORM_ID = 'appreciateOptionsForm';
+// TK - table keys
+const TK_PERIOD = 'period';
+const TK_TOTAL_GROWTH = 'totalGrowth';
+const TK_CONTRIBUTION = 'contribution';
+const TK_INTEREST = 'interest';
+const TK_CURRENT_BALANCE = 'currentBalance';
 
 export default Object.freeze({
   ...sharedConstants,
@@ -37,4 +43,9 @@ export default Object.freeze({
   MAX_DELTA_FACTOR,
   NAME_TOTALS_AS_AN_INSTRUMENT,
   OPTIONS_FORM_ID,
+  TK_PERIOD,
+  TK_TOTAL_GROWTH,
+  TK_CONTRIBUTION,
+  TK_INTEREST,
+  TK_CURRENT_BALANCE,
 });

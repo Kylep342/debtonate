@@ -325,7 +325,6 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     () => ({
       id: 'BudgetCardSummary',
       type: 'donut',
-      // graphs: balancesGraphs,
       color: getBudgetColor,
       header: (instrumentId: string) =>
         `Yield Breakdown - ${getInstrumentName(instrumentId)}`,
@@ -755,21 +754,21 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const amortizationTableHeaders: ComputedRef<
     Record<string, string | ComputedRef<string>>[]
   > = computed(() => [
-    { key: 'period', label: periodLabel },
-    { key: 'totalGrowth', label: 'Total Growth' },
-    { key: 'contribution', label: 'Contribution' },
-    { key: 'interest', label: 'Interest' },
-    { key: 'currentBalance', label: 'Current Balance' },
+    { key: constants.TK_PERIOD, label: periodLabel },
+    { key: constants.TK_TOTAL_GROWTH, label: 'Total Growth' },
+    { key: constants.TK_CONTRIBUTION, label: 'Contribution' },
+    { key: constants.TK_INTEREST, label: 'Interest' },
+    { key: constants.TK_CURRENT_BALANCE, label: 'Current Balance' },
   ]);
 
   const amortizationTableRows = (schedule: contributionTypes.ContributionSchedule) => {
     return schedule.amortizationSchedule.map(
       (record: contributionTypes.ContributionRecord) => ({
-        period: globalOptions.Period(record.period, true) as string,
-        totalGrowth: globalOptions.Money(record.growth + record.contribution),
-        contribution: globalOptions.Money(record.contribution),
-        interest: globalOptions.Money(record.growth),
-        currentBalance: globalOptions.Money(record.currentBalance),
+        [constants.TK_PERIOD]: globalOptions.Period(record.period, true) as string,
+        [constants.TK_TOTAL_GROWTH]: globalOptions.Money(record.growth + record.contribution),
+        [constants.TK_CONTRIBUTION]: globalOptions.Money(record.contribution),
+        [constants.TK_INTEREST]: globalOptions.Money(record.growth),
+        [constants.TK_CURRENT_BALANCE]: globalOptions.Money(record.currentBalance),
       })
     );
   };
@@ -777,11 +776,11 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const amortizationTableTotals = (schedule: contributionTypes.ContributionSchedule) => {
     const { lifetimeContribution, lifetimeGrowth } = schedule;
     return {
-      period: 'Totals',
-      totalGrowth: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
-      contribution: globalOptions.Money(lifetimeContribution),
-      interest: globalOptions.Money(lifetimeGrowth),
-      currentBalance: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
+      [constants.TK_PERIOD]: 'Totals',
+      [constants.TK_TOTAL_GROWTH]: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
+      [constants.TK_CONTRIBUTION]: globalOptions.Money(lifetimeContribution),
+      [constants.TK_INTEREST]: globalOptions.Money(lifetimeGrowth),
+      [constants.TK_CURRENT_BALANCE]: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
     };
   };
 

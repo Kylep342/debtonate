@@ -19,6 +19,12 @@ const LOANS = 'Loans';
 const NAME_TOTALS_AS_LOAN = 'All Loans';
 const OPTIONS_FORM_ID = 'optionsForm';
 const REFINANCING_FORM_ID = 'refinanceForm';
+// TK - table keys
+const TK_AMOUNT_PAID = 'amountPaid';
+const TK_INTEREST_PAID = 'interestPaid';
+const TK_PERIOD = 'period';
+const TK_PRINCIPAL_PAID = 'principalPaid';
+const TK_PRINCIPAL_REMAINING = 'principalRemaining';
 
 export default Object.freeze({
   ...sharedConstants,
@@ -39,4 +45,9 @@ export default Object.freeze({
   NAME_TOTALS_AS_LOAN,
   OPTIONS_FORM_ID,
   REFINANCING_FORM_ID,
+  TK_AMOUNT_PAID,
+  TK_INTEREST_PAID,
+  TK_PERIOD,
+  TK_PRINCIPAL_PAID,
+  TK_PRINCIPAL_REMAINING,
 });
