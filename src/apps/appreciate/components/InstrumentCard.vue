@@ -17,6 +17,8 @@ const props = defineProps<{
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
+const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
+
 const instrumentCurrentBalance: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
 const instrumentInterestRate: ComputedRef<string> = computed(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
 const instrumentAnnualLimit: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
@@ -25,7 +27,23 @@ const instrumentMaxMonthlyContribution: ComputedRef<string> = computed(() => `${
 const instrumentName: ComputedRef<string> = computed(() => state.getInstrumentName(props.instrument.id));
 const header: ComputedRef<string> = computed(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
 
-const graphContent: ComputedRef<DonutGraphContent> = computed(() => state.cardGraphs[props.instrument.id][props.viewedBudgetId])
+const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
+  if (isCareerPhase.value) {
+    return state.cardGraphs[props.instrument.id][props.viewedBudgetId];
+  } else {
+    // Withdrawal Donut for this instrument
+    // Ensure the budget exists in withdrawal schedules
+    const scheduleMap = state.withdrawalSchedules[props.instrument.id];
+    if (!scheduleMap || !scheduleMap[props.viewedBudgetId]) {
+      return [];
+    }
+    const summary = scheduleMap[props.viewedBudgetId];
+    return [
+      { label: 'Growth', value: summary.lifetimeGrowth, color: globalOptions.colorPalate[0] },
+      { label: 'Withdrawals', value: summary.lifetimeWithdrawal, color: globalOptions.colorPalate[2] },
+    ];
+  }
+});
 
 const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
@@ -57,7 +75,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ instrumentName }}</h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>
@@ -76,19 +94,27 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
               <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
               <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
-            <tr>
+            <tr v-if="isCareerPhase">
               <td>Current Balance</td>
               <td :class="['text-right']"><b>{{ instrumentCurrentBalance }}</b></td>
+            </tr>
+            <tr v-else>
+              <td>Starting Balance</td>
+              <td :class="['text-right']">
+                <b>{{ globalOptions.Money(
+                  state.getContributionSchedule(props.instrument.id, state.selectedCareerBudgetId || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0
+                ) }}</b>
+              </td>
             </tr>
             <tr>
               <td>Interest Rate</td>
               <td :class="['text-right']"><b>{{ instrumentInterestRate }}</b></td>
             </tr>
-            <tr v-if="instrument.annualLimit">
+            <tr v-if="instrument.annualLimit && isCareerPhase">
               <td>Annual Limit</td>
               <td :class="['text-right']"><b>{{ instrumentAnnualLimit }}</b></td>
             </tr>
-            <tr v-if="instrument.annualLimit">
+            <tr v-if="instrument.annualLimit && isCareerPhase">
               <td>Max Contribution</td>
               <td :class="['text-right']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
             </tr>

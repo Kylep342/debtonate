@@ -20,9 +20,13 @@ const currentInstrument: ComputedRef<moneyfunx.IInstrument|null> = computed(() =
   return state.getInstrument(viewedItemId.value)!;
 });
 
-const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
+const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
+
+const schedule: ComputedRef<moneyfunx.ContributionSchedule | moneyfunx.WithdrawalSchedule> = computed(() => {
   if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
-  return state.getContributionSchedule(viewedItemId.value, currentBudget.value.id);
+  return isCareerPhase.value
+    ? state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
+    : state.getWithdrawalSchedule(viewedItemId.value, currentBudget.value.id);
 });
 
 const amortizationTitle: ComputedRef<string> = computed(() => {
@@ -36,28 +40,36 @@ const amortizationSubtitle: ComputedRef<string> = computed(() => {
 });
 
 const tableRows: ComputedRef<{}[]> = computed(() => {
-  if (!contributionSchedule.value) return [];
-  return state.amortizationTableRows(contributionSchedule.value);
+  if (!schedule.value) return [];
+  return state.amortizationTableRows(schedule.value);
 });
 
 const tableFooter: ComputedRef<{}> = computed(() => {
-  if (!contributionSchedule.value) return {};
-  return state.amortizationTableTotals(contributionSchedule.value);
+  if (!schedule.value) return {};
+  return state.amortizationTableTotals(schedule.value);
 });
 
-const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
-  ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
-  + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-  + `(+${globalOptions.Money(monthlyBudget.relative)}/month)`
-  : constants.BUDGET_DETAILS;
+const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget | null): string => {
+  if (!monthlyBudget) return constants.BUDGET_DETAILS;
 
-const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value!)))
+  const budgetName = isCareerPhase.value
+    ? state.getBudgetName(monthlyBudget.id)
+    : state.getWithdrawalBudgetName(monthlyBudget.id);
+
+  return `Budget Details - ${budgetName} | `
+    + `${globalOptions.Money(monthlyBudget.absolute)}/month `
+    + (isCareerPhase.value ? `(+${globalOptions.Money(monthlyBudget.relative)}/month)` : '');
+}
+
+const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
 
 watch(
   () => state.currentBudgetId,
   (newId) => {
     if (newId && state.budgetDetailsPanelActive) {
-      currentBudget.value = state.getBudget(newId)!;
+      currentBudget.value = isCareerPhase.value
+        ? state.getBudget(newId)!
+        : state.getWithdrawalBudget(newId)!;
     }
   },
   { immediate: true },

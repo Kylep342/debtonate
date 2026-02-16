@@ -9,6 +9,7 @@ const LS_REFINANCING_USE_HIGHEST_PAYMENT = 'debtonate.refinancingUseHighestPayme
 const LS_ROUNDING_ENABLED = 'debtonate.roundingEnabled';
 const LS_ROUNDING_SCALE = 'debtonate.roundingScale';
 const LS_SNOWBALL_SORT = 'debtonate.snowballSort';
+const LS_VIEW_PHASE = 'debtonate.viewPhase';
 
 export default Object.freeze({
   LS_BUDGETS,
@@ -21,4 +22,5 @@ export default Object.freeze({
   LS_ROUNDING_ENABLED,
   LS_ROUNDING_SCALE,
   LS_SNOWBALL_SORT,
+  LS_VIEW_PHASE,
 });

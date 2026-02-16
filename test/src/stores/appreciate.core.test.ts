@@ -121,6 +121,25 @@ describe('Appreciate Core Store', () => {
       expect(state.getBudgetColor(firstBudgetId)).toBe(globalOptions.colorPalate[1]);
       expect(state.getBudgetName(firstBudgetId)).toBe('Budget 1');
     });
+
+    it('manages withdrawal budgets', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.createWithdrawalBudget(4000);
+      expect(state.monthlyWithdrawalBudgets.length).toBe(2); // 1 created + 1 default
+      expect(state.monthlyWithdrawalBudgets[0].relative).toBe(4000);
+
+      const withdrawalId = state.monthlyWithdrawalBudgets[0].id;
+      expect(state.getWithdrawalBudgetName(withdrawalId)).toBe('Withdrawal 1');
+      expect(state.getWithdrawalBudgetName(constants.DEFAULT)).toBe('Target Income');
+
+      state.editWithdrawalBudget(withdrawalId);
+      expect(state.currentBudgetId).toBe(withdrawalId);
+      expect(state.budgetFormActive).toBe(true);
+      state.exitBudgetForm();
+
+      state.deleteWithdrawalBudget(withdrawalId);
+      expect(state.monthlyWithdrawalBudgets.length).toBe(1);
+    });
   });
 
   describe('with instruments', async () => {
@@ -208,8 +227,13 @@ describe('Appreciate Core Store', () => {
       keys.LS_ACCRUE_BEFORE_CONTRIBUTION,
       keys.LS_BUDGETS,
       keys.LS_DEFLATE_ALL_MONEY,
+      keys.LS_DESIRED_NET_INCOME,
+      keys.LS_RETIREMENT_TAX_RATE,
       keys.LS_INFLATION_FACTOR,
       keys.LS_INSTRUMENTS,
+      keys.LS_SELECTED_CAREER_BUDGET_ID,
+      keys.LS_VIEW_PHASE,
+      keys.LS_WITHDRAWAL_BUDGETS,
       keys.LS_YEARS_TO_CONTRIBUTE,
       keys.LS_YEARS_TO_SPEND,
     ]);
@@ -217,6 +241,8 @@ describe('Appreciate Core Store', () => {
     state.budgets = Budgets();
     state.instruments = Instruments();
     state.setInflationFactor(0.05);
+    state.setDesiredNetIncome(6000);
+    state.setRetirementTaxRate(20);
     state.toggleAccrueBeforeContribution();
     state.toggleDeflateAllMoney(0.04);
     state.setYearsToContribute(30);
@@ -236,6 +262,8 @@ describe('Appreciate Core Store', () => {
     ));
     expect(state.accrueBeforeContribution).toBe(initialState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(initialState[keys.LS_DEFLATE_ALL_MONEY]);
+    expect(state.desiredNetIncome).toBe(initialState[keys.LS_DESIRED_NET_INCOME]);
+    expect(state.retirementTaxRate).toBe(initialState[keys.LS_RETIREMENT_TAX_RATE]);
     expect(state.inflationFactor).toBe(initialState[keys.LS_INFLATION_FACTOR]);
     expect(state.yearsToContribute).toBe(initialState[keys.LS_YEARS_TO_CONTRIBUTE]);
     expect(state.yearsToSpend).toBe(initialState[keys.LS_YEARS_TO_SPEND]);
@@ -251,6 +279,8 @@ describe('Appreciate Core Store', () => {
     ));
     expect(state.accrueBeforeContribution).toBe(changedState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(changedState[keys.LS_DEFLATE_ALL_MONEY]);
+    expect(state.desiredNetIncome).toBe(changedState[keys.LS_DESIRED_NET_INCOME]);
+    expect(state.retirementTaxRate).toBe(changedState[keys.LS_RETIREMENT_TAX_RATE]);
     expect(state.inflationFactor).toBe(changedState[keys.LS_INFLATION_FACTOR]);
     expect(state.yearsToContribute).toBe(changedState[keys.LS_YEARS_TO_CONTRIBUTE]);
     expect(state.yearsToSpend).toBe(changedState[keys.LS_YEARS_TO_SPEND]);
@@ -320,6 +350,21 @@ describe('Appreciate Core Store', () => {
     expect(state.currentInstrumentId).toBe(null);
   });
 
+  it('toggles phase and updates related getters', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    expect(state.viewPhase).toBe(constants.PHASE_CAREER);
+    state.togglePhase();
+    expect(state.viewPhase).toBe(constants.PHASE_RETIREMENT);
+    state.togglePhase();
+    expect(state.viewPhase).toBe(constants.PHASE_CAREER);
+  });
+
+  it('updates selected career budget id', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.setSelectedCareerBudgetId('some-id');
+    expect(state.selectedCareerBudgetId).toBe('some-id');
+  });
+
   it('builds titles', async () => {
     const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
@@ -357,6 +402,37 @@ describe('Appreciate Core Store', () => {
         state.getBudget(firstBudgetId)
       )
     ).toBe('Amortization Table - IRA | Budget 1');
+  });
+
+  it('generates withdrawal-based amortization table content', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = Instruments();
+    state.togglePhase(); // Retirement Phase
+
+    const withdrawalSchedule = state.withdrawalSchedules[constants.TOTALS][constants.DEFAULT];
+    const rows = state.amortizationTableRows(withdrawalSchedule);
+    const totals = state.amortizationTableTotals(withdrawalSchedule);
+    const headers = state.amortizationTableHeaders;
+
+    expect(headers.map(h => h.key)).toContain('withdrawal');
+    expect(headers.map(h => h.key)).toContain('netAmount');
+    expect(rows[0]).toHaveProperty('withdrawal');
+    expect(rows[0]).toHaveProperty('netAmount');
+    expect(totals).toHaveProperty('withdrawal');
+    expect(totals).toHaveProperty('netAmount');
+  });
+
+  it('computes withdrawal scenarios with custom withdrawal budgets', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = Instruments();
+    state.togglePhase(); // Retirement Phase
+    state.createWithdrawalBudget(6000);
+
+    const withdrawalBudgetId = state.withdrawalBudgets[0].id;
+    const schedule = state.getWithdrawalSchedule(constants.TOTALS, withdrawalBudgetId);
+
+    expect(schedule.amortizationSchedule.length).toBeGreaterThan(0);
+    expect(schedule.lifetimeWithdrawal).toBeGreaterThan(0);
   });
 
   it('computes contribution schedules', async () => {
@@ -398,6 +474,46 @@ describe('Appreciate Core Store', () => {
     Object.keys(state.contributionSchedules).forEach((instrumentId) => {
       expect(
         Object.keys(state.contributionSchedules[instrumentId])
+      ).toStrictEqual(
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
+      );
+    });
+  });
+
+  it('computes withdrawal scenarios', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.budgets = Budgets();
+    state.instruments = Instruments();
+
+    expect(
+      Object.keys(state.withdrawalScenarios)
+    ).toStrictEqual(
+      state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
+    );
+
+    state.monthlyBudgets.forEach((budget: MonthlyBudget) => {
+      expect(
+        Object.keys(state.withdrawalScenarios[budget.id])
+      ).toStrictEqual(
+        [...state.instruments.map((instrument: instrument.Instrument) => instrument.id), constants.TOTALS]
+      );
+    });
+  });
+
+  it('computes withdrawal summaries', async () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.budgets = Budgets();
+    state.instruments = Instruments();
+
+    expect(
+      Object.keys(state.withdrawalSchedules)
+    ).toStrictEqual(
+      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
+    );
+
+    Object.keys(state.withdrawalSchedules).forEach((instrumentId) => {
+      expect(
+        Object.keys(state.withdrawalSchedules[instrumentId])
       ).toStrictEqual(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
       );

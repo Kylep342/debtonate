@@ -27,6 +27,7 @@ const loanSelectors: ComputedRef<Button[]> = computed(
 const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: loanSelectors,
+  classes: ['btn-sm']
 });
 
 const defaultBudgetIndex: ComputedRef<number> = computed(

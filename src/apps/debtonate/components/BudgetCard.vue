@@ -60,7 +60,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetName }}</h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>

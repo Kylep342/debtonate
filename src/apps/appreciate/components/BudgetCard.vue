@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { contributionTypes, withdrawalTypes } from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
@@ -18,26 +18,83 @@ const props = defineProps<{
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const viewedContributionSummary: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => state.getContributionSchedule(props.viewedInstrumentId, props.budget.id));
+const isCareerPhase: ComputedRef<boolean> = computed(() => state.viewPhase === constants.PHASE_CAREER);
 
-const netWorth: ComputedRef<number> = computed(() => state.deflateAllMoney
-  ? state.deflate(
-    viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth,
-    state.getNumContributions(constants.TOTALS, props.budget.id)
-  )
-  : viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth
+const viewedContributionSummary: ComputedRef<contributionTypes.ContributionSchedule | null> = computed(() => {
+  if (!isCareerPhase.value) return null;
+  return state.getContributionSchedule(props.viewedInstrumentId, props.budget.id);
+});
+
+const viewedWithdrawalSummary: ComputedRef<withdrawalTypes.WithdrawalSchedule | null> = computed(() => {
+  if (isCareerPhase.value) return null;
+  return state.getWithdrawalSchedule(props.viewedInstrumentId, props.budget.id);
+});
+
+const netWorth: ComputedRef<number> = computed(() => {
+  if (isCareerPhase.value && viewedContributionSummary.value) {
+    return state.deflateAllMoney
+      ? state.deflate(
+        viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth,
+        state.getNumContributions(constants.TOTALS, props.budget.id)
+      )
+      : viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth;
+  } else if (viewedWithdrawalSummary.value) {
+    // In retirement, show ending balance
+    const schedule = viewedWithdrawalSummary.value.amortizationSchedule;
+    const finalBalance = schedule.length > 0 ? schedule.slice(-1)[0].currentBalance : 0;
+    return state.deflateAllMoney
+      ? state.deflate(finalBalance, state.getNumWithdrawals(constants.TOTALS, props.budget.id))
+      : finalBalance;
+  }
+  return 0;
+});
+
+const netWorthLabel: ComputedRef<string> = computed(() => isCareerPhase.value
+  ? (state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance')
+  : (state.deflateAllMoney ? 'Ending Balance (CYM)' : 'Ending Balance')
 );
-const netWorthLabel: ComputedRef<string> = computed(() => state.deflateAllMoney ? 'Retirement Balance (CYM)' : 'Retirement Balance' );
 
 const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetContributions: ComputedRef<string|number|Date> = computed(() => globalOptions.Period(viewedContributionSummary.value.amortizationSchedule.length, true));
+
+const budgetPeriodCount: ComputedRef<string|number|Date> = computed(() => {
+  if (isCareerPhase.value && viewedContributionSummary.value) {
+    return globalOptions.Period(viewedContributionSummary.value.amortizationSchedule.length, true);
+  } else if (viewedWithdrawalSummary.value) {
+    return globalOptions.Period(viewedWithdrawalSummary.value.amortizationSchedule.length, true);
+  }
+  return 0;
+});
+
 const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
-const contributionsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Retire on' : 'Contributions')
-const budgetName: ComputedRef<string> = computed(() => state.getBudgetName(props.budget.id));
+const periodLabel: ComputedRef<string> = computed(() => {
+  if (isCareerPhase.value) {
+    return globalOptions.periodsAsDates ? 'Retire on' : 'Contributions';
+  } else {
+    return globalOptions.periodsAsDates ? 'Deplete on' : 'Withdrawals';
+  }
+});
+
+const budgetName: ComputedRef<string> = computed(() => isCareerPhase.value
+  ? state.getBudgetName(props.budget.id)
+  : state.getWithdrawalBudgetName(props.budget.id)
+);
+
 const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.header(props.viewedInstrumentId));
 
-const graphContent: ComputedRef<DonutGraphContent> = computed(() => state.cardGraphs[props.viewedInstrumentId][props.budget.id])
+const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
+  if (isCareerPhase.value) {
+    return state.cardGraphs[props.viewedInstrumentId][props.budget.id];
+  } else {
+    // Withdrawal Donut
+    const summary = viewedWithdrawalSummary.value;
+    if (!summary) return [];
+    return [
+      { label: 'Growth', value: summary.lifetimeGrowth, color: globalOptions.colorPalate[0] },
+      { label: 'Withdrawals', value: summary.lifetimeWithdrawal, color: globalOptions.colorPalate[2] },
+    ];
+  }
+});
 
 const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
@@ -52,15 +109,15 @@ const editButtons: ComputedRef<Button[]> = computed(() => ([
   ...baseButtons.value,
   {
     text: constants.BTN_EDIT,
-    onClick: () => state.editBudget(props.budget.id),
+    onClick: () => isCareerPhase.value ? state.editBudget(props.budget.id) : state.editWithdrawalBudget(props.budget.id),
   },
   {
     text: constants.BTN_DELETE,
-    onClick: () => state.deleteBudget(props.budget.id),
+    onClick: () => isCareerPhase.value ? state.deleteBudget(props.budget.id) : state.deleteWithdrawalBudget(props.budget.id),
   },
 ]));
 
-const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT && isCareerPhase.value ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -69,7 +126,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
           <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetName }}</h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="buttons" />
+          <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>
@@ -92,8 +149,8 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               <td :class="['text-right']"><b>{{ budgetAmount }}</b></td>
             </tr>
             <tr>
-              <td>{{ contributionsLabel }}</td>
-              <td :class="['text-right']"><b>{{ budgetContributions }}</b></td>
+              <td>{{ periodLabel }}</td>
+              <td :class="['text-right']"><b>{{ budgetPeriodCount }}</b></td>
             </tr>
             <tr>
               <td>{{ netWorthLabel }}</td>

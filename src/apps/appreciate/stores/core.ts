@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 // import moneyfunx from 'moneyfunx';
-import { contributions, contributionTypes, instrument, sorting } from 'moneyfunx';
+import { contributions, contributionTypes, instrument, sorting, withdrawals, withdrawalTypes } from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref, ComputedRef, Ref } from 'vue';
 
@@ -31,12 +31,17 @@ export interface AppreciateCoreState {
   currentBudgetId: Ref<string | null>;
   currentInstrumentId: Ref<string | null>;
   deflateAllMoney: Ref<boolean>;
+  desiredNetIncome: Ref<number>;
+  retirementTaxRate: Ref<number>;
   inflationFactor: Ref<number>;
   instrumentDetailsPanelActive: Ref<boolean>;
   instrumentFormActive: Ref<boolean>;
   instruments: Ref<instrument.Instrument[]>;
   minimumBudget: Budget;
   optionsFormActive: Ref<boolean>;
+  selectedCareerBudgetId: Ref<string | null>;
+  viewPhase: Ref<string>;
+  withdrawalBudgets: Ref<Budget[]>;
   yearsToContribute: Ref<number>;
   yearsToSpend: Ref<number>;
 }
@@ -48,7 +53,7 @@ export interface AppreciateCoreGetters {
   balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   budgetCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   budgetFormTitle: ComputedRef<string>;
-  cardGraphs: ComputedRef<DonutGraphContent>;
+  cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>>;
   contributionScenarios: ComputedRef<Record<string, ContributionScenario>>;
   contributionSchedules: ComputedRef<
     Record<string, Record<string, contributionTypes.ContributionSchedule>>
@@ -59,21 +64,32 @@ export interface AppreciateCoreGetters {
   instrumentCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   instrumentFormTitle: ComputedRef<string>;
   instrumentsWithTotals: ComputedRef<instrument.IInstrument[]>;
+  retirementTaxRateEffective: ComputedRef<number>;
   monthlyBudgets: ComputedRef<MonthlyBudget[]>;
+  monthlyWithdrawalBudgets: ComputedRef<MonthlyBudget[]>;
   periodLabel: ComputedRef<string>;
   purchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   totalAnnualLimit: ComputedRef<number>;
   totalCurrentBalance: ComputedRef<number>;
   totalMaxPeriodsPerYear: ComputedRef<number>;
   totalsAsAnInstrument: ComputedRef<instrument.IInstrument>;
+  careerRetirementComparison: ComputedRef<
+    Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
+  >;
+  withdrawalScenarios: ComputedRef<
+    Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
+  >;
+  withdrawalSchedules: ComputedRef<
+    Record<string, Record<string, withdrawalTypes.WithdrawalSchedule>>
+  >;
 }
 
 export interface AppreciateCoreActions {
   amortizationTableRows: (
-    schedule: contributionTypes.ContributionSchedule
+    schedule: contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule
   ) => Record<string, string>[];
   amortizationTableTotals: (
-    schedule: contributionTypes.ContributionSchedule
+    schedule: contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule
   ) => Record<string, string>;
   avalanche: () => instrument.Instrument[];
   buildAmortizationTableSubtitle: (
@@ -87,6 +103,7 @@ export interface AppreciateCoreActions {
   buildInstrumentSubtitle: (instrument: instrument.IInstrument) => string;
   clearState: () => void;
   createBudget: (proposedBudget: number) => string;
+  createWithdrawalBudget: (proposedBudget: number) => string;
   createInstrument: (
     currentBalance: number,
     interestRate: number,
@@ -95,37 +112,50 @@ export interface AppreciateCoreActions {
   ) => string;
   deflate: (amount: number, periods: number) => number;
   deleteBudget: (id: string) => void;
+  deleteWithdrawalBudget: (id: string) => void;
   deleteInstrument: (id: string) => void;
   editBudget: (id: string) => void;
+  editWithdrawalBudget: (id: string) => void;
   editInstrument: (id: string) => void;
   exitBudgetForm: () => void;
   exitInstrumentForm: () => void;
   exitOptionsForm: () => void;
   exportState: () => Record<string, any>;
   getBudget: (id: string) => MonthlyBudget | undefined;
+  getWithdrawalBudget: (id: string) => MonthlyBudget | undefined;
   getBudgetColor: (id: string) => string;
   getBudgetIndex: (id: string) => number;
   getBudgetName: (id: string) => string;
+  getWithdrawalBudgetName: (id: string) => string;
   getContributionSchedule: (
     instrumentId: string,
     budgetId: string
   ) => contributionTypes.ContributionSchedule;
+  getWithdrawalSchedule: (
+    instrumentId: string,
+    budgetId: string
+  ) => withdrawalTypes.WithdrawalSchedule;
   getInstrument: (id: string) => instrument.IInstrument | undefined;
   getInstrumentIndex: (id: string) => number;
   getInstrumentName: (id: string) => string;
   getMaxMoney: (instrumentId: string) => number;
   getNumContributions: (instrumentId: string, budgetId: string) => number;
+  getNumWithdrawals: (instrumentId: string, budgetId: string) => number;
   loadState: () => void;
   openBudgetForm: () => void;
   openInstrumentForm: () => void;
   openOptionsForm: () => void;
   saveState: () => void;
+  setSelectedCareerBudgetId: (id: string) => void;
+  setDesiredNetIncome: (newIncome: number) => void;
+  setRetirementTaxRate: (newRate: number) => void;
   setInflationFactor: (newFactor: number) => void;
   setYearsToContribute: (newYears: number) => void;
   setYearsToSpend: (newYears: number) => void;
   sortInstruments: () => void;
   toggleAccrueBeforeContribution: () => void;
   toggleDeflateAllMoney: (newFactor: number) => void;
+  togglePhase: () => void;
   unviewBudget: () => void;
   unviewInstrument: () => void;
   viewBudget: (id: string) => void;
@@ -146,12 +176,17 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const currentBudgetId: Ref<string | null> = ref(null);
   const currentInstrumentId: Ref<string | null> = ref(null);
   const deflateAllMoney: Ref<boolean> = ref(false);
+  const desiredNetIncome: Ref<number> = ref(constants.DEFAULT_DESIRED_NET_INCOME);
+  const retirementTaxRate: Ref<number> = ref(constants.DEFAULT_RETIREMENT_TAX_RATE);
   const inflationFactor: Ref<number> = ref(constants.DEFAULT_INFLATION_FACTOR);
   const instrumentDetailsPanelActive: Ref<boolean> = ref(false);
   const instrumentFormActive: Ref<boolean> = ref(false);
   const instruments: Ref<instrument.Instrument[]> = ref([]);
   const minimumBudget: Budget = { id: constants.DEFAULT, relative: 0 };
   const optionsFormActive: Ref<boolean> = ref(false);
+  const selectedCareerBudgetId: Ref<string | null> = ref(constants.DEFAULT);
+  const viewPhase: Ref<string> = ref(constants.PHASE_CAREER);
+  const withdrawalBudgets: Ref<Budget[]> = ref([]);
   const yearsToContribute: Ref<number> = ref(
     constants.DEFAULT_YEARS_TO_CONTRIBUTE
   );
@@ -162,6 +197,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   // total values across all instruments
   const inflationRate: ComputedRef<number> = computed(
     () => inflationFactor.value / 100
+  );
+
+  const retirementTaxRateEffective: ComputedRef<number> = computed(
+    () => retirementTaxRate.value / 100
   );
 
   const totalAnnualLimit: ComputedRef<number> = computed(() =>
@@ -202,6 +241,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     () => [totalsAsAnInstrument.value, ...instruments.value]
   );
 
+  const careerOffsetPeriods: ComputedRef<number> = computed(
+    () => yearsToContribute.value * constants.PERIODS_PER_YEAR
+  );
+
   // Budgets
   const monthlyBudgets: ComputedRef<MonthlyBudget[]> = computed(() =>
     [...budgets.value, minimumBudget].map((budget) => ({
@@ -209,6 +252,45 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       absolute: budget.relative,
     }))
   );
+
+  const monthlyWithdrawalBudgets: ComputedRef<MonthlyBudget[]> = computed(() =>
+    [...withdrawalBudgets.value, { id: constants.DEFAULT, relative: desiredNetIncome.value }].map((budget) => ({
+      ...budget,
+      absolute: budget.relative,
+    }))
+  );
+
+  const careerRetirementComparison: ComputedRef<
+    Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
+  > = computed(() => {
+    const comparison: Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule> = {};
+    monthlyBudgets.value.forEach((careerBudget: MonthlyBudget) => {
+      const retirementInstruments = instruments.value.map((inst) => {
+        const instContributionSchedule = contributionScenarios.value[careerBudget.id].contributionSchedule[inst.id];
+        const finalBalance = instContributionSchedule.amortizationSchedule.length > 0
+          ? instContributionSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+          : inst.currentBalance;
+        const retirementInstrument = new instrument.Instrument(
+          finalBalance,
+          inst.annualRate,
+          inst.periodsPerYear,
+          inst.name,
+          inst.annualLimit
+        );
+        retirementInstrument.id = inst.id;
+        return retirementInstrument;
+      });
+
+      comparison[careerBudget.id] = withdrawals.drawdownInstruments(
+        retirementInstruments,
+        desiredNetIncome.value,
+        yearsToSpend.value * constants.PERIODS_PER_YEAR,
+        retirementTaxRateEffective.value,
+        true
+      );
+    });
+    return comparison;
+  });
 
   // String builders
   const budgetFormTitle: ComputedRef<string> = computed(() =>
@@ -266,6 +348,145 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     return schedules;
   });
 
+  // Withdrawals
+  const withdrawalScenarios: ComputedRef<
+    Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
+  > = computed(() => {
+    const scenarios: Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule> = {};
+    const baseBudgets = viewPhase.value === constants.PHASE_CAREER
+      ? monthlyBudgets.value
+      : monthlyWithdrawalBudgets.value;
+
+    const baseCareerId = (selectedCareerBudgetId.value && contributionScenarios.value[selectedCareerBudgetId.value])
+      ? selectedCareerBudgetId.value
+      : constants.DEFAULT;
+
+    baseBudgets.forEach((budget: MonthlyBudget) => {
+      const retirementInstruments = instruments.value.map((inst) => {
+        const scenario = contributionScenarios.value[baseCareerId];
+        const instContributionSchedule = scenario.contributionSchedule[inst.id];
+        const finalBalance = instContributionSchedule.amortizationSchedule.length > 0
+          ? instContributionSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+          : inst.currentBalance;
+        const retirementInstrument = new instrument.Instrument(
+          finalBalance,
+          inst.annualRate,
+          inst.periodsPerYear,
+          inst.name,
+          inst.annualLimit
+        );
+        retirementInstrument.id = inst.id;
+        return retirementInstrument;
+      });
+
+      scenarios[budget.id] = withdrawals.drawdownInstruments(
+        retirementInstruments,
+        budget.relative,
+        yearsToSpend.value * constants.PERIODS_PER_YEAR,
+        retirementTaxRateEffective.value,
+        true // accrueBeforeWithdrawal
+      );
+    });
+    return scenarios;
+  });
+
+  const withdrawalSchedules: ComputedRef<
+    Record<string, Record<string, withdrawalTypes.WithdrawalSchedule>>
+  > = computed(() => {
+    const schedules: Record<
+      string,
+      Record<string, withdrawalTypes.WithdrawalSchedule>
+    > = {};
+
+    instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+      schedules[instrument.id] = <
+        Record<string, withdrawalTypes.WithdrawalSchedule>
+      >{};
+    });
+
+    Object.keys(schedules).forEach((instrumentId: string) => {
+      Object.keys(withdrawalScenarios.value).forEach((budgetId: string) => {
+        const schedule = withdrawalScenarios.value[budgetId];
+        schedules[instrumentId][budgetId] = <withdrawalTypes.WithdrawalSchedule>{
+          ...schedule[instrumentId],
+        };
+      });
+    });
+    return schedules;
+  });
+
+  const investmentTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const metrics = [
+      'Principal',
+      'Interest',
+      'Interest/Principal Ratio',
+      'Share of Balance at 65 as Principal',
+      'Effective Avg Saved/yr of work',
+      'Growth Factor from age 26',
+      'Age of > $1M saved',
+    ];
+
+    metrics.forEach(metric => {
+      analysis[metric] = {};
+    });
+
+    monthlyBudgets.value.forEach(budget => {
+      const schedule = getContributionSchedule(constants.TOTALS, budget.id);
+      const principal = schedule.lifetimeContribution;
+      const interest = schedule.lifetimeGrowth;
+      const total = principal + interest;
+
+      analysis['Principal'][budget.id] = globalOptions.Money(principal);
+      analysis['Interest'][budget.id] = globalOptions.Money(interest);
+      analysis['Interest/Principal Ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Share of Balance at 65 as Principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
+      analysis['Effective Avg Saved/yr of work'][budget.id] = globalOptions.Money(principal / yearsToContribute.value);
+      analysis['Growth Factor from age 26'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '0.0000';
+
+      const milestonePeriod = schedule.amortizationSchedule.find(r => r.currentBalance >= 1000000)?.period;
+      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
+    });
+
+    return analysis;
+  });
+
+  const retirementTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const metrics = [
+      'Initial Balance',
+      'Growth',
+      'Growth/Initial Ratio',
+      'Share of value at 100 as growth',
+      'Effective Avg Saved/yr',
+      'Growth Factor from age 65',
+      'Age of > $1M saved',
+    ];
+
+    metrics.forEach(metric => {
+      analysis[metric] = {};
+    });
+
+    monthlyWithdrawalBudgets.value.forEach(budget => {
+      const schedule = getWithdrawalSchedule(constants.TOTALS, budget.id);
+      const initialBalance = getContributionSchedule(constants.TOTALS, selectedCareerBudgetId.value || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0;
+      const growth = schedule.lifetimeGrowth;
+      const finalBalance = schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0;
+
+      analysis['Initial Balance'][budget.id] = globalOptions.Money(initialBalance);
+      analysis['Growth'][budget.id] = globalOptions.Money(growth);
+      analysis['Growth/Initial Ratio'][budget.id] = initialBalance > 0 ? (growth / initialBalance).toFixed(4) : '0.0000';
+      analysis['Share of value at 100 as growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
+      analysis['Effective Avg Saved/yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
+      analysis['Growth Factor from age 65'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
+
+      const milestonePeriod = schedule.amortizationSchedule.find(r => r.currentBalance >= 1000000)?.period;
+      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming age 65 retirement
+    });
+
+    return analysis;
+  });
+
   // ease-of-use getters over computed values
   const periodLabel: ComputedRef<string> = computed(() =>
     globalOptions.periodsAsDates ? 'Contribution Date' : 'Contribution Number'
@@ -281,13 +502,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     () => {
       const graphs = <Graphs<LineGraphContent>>{};
       instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
-        graphs[instrument.id] = <LineGraphContent>{
-          config: {
-            maxX: getNumContributions(instrument.id, constants.DEFAULT),
-            maxY: getMaxMoney(instrument.id) * 1.1,
-          },
-          lines: <ChartSeries<Point>>{},
-        };
+        const lines = <ChartSeries<Point>>{};
+        let overallMaxX = 0;
+        let overallMaxY = 0;
+
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
           getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
@@ -295,8 +513,21 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
               line.push({ x: record.period, y: record.currentBalance });
             }
           );
-          graphs[instrument.id].lines[budget.id] = line;
+          lines[budget.id] = line;
+
+          const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+          const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+          overallMaxX = Math.max(overallMaxX, lineMaxX);
+          overallMaxY = Math.max(overallMaxY, lineMaxY);
         });
+
+        graphs[instrument.id] = <LineGraphContent>{
+          config: {
+            maxX: overallMaxX,
+            maxY: overallMaxY * 1.1,
+          },
+          lines: lines,
+        };
       });
 
       return <GraphConfig<LineGraphContent>>{
@@ -392,16 +623,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     computed(() => {
       const graphs = <Graphs<LineGraphContent>>{};
       instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
-        graphs[instrument.id] = <LineGraphContent>{
-          config: {
-            maxX: getNumContributions(instrument.id, constants.DEFAULT),
-            maxY: deflate(
-              getMaxMoney(instrument.id) * 1.1,
-              getNumContributions(instrument.id, constants.DEFAULT)
-            ),
-          },
-          lines: <ChartSeries<Point>>{},
-        };
+        const lines = <ChartSeries<Point>>{};
+        let overallMaxX = 0;
+        let overallMaxY = 0;
+
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
           getContributionSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
@@ -412,8 +637,21 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
               });
             }
           );
-          graphs[instrument.id].lines[budget.id] = line;
+          lines[budget.id] = line;
+
+          const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+          const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+          overallMaxX = Math.max(overallMaxX, lineMaxX);
+          overallMaxY = Math.max(overallMaxY, lineMaxY);
         });
+
+        graphs[instrument.id] = <LineGraphContent>{
+          config: {
+            maxX: overallMaxX,
+            maxY: overallMaxY * 1.1,
+          },
+          lines: lines,
+        };
       });
 
       return <GraphConfig<LineGraphContent>>{
@@ -439,10 +677,80 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       };
     });
 
-  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
-    [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
-    [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
-  }));
+  const withdrawalBalancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
+    () => {
+      const graphs = <Graphs<LineGraphContent>>{};
+      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+        const lines = <ChartSeries<Point>>{};
+        let overallMaxX = 0;
+        let overallMaxY = 0;
+
+        monthlyWithdrawalBudgets.value.forEach((budget: MonthlyBudget) => {
+          const line: Point[] = [];
+          // Add initial balance point (period 0 in retirement, which is end of career)
+          const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
+          const careerSchedule = getContributionSchedule(instrument.id, baseCareerId);
+          const initialBalance = careerSchedule.amortizationSchedule.length > 0
+            ? careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+            : (getInstrument(instrument.id)?.currentBalance || 0);
+
+          line.push({ x: 0, y: initialBalance });
+
+          getWithdrawalSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
+            (record: withdrawalTypes.WithdrawalRecord) => {
+              line.push({ x: record.period, y: record.currentBalance });
+            }
+          );
+          lines[budget.id] = line;
+
+          const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+          const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+          overallMaxX = Math.max(overallMaxX, lineMaxX);
+          overallMaxY = Math.max(overallMaxY, lineMaxY);
+        });
+
+        graphs[instrument.id] = <LineGraphContent>{
+          config: {
+            maxX: overallMaxX,
+            maxY: overallMaxY * 1.1,
+          },
+          lines: lines,
+        };
+      });
+
+      return <GraphConfig<LineGraphContent>>{
+        id: 'WithdrawalBalances',
+        type: 'line',
+        color: getBudgetColor,
+        graphs: graphs,
+        header: (instrumentId: string) =>
+          `Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
+        lineName: getWithdrawalBudgetName,
+        subheader: (instrumentId: string) =>
+          `Starting from ${getBudgetName(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
+        x: (x: number) => x + careerOffsetPeriods.value,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Balance',
+        yScale: d3.scaleLinear,
+      };
+    }
+  );
+
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => {
+    if (viewPhase.value === constants.PHASE_RETIREMENT) {
+      return {
+        [constants.GRAPH_BALANCES_OVER_TIME]: withdrawalBalancesGraphs.value,
+      };
+    }
+    return {
+      [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+      [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
+    };
+  });
 
   /** ACTIONS */
 
@@ -457,11 +765,16 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     currentBudgetId.value = null;
     currentInstrumentId.value = null;
     deflateAllMoney.value = false;
+    desiredNetIncome.value = constants.DEFAULT_DESIRED_NET_INCOME;
+    retirementTaxRate.value = constants.DEFAULT_RETIREMENT_TAX_RATE;
     inflationFactor.value = constants.DEFAULT_INFLATION_FACTOR;
     instrumentDetailsPanelActive.value = false;
     instrumentFormActive.value = false;
     instruments.value = [];
     optionsFormActive.value = false;
+    selectedCareerBudgetId.value = constants.DEFAULT;
+    viewPhase.value = constants.PHASE_CAREER;
+    withdrawalBudgets.value = [];
     yearsToContribute.value = constants.DEFAULT_YEARS_TO_CONTRIBUTE;
     yearsToSpend.value = constants.DEFAULT_YEARS_TO_SPEND;
   };
@@ -476,10 +789,19 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     const storedDeflateAllMoney = localStorage.getItem(
       keys.LS_DEFLATE_ALL_MONEY
     );
+    const storedDesiredNetIncome = localStorage.getItem(
+      keys.LS_DESIRED_NET_INCOME
+    );
+    const storedRetirementTaxRate = localStorage.getItem(
+      keys.LS_RETIREMENT_TAX_RATE
+    );
     const storedInflationFactor = localStorage.getItem(
       keys.LS_INFLATION_FACTOR
     );
     const storedInstruments = localStorage.getItem(keys.LS_INSTRUMENTS);
+    const storedSelectedCareerBudgetId = localStorage.getItem(keys.LS_SELECTED_CAREER_BUDGET_ID);
+    const storedViewPhase = localStorage.getItem(keys.LS_VIEW_PHASE);
+    const storedWithdrawalBudgets = localStorage.getItem(keys.LS_WITHDRAWAL_BUDGETS);
     const storedYearsToContribute = localStorage.getItem(
       keys.LS_YEARS_TO_CONTRIBUTE
     );
@@ -492,6 +814,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     if (storedBudgets) budgets.value = JSON.parse(storedBudgets);
     if (storedDeflateAllMoney)
       deflateAllMoney.value = JSON.parse(storedDeflateAllMoney);
+    if (storedDesiredNetIncome)
+      desiredNetIncome.value = JSON.parse(storedDesiredNetIncome);
+    if (storedRetirementTaxRate)
+      retirementTaxRate.value = JSON.parse(storedRetirementTaxRate);
     if (storedInflationFactor)
       inflationFactor.value = JSON.parse(storedInflationFactor);
     if (storedInstruments)
@@ -505,6 +831,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
             storedInstrument.annualLimit
           )
       );
+    if (storedSelectedCareerBudgetId)
+      selectedCareerBudgetId.value = JSON.parse(storedSelectedCareerBudgetId);
+    if (storedViewPhase)
+      viewPhase.value = JSON.parse(storedViewPhase);
+    if (storedWithdrawalBudgets)
+      withdrawalBudgets.value = JSON.parse(storedWithdrawalBudgets);
     if (storedYearsToContribute)
       yearsToContribute.value = JSON.parse(storedYearsToContribute);
     if (storedYearsToSpend)
@@ -524,10 +856,21 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       JSON.stringify(deflateAllMoney.value)
     );
     localStorage.setItem(
+      keys.LS_DESIRED_NET_INCOME,
+      JSON.stringify(desiredNetIncome.value)
+    );
+    localStorage.setItem(
+      keys.LS_RETIREMENT_TAX_RATE,
+      JSON.stringify(retirementTaxRate.value)
+    );
+    localStorage.setItem(
       keys.LS_INFLATION_FACTOR,
       JSON.stringify(inflationFactor.value)
     );
     localStorage.setItem(keys.LS_INSTRUMENTS, JSON.stringify(instruments.value));
+    localStorage.setItem(keys.LS_SELECTED_CAREER_BUDGET_ID, JSON.stringify(selectedCareerBudgetId.value));
+    localStorage.setItem(keys.LS_VIEW_PHASE, JSON.stringify(viewPhase.value));
+    localStorage.setItem(keys.LS_WITHDRAWAL_BUDGETS, JSON.stringify(withdrawalBudgets.value));
     localStorage.setItem(
       keys.LS_YEARS_TO_CONTRIBUTE,
       JSON.stringify(yearsToContribute.value)
@@ -544,8 +887,13 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     [keys.LS_ACCRUE_BEFORE_CONTRIBUTION]: accrueBeforeContribution.value,
     [keys.LS_BUDGETS]: budgets.value,
     [keys.LS_DEFLATE_ALL_MONEY]: deflateAllMoney.value,
+    [keys.LS_DESIRED_NET_INCOME]: desiredNetIncome.value,
+    [keys.LS_RETIREMENT_TAX_RATE]: retirementTaxRate.value,
     [keys.LS_INFLATION_FACTOR]: inflationFactor.value,
     [keys.LS_INSTRUMENTS]: instruments.value,
+    [keys.LS_SELECTED_CAREER_BUDGET_ID]: selectedCareerBudgetId.value,
+    [keys.LS_VIEW_PHASE]: viewPhase.value,
+    [keys.LS_WITHDRAWAL_BUDGETS]: withdrawalBudgets.value,
     [keys.LS_YEARS_TO_CONTRIBUTE]: yearsToContribute.value,
     [keys.LS_YEARS_TO_SPEND]: yearsToSpend.value,
   });
@@ -559,6 +907,22 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     ) {
       inflationFactor.value = newFactor;
     }
+  };
+
+  const setDesiredNetIncome = (newIncome: number): void => {
+    if (!Number.isNaN(newIncome) && newIncome >= 0) {
+      desiredNetIncome.value = newIncome;
+    }
+  };
+
+  const setRetirementTaxRate = (newRate: number): void => {
+    if (!Number.isNaN(newRate) && newRate >= 0 && newRate < 100) {
+      retirementTaxRate.value = newRate;
+    }
+  };
+
+  const setSelectedCareerBudgetId = (id: string): void => {
+    selectedCareerBudgetId.value = id;
   };
 
   const setYearsToContribute = (newYears: number): void => {
@@ -579,6 +943,22 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     ) {
       yearsToSpend.value = newYears;
     }
+  };
+
+  const setPhase = (phase: string): void => {
+    if (viewPhase.value !== phase) {
+      unviewBudget();
+      unviewInstrument();
+      viewPhase.value = phase;
+    }
+  };
+
+  const togglePhase = (): void => {
+    setPhase(
+      viewPhase.value === constants.PHASE_CAREER
+        ? constants.PHASE_RETIREMENT
+        : constants.PHASE_CAREER
+    );
   };
 
   const toggleAccrueBeforeContribution = (): void => {
@@ -685,6 +1065,43 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     budgetDetailsPanelActive.value = true;
   };
 
+  const getWithdrawalBudget = (id: string): MonthlyBudget | undefined =>
+    monthlyWithdrawalBudgets.value.find((budget) => budget.id === id);
+
+  const getWithdrawalBudgetName = (id: string): string => {
+    if (id === constants.DEFAULT) return 'Target Income';
+    const index = withdrawalBudgets.value.findIndex(b => b.id === id) + 1;
+    return `Withdrawal ${index}`;
+  };
+
+  const deleteWithdrawalBudget = (id: string): void => {
+    withdrawalBudgets.value = withdrawalBudgets.value.filter(
+      (budget: Budget) => budget.id !== id && budget.id !== constants.DEFAULT
+    );
+  };
+
+  const editWithdrawalBudget = (id: string): void => {
+    // Reuse budget form logic but targeted at withdrawal budgets
+    currentBudgetId.value = id;
+    openBudgetForm();
+  };
+
+  const getNumWithdrawals = (
+    instrumentId: string,
+    budgetId: string
+  ): number =>
+    getWithdrawalSchedule(instrumentId, budgetId).amortizationSchedule.length;
+
+  const createWithdrawalBudget = (proposedBudget: number): string => {
+    const budget = <Budget>{
+      id: String(Math.floor(Math.random() * Date.now())),
+      relative: proposedBudget,
+    };
+    withdrawalBudgets.value.push(budget);
+    withdrawalBudgets.value.sort((a: Budget, b: Budget) => b.relative - a.relative);
+    return budget.id;
+  };
+
   // Creation functions
 
   // Budget
@@ -732,8 +1149,26 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const getContributionSchedule = (
     instrumentId: string,
     budgetId: string
-  ): contributionTypes.ContributionSchedule =>
-    contributionSchedules.value[instrumentId][budgetId];
+  ): contributionTypes.ContributionSchedule => {
+    const instSchedules = contributionSchedules.value[instrumentId];
+    return (instSchedules && instSchedules[budgetId]) || <contributionTypes.ContributionSchedule>{
+      lifetimeGrowth: 0,
+      lifetimeContribution: 0,
+      amortizationSchedule: [],
+    };
+  };
+
+  const getWithdrawalSchedule = (
+    instrumentId: string,
+    budgetId: string
+  ): withdrawalTypes.WithdrawalSchedule => {
+    const instSchedules = withdrawalSchedules.value[instrumentId];
+    return (instSchedules && instSchedules[budgetId]) || <withdrawalTypes.WithdrawalSchedule>{
+      lifetimeGrowth: 0,
+      lifetimeWithdrawal: 0,
+      amortizationSchedule: [],
+    };
+  };
 
   const getNumContributions = (
     instrumentId: string,
@@ -751,62 +1186,124 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     return bestSchedule.lifetimeContribution + bestSchedule.lifetimeGrowth;
   };
 
+  const getMaxWithdrawalMoney = (instrumentId: string): number => {
+    const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
+    const careerSchedule = getContributionSchedule(instrumentId, baseCareerId);
+    let max = careerSchedule.amortizationSchedule.length > 0
+      ? careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+      : (getInstrument(instrumentId)?.currentBalance || 0);
+
+    monthlyWithdrawalBudgets.value.forEach((budget) => {
+      const scheduleMap = withdrawalSchedules.value[instrumentId];
+      if (!scheduleMap || !scheduleMap[budget.id]) return;
+      const schedule = scheduleMap[budget.id];
+      schedule.amortizationSchedule.forEach((record) => {
+        if (record.currentBalance > max) max = record.currentBalance;
+      });
+    });
+    return max;
+  };
+
   const amortizationTableHeaders: ComputedRef<
     Record<string, string | ComputedRef<string>>[]
-  > = computed(() => [
-    { key: constants.TK_PERIOD, label: periodLabel },
-    { key: constants.TK_TOTAL_GROWTH, label: 'Total Growth' },
-    { key: constants.TK_CONTRIBUTION, label: 'Contribution' },
-    { key: constants.TK_INTEREST, label: 'Interest' },
-    { key: constants.TK_CURRENT_BALANCE, label: 'Current Balance' },
-  ]);
+  > = computed(() => {
+    const baseHeaders = [
+      { key: constants.TK_PERIOD, label: periodLabel },
+      { key: constants.TK_TOTAL_GROWTH, label: 'Growth' },
+    ];
 
-  const amortizationTableRows = (schedule: contributionTypes.ContributionSchedule) => {
+    if (viewPhase.value === constants.PHASE_CAREER) {
+      return [
+        ...baseHeaders,
+        { key: constants.TK_CONTRIBUTION, label: 'Contribution' },
+        { key: constants.TK_CURRENT_BALANCE, label: 'Current Balance' },
+      ];
+    } else {
+      return [
+        ...baseHeaders,
+        { key: 'withdrawal', label: 'Gross Withdrawal' },
+        { key: 'netAmount', label: 'Net Income' },
+        { key: constants.TK_CURRENT_BALANCE, label: 'Current Balance' },
+      ];
+    }
+  });
+
+  const amortizationTableRows = (schedule: contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule) => {
     return schedule.amortizationSchedule.map(
-      (record: contributionTypes.ContributionRecord) => ({
-        [constants.TK_PERIOD]: globalOptions.Period(record.period, true) as string,
-        [constants.TK_TOTAL_GROWTH]: globalOptions.Money(record.growth + record.contribution),
-        [constants.TK_CONTRIBUTION]: globalOptions.Money(record.contribution),
-        [constants.TK_INTEREST]: globalOptions.Money(record.growth),
-        [constants.TK_CURRENT_BALANCE]: globalOptions.Money(record.currentBalance),
-      })
+      (record: any) => {
+        const row: Record<string, string> = {
+          [constants.TK_PERIOD]: globalOptions.Period(record.period, true) as string,
+          [constants.TK_TOTAL_GROWTH]: globalOptions.Money(record.growth),
+          [constants.TK_CURRENT_BALANCE]: globalOptions.Money(record.currentBalance),
+        };
+
+        if ('contribution' in record) {
+          row[constants.TK_CONTRIBUTION] = globalOptions.Money(record.contribution);
+        }
+
+        if ('withdrawal' in record) {
+          row['withdrawal'] = globalOptions.Money(record.withdrawal);
+          row['netAmount'] = globalOptions.Money(record.netAmount);
+        }
+
+        return row;
+      }
     );
   };
 
-  const amortizationTableTotals = (schedule: contributionTypes.ContributionSchedule) => {
-    const { lifetimeContribution, lifetimeGrowth } = schedule;
-    return {
+  const amortizationTableTotals = (schedule: contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule) => {
+    const { lifetimeGrowth } = schedule;
+    const totals: Record<string, string> = {
       [constants.TK_PERIOD]: 'Totals',
-      [constants.TK_TOTAL_GROWTH]: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
-      [constants.TK_CONTRIBUTION]: globalOptions.Money(lifetimeContribution),
-      [constants.TK_INTEREST]: globalOptions.Money(lifetimeGrowth),
-      [constants.TK_CURRENT_BALANCE]: globalOptions.Money(lifetimeGrowth + lifetimeContribution),
+      [constants.TK_TOTAL_GROWTH]: globalOptions.Money(lifetimeGrowth),
     };
+
+    if ('lifetimeContribution' in schedule) {
+      totals[constants.TK_CONTRIBUTION] = globalOptions.Money(schedule.lifetimeContribution);
+      totals[constants.TK_CURRENT_BALANCE] = globalOptions.Money(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+    }
+
+    if ('lifetimeWithdrawal' in schedule) {
+      totals['withdrawal'] = globalOptions.Money(schedule.lifetimeWithdrawal);
+      const totalNet = schedule.amortizationSchedule.reduce((acc, r: any) => acc + (r.netAmount || 0), 0);
+      totals['netAmount'] = globalOptions.Money(totalNet);
+      totals[constants.TK_CURRENT_BALANCE] = globalOptions.Money(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+    }
+
+    return totals;
   };
 
   // title building functions
   const buildAmortizationTableTitle = (
     instrument: instrument.IInstrument,
     monthlyBudget: Budget
-  ): string =>
-    `Amortization Table - ${getInstrumentName(
+  ): string => {
+    const budgetName = viewPhase.value === constants.PHASE_CAREER
+      ? getBudgetName(monthlyBudget.id)
+      : getWithdrawalBudgetName(monthlyBudget.id);
+
+    return `Amortization Table - ${getInstrumentName(
       instrument.id
-    )} | ${getBudgetName(monthlyBudget.id)}`;
+    )} | ${budgetName}`;
+  };
 
   const buildAmortizationTableSubtitle = (
     instrument: instrument.IInstrument,
     monthlyBudget: Budget
-  ): string =>
-    `(${globalOptions.Money(
+  ): string => {
+    const countLabel = viewPhase.value === constants.PHASE_CAREER ? 'Contributions' : 'Withdrawals';
+    const count = viewPhase.value === constants.PHASE_CAREER
+      ? getNumContributions(instrument.id, monthlyBudget.id)
+      : getNumWithdrawals(instrument.id, monthlyBudget.id);
+
+    return `(${globalOptions.Money(
       instrument.currentBalance
     )} | ${globalOptions.Percent(
       instrument.annualRate * 100
     )} | ${globalOptions.Money(
       (monthlyBudget as MonthlyBudget).absolute
-    )}/month | ${getNumContributions(
-      instrument.id,
-      monthlyBudget.id
-    )} Contributions)`;
+    )}/month | ${count} ${countLabel})`;
+  };
 
   const buildInstrumentSubtitle = (
     instrument: instrument.IInstrument
@@ -826,12 +1323,17 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     currentBudgetId,
     currentInstrumentId,
     deflateAllMoney,
+    desiredNetIncome,
+    retirementTaxRate,
     inflationFactor,
     instrumentDetailsPanelActive,
     instrumentFormActive,
     instruments,
     minimumBudget,
     optionsFormActive,
+    selectedCareerBudgetId,
+    viewPhase,
+    withdrawalBudgets,
     yearsToContribute,
     yearsToSpend,
 
@@ -846,16 +1348,23 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     graphs,
     graphXScale,
     inflationRate,
+    retirementTaxRateEffective,
     instrumentCardGraphConfig,
     instrumentFormTitle,
     instrumentsWithTotals,
     monthlyBudgets,
+    monthlyWithdrawalBudgets,
     periodLabel,
     purchasingPowerGraphs,
     totalAnnualLimit,
     totalCurrentBalance,
     totalMaxPeriodsPerYear,
     totalsAsAnInstrument,
+    careerRetirementComparison,
+    investmentTabularAnalysis,
+    retirementTabularAnalysis,
+    withdrawalScenarios,
+    withdrawalSchedules,
 
     // ACTIONS
     amortizationTableRows,
@@ -866,37 +1375,49 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     buildInstrumentSubtitle,
     clearState,
     createBudget,
+    createWithdrawalBudget,
     createInstrument,
     deflate,
     deleteBudget,
+    deleteWithdrawalBudget,
     deleteInstrument,
     editBudget,
+    editWithdrawalBudget,
     editInstrument,
     exitBudgetForm,
     exitInstrumentForm,
     exitOptionsForm,
     exportState,
     getBudget,
+    getWithdrawalBudget,
     getBudgetColor,
     getBudgetIndex,
     getBudgetName,
+    getWithdrawalBudgetName,
     getContributionSchedule,
+    getWithdrawalSchedule,
     getInstrument,
     getInstrumentIndex,
     getInstrumentName,
     getMaxMoney,
     getNumContributions,
+    getNumWithdrawals,
     loadState,
     openBudgetForm,
     openInstrumentForm,
     openOptionsForm,
     saveState,
+    setSelectedCareerBudgetId,
+    setDesiredNetIncome,
+    setRetirementTaxRate,
     setInflationFactor,
+    setPhase,
     setYearsToContribute,
     setYearsToSpend,
     sortInstruments,
     toggleAccrueBeforeContribution,
     toggleDeflateAllMoney,
+    togglePhase,
     unviewBudget,
     unviewInstrument,
     viewBudget,

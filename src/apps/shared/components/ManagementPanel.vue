@@ -14,7 +14,7 @@ const props = defineProps<{
       <h2>{{ props.title }}</h2>
     </div>
     <div :class="['flex-none']">
-      <base-menu :text="menu.text" :buttons="menu.buttons" />
+      <base-menu :text="menu.text" :buttons="menu.buttons" :classes="menu.classes"/>
       <base-button :class="button.classes" @click="button.onClick">
         {{ button.text }}
       </base-button>

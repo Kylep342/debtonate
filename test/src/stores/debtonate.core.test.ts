@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
-import { useDebtonateCoreStore, DebtonatecoreStore } from '@/apps/debtonate/stores/core';
+import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
@@ -45,7 +45,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('has correct total values', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
     state.sortLoans();
@@ -72,7 +72,7 @@ describe('Debtonate Core Store', () => {
 
   describe('with budgets', async () => {
     it('creates a budget', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.createBudget(100);
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.absolute.toFixed(2))
@@ -88,7 +88,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('deletes a budget', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
@@ -103,7 +103,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('edits a budget', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
       const firstBudget = state.getBudget(firstBudgetId);
@@ -122,7 +122,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('sorts budgets', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
@@ -135,7 +135,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('gets budget attributes', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
@@ -150,7 +150,7 @@ describe('Debtonate Core Store', () => {
 
   describe('with loans', async () => {
     it('creates a loan', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       const firstLoanDummy = Loans()[0];
       state.createLoan(
         firstLoanDummy.principal,
@@ -175,7 +175,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('deletes a loan', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
       expect(state.loans.length).toBe(3);
@@ -186,7 +186,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('edits a loan', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
       const firstLoan = state.getLoan(firstLoanId);
@@ -210,7 +210,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('sorts loans', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       expect(state.snowballSort).toBe(false);
 
@@ -233,7 +233,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('gets loan attributes', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
       expect(state.getLoanIndex(constants.TOTALS)).toBe(0);
@@ -247,7 +247,7 @@ describe('Debtonate Core Store', () => {
 
   describe('with refinancing', async () => {
     it('refinances a loan', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
       const firstLoan = state.getLoan(firstLoanId);
@@ -303,7 +303,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('handles internal state', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
     const initialState = state.exportState();
@@ -318,6 +318,7 @@ describe('Debtonate Core Store', () => {
       keys.LS_ROUNDING_ENABLED,
       keys.LS_ROUNDING_SCALE,
       keys.LS_SNOWBALL_SORT,
+      keys.LS_VIEW_PHASE,
     ]);
 
     state.budgets = Budgets();
@@ -363,7 +364,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('manages component states', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     state.budgets = Budgets();
     const firstBudgetId = state.budgets[0].id;
     state.loans = Loans();
@@ -431,7 +432,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('builds titles', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
     const firstBudgetId = state.monthlyBudgets[0].id;
@@ -482,7 +483,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('computes payment schedules', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
 
@@ -507,7 +508,7 @@ describe('Debtonate Core Store', () => {
   });
 
   it('computes payment summaries', async () => {
-    const state: DebtonatecoreStore = useDebtonateCoreStore();
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
     state.budgets = Budgets();
     state.loans = Loans();
 
@@ -538,7 +539,7 @@ describe('Debtonate Core Store', () => {
 
   describe('with graphing', () => {
     it('configures graphs', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
       expect(state.graphXScale).toStrictEqual(d3.scaleLinear);
@@ -597,7 +598,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('computes balances over time graph content', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       state.loans = Loans();
 
@@ -609,7 +610,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('computes interest saved over time graph content', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       state.loans = Loans();
 
@@ -621,7 +622,7 @@ describe('Debtonate Core Store', () => {
     });
 
     it('computes percent of payment as principal over time graph content', async () => {
-      const state: DebtonatecoreStore = useDebtonateCoreStore();
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       state.loans = Loans();
 

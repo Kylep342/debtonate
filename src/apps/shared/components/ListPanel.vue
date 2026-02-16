@@ -18,7 +18,7 @@ const { scrollContainer } = useResize();
 const createButton: ComputedRef<Button> = computed(() => ({
   text: props.createText,
   onClick: props.createItem,
-  classes: ['btn-success', 'text-center'],
+  classes: ['btn-sm', 'btn-success', 'text-center'],
 }));
 </script>
 

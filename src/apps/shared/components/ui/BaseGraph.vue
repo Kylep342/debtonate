@@ -58,10 +58,10 @@ const initializeChart = () => {
   if (!containerWidth.value) return;
 
   const graph = chart.graphs[props.anchorId];
-  
+
   const totalWidth = containerWidth.value;
   const totalHeight = 500;
-  
+
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
 
   const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
@@ -83,7 +83,7 @@ const initializeChart = () => {
     const bbox = (this as SVGTextElement).getBBox();
     if (bbox.width > maxLabelWidth) maxLabelWidth = bbox.width;
   });
-  
+
   // Clean up temp axis && update left margin based on max width + padding
   tempAxis.remove();
   margin.left = Math.ceil(maxLabelWidth + 20);
@@ -224,7 +224,7 @@ watch(
 }
 /* Ensure the wrapper takes full width so ResizeObserver works */
 .chartWrapper {
-  width: 100%; 
+  width: 100%;
   min-width: 800px;
 }
 </style>

@@ -40,11 +40,11 @@ watch(() => props.watchedItems, (newItems) => {
 <template>
   <div>
     <div :class="['card-actions', 'flow-root', 'p-0']">
-      <div :class="['flex', 'justify-between', 'pr-4']">
+      <div :class="['flex', 'justify-between', 'items-center', 'pr-4']">
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ constants.GRAPHS }} - {{ viewedGraphId }}
         </h2>
-        <base-menu :text="constants.BTN_SELECT" :buttons="buttons" />
+        <base-menu :text="constants.BTN_SELECT" :buttons="buttons" :classes="['btn-sm']"/>
       </div>
     </div>
     <div :class="['tabframe', 'w-fit']">

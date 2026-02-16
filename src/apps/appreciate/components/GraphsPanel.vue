@@ -8,6 +8,7 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 <template>
   <GraphsFrame
+    :key="state.viewPhase"
     :graphs="state.graphs"
     :pivot-items="state.instrumentsWithTotals"
     :watched-items="state.instruments"
