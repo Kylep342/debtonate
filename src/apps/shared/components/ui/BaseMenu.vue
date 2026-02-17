@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { Button } from '@/apps/shared/types/app';
 
-defineProps<{
-  text: string,
-  buttons: Array<Button>,
-  classes: Array<string>,
-}>();
+defineProps({
+  text: {
+    type: String,
+    required: true
+  },
+  buttons: {
+    type: Array as () => Array<Button>,
+    required: true
+  },
+  classes: {
+    type: Array as () => Array<string>,
+    required: true
+  }
+});
 </script>
 
 <template>

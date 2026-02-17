@@ -4,6 +4,7 @@ import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
 
 const state = useDebtonateCoreStore();
+const EXTRA_VIEW_COMPARATIVE_ANALYSIS = 'Comparative Analysis';
 </script>
 
 <template>
@@ -12,13 +13,16 @@ const state = useDebtonateCoreStore();
       <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4']">
         <h2>Repayment Analysis</h2>
       </div>
-      <GraphsPanel />
-      <TabularAnalysis
-        title="Repayment Comparative Analysis"
-        :analysis="state.debtonateTabularAnalysis"
-        :items="state.monthlyBudgets"
-        :get-item-name="state.getBudgetName"
-      />
+      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_COMPARATIVE_ANALYSIS]">
+        <template #[`view-${EXTRA_VIEW_COMPARATIVE_ANALYSIS}`]>
+          <TabularAnalysis
+            title="Repayment Comparative Analysis"
+            :analysis="state.debtonateTabularAnalysis"
+            :items="state.monthlyBudgets"
+            :get-item-name="state.getBudgetName"
+          />
+        </template>
+      </GraphsPanel>
     </div>
   </div>
 </template>

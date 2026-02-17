@@ -134,6 +134,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
       <h3 v-if="state.instruments.length">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
+        :config="state.budgetCardGraphConfig"
         :graph="graphContent"
         :anchorId="budget.id"
       />

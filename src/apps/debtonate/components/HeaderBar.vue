@@ -58,6 +58,6 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
         </div>
       </div>
     </div>
-    <base-menu :text="constants.BTN_MENU" :buttons="menuButtons" />
+    <base-menu :text="constants.BTN_MENU" :buttons="menuButtons" :classes="[]" />
   </header>
 </template>

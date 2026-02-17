@@ -4,11 +4,20 @@ import { onMounted, shallowReactive, watch, ShallowReactive } from 'vue';
 
 import { Arc, GraphConfig } from '@/apps/shared/types/graph';
 
-const props = defineProps<{
-  config: any,
-  graph: Arc[],
-  anchorId: string,
-}>();
+const props = defineProps({
+  config: {
+    type: Object,
+    required: true
+  },
+  graph: {
+    type: Array as () => Arc[],
+    required: true
+  },
+  anchorId: {
+    type: String,
+    required: true
+  }
+});
 
 const elId = `donut-graph-${props.anchorId}`;
 

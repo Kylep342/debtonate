@@ -35,6 +35,8 @@ const getScenarioName = (id: string) => {
   return scenario ? scenario.name : id;
 };
 
+const EXTRA_VIEW_COMPARATIVE_ANALYSIS = 'Comparative Analysis';
+
 </script>
 
 <template>
@@ -50,13 +52,16 @@ const getScenarioName = (id: string) => {
           />
         </div>
       </div>
-      <GraphsPanel />
-      <TabularAnalysis
-        title="Refinancing Scenario Comparison"
-        :analysis="state.repatriateTabularAnalysis"
-        :items="refinancingScenariosItems"
-        :get-item-name="getScenarioName"
-      />
+      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_COMPARATIVE_ANALYSIS]">
+        <template #[`view-${EXTRA_VIEW_COMPARATIVE_ANALYSIS}`]>
+          <TabularAnalysis
+            title="Refinancing Scenario Comparison"
+            :analysis="state.repatriateTabularAnalysis"
+            :items="refinancingScenariosItems"
+            :get-item-name="getScenarioName"
+          />
+        </template>
+      </GraphsPanel>
     </div>
   </div>
 </template>

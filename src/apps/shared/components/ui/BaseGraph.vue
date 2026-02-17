@@ -64,7 +64,7 @@ const initializeChart = () => {
 
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
 
-  const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
+  const svg = d3.select(`#graph-${props.anchorId}`).attr('width', totalWidth).attr('height', totalHeight);
   svg.selectAll('*').remove();
 
   // create a temporary Y scale to measure label width
@@ -204,7 +204,7 @@ watch(
     <h2 class="text-center">
       {{ chart.subheader(anchorId) }}
     </h2>
-    <svg id="graph" />
+    <svg :id="`graph-${anchorId}`" />
     <div id="tooltip" :style="{
       left: tooltipPosition.left + 'px',
       top: tooltipPosition.top + 'px',

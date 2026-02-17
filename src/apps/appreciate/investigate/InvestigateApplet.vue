@@ -20,6 +20,9 @@ const careerBudgetSelectors = computed<Button[]>(
     onClick: () => state.setSelectedCareerBudgetId(budget.id),
   })))
 );
+
+const EXTRA_VIEW_COMPARATIVE_ANALYSIS = 'Comparative Analysis';
+const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
 </script>
 
 <template>
@@ -35,16 +38,19 @@ const careerBudgetSelectors = computed<Button[]>(
           />
         </div>
       </div>
-      <GraphsPanel />
-      <TabularAnalysis
-        title="Retirement Comparative Analysis"
-        :analysis="state.retirementTabularAnalysis"
-        :items="state.monthlyWithdrawalBudgets"
-        :get-item-name="state.getWithdrawalBudgetName"
-      />
-      <div :class="['mt-8']">
-        <InvestigateSummary />
-      </div>
+      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_COMPARATIVE_ANALYSIS, EXTRA_VIEW_RETIREMENT_SUMMARY]">
+        <template #[`view-${EXTRA_VIEW_COMPARATIVE_ANALYSIS}`]>
+          <TabularAnalysis
+            title="Retirement Comparative Analysis"
+            :analysis="state.retirementTabularAnalysis"
+            :items="state.monthlyWithdrawalBudgets"
+            :get-item-name="state.getWithdrawalBudgetName"
+          />
+        </template>
+        <template #[`view-${EXTRA_VIEW_RETIREMENT_SUMMARY}`]>
+          <InvestigateSummary />
+        </template>
+      </GraphsPanel>
     </div>
   </div>
 </template>
