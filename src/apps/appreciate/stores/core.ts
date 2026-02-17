@@ -420,10 +420,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     const metrics = [
       'Principal',
       'Interest',
-      'Interest/Principal Ratio',
-      'Share of Balance at 65 as Principal',
-      'Effective Avg Saved/yr of work',
-      'Growth Factor from age 26',
+      'Interest/principal ratio',
+      'Share of balance at retirement as principal',
+      'Effective avg saved/yr of work',
+      'Growth factor from present',
       'Age of > $1M saved',
     ];
 
@@ -439,10 +439,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
       analysis['Principal'][budget.id] = globalOptions.Money(principal);
       analysis['Interest'][budget.id] = globalOptions.Money(interest);
-      analysis['Interest/Principal Ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
-      analysis['Share of Balance at 65 as Principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
-      analysis['Effective Avg Saved/yr of work'][budget.id] = globalOptions.Money(principal / yearsToContribute.value);
-      analysis['Growth Factor from age 26'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '0.0000';
+      analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Share of balance at retirement as principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
+      analysis['Effective avg saved/yr of work'][budget.id] = globalOptions.Money(principal / yearsToContribute.value);
+      analysis['Growth factor from present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '0.0000';
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => r.currentBalance >= 1000000)?.period;
       analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
@@ -454,12 +454,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const retirementTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
     const analysis: Record<string, Record<string, any>> = {};
     const metrics = [
-      'Initial Balance',
+      'Initial balance',
       'Growth',
-      'Growth/Initial Ratio',
-      'Share of value at 100 as growth',
-      'Effective Avg Saved/yr',
-      'Growth Factor from age 65',
+      'Growth/initial ratio',
+      'Share of value retirement end as growth',
+      'Effective avg saved/yr',
+      'Growth factor from retirement start',
       'Age of > $1M saved',
     ];
 
@@ -473,15 +473,15 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       const growth = schedule.lifetimeGrowth;
       const finalBalance = schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0;
 
-      analysis['Initial Balance'][budget.id] = globalOptions.Money(initialBalance);
+      analysis['Initial balance'][budget.id] = globalOptions.Money(initialBalance);
       analysis['Growth'][budget.id] = globalOptions.Money(growth);
-      analysis['Growth/Initial Ratio'][budget.id] = initialBalance > 0 ? (growth / initialBalance).toFixed(4) : '0.0000';
-      analysis['Share of value at 100 as growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
-      analysis['Effective Avg Saved/yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
-      analysis['Growth Factor from age 65'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
+      analysis['Growth/initial ratio'][budget.id] = initialBalance > 0 ? (growth / initialBalance).toFixed(4) : '0.0000';
+      analysis['Share of value retirement end as growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
+      analysis['Effective avg saved/yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
+      analysis['Growth factor from retirement start'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => r.currentBalance >= 1000000)?.period;
-      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming age 65 retirement
+      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming retirement start retirement
     });
 
     return analysis;

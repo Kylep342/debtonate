@@ -62,9 +62,9 @@ all new phases come with more graphs, tables, and an enhanced calculator view sh
 | **Principal** | $10,800.00 | $831,000.00 | $1,077,000.00 | $1,220,500.00 | $1,425,500.00 |
 | **Interest** | $1,337,654.68 | $2,798,369.85 | $3,480,941.64 | $3,879,108.52 | $4,447,918.35 |
 | **Interest/Principal Ratio** | 123.8569 | 3.3675 | 3.2321 | 3.1783 | 3.1203 |
-| **Share of Balance at 65 as Principal** | 0.80% | 22.90% | 23.63% | 23.93% | 24.27% |
+| **Share of Balance at retirement as Principal** | 0.80% | 22.90% | 23.63% | 23.93% | 24.27% |
 | **Effective Avg Saved/yr of work** | $32,889.14 | $88,521.22 | $111,169.31 | $124,380.70 | $143,254.11 |
-| **Growth Factor from age 26** | 73.0949 | 48.9661 | 56.8889 | 60.9855 | 66.2764 |
+| **Growth Factor from present** | 73.0949 | 48.9661 | 56.8889 | 60.9855 | 66.2764 |
 | **Age of > $1M saved** | 61 | 47 | 44 | 43 | 42 |
 
  ### investigate
@@ -74,7 +74,7 @@ all new phases come with more graphs, tables, and an enhanced calculator view sh
 | **Initial Balance** | $1,348,454.68 | $3,629,369.85 | $4,557,941.64 | $5,099,608.52 | $5,873,418.35 |
 | **Growth** | $11,603,811.70 | $10,467,649.77 | $19,453,050.39 | $24,694,534.09 | $32,182,367.95 |
 | **Growth/Initial Ratio** | 8.6053 | 2.8842 | 4.2679 | 4.8424 | 5.4793 |
-| **Share of value at 100 as growth** | 113.15% | 74.25% | 81.02% | 82.88% | 84.57% |
+| **Share of value retirement end as growth** | 113.15% | 74.25% | 81.02% | 82.88% | 84.57% |
 | **Effective Avg Saved/yr** | $322,328.10 | $290,768.05 | $540,362.51 | $685,959.28 | $893,954.67 |
-| **Growth Factor from age 65** | 10.7583 | 2.7029 | 3.8826 | 4.3523 | 4.8600 |
+| **Growth Factor from retirement start** | 10.7583 | 2.7029 | 3.8826 | 4.3523 | 4.8600 |
 | **Age of > $10M saved** | - | 94 | 85 | 81 | 77 |
