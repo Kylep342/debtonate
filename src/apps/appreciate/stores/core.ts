@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-// import moneyfunx from 'moneyfunx';
 import { contributions, contributionTypes, instrument, sorting, withdrawals, withdrawalTypes } from 'moneyfunx';
 import { defineStore } from 'pinia';
 import { computed, ref, ComputedRef, Ref } from 'vue';
