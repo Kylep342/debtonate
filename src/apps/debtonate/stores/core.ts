@@ -473,6 +473,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLoan(loan.id)!.currentBalance,
           },
@@ -580,6 +582,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
           },
@@ -628,6 +632,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan: loan.ILoan) => {
       graphs[loan.id] = <LineGraphContent>{
         config: {
+          minX: 1,
+          minY: 0,
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
         },
@@ -689,6 +695,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         graphs[scenario.id] = <LineGraphContent>{
           config: {
             maxX: schedule.amortizationSchedule.length,
+            minY: 0,
             maxY: scenario.currentBalance,
           },
           lines: {
@@ -861,8 +868,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     [keys.LS_BUDGETS]: budgets.value,
     [keys.LS_LOANS]: loans.value,
     [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]:
-      refinancingUseHighestPayment.value,
+    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
     [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
     [keys.LS_ROUNDING_SCALE]: roundingScale.value,
     [keys.LS_SNOWBALL_SORT]: snowballSort.value,

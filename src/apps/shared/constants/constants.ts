@@ -23,7 +23,7 @@ const BTN_OFF = 'Off';
 const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_PIVOT = 'Pivot';
-const BTN_REFINANCE = 'Refinance';
+const BTN_REFINANCE = 'Refinancing';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 
@@ -106,6 +106,13 @@ const NAME_DEBTONATE = 'Debtonate';
 const NAME_MIN_BUDGET = 'Minimum Budget';
 const PERIOD = 'Period';
 const PERIODS_PER_YEAR = 12;
+
+// phase toggles
+const PT_CAREER = 'Career'; // appreciate
+const PT_CURRENT_DEBT = 'Current Debt'; // debtonate
+const PT_REFINANCING = 'Refinancing'; // repatriate
+const PT_RETIREMENT = 'Retirement'; // investigate
+
 const TABLES = 'Tables';
 const THEME = 'retro';
 const THEME_DARK = 'synthwave';
@@ -141,6 +148,10 @@ export default Object.freeze({
   NAME_MIN_BUDGET,
   PERIOD,
   PERIODS_PER_YEAR,
+  PT_CAREER,
+  PT_CURRENT_DEBT,
+  PT_REFINANCING,
+  PT_RETIREMENT,
   TABLES,
   THEME,
   THEME_DARK,
