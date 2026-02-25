@@ -522,6 +522,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
         graphs[instrument.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: overallMaxX,
             maxY: overallMaxY * 1.1,
           },
@@ -646,6 +648,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
         graphs[instrument.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: overallMaxX,
             maxY: overallMaxY * 1.1,
           },
@@ -693,11 +697,11 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
             ? careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance
             : (getInstrument(instrument.id)?.currentBalance || 0);
 
-          line.push({ x: 0, y: initialBalance });
+          line.push({ x: careerOffsetPeriods.value, y: initialBalance });
 
           getWithdrawalSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
             (record: withdrawalTypes.WithdrawalRecord) => {
-              line.push({ x: record.period, y: record.currentBalance });
+              line.push({ x: careerOffsetPeriods.value + record.period, y: record.currentBalance });
             }
           );
           lines[budget.id] = line;
@@ -710,6 +714,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
         graphs[instrument.id] = <LineGraphContent>{
           config: {
+            minX: careerOffsetPeriods.value,
+            minY: 0,
             maxX: overallMaxX,
             maxY: overallMaxY * 1.1,
           },
@@ -727,7 +733,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         lineName: getWithdrawalBudgetName,
         subheader: (instrumentId: string) =>
           `Starting from ${getBudgetName(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
-        x: (x: number) => x + careerOffsetPeriods.value,
+        x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
         xScale: graphXScale.value,

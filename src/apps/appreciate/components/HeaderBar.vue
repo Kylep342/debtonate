@@ -27,8 +27,16 @@ const menuButtons: ComputedRef<Button[]> = computed(() => [
 ]);
 
 const phaseButtons: ComputedRef<Button[]> = computed(() => [
-  { text: 'Career', onClick: () => state.setPhase(constants.PHASE_CAREER), classes: [{'btn-success': isCareer.value}] },
-  { text: 'Retirement', onClick: () => state.setPhase(constants.PHASE_RETIREMENT), classes: [{'btn-success': isRetirement.value}] },
+  {
+    text: constants.PT_CAREER,
+    onClick: () => state.setPhase(constants.PHASE_CAREER),
+    classes: [{'btn-success': isCareer.value}]
+  },
+  {
+    text: constants.PT_RETIREMENT,
+    onClick: () => state.setPhase(constants.PHASE_RETIREMENT),
+    classes: [{'btn-success': isRetirement.value}]
+  },
 ]);
 </script>
 

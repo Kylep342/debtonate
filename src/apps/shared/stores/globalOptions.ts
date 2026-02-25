@@ -156,12 +156,16 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   );
 
   /**
-   * Converts an integer period number to a date
-   * @param {number[integer]} period The period to convert
+   * Converts an integer period number to a date or formats an existing date
+   * @param {number | Date} period The period to convert or the date to format
    * @param {boolean} asStr Flag to return as a locale-aware string (default=false)
-   * @returns {Date | string} The date converted from `period`
+   * @returns {Date | string | number} The date or period converted from `period`
    */
-  const Period = (period: number, asStr: boolean = false): string|number|Date => {
+  const Period = (period: number | Date, asStr: boolean = false): string | number | Date => {
+    if (period instanceof Date) {
+      return asStr ? period.toLocaleDateString(language.value) : period;
+    }
+
     if (periodsAsDates.value) {
       const anchorDate = new Date(baseDate.value);
       const relativeDate = new Date(

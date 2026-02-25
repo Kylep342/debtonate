@@ -69,7 +69,7 @@ const initializeChart = () => {
 
   // create a temporary Y scale to measure label width
   const tempY = chart.yScale()
-    .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
+    .domain([chart.y(graph.config.minY || 0), chart.y(graph.config.maxY * 1.1)])
     .range([totalHeight - margin.top - margin.bottom, 0]);
 
   const tempAxis = svg.append('g')
@@ -95,7 +95,7 @@ const initializeChart = () => {
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const x = chart.xScale()
-    .domain([chart.x(0), chart.x(graph.config.maxX)])
+    .domain([chart.x(graph.config.minX || 0), chart.x(graph.config.maxX)])
     .range([0, innerWidth]);
 
   const y = chart.yScale()
@@ -108,7 +108,7 @@ const initializeChart = () => {
 
   g.append('g')
     .attr('transform', `translate(0, ${innerHeight})`)
-    .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0));
+    .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0).tickFormat(chart.xFormat as any));
 
   g.append('g')
     .call(d3.axisLeft(y).ticks(innerHeight / 40).tickFormat(chart.yFormat))
@@ -139,7 +139,8 @@ const initializeChart = () => {
           tooltipProps.value = {
             tooltipConfig: <TooltipConfig>{
               xLabel: chart.xLabel(),
-              xFormat: chart.xFormat,
+              xFormat: chart.xFormat as any,
+              minX: graph.config.minX,
               lines: graph.lines,
               color: chart.color,
               lineName: chart.lineName,

@@ -4,7 +4,6 @@ import sharedConstants from '@/apps/shared/constants/constants';
 
 const BTN_AMORTIZATION_TABLES = "Amortization Tables";
 const BTN_DEBTONATE = 'Loans';
-const BTN_REPATRIATE = 'Refinance';
 const BTN_REFINANCE = 'Refinance';
 const BTN_REFINANCING_SUMMARY = "Refinancing Summary";
 const BUDGET_DETAILS_ID = 'budgetDetails';
@@ -34,7 +33,6 @@ export default Object.freeze({
   ...sharedConstants,
   BTN_AMORTIZATION_TABLES,
   BTN_DEBTONATE,
-  BTN_REPATRIATE,
   BTN_REFINANCE,
   BTN_REFINANCING_SUMMARY,
   BUDGET_DETAILS_ID,

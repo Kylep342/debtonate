@@ -28,12 +28,12 @@ const menuButtons: Button[] = [
 
 const phaseButtons: ComputedRef<Button[]> = computed(() => [
   {
-    text: 'Loans',
+    text: constants.PT_CURRENT_DEBT,
     onClick: () => state.setPhase(constants.PHASE_DEBTONATE),
     classes: [{'btn-success': isDebtonate.value}]
   },
   {
-    text: 'Refinance',
+    text: constants.PT_REFINANCING,
     onClick: () => state.setPhase(constants.PHASE_REPATRIATE),
     classes: [{'btn-success': isRepatriate.value}]
   },

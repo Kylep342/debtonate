@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OptionsGear from '@/apps/shared/components/OptionsGear.vue';
 import { Button } from '@/apps/shared/types/app';
 
 defineProps({
