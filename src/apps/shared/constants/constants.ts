@@ -53,24 +53,39 @@ const GRAPHS = 'Graphs';
 const LOCALES: Locale[] = [
   { code: 'ar-AE', currency: 'AED', flag: '🇦🇪' }, // UAE Dirham
   { code: 'ar-EG', currency: 'EGP', flag: '🇪🇬' }, // Egyptian Pound
+  { code: 'ar-KW', currency: 'KWD', flag: '🇰🇼' }, // Kuwaiti Dinar
+  { code: 'ar-MA', currency: 'MAD', flag: '🇲🇦' }, // Moroccan Dirham
+  { code: 'ar-QA', currency: 'QAR', flag: '🇶🇦' }, // Qatari Rial
   { code: 'ar-SA', currency: 'SAR', flag: '🇸🇦' }, // Saudi Riyal
   { code: 'bg-BG', currency: 'BGN', flag: '🇧🇬' }, // Bulgarian Lev
+  { code: 'bn-BD', currency: 'BDT', flag: '🇧🇩' }, // Bangladeshi Taka
   { code: 'cs-CZ', currency: 'CZK', flag: '🇨🇿' }, // Czech Koruna
   { code: 'da-DK', currency: 'DKK', flag: '🇩🇰' }, // Danish Krone
+  { code: 'de-AT', currency: 'EUR', flag: '🇦🇹' }, // Euro (Austria)
+  { code: 'de-CH', currency: 'CHF', flag: '🇨🇭' }, // Swiss Franc
   { code: 'de-DE', currency: 'EUR', flag: '🇩🇪' }, // Euro (Germany)
+  { code: 'el-GR', currency: 'EUR', flag: '🇬🇷' }, // Euro (Greece)
   { code: 'en-AU', currency: 'AUD', flag: '🇦🇺' }, // Australian Dollar
   { code: 'en-CA', currency: 'CAD', flag: '🇨🇦' }, // Canadian Dollar
   { code: 'en-GB', currency: 'GBP', flag: '🇬🇧' }, // British Pound Sterling
+  { code: 'en-GH', currency: 'GHS', flag: '🇬🇭' }, // Ghanaian Cedi
+  { code: 'en-IE', currency: 'EUR', flag: '🇮🇪' }, // Euro (Ireland)
+  { code: 'en-KE', currency: 'KES', flag: '🇰🇪' }, // Kenyan Shilling
   { code: 'en-NG', currency: 'NGN', flag: '🇳🇬' }, // Nigerian Naira
   { code: 'en-NZ', currency: 'NZD', flag: '🇳🇿' }, // New Zealand Dollar
+  { code: 'en-PH', currency: 'PHP', flag: '🇵🇭' }, // Philippine Peso
   { code: 'en-SG', currency: 'SGD', flag: '🇸🇬' }, // Singapore Dollar
   { code: 'en-US', currency: 'USD', flag: '🇺🇸' }, // United States Dollar
   { code: 'en-ZA', currency: 'ZAR', flag: '🇿🇦' }, // South African Rand
   { code: 'es-AR', currency: 'ARS', flag: '🇦🇷' }, // Argentine Peso
   { code: 'es-CL', currency: 'CLP', flag: '🇨🇱' }, // Chilean Peso
   { code: 'es-CO', currency: 'COP', flag: '🇨🇴' }, // Colombian Peso
+  { code: 'es-CR', currency: 'CRC', flag: '🇨🇷' }, // Costa Rican Colón
+  { code: 'es-DO', currency: 'DOP', flag: '🇩🇴' }, // Dominican Peso
   { code: 'es-ES', currency: 'EUR', flag: '🇪🇸' }, // Euro (Spain)
+  { code: 'es-GT', currency: 'GTQ', flag: '🇬🇹' }, // Guatemalan Quetzal
   { code: 'es-MX', currency: 'MXN', flag: '🇲🇽' }, // Mexican Peso
+  { code: 'es-PA', currency: 'PAB', flag: '🇵🇦' }, // Panamanian Balboa
   { code: 'es-PE', currency: 'PEN', flag: '🇵🇪' }, // Peruvian Sol
   { code: 'es-UY', currency: 'UYU', flag: '🇺🇾' }, // Uruguayan Peso
   { code: 'es-VE', currency: 'VES', flag: '🇻🇪' }, // Venezuelan Bolívar
@@ -81,6 +96,7 @@ const LOCALES: Locale[] = [
   { code: 'hi-IN', currency: 'INR', flag: '🇮🇳' }, // Indian Rupee
   { code: 'hu-HU', currency: 'HUF', flag: '🇭🇺' }, // Hungarian Forint
   { code: 'id-ID', currency: 'IDR', flag: '🇮🇩' }, // Indonesian Rupiah
+  { code: 'is-IS', currency: 'ISK', flag: '🇮🇸' }, // Icelandic Króna
   { code: 'it-IT', currency: 'EUR', flag: '🇮🇹' }, // Euro (Italy)
   { code: 'ja-JP', currency: 'JPY', flag: '🇯🇵' }, // Japanese Yen
   { code: 'ko-KR', currency: 'KRW', flag: '🇰🇷' }, // South Korean Won
@@ -94,7 +110,9 @@ const LOCALES: Locale[] = [
   { code: 'ru-RU', currency: 'RUB', flag: '🇷🇺' }, // Russian Ruble
   { code: 'sv-SE', currency: 'SEK', flag: '🇸🇪' }, // Swedish Krona
   { code: 'th-TH', currency: 'THB', flag: '🇹🇭' }, // Thai Baht
+  { code: 'tr-TR', currency: 'TRY', flag: '🇹🇷' }, // Turkish Lira
   { code: 'uk-UA', currency: 'UAH', flag: '🇺🇦' }, // Ukrainian Hryvnia
+  { code: 'ur-PK', currency: 'PKR', flag: '🇵🇰' }, // Pakistani Rupee
   { code: 'vi-VN', currency: 'VND', flag: '🇻🇳' }, // Vietnamese Dong
   { code: 'zh-CN', currency: 'CNY', flag: '🇨🇳' }, // Chinese Yuan
   { code: 'zh-HK', currency: 'HKD', flag: '🇭🇰' }, // Hong Kong Dollar
