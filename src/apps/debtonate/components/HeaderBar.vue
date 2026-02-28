@@ -17,13 +17,9 @@ const copyStateToClipboard = () => navigator.clipboard.writeText(
 const isDebtonate = computed(() => state.viewPhase === constants.PHASE_DEBTONATE);
 const isRepatriate = computed(() => state.viewPhase === constants.PHASE_REPATRIATE);
 
-const menuButtons: Button[] = [
-  { text: constants.BTN_OPTIONS, onClick: state.openOptionsForm },
-  { text: constants.BTN_LOAD, onClick: state.loadState },
-  { text: constants.BTN_SAVE, onClick: state.saveState },
-  { text: constants.BTN_CLEAR, onClick: state.clearState },
-  { text: constants.BTN_COPY, onClick: copyStateToClipboard },
+const appButtons: Button[] = [
   { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
+  { text: constants.NAME_DEBTONATE, onClick: () => router.push(routes.ROUTE_DEBTONATE) },
 ];
 
 const phaseButtons: ComputedRef<Button[]> = computed(() => [
@@ -45,7 +41,13 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
     <div :class="['flex-1']">
       <img src="/icon.png">
       <div :class="['flex', 'items-center']">
-        <h1>Debtonate -&nbsp;</h1>
+        <base-menu
+          :text="constants.NAME_DEBTONATE"
+          :buttons="appButtons"
+          :classes="['btn-secondary', 'btn-sm']"
+          style="filter: brightness(0.9);"
+        />
+        <span class="text-xl font-bold mx-2">&nbsp|&nbsp</span>
         <div :class="['flex', 'items-center']">
           <base-button
             v-for="(button) in phaseButtons"
@@ -58,6 +60,6 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
         </div>
       </div>
     </div>
-    <base-menu :text="constants.BTN_MENU" :buttons="menuButtons" :classes="[]" />
+    <base-button @click="state.openOptionsForm">{{ constants.BTN_OPTIONS }}</base-button>
   </header>
 </template>

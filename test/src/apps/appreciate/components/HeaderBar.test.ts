@@ -29,7 +29,6 @@ describe('HeaderBar Component (Appreciate)', () => {
       { text: 'Save', onClick: vi.fn(), classes: [] },
       { text: 'Clear', onClick: vi.fn(), classes: [] },
       { text: 'Copy', onClick: vi.fn(), classes: [] },
-      { text: constants.NAME_DEBTONATE, onClick: vi.fn(), classes: [] },
     ];
 
     pushMock.mockClear();
@@ -44,13 +43,16 @@ describe('HeaderBar Component (Appreciate)', () => {
 
   it('renders correctly and shows phase buttons', () => {
     const wrapper = mount(HeaderBar, { global: globalConfig });
-    expect(wrapper.find('h1').text()).toContain('Appreciate');
+    const appMenu = wrapper.findComponent(BaseMenu);
+    expect(appMenu.props('text')).toBe(constants.NAME_APPRECIATE);
 
     const buttons = wrapper.findAll('button');
-    // 2 phase buttons + 1 menu button = 3 buttons in the DOM (BaseMenu renders a button)
-    expect(buttons.length).toBe(3);
-    expect(buttons[0].text()).toBe('Career');
-    expect(buttons[1].text()).toBe('Retirement');
+    // 1 app menu button + 2 phase buttons + 1 options button = 4 buttons in the DOM
+    expect(buttons.length).toBe(4);
+    expect(buttons[0].text()).toBe(constants.NAME_APPRECIATE);
+    expect(buttons[1].text()).toBe('Career');
+    expect(buttons[2].text()).toBe('Retirement');
+    expect(buttons[3].text()).toBe(constants.BTN_OPTIONS);
   });
 
   it('toggles phase when buttons are clicked', async () => {
@@ -59,17 +61,30 @@ describe('HeaderBar Component (Appreciate)', () => {
 
     const buttons = wrapper.findAll('button');
 
-    await buttons[1].trigger('click'); // Click Retirement
+    // buttons[0] is the app menu
+    await buttons[2].trigger('click'); // Click Retirement
     expect(store.setPhase).toHaveBeenCalledWith(constants.PHASE_RETIREMENT);
 
-    await buttons[0].trigger('click'); // Click Career
+    await buttons[1].trigger('click'); // Click Career
     expect(store.setPhase).toHaveBeenCalledWith(constants.PHASE_CAREER);
   });
 
-  it('navigates to Debtonate via menu', async () => {
+  it('opens options modal via options button', async () => {
+    const store = useAppreciateCoreStore();
     const wrapper = mount(HeaderBar, { global: globalConfig });
 
-    const menuItems = wrapper.findAll('li a');
+    const buttons = wrapper.findAll('button');
+    const optionsButton = buttons.find(b => b.text() === constants.BTN_OPTIONS);
+
+    await optionsButton?.trigger('click');
+    expect(store.openOptionsForm).toHaveBeenCalled();
+  });
+
+  it('navigates to Debtonate via app menu', async () => {
+    const wrapper = mount(HeaderBar, { global: globalConfig });
+
+    const appMenu = wrapper.findAllComponents(BaseMenu)[0];
+    const menuItems = appMenu.findAll('li a');
     const debtonateItem = menuItems.find(item => item.text() === constants.NAME_DEBTONATE);
 
     expect(debtonateItem?.exists()).toBe(true);

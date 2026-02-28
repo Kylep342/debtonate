@@ -17,8 +17,14 @@ const desiredNetIncomeCardRef = ref(null);
 const retirementTaxRateCardRef = ref(null);
 
 const globalOptionsFormletRef = ref(null);
+const appOptionsCardRef = ref(null);
+
+const copyStateToClipboard = () => navigator.clipboard.writeText(
+  JSON.stringify(state.exportState())
+);
 
 const cardRefs = computed(() => [
+  appOptionsCardRef.value,
   accrualCardRef.value,
   inflationCardRef.value,
   yearsToContributeCardRef.value,
@@ -76,6 +82,28 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
       </div>
       <br>
       <div :class="['formInputs']">
+        <collapsible-card ref="appOptionsCardRef">
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              App State
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div>
+              <base-button @click="state.loadState">{{ constants.BTN_LOAD }}</base-button>
+              <base-button @click="state.saveState">{{ constants.BTN_SAVE }}</base-button>
+              <base-button @click="state.clearState">{{ constants.BTN_CLEAR }}</base-button>
+              <base-button @click="copyStateToClipboard">{{ constants.BTN_COPY }}</base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                Manage your application state: load from the browser's local storage, save to the browser's local storage, clear all data, or copy state to clipboard.
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
         <collapsible-card ref="accrualCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">

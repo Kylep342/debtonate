@@ -40,7 +40,7 @@ const sortedCurrencies: ComputedRef<Option[]> = computed(() => {
       label: `${locale.currency} (${locale.flag})`,
     };
   });
-  return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
+  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
 });
 const sortedLanguages: ComputedRef<Option[]> = computed(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
@@ -49,7 +49,7 @@ const sortedLanguages: ComputedRef<Option[]> = computed(() => {
       label: `${locale.code} (${locale.flag})`
     };
   });
-  return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
+  return options.sort((a, b: Option) => a.option.localeCompare(b.option));
 });
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
