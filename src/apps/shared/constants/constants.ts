@@ -37,7 +37,7 @@ const BUDGETS = 'Budgets';
 const BUG_FORM_LINK = "https://forms.gle/5hdgxA4jKGQA5U8J9"
 
 // App color scheme
-const COLORS_SMART = [
+const COLOR_PALETTE = [
   'oklch(var(--s))',
   'oklch(var(--p))',
   'oklch(var(--a))',
@@ -138,7 +138,7 @@ export default Object.freeze({
   BUDGET_FORM_ID,
   BUDGETS,
   BUG_FORM_LINK,
-  COLORS_SMART,
+  COLOR_PALETTE,
   DATE,
   DEFAULT,
   GRAPHS,
