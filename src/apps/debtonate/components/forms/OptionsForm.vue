@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { loan } from 'moneyfunx';
 import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -10,19 +10,20 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const reductionCardRef = ref(null);
+const repaymentCardRef = ref(null);
+const reducePaymentsCardRef = ref(null);
 const refinancingCardRef = ref(null);
 const roundingCardRef = ref(null);
-const appOptionsCardRef = ref(null);
 
 const globalOptionsFormletRef = ref(null);
+const appStateCardRef = ref(null);
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())
 );
 
 const cardRefs = computed(() => [
-  appOptionsCardRef.value,
+  appStateCardRef.value,
   repaymentCardRef.value,
   reducePaymentsCardRef.value,
   refinancingCardRef.value,
@@ -57,7 +58,7 @@ const refinancingUseHighestPaymentExample: ComputedRef<string> = computed(() => 
   return '';
 });
 const repaymentPriorityExample: ComputedRef<string> = computed(
-  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: moneyfunx.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
+  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: loan.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
 );
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
@@ -85,7 +86,7 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
       <hr>
       <br>
       <div :class="['formInputs']">
-        <collapsible-card ref="appOptionsCardRef">
+        <collapsible-card ref="appStateCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               App State

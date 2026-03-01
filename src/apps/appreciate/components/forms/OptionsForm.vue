@@ -17,14 +17,14 @@ const desiredNetIncomeCardRef = ref(null);
 const retirementTaxRateCardRef = ref(null);
 
 const globalOptionsFormletRef = ref(null);
-const appOptionsCardRef = ref(null);
+const appStateCardRef = ref(null);
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())
 );
 
 const cardRefs = computed(() => [
-  appOptionsCardRef.value,
+  appStateCardRef.value,
   accrualCardRef.value,
   inflationCardRef.value,
   yearsToContributeCardRef.value,
@@ -82,7 +82,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
       </div>
       <br>
       <div :class="['formInputs']">
-        <collapsible-card ref="appOptionsCardRef">
+        <collapsible-card ref="appStateCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               App State
