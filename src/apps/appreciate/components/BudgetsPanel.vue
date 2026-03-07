@@ -27,23 +27,31 @@ const instrumentSelectors: ComputedRef<Button[]> = computed(
 const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: instrumentSelectors,
+  classes: ['btn-sm']
 });
 
+const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
+
+const displayedBudgets = computed(() => isCareerPhase.value ? state.monthlyBudgets : state.monthlyWithdrawalBudgets);
+
 const defaultBudgetIndex: ComputedRef<number> = computed(
-  () => state.monthlyBudgets.findIndex((budget: MonthlyBudget) => budget.id === constants.DEFAULT)
+  () => displayedBudgets.value.findIndex((budget: MonthlyBudget) => budget.id === constants.DEFAULT)
 );
 
 const orderedBudgets: ComputedRef<MonthlyBudget[]> = computed(() => [
-  state.monthlyBudgets[defaultBudgetIndex.value],
-  ...state.monthlyBudgets.slice(0, defaultBudgetIndex.value),
-  ...state.monthlyBudgets.slice(defaultBudgetIndex.value + 1),
+  displayedBudgets.value[defaultBudgetIndex.value],
+  ...displayedBudgets.value.slice(0, defaultBudgetIndex.value),
+  ...displayedBudgets.value.slice(defaultBudgetIndex.value + 1),
 ]);
+
+const panelTitle = computed(() => isCareerPhase.value ? constants.BUDGETS : constants.WITHDRAWALS);
+const createBudgetAction = () => isCareerPhase.value ? state.openBudgetForm() : state.openBudgetForm(); // TODO: withdrawal form
 </script>
 
 <template>
   <ListPanel
     panel-id="budgetManagementPanel"
-    :title="constants.BUDGETS"
+    :title="panelTitle"
     :items="orderedBudgets"
     :create-item="state.openBudgetForm"
     :pivot-menu="pivotMenu"

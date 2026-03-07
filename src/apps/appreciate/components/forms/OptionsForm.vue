@@ -12,15 +12,25 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
 const accrualCardRef = ref(null);
 const inflationCardRef = ref(null);
 const yearsToContributeCardRef= ref(null);
-const yearsToSPendCardRef = ref(null);
+const yearsToSpendCardRef = ref(null);
+const desiredNetIncomeCardRef = ref(null);
+const retirementTaxRateCardRef = ref(null);
 
 const globalOptionsFormletRef = ref(null);
+const appStateCardRef = ref(null);
+
+const copyStateToClipboard = () => navigator.clipboard.writeText(
+  JSON.stringify(state.exportState())
+);
 
 const cardRefs = computed(() => [
+  appStateCardRef.value,
   accrualCardRef.value,
   inflationCardRef.value,
   yearsToContributeCardRef.value,
-  yearsToSPendCardRef.value,
+  yearsToSpendCardRef.value,
+  desiredNetIncomeCardRef.value,
+  retirementTaxRateCardRef.value,
 ].filter(Boolean));
 
 const allCollapsed: Ref<boolean> = ref(false);
@@ -56,9 +66,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
       <base-button
         :class="['btn btn-circle btn-ghost']"
         @click="state.exitOptionsForm"
-      >
-        x
-      </base-button>
+      >x</base-button>
     </template>
     <template #body>
       <div class="flex justify-between items-center">
@@ -72,6 +80,28 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
       </div>
       <br>
       <div :class="['formInputs']">
+        <collapsible-card ref="appStateCardRef">
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              App State
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div>
+              <base-button @click="state.loadState">{{ constants.BTN_LOAD }}</base-button>
+              <base-button @click="state.saveState">{{ constants.BTN_SAVE }}</base-button>
+              <base-button @click="state.clearState">{{ constants.BTN_CLEAR }}</base-button>
+              <base-button @click="copyStateToClipboard">{{ constants.BTN_COPY }}</base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                Manage your application state: load from the browser's local storage, save to the browser's local storage, clear all data, or copy state to clipboard.
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
         <collapsible-card ref="accrualCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
@@ -165,7 +195,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
             </div>
           </template>
         </collapsible-card>
-        <collapsible-card ref="yearsToSPendCardRef">
+        <collapsible-card ref="yearsToSpendCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
               Years to Spend
@@ -187,6 +217,58 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
             <div :class="['text-base', 'max-w-prose']">
               <p>
                 Sets the number of years to spend your savings
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
+        <collapsible-card ref="desiredNetIncomeCardRef">
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Desired Net Retirement Income
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div :class="['flex', 'flex-row']">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-desired-net-income`"
+                v-model.number="state.desiredNetIncome"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="100"
+                label="desiredNetIncome"
+              >
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                Sets the desired monthly net income (after tax) during retirement
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
+        <collapsible-card ref="retirementTaxRateCardRef">
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              Retirement Tax Rate (%)
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div :class="['flex', 'flex-row']">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-retirement-tax-rate`"
+                v-model.number="state.retirementTaxRate"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.1"
+                label="retirementTaxRate"
+              >
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                Sets the expected effective tax rate on withdrawals during retirement
               </p>
             </div>
           </template>

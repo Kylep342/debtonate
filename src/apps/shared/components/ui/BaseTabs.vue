@@ -17,6 +17,7 @@ const tabStyle = (id: string): string => props.isViewedItemId(id) ? 'btn-seconda
     <div :class="['tabs', 'flex', 'flex-row', 'join', 'w-full', 'flex-grow', 'p-4']">
       <div v-for="item in pivot" :key="item.id" :class="['join-item', flexBasis, 'w-full']">
         <base-button :class="[
+          'btn-sm',
           'w-full',
           tabStyle(item.id),
           { 'shadow-lg': isViewedItemId(item.id) },

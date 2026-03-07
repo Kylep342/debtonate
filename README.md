@@ -33,3 +33,5 @@ Shared idea: "(focused) time travel view" - show cards 'at period X' in addtion 
 Want to have a comparison/summary page
 
 e.g. for X (Instrument) show effects of each Y (Budget) side-by-side
+
+HoverHelp - menu-togglable context on terms/values

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { loan } from 'moneyfunx';
 import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -16,8 +16,14 @@ const refinancingCardRef = ref(null);
 const roundingCardRef = ref(null);
 
 const globalOptionsFormletRef = ref(null);
+const appStateCardRef = ref(null);
+
+const copyStateToClipboard = () => navigator.clipboard.writeText(
+  JSON.stringify(state.exportState())
+);
 
 const cardRefs = computed(() => [
+  appStateCardRef.value,
   repaymentCardRef.value,
   reducePaymentsCardRef.value,
   refinancingCardRef.value,
@@ -52,7 +58,7 @@ const refinancingUseHighestPaymentExample: ComputedRef<string> = computed(() => 
   return '';
 });
 const repaymentPriorityExample: ComputedRef<string> = computed(
-  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: moneyfunx.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
+  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: loan.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
 );
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
@@ -60,19 +66,26 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
 </script>
 
 <template>
-  <base-modal :body-classes="['overflow-y-auto']" @exit="state.exitOptionsForm">
+  <base-modal
+    :body-classes="['overflow-y-auto']"
+    @exit="state.exitOptionsForm"
+  >
     <template #header>
       <h2 :class="['pl-4']">Options</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="state.exitOptionsForm">
-        x
-      </base-button>
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="state.exitOptionsForm"
+      >x</base-button>
     </template>
     <template #body>
       <div class="flex justify-between items-center">
         <h3 :class="['pl-4']">Debtonate Options</h3>
-        <base-button :class="['btn-sm']" @click="toggleAllCards">
+        <base-button
+          :class="['btn-sm']"
+          @click="toggleAllCards"
+        >
           {{ allCollapsed ? '+' : '-' }}
         </base-button>
       </div>
@@ -80,6 +93,28 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
       <hr>
       <br>
       <div :class="['formInputs']">
+        <collapsible-card ref="appStateCardRef">
+          <template #cardTitle>
+            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
+              App State
+            </h3>
+          </template>
+          <template #cardTitleActions>
+            <div>
+              <base-button @click="state.loadState">{{ constants.BTN_LOAD }}</base-button>
+              <base-button @click="state.saveState">{{ constants.BTN_SAVE }}</base-button>
+              <base-button @click="state.clearState">{{ constants.BTN_CLEAR }}</base-button>
+              <base-button @click="copyStateToClipboard">{{ constants.BTN_COPY }}</base-button>
+            </div>
+          </template>
+          <template #cardBody>
+            <div :class="['text-base', 'max-w-prose']">
+              <p>
+                Manage your application state: load from the browser's local storage, save to the browser's local storage, clear all data, or copy state to clipboard.
+              </p>
+            </div>
+          </template>
+        </collapsible-card>
         <collapsible-card ref="repaymentCardRef">
           <template #cardTitle>
             <div :class="['flex', 'flex-row']">

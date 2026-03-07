@@ -58,18 +58,18 @@ const initializeChart = () => {
   if (!containerWidth.value) return;
 
   const graph = chart.graphs[props.anchorId];
-  
+
   const totalWidth = containerWidth.value;
   const totalHeight = 500;
-  
+
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
 
-  const svg = d3.select('#graph').attr('width', totalWidth).attr('height', totalHeight);
+  const svg = d3.select(`#graph-${props.anchorId}`).attr('width', totalWidth).attr('height', totalHeight);
   svg.selectAll('*').remove();
 
   // create a temporary Y scale to measure label width
   const tempY = chart.yScale()
-    .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
+    .domain([chart.y(graph.config.minY || 0), chart.y(graph.config.maxY * 1.1)])
     .range([totalHeight - margin.top - margin.bottom, 0]);
 
   const tempAxis = svg.append('g')
@@ -83,7 +83,7 @@ const initializeChart = () => {
     const bbox = (this as SVGTextElement).getBBox();
     if (bbox.width > maxLabelWidth) maxLabelWidth = bbox.width;
   });
-  
+
   // Clean up temp axis && update left margin based on max width + padding
   tempAxis.remove();
   margin.left = Math.ceil(maxLabelWidth + 20);
@@ -95,7 +95,7 @@ const initializeChart = () => {
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const x = chart.xScale()
-    .domain([chart.x(0), chart.x(graph.config.maxX)])
+    .domain([chart.x(graph.config.minX || 0), chart.x(graph.config.maxX)])
     .range([0, innerWidth]);
 
   const y = chart.yScale()
@@ -108,7 +108,7 @@ const initializeChart = () => {
 
   g.append('g')
     .attr('transform', `translate(0, ${innerHeight})`)
-    .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0));
+    .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0).tickFormat(chart.xFormat as any));
 
   g.append('g')
     .call(d3.axisLeft(y).ticks(innerHeight / 40).tickFormat(chart.yFormat))
@@ -139,7 +139,8 @@ const initializeChart = () => {
           tooltipProps.value = {
             tooltipConfig: <TooltipConfig>{
               xLabel: chart.xLabel(),
-              xFormat: chart.xFormat,
+              xFormat: chart.xFormat as any,
+              minX: graph.config.minX,
               lines: graph.lines,
               color: chart.color,
               lineName: chart.lineName,
@@ -204,7 +205,7 @@ watch(
     <h2 class="text-center">
       {{ chart.subheader(anchorId) }}
     </h2>
-    <svg id="graph" />
+    <svg :id="`graph-${anchorId}`" />
     <div id="tooltip" :style="{
       left: tooltipPosition.left + 'px',
       top: tooltipPosition.top + 'px',
@@ -224,7 +225,7 @@ watch(
 }
 /* Ensure the wrapper takes full width so ResizeObserver works */
 .chartWrapper {
-  width: 100%; 
+  width: 100%;
   min-width: 800px;
 }
 </style>

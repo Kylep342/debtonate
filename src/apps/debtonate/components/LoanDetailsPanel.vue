@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { loan, paymentTypes, payments } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -10,7 +10,7 @@ import { MonthlyBudget } from '@/apps/shared/types/core';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const currentLoan: Ref<moneyfunx.ILoan|null> = ref(null);
+const currentLoan: Ref<loan.ILoan|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
@@ -19,8 +19,8 @@ const currentBudget: ComputedRef<MonthlyBudget|null> = computed(() => {
   return state.getBudget(viewedItemId.value)!;
 });
 
-const paymentSchedule: ComputedRef<moneyfunx.PaymentSchedule> = computed(() => {
-  if (!currentLoan.value || !viewedItemId.value) return <moneyfunx.PaymentSchedule>{};
+const paymentSchedule: ComputedRef<paymentTypes.PaymentSchedule> = computed(() => {
+  if (!currentLoan.value || !viewedItemId.value) return <paymentTypes.PaymentSchedule>{};
   return state.getPaymentSchedule(currentLoan.value.id, viewedItemId.value);
 });
 
@@ -45,7 +45,7 @@ const tableFooter: ComputedRef<{}> = computed(() => {
 });
 
 
-const buildLoanDetailsTitle = (loan: moneyfunx.ILoan): string => loan
+const buildLoanDetailsTitle = (loan: loan.ILoan): string => loan
   ? `Loan Details - ${state.getLoanName(loan.id)} | `
   + `${state.buildLoanSubtitle(loan)}`
   : constants.LOAN_DETAILS;

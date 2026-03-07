@@ -13,6 +13,8 @@ export type ChartSeries<TDrawable extends Drawable> = Record<string, TDrawable[]
 
 export type LineGraphContent = {
   config: {
+    minX?: number
+    minY?: number
     maxX: number
     maxY: number
   },
@@ -56,7 +58,7 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   yLabel: () => string;
   x: (value: any) => any;
   y: (value: any) => any;
-  xFormat: (value: number) => string | number | Date;
+  xFormat: (value: number | Date) => string | number | Date;
   yFormat: (value: number) => string;
   xScale: () => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>;
   yScale: () => d3.ScaleLinear<number, number, any>;
@@ -64,7 +66,8 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
 
 export type TooltipConfig = {
   xLabel: string;
-  xFormat: (index: number) => string;
+  xFormat: (value: number | Date) => string;
+  minX?: number;
   lines: Record<string, Point[]>;
   color: (id: string) => string;
   lineName: (id: string) => string;

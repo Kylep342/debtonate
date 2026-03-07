@@ -23,3 +23,11 @@ export type TableHeader = {
   label: string;
   class?: string;
 }
+
+export type FormField = {
+  key: string;
+  label: string;
+  type: 'number' | 'text' | 'string';
+  step?: string;
+  required?: boolean;
+};

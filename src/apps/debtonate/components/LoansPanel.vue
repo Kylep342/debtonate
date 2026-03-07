@@ -26,6 +26,7 @@ const budgetSelectors: ComputedRef<Button[]> = computed(
 const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,
   buttons: budgetSelectors,
+  classes: ['btn-sm']
 });
 </script>
 

@@ -35,7 +35,9 @@ export interface DebtonateCoreState {
   refinancingUseHighestPayment: Ref<boolean>;
   roundingEnabled: Ref<boolean>;
   roundingScale: Ref<number>;
+  selectedLoanId: Ref<string | null>;
   snowballSort: Ref<boolean>;
+  viewPhase: Ref<string>;
 }
 
 export interface DebtonateCoreGetters {
@@ -46,6 +48,7 @@ export interface DebtonateCoreGetters {
   budgetCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   budgetFormTitle: ComputedRef<string>;
   cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>>;
+  debtonateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>>;
   graphs: ComputedRef<Record<string, GraphConfig>>;
   graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>>;
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
@@ -61,6 +64,7 @@ export interface DebtonateCoreGetters {
   periodLabel: ComputedRef<string>;
   rawTotalMinPayment: ComputedRef<number>;
   refinancingFormTitle: ComputedRef<string>;
+  repatriateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>>;
   refinancingSchedules: ComputedRef<
     Record<string, Record<string, PaymentScenario>>
   >;
@@ -150,6 +154,8 @@ export interface DebtonateCoreActions {
     loan: loan.ILoan
   ) => number;
   saveState: () => void;
+  setSelectedLoanId: (id: string | null) => void;
+  setPhase: (phase: string) => void;
   setRoundingScale: (newScale: number) => void;
   snowball: () => loan.Loan[];
   sortLoans: () => void;
@@ -187,7 +193,9 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const refinancingUseHighestPayment: Ref<boolean> = ref(false);
   const roundingEnabled: Ref<boolean> = ref(false);
   const roundingScale: Ref<number> = ref(100);
+  const selectedLoanId: Ref<string | null> = ref(constants.TOTALS);
   const snowballSort: Ref<boolean> = ref(false);
+  const viewPhase: Ref<string> = ref(constants.PHASE_DEBTONATE);
 
   /** GETTERS */
 
@@ -302,6 +310,94 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     return schedules;
   });
 
+  const repatriateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const metrics = [
+      'Principal',
+      'Interest Rate',
+      'Total Interest',
+      'Total Payment',
+      'Interest/Principal Ratio',
+      'Total Fees',
+      'Periods to Payoff',
+    ];
+
+    metrics.forEach(metric => {
+      analysis[metric] = {};
+    });
+
+    const parentLoanId = selectedLoanId.value || constants.TOTALS;
+    const parentLoan = getLoan(parentLoanId);
+    if (!parentLoan) return analysis;
+
+    // Original Loan as first column
+    const scenarios = [parentLoan, ...(refinancingScenarios.value[parentLoanId] || [])];
+
+    scenarios.forEach(scenario => {
+      let schedule: paymentTypes.PaymentSchedule;
+      let payment: number;
+
+      if (scenario.id === parentLoanId) {
+        // Use the default budget for the original loan comparison
+        schedule = getPaymentSchedule(parentLoanId, constants.DEFAULT);
+        payment = schedule.amortizationSchedule[0]?.principal + schedule.amortizationSchedule[0]?.interest || scenario.minPayment;
+      } else {
+        const scenarioData = refinancingSchedules.value[parentLoanId][scenario.id];
+        schedule = scenarioData.paymentSchedule[scenario.id];
+        payment = scenarioData.paymentAmount;
+      }
+
+      const principal = scenario.currentBalance;
+      const interest = schedule.lifetimeInterest;
+      const total = principal + interest + (scenario.fees || 0);
+
+      analysis['Principal'][scenario.id] = globalOptions.Money(principal);
+      analysis['Interest Rate'][scenario.id] = globalOptions.Percent(scenario.annualRate * 100);
+      analysis['Total Interest'][scenario.id] = globalOptions.Money(interest);
+      analysis['Total Payment'][scenario.id] = globalOptions.Money(total);
+      analysis['Interest/Principal Ratio'][scenario.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Total Fees'][scenario.id] = globalOptions.Money(scenario.fees || 0);
+      analysis['Periods to Payoff'][scenario.id] = schedule.amortizationSchedule.length;
+    });
+
+    return analysis;
+  });
+
+  const debtonateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const metrics = [
+      'Total Principal',
+      'Total Interest',
+      'Total Fees',
+      'Total Cost',
+      'Interest/Principal Ratio',
+      'Avg Monthly Payment',
+      'Periods to Payoff',
+    ];
+
+    metrics.forEach(metric => {
+      analysis[metric] = {};
+    });
+
+    monthlyBudgets.value.forEach(budget => {
+      const schedule = getPaymentSchedule(constants.TOTALS, budget.id);
+      const principal = totalCurrentBalance.value;
+      const interest = schedule.lifetimeInterest;
+      const fees = totalFees.value;
+      const total = principal + interest + fees;
+
+      analysis['Total Principal'][budget.id] = globalOptions.Money(principal);
+      analysis['Total Interest'][budget.id] = globalOptions.Money(interest);
+      analysis['Total Fees'][budget.id] = globalOptions.Money(fees);
+      analysis['Total Cost'][budget.id] = globalOptions.Money(total);
+      analysis['Interest/Principal Ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Avg Monthly Payment'][budget.id] = globalOptions.Money(budget.absolute);
+      analysis['Periods to Payoff'][budget.id] = schedule.amortizationSchedule.length;
+    });
+
+    return analysis;
+  });
+
   // String builders
   const budgetFormTitle: ComputedRef<string> = computed(() =>
     currentBudgetId.value && budgetFormActive.value
@@ -377,6 +473,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLoan(loan.id)!.currentBalance,
           },
@@ -400,7 +498,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         graphs: graphs,
         header: (loanId: string) =>
           `Balances over Time by Budget - ${getLoanName(loanId)}`,
-        lineName: getBudgetName,
+        lineName: getBudgetAbsoluteRate,
         subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
@@ -420,7 +518,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       type: 'donut',
       color: getBudgetColor,
       header: (loanId: string) => `Cost Breakdown - ${getLoanName(loanId)}`,
-      lineName: getBudgetName,
+      lineName: getBudgetAbsoluteRate,
       subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
       x: globalOptions.Period,
       xFormat: (x: number) => globalOptions.Period(x, true),
@@ -439,8 +537,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       type: 'donut',
       color: () => '#FFFFFF',
       header: (budgetId: string) =>
-        `Cost Breakdown - ${getBudgetName(budgetId)}`,
-      lineName: getBudgetName,
+        `Cost Breakdown - ${getBudgetAbsoluteRate(budgetId)}`,
+      lineName: getBudgetAbsoluteRate,
       subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
       x: globalOptions.Period,
       xFormat: (x: number) => globalOptions.Period(x, true),
@@ -484,6 +582,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       loansWithTotals.value.forEach((loan: loan.ILoan) => {
         graphs[loan.id] = <LineGraphContent>{
           config: {
+            minX: 1,
+            minY: 0,
             maxX: getNumPayments(loan.id, constants.DEFAULT),
             maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
           },
@@ -511,7 +611,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         graphs: graphs,
         header: (loanId: string) =>
           `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
-        lineName: getBudgetName,
+        lineName: getBudgetAbsoluteRate,
         subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
@@ -532,6 +632,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     loansWithTotals.value.forEach((loan: loan.ILoan) => {
       graphs[loan.id] = <LineGraphContent>{
         config: {
+          minX: 1,
+          minY: 0,
           maxX: getNumPayments(loan.id, constants.DEFAULT),
           maxY: 100,
         },
@@ -560,7 +662,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         `Percent of Payment as Principal over Time by Budget - ${getLoanName(
           loanId
         )}`,
-      lineName: getBudgetName,
+      lineName: getBudgetAbsoluteRate,
       subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
       x: globalOptions.Period,
       xFormat: (x: number) => globalOptions.Period(x, true),
@@ -573,12 +675,244 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     };
   });
 
-  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => ({
-    [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
-    [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
-    [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]:
-      percentOfPaymentAsPrincaplGraphs.value,
-  }));
+  const refinancingBalancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
+    () => {
+      const graphs = <Graphs<LineGraphContent>>{};
+
+      loansWithTotals.value.forEach((parentLoan) => {
+        const parentLoanId = parentLoan.id;
+        const scenarios = [
+          parentLoan,
+          ...(refinancingScenarios.value[parentLoanId] || []),
+        ];
+
+        let maxX = 0;
+        let maxY = 0;
+        const lines: ChartSeries<Point> = {};
+
+        scenarios.forEach((scenario) => {
+          let schedule: paymentTypes.PaymentSchedule;
+          if (scenario.id === parentLoanId) {
+            schedule = getPaymentSchedule(parentLoanId, constants.DEFAULT);
+          } else {
+            schedule =
+              refinancingSchedules.value[parentLoanId][scenario.id]
+                .paymentSchedule[scenario.id];
+          }
+
+          maxX = Math.max(maxX, schedule.amortizationSchedule.length);
+          maxY = Math.max(maxY, scenario.currentBalance);
+
+          lines[scenario.id] = schedule.amortizationSchedule.map(
+            (record: paymentTypes.PaymentRecord) => ({
+              x: record.period,
+              y: record.principalRemaining,
+            })
+          );
+        });
+
+        graphs[parentLoanId] = <LineGraphContent>{
+          config: {
+            maxX,
+            minY: 0,
+            maxY,
+          },
+          lines,
+        };
+      });
+
+      const getScenarioNameLocal = (id: string) => {
+        const parentId = selectedLoanId.value || constants.TOTALS;
+        const parentLoan = getLoan(parentId);
+        if (!parentLoan) return id;
+
+        let payment = 0;
+        if (id === parentId) {
+          const schedule = getPaymentSchedule(parentId, constants.DEFAULT);
+          payment =
+            schedule.amortizationSchedule[0]?.principal +
+              schedule.amortizationSchedule[0]?.interest ||
+            parentLoan.minPayment;
+        } else {
+          const scenarioData = refinancingSchedules.value[parentId][id];
+          if (scenarioData) {
+            payment = scenarioData.paymentAmount;
+          }
+        }
+
+        if (payment > 0) {
+          const suffix = globalOptions.periodsAsDates ? 'month' : 'period';
+          return `${globalOptions.Money(payment)}/${suffix}`;
+        }
+        return id;
+      };
+
+      return <GraphConfig<LineGraphContent>>{
+        id: 'RefinancingBalances',
+        type: 'line',
+        color: (id: string) => {
+          if (getLoan(id)) return globalOptions.colorPalate[0];
+          for (const [parentId, scenarios] of Object.entries(
+            refinancingScenarios.value
+          )) {
+            const index = scenarios.findIndex((s) => s.id === id);
+            if (index !== -1) {
+              return globalOptions.colorPalate[
+                (index + 1) % globalOptions.colorPalate.length
+              ];
+            }
+          }
+          return globalOptions.colorPalate[0];
+        },
+        graphs: graphs,
+        header: (loanId: string) => `Balance Comparison - ${getLoanName(loanId)}`,
+        lineName: getScenarioNameLocal,
+        subheader: (loanId: string) => {
+          const loan = getLoan(loanId);
+          return loan ? buildLoanSubtitle(loan) : '';
+        },
+        x: globalOptions.Period,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Balance',
+        yScale: d3.scaleLinear,
+      };
+    }
+  );
+
+  const refinancingInterestPaidGraphs: ComputedRef<
+    GraphConfig<LineGraphContent>
+  > = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    loansWithTotals.value.forEach((parentLoan) => {
+      const parentLoanId = parentLoan.id;
+      const scenarios = [
+        parentLoan,
+        ...(refinancingScenarios.value[parentLoanId] || []),
+      ];
+
+      let maxX = 0;
+      let maxY = 0;
+      const lines: ChartSeries<Point> = {};
+
+      scenarios.forEach((scenario) => {
+        let schedule: paymentTypes.PaymentSchedule;
+        if (scenario.id === parentLoanId) {
+          schedule = getPaymentSchedule(parentLoanId, constants.DEFAULT);
+        } else {
+          schedule =
+            refinancingSchedules.value[parentLoanId][scenario.id]
+              .paymentSchedule[scenario.id];
+        }
+
+        maxX = Math.max(maxX, schedule.amortizationSchedule.length);
+
+        let cumulativeInterest = 0;
+        lines[scenario.id] = schedule.amortizationSchedule.map(
+          (record: paymentTypes.PaymentRecord) => {
+            cumulativeInterest += record.interest;
+            return {
+              x: record.period,
+              y: cumulativeInterest,
+            };
+          }
+        );
+        maxY = Math.max(maxY, cumulativeInterest);
+      });
+
+      graphs[parentLoanId] = <LineGraphContent>{
+        config: {
+          maxX,
+          minY: 0,
+          maxY,
+        },
+        lines,
+      };
+    });
+
+    const getScenarioNameLocal = (id: string) => {
+      const parentId = selectedLoanId.value || constants.TOTALS;
+      const parentLoan = getLoan(parentId);
+      if (!parentLoan) return id;
+
+      let payment = 0;
+      if (id === parentId) {
+        const schedule = getPaymentSchedule(parentId, constants.DEFAULT);
+        payment =
+          schedule.amortizationSchedule[0]?.principal +
+            schedule.amortizationSchedule[0]?.interest ||
+          parentLoan.minPayment;
+      } else {
+        const scenarioData = refinancingSchedules.value[parentId][id];
+        if (scenarioData) {
+          payment = scenarioData.paymentAmount;
+        }
+      }
+
+      if (payment > 0) {
+        const suffix = globalOptions.periodsAsDates ? 'month' : 'period';
+        return `${globalOptions.Money(payment)}/${suffix}`;
+      }
+      return id;
+    };
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'RefinancingInterestPaid',
+      type: 'line',
+      color: (id: string) => {
+        if (getLoan(id)) return globalOptions.colorPalate[0];
+        for (const [parentId, scenarios] of Object.entries(
+          refinancingScenarios.value
+        )) {
+          const index = scenarios.findIndex((s) => s.id === id);
+          if (index !== -1) {
+            return globalOptions.colorPalate[
+              (index + 1) % globalOptions.colorPalate.length
+            ];
+          }
+        }
+        return globalOptions.colorPalate[0];
+      },
+      graphs: graphs,
+      header: (loanId: string) =>
+        `Interest Paid Comparison - ${getLoanName(loanId)}`,
+      lineName: getScenarioNameLocal,
+      subheader: (loanId: string) => {
+        const loan = getLoan(loanId);
+        return loan ? buildLoanSubtitle(loan) : '';
+      },
+      x: globalOptions.Period,
+      xFormat: (x: number) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Interest Paid',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const graphs: ComputedRef<
+    Record<string, GraphConfig<LineGraphContent>>
+  > = computed(() => {
+    if (viewPhase.value === constants.PHASE_REPATRIATE) {
+      return {
+        [constants.GRAPH_BALANCES_OVER_TIME]: refinancingBalancesGraphs.value,
+        [constants.GRAPH_INTEREST_PAID_OVER_TIME]:
+          refinancingInterestPaidGraphs.value,
+      };
+    }
+    return {
+      [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+      [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
+      [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]:
+        percentOfPaymentAsPrincaplGraphs.value,
+    };
+  });
 
   /** ACTIONS */
 
@@ -601,7 +935,9 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     refinancingUseHighestPayment.value = false;
     roundingEnabled.value = false;
     roundingScale.value = 100;
+    selectedLoanId.value = constants.TOTALS;
     snowballSort.value = true;
+    viewPhase.value = constants.PHASE_DEBTONATE;
   };
 
   const loadState = () => {
@@ -612,19 +948,52 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     if (storedBudgets) budgets.value = JSON.parse(storedBudgets);
 
     const storedLoans = localStorage.getItem(keys.LS_LOANS);
-    if (storedLoans)
-      loans.value = JSON.parse(storedLoans).map(
-        (storedLoan: loan.ILoan) =>
-          new loan.Loan(
-            storedLoan.principal,
-            storedLoan.annualRate,
-            constants.PERIODS_PER_YEAR,
-            storedLoan.termInYears,
-            storedLoan.name,
-            storedLoan.currentBalance,
-            storedLoan.fees
-          )
-      );
+    if (storedLoans) {
+      loans.value = JSON.parse(storedLoans).map((storedLoan: loan.ILoan) => {
+        const l = new loan.Loan(
+          storedLoan.principal,
+          storedLoan.annualRate,
+          constants.PERIODS_PER_YEAR,
+          storedLoan.termInYears,
+          storedLoan.name,
+          storedLoan.currentBalance,
+          storedLoan.fees
+        );
+        l.id = storedLoan.id;
+        return l;
+      });
+    }
+
+    const storedRefinancingScenarios = localStorage.getItem(
+      keys.LS_REFINANCING_SCENARIOS
+    );
+    if (storedRefinancingScenarios) {
+      const parsedScenarios = JSON.parse(storedRefinancingScenarios);
+      const reconstructedScenarios: Record<string, loan.Loan[]> = {};
+
+      const loanIdsToLoad = [...loans.value.map((l) => l.id), constants.TOTALS];
+
+      loanIdsToLoad.forEach((id) => {
+        if (parsedScenarios[id]) {
+          reconstructedScenarios[id] = (parsedScenarios[id] as any[]).map(
+            (storedScenario: loan.ILoan) => {
+              const l = new loan.Loan(
+                storedScenario.principal,
+                storedScenario.annualRate,
+                constants.PERIODS_PER_YEAR,
+                storedScenario.termInYears,
+                storedScenario.name,
+                storedScenario.currentBalance,
+                storedScenario.fees
+              );
+              l.id = storedScenario.id;
+              return l;
+            }
+          );
+        }
+      });
+      refinancingScenarios.value = reconstructedScenarios;
+    }
 
     const storedReducePayments = localStorage.getItem(keys.LS_REDUCE_PAYMENTS);
     if (storedReducePayments)
@@ -649,6 +1018,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     const storedSnowballSort = localStorage.getItem(keys.LS_SNOWBALL_SORT);
     if (storedSnowballSort)
       snowballSort.value = JSON.parse(storedSnowballSort);
+
+    const storedViewPhase = localStorage.getItem(keys.LS_VIEW_PHASE);
+    if (storedViewPhase)
+      viewPhase.value = JSON.parse(storedViewPhase);
   };
 
   const saveState = (): void => {
@@ -665,6 +1038,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       JSON.stringify(refinancingUseHighestPayment.value)
     );
     localStorage.setItem(
+      keys.LS_REFINANCING_SCENARIOS,
+      JSON.stringify(refinancingScenarios.value)
+    );
+    localStorage.setItem(
       keys.LS_ROUNDING_ENABLED,
       JSON.stringify(roundingEnabled.value)
     );
@@ -676,6 +1053,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       keys.LS_SNOWBALL_SORT,
       JSON.stringify(snowballSort.value)
     );
+    localStorage.setItem(
+      keys.LS_VIEW_PHASE,
+      JSON.stringify(viewPhase.value)
+    );
   };
 
   const exportState = () => ({
@@ -684,14 +1065,27 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     [keys.LS_BUDGETS]: budgets.value,
     [keys.LS_LOANS]: loans.value,
     [keys.LS_REDUCE_PAYMENTS]: reducePayments.value,
-    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]:
-      refinancingUseHighestPayment.value,
+    [keys.LS_REFINANCING_SCENARIOS]: refinancingScenarios.value,
+    [keys.LS_REFINANCING_USE_HIGHEST_PAYMENT]: refinancingUseHighestPayment.value,
     [keys.LS_ROUNDING_ENABLED]: roundingEnabled.value,
     [keys.LS_ROUNDING_SCALE]: roundingScale.value,
     [keys.LS_SNOWBALL_SORT]: snowballSort.value,
+    [keys.LS_VIEW_PHASE]: viewPhase.value,
   });
 
   // debtonate settings
+  const setSelectedLoanId = (id: string | null): void => {
+    selectedLoanId.value = id;
+  };
+
+  const setPhase = (phase: string): void => {
+    if (viewPhase.value !== phase) {
+      unviewBudget();
+      unviewLoan();
+      viewPhase.value = phase;
+    }
+  };
+
   const setRoundingScale = (newScale: number): void => {
     if (!Number.isNaN(newScale) && newScale > 0) {
       roundingScale.value = newScale;
@@ -778,6 +1172,11 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
       : `${constants.BUDGET} ${getBudgetIndex(id)}`;
+  const getBudgetAbsoluteRate = (id: string): string => {
+    const budget = getBudget(id);
+    const suffix = globalOptions.periodsAsDates ? 'month' : 'period';
+    return budget ? `${globalOptions.Money(budget.absolute)}/${suffix}` : id;
+  };
   const unviewBudget = (): void => {
     budgetDetailsPanelActive.value = false;
     currentBudgetId.value = null;
@@ -915,7 +1314,14 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const getPaymentSchedule = (
     loanId: string,
     budgetId: string
-  ): paymentTypes.PaymentSchedule => paymentSchedules.value[loanId][budgetId];
+  ): paymentTypes.PaymentSchedule => {
+    const schedules = paymentSchedules.value[loanId];
+    return schedules ? schedules[budgetId] : {
+      lifetimeInterest: 0,
+      lifetimePrincipal: 0,
+      amortizationSchedule: [],
+    } as any;
+  };
 
   const getNumPayments = (loanId: string, budgetId: string): number =>
     getPaymentSchedule(loanId, budgetId).amortizationSchedule.length;
@@ -1009,7 +1415,9 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     refinancingUseHighestPayment,
     roundingEnabled,
     roundingScale,
+    selectedLoanId,
     snowballSort,
+    viewPhase,
 
     // GETTERS
     amortizationTableHeaders,
@@ -1017,6 +1425,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     budgetCardGraphConfig,
     budgetFormTitle,
     cardGraphs,
+    debtonateTabularAnalysis,
     graphs,
     graphXScale,
     interestSavedGraphs,
@@ -1030,6 +1439,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     periodLabel,
     rawTotalMinPayment,
     refinancingFormTitle,
+    repatriateTabularAnalysis,
     refinancingSchedules,
     roundedTotalMinPayment,
     totalCurrentBalance,
@@ -1082,6 +1492,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     refinancingScenarioName,
     refinancingScenarioPayment,
     saveState,
+    setSelectedLoanId,
+    setPhase,
     setRoundingScale,
     snowball,
     sortLoans,

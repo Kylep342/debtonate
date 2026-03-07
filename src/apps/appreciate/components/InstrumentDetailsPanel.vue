@@ -13,14 +13,20 @@ const currentInstrument: Ref<moneyfunx.IInstrument|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
+const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
+
 const currentBudget: ComputedRef<Budget|null> = computed(() => {
   if (!viewedItemId.value) return null;
-  return state.getBudget(viewedItemId.value)!;
+  return isCareerPhase.value
+    ? state.getBudget(viewedItemId.value)!
+    : state.getWithdrawalBudget(viewedItemId.value)!;
 });
 
-const contributionSchedule: ComputedRef<moneyfunx.ContributionSchedule> = computed(() => {
+const schedule: ComputedRef<moneyfunx.ContributionSchedule | moneyfunx.WithdrawalSchedule> = computed(() => {
   if (!currentInstrument.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
-  return state.getContributionSchedule(currentInstrument.value.id, viewedItemId.value)
+  return isCareerPhase.value
+    ? state.getContributionSchedule(currentInstrument.value.id, viewedItemId.value)
+    : state.getWithdrawalSchedule(currentInstrument.value.id, viewedItemId.value);
 });
 
 const amortizationTitle: ComputedRef<string> = computed(() => {
@@ -34,21 +40,21 @@ const amortizationSubtitle: ComputedRef<string> = computed(() => {
 });
 
 const tableRows: ComputedRef<{}[]> = computed(() => {
-  if (!contributionSchedule.value) return [];
-  return state.amortizationTableRows(contributionSchedule.value)
+  if (!schedule.value) return [];
+  return state.amortizationTableRows(schedule.value)
 });
 
 const tableFooter: ComputedRef<{}> = computed(() => {
-  if (!contributionSchedule.value) return [];
-  return state.amortizationTableTotals(contributionSchedule.value)
+  if (!schedule.value) return [];
+  return state.amortizationTableTotals(schedule.value)
 });
 
-const buildInstrumentDetailsTitle = (instrument: moneyfunx.IInstrument): string => instrument
+const buildInstrumentDetailsTitle = (instrument: moneyfunx.IInstrument | null): string => instrument
   ? `Instrument Details - ${state.getInstrumentName(instrument.id)} | `
     + `${state.buildInstrumentSubtitle(instrument)}`
   : constants.INSTRUMENT_DETAILS;
 
-const title: ComputedRef<string> = computed(() => buildInstrumentDetailsTitle(currentInstrument.value!));
+const title: ComputedRef<string> = computed(() => buildInstrumentDetailsTitle(currentInstrument.value));
 
 watch(
   () => state.currentInstrumentId,

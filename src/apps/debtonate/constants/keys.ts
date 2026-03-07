@@ -5,10 +5,12 @@ const LS_LANGUAGE = 'debtonate.language';
 const LS_LOANS = 'debtonate.loans';
 const LS_PERIODS_AS_DATES = 'debtonate.periodsAsDates';
 const LS_REDUCE_PAYMENTS = 'debtonate.reducePayments';
+const LS_REFINANCING_SCENARIOS = 'debtonate.refinancingScenarios';
 const LS_REFINANCING_USE_HIGHEST_PAYMENT = 'debtonate.refinancingUseHighestPayment';
 const LS_ROUNDING_ENABLED = 'debtonate.roundingEnabled';
 const LS_ROUNDING_SCALE = 'debtonate.roundingScale';
 const LS_SNOWBALL_SORT = 'debtonate.snowballSort';
+const LS_VIEW_PHASE = 'debtonate.viewPhase';
 
 export default Object.freeze({
   LS_BUDGETS,
@@ -17,8 +19,10 @@ export default Object.freeze({
   LS_LOANS,
   LS_PERIODS_AS_DATES,
   LS_REDUCE_PAYMENTS,
+  LS_REFINANCING_SCENARIOS,
   LS_REFINANCING_USE_HIGHEST_PAYMENT,
   LS_ROUNDING_ENABLED,
   LS_ROUNDING_SCALE,
   LS_SNOWBALL_SORT,
+  LS_VIEW_PHASE,
 });

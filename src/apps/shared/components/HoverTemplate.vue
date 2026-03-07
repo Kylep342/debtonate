@@ -46,7 +46,7 @@ onUpdated(reportSize);
           <td :class="['text-right']">
             {{
               tooltipConfig.yFormat(
-                line[Math.min(index - 1, line.length - 1)].y
+                line[Math.max(0, Math.min(index - (tooltipConfig.minX || 0), line.length - 1))].y
               )
             }}
           </td>
