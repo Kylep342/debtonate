@@ -314,6 +314,7 @@ describe('Debtonate Core Store', () => {
       keys.LS_BUDGETS,
       keys.LS_LOANS,
       keys.LS_REDUCE_PAYMENTS,
+      keys.LS_REFINANCING_SCENARIOS,
       keys.LS_REFINANCING_USE_HIGHEST_PAYMENT,
       keys.LS_ROUNDING_ENABLED,
       keys.LS_ROUNDING_SCALE,
