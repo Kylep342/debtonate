@@ -66,9 +66,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
       <base-button
         :class="['btn btn-circle btn-ghost']"
         @click="state.exitOptionsForm"
-      >
-        x
-      </base-button>
+      >x</base-button>
     </template>
     <template #body>
       <div class="flex justify-between items-center">

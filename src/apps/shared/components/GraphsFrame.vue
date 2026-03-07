@@ -16,11 +16,21 @@ const props = defineProps<{
   initialGraphId: string;
 }>();
 
+const emit = defineEmits<{
+  (e: 'update:viewed-item-id', id: string): void;
+}>();
+
 const {
   viewedItemId,
   isViewedItemId,
   setViewedItemId
 } = usePivot(props.initialItemId);
+
+watch(viewedItemId, (newId) => {
+  if (newId) {
+    emit('update:viewed-item-id', newId);
+  }
+});
 
 const viewedGraphId: Ref<string> = ref(props.initialGraphId);
 const activeGraph: ComputedRef<GraphConfig<LineGraphContent> | undefined> = computed(() => props.graphs[viewedGraphId.value]);

@@ -118,4 +118,26 @@ describe('GraphsFrame Component', () => {
     expect(wrapper.find('.extra').exists()).toBe(true);
     expect(wrapper.findComponent(BaseTabs).exists()).toBe(false);
   });
+
+  it('emits update:viewed-item-id when a tab is clicked', async () => {
+    const wrapper = mount(GraphsFrame, {
+      props: {
+        graphs: mockGraphs,
+        pivotItems: mockPivotItems,
+        watchedItems: mockWatchedItems,
+        getItemName: mockGetItemName,
+        initialItemId: 'item1',
+        initialGraphId: 'Graph 1'
+      },
+      global: globalConfig
+    });
+
+    const tabs = wrapper.findComponent(BaseTabs);
+    const buttons = tabs.findAll('button');
+    // Click the second tab (item2)
+    await buttons[1].trigger('click');
+
+    expect(wrapper.emitted('update:viewed-item-id')).toBeTruthy();
+    expect(wrapper.emitted('update:viewed-item-id')![0]).toEqual(['item2']);
+  });
 });

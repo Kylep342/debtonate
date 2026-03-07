@@ -538,7 +538,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         graphs: graphs,
         header: (instrumentId: string) =>
           `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
-        lineName: getBudgetName,
+        lineName: getBudgetAbsoluteRate,
         subheader: (instrumentId: string) =>
           buildInstrumentSubtitle(getInstrument(instrumentId)!),
         x: globalOptions.Period,
@@ -560,7 +560,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       color: getBudgetColor,
       header: (instrumentId: string) =>
         `Yield Breakdown - ${getInstrumentName(instrumentId)}`,
-      lineName: getBudgetName,
+      lineName: getBudgetAbsoluteRate,
       subheader: (instrumentId: string) =>
         buildInstrumentSubtitle(getInstrument(instrumentId)!),
       x: globalOptions.Period,
@@ -580,8 +580,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       type: 'donut',
       color: () => '#FFFFFF',
       header: (budgetId: string) =>
-        `Yield Breakdown - ${getBudgetName(budgetId)}`,
-      lineName: getBudgetName,
+        `Yield Breakdown - ${getBudgetAbsoluteRate(budgetId)}`,
+      lineName: getBudgetAbsoluteRate,
       subheader: (instrumentId: string) =>
         buildInstrumentSubtitle(getInstrument(instrumentId)!),
       x: globalOptions.Period,
@@ -666,7 +666,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           `Purchasing Power over Time by Budget - ${getInstrumentName(
             instrumentId
           )}`,
-        lineName: getBudgetName,
+        lineName: getBudgetAbsoluteRate,
         subheader: (instrumentId: string) =>
           buildInstrumentSubtitle(getInstrument(instrumentId)!),
         x: globalOptions.Period,
@@ -730,9 +730,9 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         graphs: graphs,
         header: (instrumentId: string) =>
           `Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
-        lineName: getWithdrawalBudgetName,
+        lineName: getWithdrawalBudgetAbsoluteRate,
         subheader: (instrumentId: string) =>
-          `Starting from ${getBudgetName(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
+          `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -827,14 +827,17 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       inflationFactor.value = JSON.parse(storedInflationFactor);
     if (storedInstruments)
       instruments.value = JSON.parse(storedInstruments).map(
-        (storedInstrument: instrument.IInstrument) =>
-          new instrument.Instrument(
+        (storedInstrument: instrument.IInstrument) => {
+          const inst = new instrument.Instrument(
             storedInstrument.currentBalance,
             storedInstrument.annualRate,
             constants.PERIODS_PER_YEAR,
             storedInstrument.name,
             storedInstrument.annualLimit
-          )
+          );
+          inst.id = storedInstrument.id;
+          return inst;
+        }
       );
     if (storedSelectedCareerBudgetId)
       selectedCareerBudgetId.value = JSON.parse(storedSelectedCareerBudgetId);
@@ -1061,6 +1064,11 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     id === constants.DEFAULT
       ? constants.NAME_MIN_BUDGET
       : `${constants.BUDGET} ${getBudgetIndex(id)}`;
+  const getBudgetAbsoluteRate = (id: string): string => {
+    const budget = getBudget(id);
+    const suffix = globalOptions.periodsAsDates ? 'month' : 'period';
+    return budget ? `${globalOptions.Money(budget.absolute)}/${suffix}` : id;
+  };
   const unviewBudget = (): void => {
     budgetDetailsPanelActive.value = false;
     currentBudgetId.value = null;
@@ -1077,6 +1085,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     if (id === constants.DEFAULT) return 'Target Income';
     const index = withdrawalBudgets.value.findIndex(b => b.id === id) + 1;
     return `Withdrawal ${index}`;
+  };
+
+  const getWithdrawalBudgetAbsoluteRate = (id: string): string => {
+    const budget = getWithdrawalBudget(id);
+    const suffix = globalOptions.periodsAsDates ? 'month' : 'period';
+    return budget ? `${globalOptions.Money(budget.absolute)}/${suffix}` : id;
   };
 
   const deleteWithdrawalBudget = (id: string): void => {
@@ -1283,13 +1297,13 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     instrument: instrument.IInstrument,
     monthlyBudget: Budget
   ): string => {
-    const budgetName = viewPhase.value === constants.PHASE_CAREER
+    const budgetRate = viewPhase.value === constants.PHASE_CAREER
       ? getBudgetName(monthlyBudget.id)
       : getWithdrawalBudgetName(monthlyBudget.id);
 
     return `Amortization Table - ${getInstrumentName(
       instrument.id
-    )} | ${budgetName}`;
+    )} | ${budgetRate}`;
   };
 
   const buildAmortizationTableSubtitle = (

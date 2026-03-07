@@ -10,10 +10,6 @@ import routes from '@/apps/shared/constants/routes';
 const router: Router = useRouter();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const copyStateToClipboard = () => navigator.clipboard.writeText(
-  JSON.stringify(state.exportState())
-);
-
 const isCareer = computed(() => state.viewPhase === constants.PHASE_CAREER);
 const isRetirement = computed(() => state.viewPhase === constants.PHASE_RETIREMENT);
 
@@ -21,14 +17,6 @@ const appButtons: Button[] = [
   { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
   { text: constants.NAME_DEBTONATE, onClick: () => router.push(routes.ROUTE_DEBTONATE) },
 ];
-
-const menuButtons: ComputedRef<Button[]> = computed(() => [
-  { text: constants.BTN_OPTIONS, onClick: state.openOptionsForm },
-  { text: constants.BTN_LOAD, onClick: state.loadState },
-  { text: constants.BTN_SAVE, onClick: state.saveState },
-  { text: constants.BTN_CLEAR, onClick: state.clearState },
-  { text: constants.BTN_COPY, onClick: copyStateToClipboard },
-]);
 
 const phaseButtons: ComputedRef<Button[]> = computed(() => [
   {

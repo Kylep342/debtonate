@@ -10,41 +10,13 @@ defineProps<{
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const isRepatriate = computed(() => state.viewPhase === constants.PHASE_REPATRIATE);
+const pivotItems = computed(() => state.loansWithTotals);
 
-const pivotItems = computed(() => {
-  if (isRepatriate.value) {
-    const parentId = state.selectedLoanId || constants.TOTALS;
-    const parentLoan = state.getLoan(parentId);
-    if (!parentLoan) return [];
-    return [parentLoan, ...(state.refinancingScenarios[parentId] || [])];
-  }
-  return state.loansWithTotals;
-});
+const watchedItems = computed(() => state.loans);
 
-const watchedItems = computed(() => {
-  if (isRepatriate.value) {
-    const parentId = state.selectedLoanId || constants.TOTALS;
-    return state.refinancingScenarios[parentId] || [];
-  }
-  return state.loans;
-});
+const getScenarioNameLocal = (id: string) => state.getLoanName(id);
 
-const getScenarioNameLocal = (id: string) => {
-  if (!isRepatriate.value) return state.getLoanName(id);
-
-  const parentId = state.selectedLoanId || constants.TOTALS;
-  if (id === parentId) return 'Original';
-  const scenario = state.refinancingScenarios[parentId]?.find(s => s.id === id);
-  return scenario ? scenario.name : id;
-};
-
-const initialItemId = computed(() => {
-  if (isRepatriate.value) {
-    return state.selectedLoanId || constants.TOTALS;
-  }
-  return constants.TOTALS;
-});
+const initialItemId = computed(() => state.selectedLoanId || constants.TOTALS);
 
 </script>
 
@@ -58,6 +30,7 @@ const initialItemId = computed(() => {
     :get-item-name="getScenarioNameLocal"
     :initial-item-id="initialItemId"
     :initial-graph-id="constants.GRAPH_BALANCES_OVER_TIME"
+    @update:viewed-item-id="state.setSelectedLoanId"
   >
     <template v-for="id in extraViewIds" :key="id" #[`view-${id}`]="slotProps">
       <slot :name="`view-${id}`" v-bind="slotProps" />

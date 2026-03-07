@@ -10,10 +10,6 @@ import routes from '@/apps/shared/constants/routes';
 const router: Router = useRouter();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const copyStateToClipboard = () => navigator.clipboard.writeText(
-  JSON.stringify(state.exportState())
-);
-
 const isDebtonate = computed(() => state.viewPhase === constants.PHASE_DEBTONATE);
 const isRepatriate = computed(() => state.viewPhase === constants.PHASE_REPATRIATE);
 

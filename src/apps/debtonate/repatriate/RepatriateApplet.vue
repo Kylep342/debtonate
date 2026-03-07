@@ -9,17 +9,6 @@ import { ILoan } from 'moneyfunx';
 
 const state = useDebtonateCoreStore();
 
-const selectedLoanName = computed<string>(() => (
-  `Loan: ${state.getLoanName(state.selectedLoanId || constants.TOTALS)}`
-));
-
-const loanSelectors = computed<Button[]>(
-  () => (state.loansWithTotals.map((loan: ILoan) => ({
-    text: loan.name,
-    onClick: () => state.setSelectedLoanId(loan.id),
-  })))
-);
-
 const refinancingScenariosItems = computed(() => {
   const parentId = state.selectedLoanId || constants.TOTALS;
   const parentLoan = state.getLoan(parentId);
@@ -44,13 +33,6 @@ const EXTRA_VIEW_COMPARATIVE_ANALYSIS = 'Comparative Analysis';
     <div :class="['w-full', 'max-w-6xl']">
       <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4']">
         <h2>Refinancing Analysis</h2>
-        <div :class="['mr-4']">
-          <base-menu
-            :text="selectedLoanName"
-            :buttons="loanSelectors"
-            :classes="['btn-sm']"
-          />
-        </div>
       </div>
       <GraphsPanel :extra-view-ids="[EXTRA_VIEW_COMPARATIVE_ANALYSIS]">
         <template #[`view-${EXTRA_VIEW_COMPARATIVE_ANALYSIS}`]>
