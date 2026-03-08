@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ComputedRef, Reactive } from 'vue';
+import { computed, reactive, watch, ComputedRef, Reactive } from 'vue';
 
 import InstrumentCard from '@/apps/appreciate/components/InstrumentCard.vue';
 import constants from '@/apps/appreciate/constants/constants';
@@ -16,12 +16,22 @@ const {
   setViewedItemId: setViewedBudgetId
 } = usePivot(constants.DEFAULT);
 
-const budgetSelectors: ComputedRef<Button[]> = computed(
-  () => (state.monthlyBudgets.map((budget: MonthlyBudget) => ({
-    text: state.getBudgetName(budget.id),
+watch(() => state.viewPhase, () => {
+  setViewedBudgetId(constants.DEFAULT);
+});
+
+const budgetSelectors: ComputedRef<Button[]> = computed(() => {
+  const budgets = state.viewPhase === constants.PHASE_CAREER
+    ? state.monthlyBudgets
+    : state.monthlyWithdrawalBudgets;
+
+  return budgets.map((budget: MonthlyBudget) => ({
+    text: state.viewPhase === constants.PHASE_CAREER
+      ? state.getBudgetName(budget.id)
+      : state.getWithdrawalBudgetName(budget.id),
     onClick: () => setViewedBudgetId(budget.id),
-  })))
-);
+  }));
+});
 
 const pivotMenu: Reactive<Menu> = reactive({
   text: constants.BTN_PIVOT,

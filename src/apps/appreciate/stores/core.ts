@@ -579,9 +579,15 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       id: 'InstrumentCardSummary',
       type: 'donut',
       color: () => '#FFFFFF',
-      header: (budgetId: string) =>
-        `Yield Breakdown - ${getBudgetAbsoluteRate(budgetId)}`,
-      lineName: getBudgetAbsoluteRate,
+      header: (budgetId: string) => {
+        const budgetRate = viewPhase.value === constants.PHASE_CAREER
+          ? getBudgetAbsoluteRate(budgetId)
+          : getWithdrawalBudgetAbsoluteRate(budgetId);
+        return `Yield Breakdown - ${budgetRate}`;
+      },
+      lineName: (budgetId: string) => viewPhase.value === constants.PHASE_CAREER
+        ? getBudgetAbsoluteRate(budgetId)
+        : getWithdrawalBudgetAbsoluteRate(budgetId),
       subheader: (instrumentId: string) =>
         buildInstrumentSubtitle(getInstrument(instrumentId)!),
       x: globalOptions.Period,
