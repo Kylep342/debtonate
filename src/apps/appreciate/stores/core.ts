@@ -751,10 +751,82 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     }
   );
 
+  const withdrawalPurchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
+    () => {
+      const graphs = <Graphs<LineGraphContent>>{};
+      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+        const lines = <ChartSeries<Point>>{};
+        let overallMaxX = 0;
+        let overallMaxY = 0;
+
+        monthlyWithdrawalBudgets.value.forEach((budget: MonthlyBudget) => {
+          const line: Point[] = [];
+          // Add initial balance point (period 0 in retirement, which is end of career)
+          const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
+          const careerSchedule = getContributionSchedule(instrument.id, baseCareerId);
+          const initialBalance = careerSchedule.amortizationSchedule.length > 0
+            ? careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+            : (getInstrument(instrument.id)?.currentBalance || 0);
+
+          line.push({
+            x: careerOffsetPeriods.value,
+            y: deflate(initialBalance, careerOffsetPeriods.value),
+          });
+
+          getWithdrawalSchedule(instrument.id, budget.id).amortizationSchedule.forEach(
+            (record: withdrawalTypes.WithdrawalRecord) => {
+              line.push({
+                x: careerOffsetPeriods.value + record.period,
+                y: deflate(record.currentBalance, careerOffsetPeriods.value + record.period),
+              });
+            }
+          );
+          lines[budget.id] = line;
+
+          const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+          const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+          overallMaxX = Math.max(overallMaxX, lineMaxX);
+          overallMaxY = Math.max(overallMaxY, lineMaxY);
+        });
+
+        graphs[instrument.id] = <LineGraphContent>{
+          config: {
+            minX: careerOffsetPeriods.value,
+            minY: 0,
+            maxX: overallMaxX,
+            maxY: overallMaxY * 1.1,
+          },
+          lines: lines,
+        };
+      });
+
+      return <GraphConfig<LineGraphContent>>{
+        id: 'WithdrawalPurchasingPower',
+        type: 'line',
+        color: getBudgetColor,
+        graphs: graphs,
+        header: (instrumentId: string) =>
+          `Purchasing Power Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
+        lineName: getWithdrawalBudgetAbsoluteRate,
+        subheader: (instrumentId: string) =>
+          `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
+        x: globalOptions.Period,
+        xFormat: (x: number) => globalOptions.Period(x, true),
+        xLabel: () => globalOptions.Time,
+        xScale: graphXScale.value,
+        y: (y: number) => y,
+        yFormat: globalOptions.Money,
+        yLabel: () => 'Balance',
+        yScale: d3.scaleLinear,
+      };
+    }
+  );
+
   const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => {
     if (viewPhase.value === constants.PHASE_RETIREMENT) {
       return {
         [constants.GRAPH_BALANCES_OVER_TIME]: withdrawalBalancesGraphs.value,
+        [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: withdrawalPurchasingPowerGraphs.value,
       };
     }
     return {
