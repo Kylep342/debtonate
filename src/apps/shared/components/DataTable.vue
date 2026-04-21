@@ -16,7 +16,7 @@ defineProps<{
       <h3 :class="['text-center']">{{ title }}</h3>
       <h5 :class="['text-center']">{{ subtitle }}</h5>
     </header>
-    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto']">
+    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto', 'overflow-x-auto']">
       <base-table :class="['table-sm']">
         <template #header>
           <thead>

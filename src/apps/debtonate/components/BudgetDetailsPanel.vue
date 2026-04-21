@@ -75,7 +75,7 @@ watch(
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentBudget" :class="['tabframe', 'w-auto']">
+      <div v-if="currentBudget" :class="['tabframe', 'w-auto', 'pb-10']">
         <base-tabs
           :get-item-name="state.getLoanName"
           :pivot="state.loansWithTotals"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import DebtonateApplet from '@/apps/debtonate/debtonate/DebtonateApplet.vue';
 import RepatriateApplet from '@/apps/debtonate/repatriate/RepatriateApplet.vue';
@@ -17,8 +17,12 @@ import SiteIntro from '@/apps/shared/components/SiteIntro.vue';
 import constants from '@/apps/debtonate/constants/constants';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useModal } from '@/apps/shared/composables/useModal';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+const { isMobile } = useBreakpoint();
+
+const activeTab = ref('analysis');
 
 const isRepatriatePhase = computed<boolean>(() => state.viewPhase === constants.PHASE_REPATRIATE);
 
@@ -28,6 +32,13 @@ useModal(computed<boolean>(() => state.loanDetailsPanelActive), constants.LOAN_D
 useModal(computed<boolean>(() => state.loanFormActive), constants.LOAN_FORM_ID);
 useModal(computed<boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
 useModal(computed<boolean>(() => state.refinancingFormActive), constants.REFINANCING_FORM_ID);
+
+const tabClass = (tab: string) => [
+  'tab',
+  'tab-bordered',
+  'flex-1',
+  { 'tab-active': activeTab.value === tab }
+];
 </script>
 
 <template>
@@ -40,11 +51,27 @@ useModal(computed<boolean>(() => state.refinancingFormActive), constants.REFINAN
     <OptionsForm :id="constants.OPTIONS_FORM_ID" />
     <RefinancingForm :id="constants.REFINANCING_FORM_ID" />
 
-    <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen']">
-      <LoansPanel />
-      <BudgetsPanel />
+    <!-- Mobile Tabs -->
+    <div v-if="isMobile" class="tabs tabs-boxed bg-base-100 flex-none rounded-none border-b">
+      <a :class="tabClass('loans')" @click="activeTab = 'loans'">Loans</a>
+      <a :class="tabClass('budgets')" @click="activeTab = 'budgets'">Budgets</a>
+      <a :class="tabClass('analysis')" @click="activeTab = 'analysis'">Analysis</a>
+    </div>
 
-      <div :class="['flex-1', 'flex', 'flex-col', 'items-center', 'overflow-y-auto']">
+    <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen', { 'flex-col': isMobile }]">
+      <template v-if="!isMobile">
+        <LoansPanel />
+        <BudgetsPanel />
+      </template>
+      <template v-else>
+        <LoansPanel v-if="activeTab === 'loans'" :class="['!w-full']" :active-tab="ref(activeTab)" />
+        <BudgetsPanel v-if="activeTab === 'budgets'" :class="['!w-full']" :active-tab="ref(activeTab)" />
+      </template>
+
+      <div
+        v-if="!isMobile || activeTab === 'analysis'"
+        :class="['flex-1', 'flex', 'flex-col', 'items-center', 'overflow-y-auto']"
+      >
         <div
           v-if="!state.loans.length"
           :class="['m-4', 'text-wrap', 'text-pretty', 'w-30']"

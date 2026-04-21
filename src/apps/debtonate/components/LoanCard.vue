@@ -8,6 +8,7 @@ import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { DonutGraphContent } from '@/apps/shared/types/graph';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const props = defineProps<{
   loan: moneyfunx.ILoan,
@@ -16,6 +17,7 @@ const props = defineProps<{
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+const { isMobile } = useBreakpoint();
 
 const loanCurrentBalance: ComputedRef<string> = computed(() => `${globalOptions.Money(props.loan.currentBalance)}`);
 const loanInterestRate: ComputedRef<string> = computed(() => `${globalOptions.Percent(props.loan.annualRate * 100)}`);
@@ -57,7 +59,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.loan.id === constant
 </script>
 
 <template>
-  <base-card :class="['w-75', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
@@ -74,7 +76,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.loan.id === constant
         :graph="graphContent"
         :anchorId="loan.id"
       />
-      <base-table :class="['table-sm']">
+      <base-table :class="['table-xs', 'sm:table-sm']">
         <template #body>
           <tbody>
             <tr v-if="state.loans.length" v-for="(datum) in graphContent" :key="datum.label">
@@ -96,7 +98,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.loan.id === constant
               <td :class="['text-right']"><b>{{ loanTermInYears }} years</b></td>
             </tr>
             <tr>
-              <td>Minimum Payment</td>
+              <td>{{ isMobile ? 'Min Payment' : 'Minimum Payment' }}</td>
               <td :class="['text-right']"><b>{{ loanMinPayment }}</b></td>
             </tr>
             <tr v-if="loanPrincipal !== loanCurrentBalance">

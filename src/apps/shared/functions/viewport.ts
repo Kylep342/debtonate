@@ -1,15 +1,16 @@
-import { Ref } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 
 import { TooltipSize } from '@/apps/shared/types/graph';
 
-export const fillHeight = (componentRef: Ref, bottomDelta: number=0) => {
+export const fillHeight = (componentRef: any, bottomDelta: number=0) => {
+  if (!componentRef.value) return 0;
   const containerTop = componentRef.value.getBoundingClientRect().top;
   const availableHeight = window.innerHeight - (containerTop + bottomDelta);
   return availableHeight;
 };
 
-//
-export const fillWidth = (componentRef: Ref, rightDelta: number=0) => {
+export const fillWidth = (componentRef: any, rightDelta: number=0) => {
+  if (!componentRef.value) return 0;
   const containerLeft = componentRef.value.getBoundingClientRect().left;
   const availableWidth = window.innerWidth - (containerLeft + rightDelta);
   return availableWidth;
@@ -17,12 +18,6 @@ export const fillWidth = (componentRef: Ref, rightDelta: number=0) => {
 
 /**
  * Calculates the optimal CSS transform to keep a tooltip within the viewport.
- *
- * @param {object} tooltipSize - The reactive size of the tooltip ({ width: number, height: number }).
- * @param {number} cursorX - The horizontal position of the mouse cursor.
- * @param {number} cursorY - The vertical position of the mouse cursor.
- * @param {number} offset - A small buffer to add between the cursor and the tooltip.
- * @returns {string} A CSS transform string (e.g., 'translateX(-100%) translateY(-100%)').
  */
 export function smartTransform(
   tooltipSize: TooltipSize,
@@ -33,17 +28,43 @@ export function smartTransform(
   let translateX = '0%';
   let translateY = '0%';
 
-  // If the tooltip would overflow the right edge of the screen,
-  // flip it to the left side of the cursor.
   if (cursorX + tooltipSize.width + offset > window.innerWidth) {
     translateX = '-100%';
   }
 
-  // If the tooltip would overflow the bottom edge of the screen,
-  // flip it above the cursor.
   if (cursorY + tooltipSize.height + offset > window.innerHeight) {
     translateY = '-100%';
   }
 
   return `translateX(${translateX}) translateY(${translateY})`;
+}
+
+/**
+ * Reactive breakpoint utility
+ */
+export function useBreakpoint() {
+  const width = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
+
+  const updateWidth = () => {
+    width.value = window.innerWidth;
+  };
+
+  onMounted(() => {
+    window.addEventListener('resize', updateWidth);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateWidth);
+  });
+
+  const isMobile = computed(() => width.value < 768);
+  const isTablet = computed(() => width.value >= 768 && width.value < 1024);
+  const isDesktop = computed(() => width.value >= 1024);
+
+  return {
+    width,
+    isMobile,
+    isTablet,
+    isDesktop
+  };
 }

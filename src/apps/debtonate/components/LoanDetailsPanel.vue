@@ -74,7 +74,7 @@ watch(
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentLoan" :class="['tabframe', 'w-auto']">
+      <div v-if="currentLoan" :class="['tabframe', 'w-auto', 'pb-10']">
         <RefinancingTable
           v-if="state.refinancingScenarios[currentLoan.id]?.length"
           :parent-id="currentLoan.id"

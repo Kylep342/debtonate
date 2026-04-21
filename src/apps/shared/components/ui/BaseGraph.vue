@@ -13,7 +13,7 @@ import {
 } from 'vue';
 
 import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
-import { smartTransform } from '@/apps/shared/functions/viewport';
+import { smartTransform, useBreakpoint } from '@/apps/shared/functions/viewport';
 import { GraphConfig, Point, TooltipConfig, TooltipPosition, TooltipSize } from '@/apps/shared/types/graph';
 
 type TooltipProps = {
@@ -38,6 +38,8 @@ const containerRef = ref<HTMLDivElement | null>(null);
 const containerWidth = ref(0);
 let resizeObserver: ResizeObserver | null = null;
 
+const { isMobile } = useBreakpoint();
+
 const updateTooltipSize = (size: TooltipSize) => {
   tooltipSize.value = size;
 };
@@ -60,7 +62,7 @@ const initializeChart = () => {
   const graph = chart.graphs[props.anchorId];
 
   const totalWidth = containerWidth.value;
-  const totalHeight = 500;
+  const totalHeight = isMobile.value ? 300 : 500;
 
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
 
@@ -226,6 +228,5 @@ watch(
 /* Ensure the wrapper takes full width so ResizeObserver works */
 .chartWrapper {
   width: 100%;
-  min-width: 800px;
 }
 </style>

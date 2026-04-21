@@ -21,6 +21,18 @@ describe('useEvent composable', () => {
   });
 
   it('should add an event listener on mount and remove it on unmount', () => {
+    // Mock matchMedia as it is missing in JSDOM
+    window.matchMedia = vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // deprecated
+      removeListener: vi.fn(), // deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
     const addListenerSpy = vi.spyOn(window, 'addEventListener');
     const removeListenerSpy = vi.spyOn(window, 'removeEventListener');
     const matchMediaSpy = vi.spyOn(window, 'matchMedia');

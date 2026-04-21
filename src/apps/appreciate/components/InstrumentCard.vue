@@ -8,6 +8,7 @@ import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { DonutGraphContent } from '@/apps/shared/types/graph';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const props = defineProps<{
   instrument: moneyfunx.IInstrument,
@@ -16,6 +17,7 @@ const props = defineProps<{
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
+const { isMobile } = useBreakpoint();
 
 const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
 
@@ -70,7 +72,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
 </script>
 
 <template>
-  <base-card :class="['w-75', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100']">
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0']">
         <div :class="['flex', 'justify-between', 'pr-4']">
@@ -87,7 +89,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
         :graph="graphContent"
         :anchorId="instrument.id"
       />
-      <base-table :class="['table-sm']">
+      <base-table :class="['table-xs', 'sm:table-sm']">
         <template #body>
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
@@ -115,7 +117,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
               <td :class="['text-right']"><b>{{ instrumentAnnualLimit }}</b></td>
             </tr>
             <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td>Max Contribution</td>
+              <td>{{ isMobile ? 'Max Monthly' : 'Max Contribution' }}</td>
               <td :class="['text-right']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
             </tr>
           </tbody>
