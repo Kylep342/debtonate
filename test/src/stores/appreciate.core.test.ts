@@ -579,26 +579,27 @@ describe('Appreciate Core Store', () => {
       ]));
     });
 
-    it('computs balances over time graph content', async () => {
-      const state: AppreciateCoreStore = useAppreciateCoreStore();
-      state.budgets = Budgets(); state.loans = Instruments();
-
-      expect(
-        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
-      ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
-      );
-    });
-
-    it('computs purchasing power over time graph content', async () => {
+    it('computes balances over time graph content', async () => {
       const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       state.instruments = Instruments();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs)
+        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
+        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id).sort()
+      );
+    });
+
+    it('computes purchasing power over time graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id).sort()
       );
     })
   });

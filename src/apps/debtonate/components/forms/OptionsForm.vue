@@ -92,7 +92,7 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
       <br>
       <hr>
       <br>
-      <div :class="['formInputs']">
+      <div :class="['formInputs', 'pb-10']">
         <collapsible-card ref="appStateCardRef">
           <template #cardTitle>
             <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">

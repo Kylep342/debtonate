@@ -78,7 +78,7 @@ watch(
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentInstrument" :class="['tabframe', 'w-auto']">
+      <div v-if="currentInstrument" :class="['tabframe', 'w-auto', 'pb-10']">
         <base-tabs
           :get-item-name="state.getBudgetName"
           :pivot="state.monthlyBudgets"

@@ -18,14 +18,14 @@ describe('BaseGraph Component', () => {
     }
 
     // Mock ResizeObserver
-    global.ResizeObserver = vi.fn().mockImplementation((callback) => {
-      resizeCallback = callback;
-      return {
-        observe: vi.fn(),
-        unobserve: vi.fn(),
-        disconnect: vi.fn(),
-      };
-    });
+    global.ResizeObserver = class ResizeObserver {
+      constructor(callback: ResizeObserverCallback) {
+        resizeCallback = callback;
+      }
+      observe = vi.fn();
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+    };
   });
 
   afterEach(() => {

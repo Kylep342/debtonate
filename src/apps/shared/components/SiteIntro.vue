@@ -12,8 +12,8 @@ const globalOptions: GlobalOptionsStore = useGlobalOptionsStore()
 </script>
 
 <template>
-  <div :class="['w-1/2']">
-    <p>Welcome to {{ appName }}!</p>
+  <div :class="['w-full', 'md:w-1/2', 'text-pretty']">
+    <p class="text-lg font-bold">Welcome to {{ appName }}!</p>
     <br>
     <p>
       {{ appName }} is a financial calculator for {{ appDescription }}.

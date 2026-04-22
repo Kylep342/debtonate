@@ -9,6 +9,11 @@ import ListPanel from '@/apps/shared/components/ListPanel.vue';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { Button, Menu } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { Ref } from 'vue';
+
+defineProps<{
+  activeTab?: Ref<string>;
+}>();
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
@@ -56,6 +61,7 @@ const createBudgetAction = () => isCareerPhase.value ? state.openBudgetForm() : 
     :create-item="state.openBudgetForm"
     :pivot-menu="pivotMenu"
     :create-text="constants.BTN_CREATE"
+    :active-tab="activeTab"
   >
     <template #item="{ item }">
       <BudgetCard

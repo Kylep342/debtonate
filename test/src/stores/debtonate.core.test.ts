@@ -604,9 +604,9 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs)
+        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
       );
     });
 
@@ -616,9 +616,9 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs)
+        Object.keys(state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
       );
     });
 
@@ -628,9 +628,9 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL].graphs)
+        Object.keys(state.graphs[constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
+        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
       );
     });
   });

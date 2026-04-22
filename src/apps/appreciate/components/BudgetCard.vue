@@ -121,7 +121,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
 </script>
 
 <template>
-  <base-card :class="['w-75', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100']">
     <template #cardTitle>
       <div class="card-actions flow-root">
         <div :class="['flex', 'justify-between', 'pr-4']">
@@ -138,7 +138,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
         :graph="graphContent"
         :anchorId="budget.id"
       />
-      <base-table :class="['table-sm']">
+      <base-table :class="['table-xs', 'sm:table-sm']">
         <template #body>
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">

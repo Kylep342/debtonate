@@ -29,5 +29,6 @@ export default defineConfig({
     environment: 'jsdom',
     exclude: ['build', 'node_modules'],
     root: '.',
+    execArgv: ['--no-webstorage'],
   },
 });
