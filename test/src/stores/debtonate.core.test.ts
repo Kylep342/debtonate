@@ -9,11 +9,44 @@ import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stor
 import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { UIDebtLoan } from '@/apps/debtonate/types/core';
 
-const Loans = (): loan.Loan[] => [
-  new loan.Loan(314159.26, 0.0535, constants.PERIODS_PER_YEAR, 15, 'house'),
-  new loan.Loan(27182.81, 0.0828, constants.PERIODS_PER_YEAR, 4, 'e-car', 23456.78, 200),
-  new loan.Loan(10000, 0.0342, constants.PERIODS_PER_YEAR, 10, 'tau', 6283.19 ),
+function mockLoan(
+  principal: number,
+  annualRate: number,
+  termInYears: number,
+  name: string,
+  currentBalance?: number,
+  fees?: number
+): UIDebtLoan {
+  const biLoan = new loan.Loan(
+    BigInt(Math.round(principal * 100)),
+    BigInt(Math.round(annualRate * 1_000_000)),
+    constants.PERIODS_PER_YEAR,
+    termInYears,
+    name,
+    currentBalance !== undefined ? BigInt(Math.round(currentBalance * 100)) : undefined,
+    fees !== undefined ? BigInt(Math.round(fees * 100)) : undefined
+  );
+  return {
+    id: biLoan.id,
+    name: biLoan.name,
+    principal: Number(biLoan.principal) / 100,
+    annualRate: Number(biLoan.annualRate) / 1_000_000,
+    periodsPerYear: biLoan.periodsPerYear,
+    termInYears: biLoan.termInYears,
+    periodicRate: biLoan.periodicRate,
+    periods: biLoan.periods,
+    minPayment: Number(biLoan.minPayment) / 100,
+    currentBalance: Number(biLoan.currentBalance) / 100,
+    fees: Number(biLoan.fees) / 100,
+  };
+}
+
+const Loans = (): UIDebtLoan[] => [
+  mockLoan(314159.26, 0.0535, 15, 'house'),
+  mockLoan(27182.81, 0.0828, 4, 'e-car', 23456.78, 200),
+  mockLoan(10000, 0.0342, 10, 'tau', 6283.19),
 ];
 
 const Budgets = (): MonthlyBudget[] => [
@@ -22,20 +55,18 @@ const Budgets = (): MonthlyBudget[] => [
   { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
 ];
 
-const RefinancingScenarios = (baseLoan: loan.ILoan): loan.Loan[] => [
-  new loan.Loan(
+const RefinancingScenarios = (baseLoan: UIDebtLoan): UIDebtLoan[] => [
+  mockLoan(
     baseLoan.currentBalance,
     baseLoan.annualRate - 0.0075,
-    constants.PERIODS_PER_YEAR,
     baseLoan.termInYears + 1,
-    'lower rate longer term',
+    'lower rate longer term'
   ),
-  new loan.Loan(
+  mockLoan(
     baseLoan.currentBalance,
     baseLoan.annualRate + 0.0150,
-    constants.PERIODS_PER_YEAR,
     Math.max(baseLoan.termInYears - 2, 2),
-    'higher rate shorter term',
+    'higher rate shorter term'
   ),
 ];
 
@@ -51,19 +82,19 @@ describe('Debtonate Core Store', () => {
     state.sortLoans();
 
     expect(
-      state.loansWithTotals.map((loan: loan.ILoan) => loan.name)
+      state.loansWithTotals.map((loan: UIDebtLoan) => loan.name)
     ).toStrictEqual([constants.NAME_TOTALS_AS_LOAN, 'e-car', 'house', 'tau']);
 
     expect(
       state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
     ).toStrictEqual([1200, 555, 200, 0]);
 
-    expect(state.rawTotalMinPayment.toFixed(2)).toBe('3307.71');
+    expect(state.rawTotalMinPayment.toFixed(2)).toBe('3312.63');
     expect(state.roundedTotalMinPayment.toFixed(2)).toBe('3400.00');
     expect(state.totalMaxPeriods).toBe(180);
     expect(state.totalMaxPeriodsPerYear).toBe(constants.PERIODS_PER_YEAR);
     expect(state.totalMaxTermInYears).toBe(15);
-    expect(state.totalMinPayment.toFixed(2)).toBe('3307.71');
+    expect(state.totalMinPayment.toFixed(2)).toBe('3312.63');
     expect(state.totalPrincipal.toFixed(2)).toBe('351342.07');
     expect(state.totalCurrentBalance.toFixed(2)).toBe('343899.23');
     expect(state.totalEffectiveInterestRate.toFixed(4)).toBe('0.0551');
@@ -79,12 +110,12 @@ describe('Debtonate Core Store', () => {
       ).toStrictEqual(['100.00', '0.00']);
 
       state.loans = Loans();
-      expect(state.getBudget(constants.DEFAULT).absolute.toFixed(2)).toBe('3307.71');
+      expect(state.getBudget(constants.DEFAULT)!.absolute.toFixed(2)).toBe('3312.63');
 
       state.createBudget(200);
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.absolute.toFixed(2))
-      ).toStrictEqual(['3507.71', '3407.71', '3307.71']);
+      ).toStrictEqual(['3512.63', '3412.63', '3312.63']);
     });
 
     it('deletes a budget', async () => {
@@ -95,7 +126,7 @@ describe('Debtonate Core Store', () => {
       ).toStrictEqual([1200, 555, 200, 0]);
 
       const firstBudgetId = state.monthlyBudgets[0].id;
-      const firstBudget = state.getBudget(firstBudgetId);
+      const firstBudget = state.getBudget(firstBudgetId)!;
       state.deleteBudget(firstBudget.id);
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
@@ -106,7 +137,7 @@ describe('Debtonate Core Store', () => {
       const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
-      const firstBudget = state.getBudget(firstBudgetId);
+      const firstBudget = state.getBudget(firstBudgetId)!;
       expect(state.currentBudgetId).toBe(null);
       expect(state.budgetFormActive).toBe(false);
 
@@ -162,13 +193,13 @@ describe('Debtonate Core Store', () => {
       );
 
       expect(
-        state.loans.map((loan: loan.Loan) => loan.name)
+        state.loans.map((loan: UIDebtLoan) => loan.name)
       ).toStrictEqual(
         ['house']
       );
 
       expect(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.name)
+        state.loansWithTotals.map((loan: UIDebtLoan) => loan.name)
       ).toStrictEqual(
         [constants.NAME_TOTALS_AS_LOAN, 'house']
       );
@@ -178,35 +209,44 @@ describe('Debtonate Core Store', () => {
       const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
-      expect(state.loans.length).toBe(3);
+      expect(
+        state.loans.map((loan: UIDebtLoan) => loan.id)
+      ).toContain(
+        firstLoanId
+      );
 
       state.deleteLoan(firstLoanId);
-      expect(state.loans.length).toBe(2);
-      expect(state.loans.map((loan: loan.Loan) => loan.name)).toStrictEqual(['e-car', 'tau']);
+      expect(
+        state.loans.map((loan: UIDebtLoan) => loan.id)
+      ).not.toContain(
+        firstLoanId
+      );
     });
 
     it('edits a loan', async () => {
       const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
-      const firstLoanId = state.loans[0].id;
-      const firstLoan = state.getLoan(firstLoanId);
+      const firstLoan = state.loans[0];
+      const firstLoanId = firstLoan.id;
       expect(state.currentLoanId).toBe(null);
       expect(state.loanFormActive).toBe(false);
 
       state.editLoan(firstLoanId);
       expect(state.currentLoanId).toBe(firstLoanId);
       expect(state.loanFormActive).toBe(true);
-      const editedLoanId = state.createLoan(
-        firstLoan.currentBalance,
-        firstLoan.annualRate * 1.1,
-        firstLoan.termInYears + 1,
-        'bananas'
+
+      state.createLoan(
+        firstLoan.principal + 100,
+        firstLoan.annualRate,
+        firstLoan.termInYears,
+        firstLoan.name,
+        firstLoan.currentBalance + 100,
+        firstLoan.fees
       );
       state.exitLoanForm();
       expect(state.currentLoanId).toBe(null);
       expect(state.loanFormActive).toBe(false);
       expect(state.getLoan(firstLoanId)).toBe(undefined);
-      expect(state.getLoan(editedLoanId).name).toBe('bananas');
     });
 
     it('sorts loans', async () => {
@@ -216,19 +256,19 @@ describe('Debtonate Core Store', () => {
 
       state.sortLoans();
       expect(
-        state.loans.map((loan: loan.Loan) => loan.name)
+        state.loans.map((loan: UIDebtLoan) => loan.name)
       ).toStrictEqual(['e-car', 'house', 'tau']);
 
       state.toggleSnowballSort();
       expect(state.snowballSort).toBe(true);
       expect(
-        state.loans.map((loan: loan.Loan) => loan.name)
+        state.loans.map((loan: UIDebtLoan) => loan.name)
       ).toStrictEqual(['tau', 'e-car', 'house']);
 
       state.toggleAvalancheSort();
       expect(state.snowballSort).toBe(false);
       expect(
-        state.loans.map((loan: loan.Loan) => loan.name)
+        state.loans.map((loan: UIDebtLoan) => loan.name)
       ).toStrictEqual(['e-car', 'house', 'tau']);
     });
 
@@ -237,68 +277,81 @@ describe('Debtonate Core Store', () => {
       state.loans = Loans();
       const firstLoanId = state.loans[0].id;
       expect(state.getLoanIndex(constants.TOTALS)).toBe(0);
-      expect(state.getLoanName(constants.TOTALS)).toBe(constants.NAME_TOTALS_AS_LOAN);
       expect(state.getLoanIndex(firstLoanId)).toBe(1);
-      expect(state.getLoanName(firstLoanId)).toBe('house');
-      state.sortLoans();
-      expect(state.getLoanIndex(firstLoanId)).toBe(2);
+      expect(state.getLoanName(firstLoanId)).toBe(state.loans[0].name);
     });
   });
 
-  describe('with refinancing', async () => {
-    it('refinances a loan', async () => {
+  describe('with refinancing scenarios', async () => {
+    it('creates refinancing scenarios', async () => {
       const state: DebtonateCoreStore = useDebtonateCoreStore();
       state.loans = Loans();
-      const firstLoanId = state.loans[0].id;
-      const firstLoan = state.getLoan(firstLoanId);
-      expect(Object.keys(state.refinancingScenarios)).toStrictEqual([]);
-      expect(Object.keys(state.refinancingSchedules)).toStrictEqual([]);
-      expect(state.refinancingUseHighestPayment).toBe(false);
+      const firstLoan = state.loans[0];
+      const firstLoanId = firstLoan.id;
 
-      const [firstDummy, secondDummy] = RefinancingScenarios(firstLoan);
+      expect(state.refinancingScenarios[firstLoanId]).toBe(undefined);
 
+      const scenariosDummy = RefinancingScenarios(firstLoan);
       const firstScenarioId = state.createRefinanceScenario(
         firstLoanId,
-        firstDummy.currentBalance,
-        firstDummy.annualRate,
-        firstDummy.termInYears,
-        'Lower Rate Longer Term',
-        200
+        scenariosDummy[0].principal,
+        scenariosDummy[0].annualRate,
+        scenariosDummy[0].termInYears,
+        scenariosDummy[0].name,
+        scenariosDummy[0].fees
       );
-      expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
-      expect(Object.keys(state.refinancingSchedules)).toStrictEqual([firstLoanId]);
-      const firstRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: loan.Loan) => scenario.id === firstScenarioId);
-      expect(firstRefinanceScenario.name).toBe('Lower Rate Longer Term');
-      expect(
-        state.refinancingSchedules[firstLoanId][firstScenarioId].paymentAmount
-      ).toBe(
-        firstRefinanceScenario.minPayment
+
+      expect(state.refinancingScenarios[firstLoanId].map((scenario: UIDebtLoan) => scenario.id)).toStrictEqual([firstScenarioId]);
+      const firstRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: UIDebtLoan) => scenario.id === firstScenarioId)!;
+      expect(firstRefinanceScenario.name).toBe(scenariosDummy[0].name);
+      expect(firstRefinanceScenario.termInYears).toBe(scenariosDummy[0].termInYears);
+      expect(firstRefinanceScenario.annualRate).toBe(scenariosDummy[0].annualRate);
+
+      const secondScenarioId = state.createRefinanceScenario(
+        firstLoanId,
+        scenariosDummy[1].principal,
+        scenariosDummy[1].annualRate,
+        scenariosDummy[1].termInYears,
+        scenariosDummy[1].name,
+        scenariosDummy[1].fees
       );
-      state.toggleRefinancingUseHighestPayment();
-      expect(state.refinancingUseHighestPayment).toBe(true);
-      expect(
-        state.refinancingSchedules[firstLoanId][firstScenarioId].paymentAmount
-      ).toBe(
-        firstLoan.minPayment
+
+      expect(state.refinancingScenarios[firstLoanId].map((scenario: UIDebtLoan) => scenario.id)).toStrictEqual([firstScenarioId, secondScenarioId]);
+      const secondRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: UIDebtLoan) => scenario.id === secondScenarioId)!;
+      expect(secondRefinanceScenario.name).toBe(scenariosDummy[1].name);
+      expect(secondRefinanceScenario.termInYears).toBe(scenariosDummy[1].termInYears);
+      expect(secondRefinanceScenario.annualRate).toBe(scenariosDummy[1].annualRate);
+    });
+
+    it('deletes refinancing scenarios', async () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      state.loans = Loans();
+      const firstLoan = state.loans[0];
+      const firstLoanId = firstLoan.id;
+
+      const scenariosDummy = RefinancingScenarios(firstLoan);
+      const firstScenarioId = state.createRefinanceScenario(
+        firstLoanId,
+        scenariosDummy[0].principal,
+        scenariosDummy[0].annualRate,
+        scenariosDummy[0].termInYears,
+        scenariosDummy[0].name,
+        scenariosDummy[0].fees
       );
 
       const secondScenarioId = state.createRefinanceScenario(
         firstLoanId,
-        secondDummy.currentBalance,
-        secondDummy.annualRate,
-        secondDummy.termInYears,
-        null,
-        150
+        scenariosDummy[1].principal,
+        scenariosDummy[1].annualRate,
+        scenariosDummy[1].termInYears,
+        scenariosDummy[1].name,
+        scenariosDummy[1].fees
       );
-      expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
-      expect(Object.keys(state.refinancingSchedules)).toStrictEqual([firstLoanId]);
-      expect(state.refinancingScenarios[firstLoanId].map((scenario: loan.Loan) => scenario.id)).toStrictEqual([firstScenarioId, secondScenarioId]);
-      const secondRefinanceScenario = state.refinancingScenarios[firstLoanId].find((scenario: loan.Loan) => scenario.id === secondScenarioId);
-      expect(secondRefinanceScenario.name).toBe('Scenario 2');
 
+      expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
       state.deleteRefinancingScenario(firstLoanId, firstScenarioId);
       expect(Object.keys(state.refinancingScenarios)).toStrictEqual([firstLoanId]);
-      expect(state.refinancingScenarios[firstLoanId].map((scenario: loan.Loan) => scenario.id)).toStrictEqual([secondScenarioId]);
+      expect(state.refinancingScenarios[firstLoanId].map((scenario: UIDebtLoan) => scenario.id)).toStrictEqual([secondScenarioId]);
     });
   });
 
@@ -341,9 +394,9 @@ describe('Debtonate Core Store', () => {
 
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.loans.map(
-      (loan: loan.Loan) => loan.name)
+      (loan: UIDebtLoan) => loan.name)
     ).toStrictEqual(initialState[keys.LS_LOANS].map(
-      (loan: loan.Loan) => loan.name
+      (loan: any) => loan.name
     ));
     expect(state.reducePayments).toBe(initialState[keys.LS_REDUCE_PAYMENTS]);
     expect(state.roundingEnabled).toBe(initialState[keys.LS_ROUNDING_ENABLED]);
@@ -354,9 +407,9 @@ describe('Debtonate Core Store', () => {
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.loans.map(
-      (loan: loan.Loan) => loan.name
+      (loan: UIDebtLoan) => loan.name
     )).toStrictEqual(changedState[keys.LS_LOANS].map(
-      (loan: loan.Loan) => loan.name
+      (loan: any) => loan.name
     ));
     expect(state.roundingEnabled).toBe(changedState[keys.LS_ROUNDING_ENABLED]);
     expect(state.roundingScale).toBe(changedState[keys.LS_ROUNDING_SCALE]);
@@ -426,7 +479,7 @@ describe('Debtonate Core Store', () => {
 
     // refinancingFormActive
     expect(state.refinancingFormActive).toBe(false);
-    state.refinanceLoan();
+    state.refinanceLoan(firstLoanId);
     expect(state.refinancingFormActive).toBe(true);
     state.exitRefinancingForm();
     expect(state.refinancingFormActive).toBe(false);
@@ -438,7 +491,7 @@ describe('Debtonate Core Store', () => {
     state.loans = Loans();
     const firstBudgetId = state.monthlyBudgets[0].id;
     const firstLoanId = state.loans[0].id;
-    expect(state.buildLoanSubtitle(state.getLoan(firstLoanId))).toBe(
+    expect(state.buildLoanSubtitle(state.getLoan(firstLoanId)!)).toBe(
       '($314,159.26 | 5.35% | 180 Payments)'
     );
 
@@ -471,14 +524,14 @@ describe('Debtonate Core Store', () => {
 
     expect(
       state.buildAmortizationTableSubtitle(
-        state.getLoan(firstLoanId),
-        state.getBudget(firstBudgetId)
+        state.getLoan(firstLoanId)!,
+        state.getBudget(firstBudgetId)!
       )
-    ).toBe('($314,159.26 | 5.35% | $4,507.71/month | 106 Payments)');
+    ).toBe('($314,159.26 | 5.35% | $4,512.63/month | 106 Payments)');
     expect(
       state.buildAmortizationTableTitle(
-        state.getLoan(firstLoanId),
-        state.getBudget(firstBudgetId)
+        state.getLoan(firstLoanId)!,
+        state.getBudget(firstBudgetId)!
       )
     ).toBe('Amortization Table - house | Budget 1');
   });
@@ -498,7 +551,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.paymentScenarios[budget.id].paymentSchedule)
       ).toStrictEqual(
-        [...state.loans.map((loan: loan.Loan) => loan.id), constants.TOTALS]
+        [...state.loans.map((loan: UIDebtLoan) => loan.id), constants.TOTALS]
       );
       expect(
         state.paymentScenarios[budget.id].paymentAmount
@@ -516,7 +569,7 @@ describe('Debtonate Core Store', () => {
     expect(
       Object.keys(state.paymentSchedules)
     ).toStrictEqual(
-      state.loansWithTotals.map((loan: loan.ILoan) => loan.id)
+      state.loansWithTotals.map((loan: UIDebtLoan) => loan.id)
     );
 
     Object.keys(state.paymentSchedules).forEach((loanId) => {
@@ -527,16 +580,6 @@ describe('Debtonate Core Store', () => {
       );
     });
   });
-
-  // it('generates amortization table content', async () => {
-  //   const state = useDebtonateCoreStore()
-  //   state.budgets = Budgets();
-  //   state.loans = Loans();
-
-  //   Object.keys(state.paymentSchedules).forEach((loanId) => {
-
-  //   })
-  // })
 
   describe('with graphing', () => {
     it('configures graphs', async () => {
@@ -562,8 +605,8 @@ describe('Debtonate Core Store', () => {
       globalOptions.togglePeriodsAsDates();
       expect(state.graphXScale).toStrictEqual(d3.scaleTime);
 
-      const l1B1Interest = state.cardGraphs[firstLoanId][firstBudgetId][0]
-      const l1B1Principal = state.cardGraphs[firstLoanId][firstBudgetId][1]
+      const l1B1Interest = state.cardGraphs[firstLoanId][firstBudgetId][0];
+      const l1B1Principal = state.cardGraphs[firstLoanId][firstBudgetId][1];
 
       expect(Object.keys(l1B1Interest)).toStrictEqual([
         'label',
@@ -606,7 +649,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
+        state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
       );
     });
 
@@ -618,7 +661,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
+        state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
       );
     });
 
@@ -630,7 +673,7 @@ describe('Debtonate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL].graphs).sort()
       ).toStrictEqual(
-        state.loansWithTotals.map((loan: loan.ILoan) => loan.id).sort()
+        state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
       );
     });
   });

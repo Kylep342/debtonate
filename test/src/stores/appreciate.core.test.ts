@@ -9,11 +9,36 @@ import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/s
 import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { UIInstrument } from '@/apps/appreciate/types/core';
 
-const Instruments = (): instrument.Instrument[] => [
-  new instrument.Instrument(10000, 0.11, constants.PERIODS_PER_YEAR, 'IRA', 6500),
-  new instrument.Instrument(0, 0.042666667, constants.PERIODS_PER_YEAR, 'ABC'),
-  new instrument.Instrument(45000, 0.085, constants.PERIODS_PER_YEAR, '401(K)', 23500),
+function mockInstrument(
+  currentBalance: number,
+  annualRate: number,
+  name: string,
+  annualLimit: number = 0
+): UIInstrument {
+  const biInst = new instrument.Instrument(
+    BigInt(Math.round(currentBalance * 100)),
+    BigInt(Math.round(annualRate * 1_000_000)),
+    constants.PERIODS_PER_YEAR,
+    name,
+    BigInt(Math.round(annualLimit * 100))
+  );
+  return {
+    id: biInst.id,
+    name: biInst.name,
+    currentBalance: Number(biInst.currentBalance) / 100,
+    annualRate: Number(biInst.annualRate) / 1_000_000,
+    periodsPerYear: biInst.periodsPerYear,
+    periodicRate: biInst.periodicRate,
+    annualLimit: Number(biInst.annualLimit) / 100,
+  };
+}
+
+const Instruments = (): UIInstrument[] => [
+  mockInstrument(10000, 0.11, 'IRA', 6500),
+  mockInstrument(0, 0.042666667, 'ABC'),
+  mockInstrument(45000, 0.085, '401(K)', 23500),
 ];
 
 const Budgets = (): MonthlyBudget[] => [
@@ -34,7 +59,7 @@ describe('Appreciate Core Store', () => {
     state.sortInstruments();
 
     expect(
-      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.name)
+      state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.name)
     ).toStrictEqual([constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA', '401(K)', 'ABC']);
 
     expect(
@@ -54,7 +79,7 @@ describe('Appreciate Core Store', () => {
       ).toStrictEqual(['100.00', '0.00']);
 
       state.instruments = Instruments();
-      expect(state.getBudget(constants.DEFAULT).absolute.toFixed(2)).toBe('0.00');
+      expect(state.getBudget(constants.DEFAULT)!.absolute.toFixed(2)).toBe('0.00');
 
       state.createBudget(200);
       expect(
@@ -70,7 +95,7 @@ describe('Appreciate Core Store', () => {
       ).toStrictEqual([1200, 555, 200, 0]);
 
       const firstBudgetId = state.monthlyBudgets[0].id;
-      const firstBudget = state.getBudget(firstBudgetId);
+      const firstBudget = state.getBudget(firstBudgetId)!;
       state.deleteBudget(firstBudget.id);
       expect(
         state.monthlyBudgets.map((budget: MonthlyBudget) => budget.relative)
@@ -81,7 +106,7 @@ describe('Appreciate Core Store', () => {
       const state: AppreciateCoreStore = useAppreciateCoreStore();
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
-      const firstBudget = state.getBudget(firstBudgetId);
+      const firstBudget = state.getBudget(firstBudgetId)!;
       expect(state.currentBudgetId).toBe(null);
       expect(state.budgetFormActive).toBe(false);
 
@@ -145,22 +170,22 @@ describe('Appreciate Core Store', () => {
   describe('with instruments', async () => {
     it('creates an instrument', async () => {
       const state: AppreciateCoreStore = useAppreciateCoreStore();
-      const firstInstrumentDummy = Instruments()[0]
+      const firstInstrumentDummy = Instruments()[0];
       state.createInstrument(
         firstInstrumentDummy.currentBalance,
-        () => 0,
+        firstInstrumentDummy.annualRate,
         firstInstrumentDummy.name,
-        () => 0
+        firstInstrumentDummy.annualLimit
       );
 
       expect(
-        state.instruments.map((instrument: instrument.Instrument) => instrument.name)
+        state.instruments.map((instrument: UIInstrument) => instrument.name)
       ).toStrictEqual(
         ['IRA']
       );
 
       expect(
-        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.name)
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.name)
       ).toStrictEqual(
         [constants.NAME_TOTALS_AS_AN_INSTRUMENT, 'IRA']
       );
@@ -175,7 +200,7 @@ describe('Appreciate Core Store', () => {
 
       state.deleteInstrument(firstInstrumentId);
       expect(state.instruments.length).toBe(2);
-      expect(state.instruments.map((instrument: instrument.Instrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
+      expect(state.instruments.map((instrument: UIInstrument) => instrument.name)).toStrictEqual(['401(K)', 'ABC']);
     });
 
     it('edits an instrument', async () => {
@@ -183,7 +208,7 @@ describe('Appreciate Core Store', () => {
       state.instruments = Instruments();
       state.sortInstruments();
       const firstInstrumentId = state.instruments[0].id;
-      const firstInstrument = state.getInstrument(firstInstrumentId);
+      const firstInstrument = state.getInstrument(firstInstrumentId)!;
       expect(state.currentInstrumentId).toBe(null);
       expect(state.instrumentFormActive).toBe(false);
 
@@ -195,12 +220,13 @@ describe('Appreciate Core Store', () => {
         firstInstrument.currentBalance,
         4.88,
         'Beans',
+        0
       );
       state.exitInstrumentForm();
       expect(state.currentInstrumentId).toBe(null);
       expect(state.instrumentFormActive).toBe(false);
       expect(state.getInstrument(firstInstrumentId)).toBe(undefined);
-      expect(state.getInstrument(editedInstrumentId).name).toBe('Beans');
+      expect(state.getInstrument(editedInstrumentId)!.name).toBe('Beans');
     });
 
     it('gets intstrument attributes', async () => {
@@ -256,9 +282,9 @@ describe('Appreciate Core Store', () => {
 
     expect(state.budgets).toStrictEqual(initialState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument: instrument.Instrument) => instrument.name)
+      (instrument: UIInstrument) => instrument.name)
     ).toStrictEqual(initialState[keys.LS_INSTRUMENTS].map(
-      (instrument: instrument.Instrument) => instrument.name
+      (instrument: any) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(initialState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(initialState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -273,9 +299,9 @@ describe('Appreciate Core Store', () => {
     state.loadState();
     expect(state.budgets).toStrictEqual(changedState[keys.LS_BUDGETS]);
     expect(state.instruments.map(
-      (instrument: instrument.Instrument) => instrument.name
+      (instrument: UIInstrument) => instrument.name
     )).toStrictEqual(changedState[keys.LS_INSTRUMENTS].map(
-      (instrument: instrument.Instrument) => instrument.name
+      (instrument: any) => instrument.name
     ));
     expect(state.accrueBeforeContribution).toBe(changedState[keys.LS_ACCRUE_BEFORE_CONTRIBUTION]);
     expect(state.deflateAllMoney).toBe(changedState[keys.LS_DEFLATE_ALL_MONEY]);
@@ -291,7 +317,6 @@ describe('Appreciate Core Store', () => {
   it('manages component states', async () => {
     const state: AppreciateCoreStore = useAppreciateCoreStore();
     state.budgets = Budgets();
-    // monthlyBudgets is 1-indexed as the base minimumBudget is at [0]
     const firstBudgetId = state.monthlyBudgets[1].id;
     state.instruments = Instruments();
     const firstInstrumentId = state.instruments[0].id;
@@ -372,7 +397,7 @@ describe('Appreciate Core Store', () => {
     state.sortInstruments();
     const firstBudgetId = state.monthlyBudgets[0].id;
     const firstInstrumentId = state.instruments[0].id;
-    expect(state.buildInstrumentSubtitle(state.getInstrument(firstInstrumentId))).toBe(
+    expect(state.buildInstrumentSubtitle(state.getInstrument(firstInstrumentId)!)).toBe(
       '($10,000.00 | 11%)'
     );
 
@@ -392,14 +417,14 @@ describe('Appreciate Core Store', () => {
 
     expect(
       state.buildAmortizationTableSubtitle(
-        state.getInstrument(firstInstrumentId),
-        state.getBudget(firstBudgetId)
+        state.getInstrument(firstInstrumentId)!,
+        state.getBudget(firstBudgetId)!
       )
     ).toBe('($10,000.00 | 11% | $1,200.00/month | 300 Contributions)');
     expect(
       state.buildAmortizationTableTitle(
-        state.getInstrument(firstInstrumentId),
-        state.getBudget(firstBudgetId)
+        state.getInstrument(firstInstrumentId)!,
+        state.getBudget(firstBudgetId)!
       )
     ).toBe('Amortization Table - IRA | Budget 1');
   });
@@ -450,7 +475,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.contributionScenarios[budget.id].contributionSchedule)
       ).toStrictEqual(
-        [...state.instruments.map((instrument: instrument.Instrument) => instrument.id), constants.TOTALS]
+        [...state.instruments.map((instrument: UIInstrument) => instrument.id), constants.TOTALS]
       );
       expect(
         state.contributionScenarios[budget.id].contributionAmount
@@ -468,7 +493,7 @@ describe('Appreciate Core Store', () => {
     expect(
       Object.keys(state.contributionSchedules)
     ).toStrictEqual(
-      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
+      state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id)
     );
 
     Object.keys(state.contributionSchedules).forEach((instrumentId) => {
@@ -495,7 +520,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.withdrawalScenarios[budget.id])
       ).toStrictEqual(
-        [...state.instruments.map((instrument: instrument.Instrument) => instrument.id), constants.TOTALS]
+        [...state.instruments.map((instrument: UIInstrument) => instrument.id), constants.TOTALS]
       );
     });
   });
@@ -508,7 +533,7 @@ describe('Appreciate Core Store', () => {
     expect(
       Object.keys(state.withdrawalSchedules)
     ).toStrictEqual(
-      state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id)
+      state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id)
     );
 
     Object.keys(state.withdrawalSchedules).forEach((instrumentId) => {
@@ -543,8 +568,8 @@ describe('Appreciate Core Store', () => {
       globalOptions.togglePeriodsAsDates();
       expect(state.graphXScale).toStrictEqual(d3.scaleTime);
 
-      const i1B1Interest = state.cardGraphs[firstInstrumentId][firstBudgetId][0]
-      const i1B1Contribution = state.cardGraphs[firstInstrumentId][firstBudgetId][1]
+      const i1B1Interest = state.cardGraphs[firstInstrumentId][firstBudgetId][0];
+      const i1B1Contribution = state.cardGraphs[firstInstrumentId][firstBudgetId][1];
 
       expect(Object.keys(i1B1Interest)).toStrictEqual([
         'label',
@@ -587,7 +612,7 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id).sort()
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );
     });
 
@@ -599,8 +624,8 @@ describe('Appreciate Core Store', () => {
       expect(
         Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs).sort()
       ).toStrictEqual(
-        state.instrumentsWithTotals.map((instrument: instrument.IInstrument) => instrument.id).sort()
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );
-    })
+    });
   });
 });
