@@ -16,7 +16,7 @@
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
     "d3": "^7.9.0",
-    "moneyfunx": "file:../moneyfunx",
+    "moneyfunx": "4.0.0",
     "pinia": "^3.0.3",
     "vite": "^8.0.9",
     "vue": "^3.2.37",
