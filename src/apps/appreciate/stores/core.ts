@@ -5,7 +5,7 @@ import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
-import { ContributionScenario } from '@/apps/appreciate/types/core';
+import { ContributionScenario, UIInstrument } from '@/apps/appreciate/types/core';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import {
   Budget,
@@ -15,7 +15,6 @@ import {
   Arc,
   ChartSeries,
   DonutGraphContent,
-  // Graph,
   GraphConfig,
   Graphs,
   LineGraphContent,
@@ -35,7 +34,7 @@ export interface AppreciateCoreState {
   inflationFactor: Ref<number>;
   instrumentDetailsPanelActive: Ref<boolean>;
   instrumentFormActive: Ref<boolean>;
-  instruments: Ref<instrument.Instrument[]>;
+  instruments: Ref<UIInstrument[]>;
   minimumBudget: Budget;
   optionsFormActive: Ref<boolean>;
   selectedCareerBudgetId: Ref<string | null>;
@@ -62,7 +61,7 @@ export interface AppreciateCoreGetters {
   inflationRate: ComputedRef<number>;
   instrumentCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   instrumentFormTitle: ComputedRef<string>;
-  instrumentsWithTotals: ComputedRef<instrument.IInstrument[]>;
+  instrumentsWithTotals: ComputedRef<UIInstrument[]>;
   retirementTaxRateEffective: ComputedRef<number>;
   monthlyBudgets: ComputedRef<MonthlyBudget[]>;
   monthlyWithdrawalBudgets: ComputedRef<MonthlyBudget[]>;
@@ -71,7 +70,7 @@ export interface AppreciateCoreGetters {
   totalAnnualLimit: ComputedRef<number>;
   totalCurrentBalance: ComputedRef<number>;
   totalMaxPeriodsPerYear: ComputedRef<number>;
-  totalsAsAnInstrument: ComputedRef<instrument.IInstrument>;
+  totalsAsAnInstrument: ComputedRef<UIInstrument>;
   careerRetirementComparison: ComputedRef<
     Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
   >;
@@ -90,16 +89,16 @@ export interface AppreciateCoreActions {
   amortizationTableTotals: (
     schedule: contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule
   ) => Record<string, string>;
-  avalanche: () => instrument.Instrument[];
+  avalanche: () => UIInstrument[];
   buildAmortizationTableSubtitle: (
-    instrument: instrument.IInstrument,
+    instrument: UIInstrument,
     budget: Budget
   ) => string;
   buildAmortizationTableTitle: (
-    instrument: instrument.IInstrument,
+    instrument: UIInstrument,
     budget: Budget
   ) => string;
-  buildInstrumentSubtitle: (instrument: instrument.IInstrument) => string;
+  buildInstrumentSubtitle: (instrument: UIInstrument) => string;
   clearState: () => void;
   createBudget: (proposedBudget: number) => string;
   createWithdrawalBudget: (proposedBudget: number) => string;
@@ -134,7 +133,7 @@ export interface AppreciateCoreActions {
     instrumentId: string,
     budgetId: string
   ) => withdrawalTypes.WithdrawalSchedule;
-  getInstrument: (id: string) => instrument.IInstrument | undefined;
+  getInstrument: (id: string) => UIInstrument | undefined;
   getInstrumentIndex: (id: string) => number;
   getInstrumentName: (id: string) => string;
   getMaxMoney: (instrumentId: string) => number;
@@ -161,6 +160,68 @@ export interface AppreciateCoreActions {
   viewInstrument: (id: string) => void;
 }
 
+// MAPPING UTILITIES
+function toBigIntInstrument(uiInst: UIInstrument): instrument.Instrument {
+  const biInst = new instrument.Instrument(
+    BigInt(Math.round(uiInst.currentBalance * 100)),
+    BigInt(Math.round(uiInst.annualRate * 1_000_000)),
+    uiInst.periodsPerYear,
+    uiInst.name,
+    BigInt(Math.round(uiInst.annualLimit * 100))
+  );
+  biInst.id = uiInst.id;
+  return biInst;
+}
+
+function toUIInstrument(biInst: instrument.Instrument): UIInstrument {
+  return {
+    id: biInst.id,
+    name: biInst.name,
+    currentBalance: Number(biInst.currentBalance) / 100,
+    annualRate: Number(biInst.annualRate) / 1_000_000,
+    periodsPerYear: biInst.periodsPerYear,
+    periodicRate: biInst.periodicRate,
+    annualLimit: Number(biInst.annualLimit) / 100,
+  };
+}
+
+function toFloatContributionSchedule(biSchedule: any): any {
+  const floatSchedule: any = {};
+  Object.keys(biSchedule).forEach((key) => {
+    const entry = biSchedule[key];
+    floatSchedule[key] = {
+      lifetimeGrowth: Number(entry.lifetimeGrowth) / 100,
+      lifetimeContribution: Number(entry.lifetimeContribution) / 100,
+      amortizationSchedule: entry.amortizationSchedule.map((record: any) => ({
+        period: record.period,
+        contribution: Number(record.contribution) / 100,
+        growth: Number(record.growth) / 100,
+        currentBalance: Number(record.currentBalance) / 100,
+      })),
+    };
+  });
+  return floatSchedule;
+}
+
+function toFloatWithdrawalSchedule(biSchedule: any): any {
+  const floatSchedule: any = {};
+  Object.keys(biSchedule).forEach((key) => {
+    const entry = biSchedule[key];
+    floatSchedule[key] = {
+      lifetimeGrowth: Number(entry.lifetimeGrowth) / 100,
+      lifetimeWithdrawal: Number(entry.lifetimeWithdrawal) / 100,
+      amortizationSchedule: entry.amortizationSchedule.map((record: any) => ({
+        period: record.period,
+        withdrawal: Number(record.withdrawal) / 100,
+        netAmount: Number(record.netAmount) / 100,
+        growth: Number(record.growth) / 100,
+        currentBalance: Number(record.currentBalance) / 100,
+      })),
+    };
+  });
+  return floatSchedule;
+}
+
 export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   // dependent stores
 
@@ -180,7 +241,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const inflationFactor: Ref<number> = ref(constants.DEFAULT_INFLATION_FACTOR);
   const instrumentDetailsPanelActive: Ref<boolean> = ref(false);
   const instrumentFormActive: Ref<boolean> = ref(false);
-  const instruments: Ref<instrument.Instrument[]> = ref([]);
+  const instruments: Ref<UIInstrument[]> = ref([]);
   const minimumBudget: Budget = { id: constants.DEFAULT, relative: 0 };
   const optionsFormActive: Ref<boolean> = ref(false);
   const selectedCareerBudgetId: Ref<string | null> = ref(constants.DEFAULT);
@@ -224,7 +285,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   );
 
   // Instruments
-  const totalsAsAnInstrument: ComputedRef<instrument.IInstrument> = computed(
+  const totalsAsAnInstrument: ComputedRef<UIInstrument> = computed(
     () => ({
       id: constants.TOTALS,
       name: constants.NAME_TOTALS_AS_AN_INSTRUMENT,
@@ -236,7 +297,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     })
   );
 
-  const instrumentsWithTotals: ComputedRef<instrument.IInstrument[]> = computed(
+  const instrumentsWithTotals: ComputedRef<UIInstrument[]> = computed(
     () => [totalsAsAnInstrument.value, ...instruments.value]
   );
 
@@ -270,23 +331,24 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           ? instContributionSchedule.amortizationSchedule.slice(-1)[0].currentBalance
           : inst.currentBalance;
         const retirementInstrument = new instrument.Instrument(
-          finalBalance,
-          inst.annualRate,
+          BigInt(Math.round(finalBalance * 100)),
+          BigInt(Math.round(inst.annualRate * 1_000_000)),
           inst.periodsPerYear,
           inst.name,
-          inst.annualLimit
+          BigInt(Math.round(inst.annualLimit * 100))
         );
         retirementInstrument.id = inst.id;
         return retirementInstrument;
       });
 
-      comparison[careerBudget.id] = withdrawals.drawdownInstruments(
+      const biSchedule = withdrawals.drawdownInstruments(
         retirementInstruments,
-        desiredNetIncome.value,
+        BigInt(Math.round(desiredNetIncome.value * 100)),
         yearsToSpend.value * constants.PERIODS_PER_YEAR,
         retirementTaxRateEffective.value,
         true
       );
+      comparison[careerBudget.id] = toFloatWithdrawalSchedule(biSchedule);
     });
     return comparison;
   });
@@ -309,14 +371,16 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     computed(() => {
       const scenarios: Record<string, ContributionScenario> = {};
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+        const biInstruments = instruments.value.map(toBigIntInstrument);
+        const biSchedule = contributions.contributeInstruments(
+          biInstruments,
+          BigInt(Math.round(budget.relative * 100)),
+          yearsToContribute.value * constants.PERIODS_PER_YEAR,
+          accrueBeforeContribution.value
+        );
         scenarios[budget.id] = <ContributionScenario>{
           contributionAmount: budget.relative,
-          contributionSchedule: contributions.contributeInstruments(
-            instruments.value,
-            budget.relative,
-            yearsToContribute.value * constants.PERIODS_PER_YEAR,
-            accrueBeforeContribution.value
-          ),
+          contributionSchedule: toFloatContributionSchedule(biSchedule),
         };
       });
       return scenarios;
@@ -330,7 +394,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       Record<string, contributionTypes.ContributionSchedule>
     > = {};
 
-    instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
       schedules[instrument.id] = <
         Record<string, contributionTypes.ContributionSchedule>
       >{};
@@ -368,23 +432,24 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           ? instContributionSchedule.amortizationSchedule.slice(-1)[0].currentBalance
           : inst.currentBalance;
         const retirementInstrument = new instrument.Instrument(
-          finalBalance,
-          inst.annualRate,
+          BigInt(Math.round(finalBalance * 100)),
+          BigInt(Math.round(inst.annualRate * 1_000_000)),
           inst.periodsPerYear,
           inst.name,
-          inst.annualLimit
+          BigInt(Math.round(inst.annualLimit * 100))
         );
         retirementInstrument.id = inst.id;
         return retirementInstrument;
       });
 
-      scenarios[budget.id] = withdrawals.drawdownInstruments(
+      const biSchedule = withdrawals.drawdownInstruments(
         retirementInstruments,
-        budget.relative,
+        BigInt(Math.round(budget.relative * 100)),
         yearsToSpend.value * constants.PERIODS_PER_YEAR,
         retirementTaxRateEffective.value,
         true // accrueBeforeWithdrawal
       );
+      scenarios[budget.id] = toFloatWithdrawalSchedule(biSchedule);
     });
     return scenarios;
   });
@@ -397,7 +462,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       Record<string, withdrawalTypes.WithdrawalSchedule>
     > = {};
 
-    instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
       schedules[instrument.id] = <
         Record<string, withdrawalTypes.WithdrawalSchedule>
       >{};
@@ -500,7 +565,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const balancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
       const graphs = <Graphs<LineGraphContent>>{};
-      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+      instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
         const lines = <ChartSeries<Point>>{};
         let overallMaxX = 0;
         let overallMaxY = 0;
@@ -602,7 +667,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
   const cardGraphs: ComputedRef<Record<string, Record<string, DonutGraphContent>>> = computed(() => {
     const config = <Record<string, Record<string, DonutGraphContent>>>{};
-    instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
       config[instrument.id] = <Record<string, DonutGraphContent>>{};
       monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
         const totalsContributionSummary = getContributionSchedule(
@@ -629,7 +694,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const purchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>> =
     computed(() => {
       const graphs = <Graphs<LineGraphContent>>{};
-      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+      instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
         const lines = <ChartSeries<Point>>{};
         let overallMaxX = 0;
         let overallMaxY = 0;
@@ -689,14 +754,13 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const withdrawalBalancesGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
       const graphs = <Graphs<LineGraphContent>>{};
-      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+      instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
         const lines = <ChartSeries<Point>>{};
         let overallMaxX = 0;
         let overallMaxY = 0;
 
         monthlyWithdrawalBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
-          // Add initial balance point (period 0 in retirement, which is end of career)
           const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
           const careerSchedule = getContributionSchedule(instrument.id, baseCareerId);
           const initialBalance = careerSchedule.amortizationSchedule.length > 0
@@ -754,14 +818,13 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const withdrawalPurchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(
     () => {
       const graphs = <Graphs<LineGraphContent>>{};
-      instrumentsWithTotals.value.forEach((instrument: instrument.IInstrument) => {
+      instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
         const lines = <ChartSeries<Point>>{};
         let overallMaxX = 0;
         let overallMaxY = 0;
 
         monthlyWithdrawalBudgets.value.forEach((budget: MonthlyBudget) => {
           const line: Point[] = [];
-          // Add initial balance point (period 0 in retirement, which is end of career)
           const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
           const careerSchedule = getContributionSchedule(instrument.id, baseCareerId);
           const initialBalance = careerSchedule.amortizationSchedule.length > 0
@@ -905,16 +968,17 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       inflationFactor.value = JSON.parse(storedInflationFactor);
     if (storedInstruments)
       instruments.value = JSON.parse(storedInstruments).map(
-        (storedInstrument: instrument.IInstrument) => {
-          const inst = new instrument.Instrument(
-            storedInstrument.currentBalance,
-            storedInstrument.annualRate,
+        (storedInstrument: any) => {
+          const biInst = new instrument.Instrument(
+            BigInt(Math.round(storedInstrument.currentBalance * 100)),
+            BigInt(Math.round(storedInstrument.annualRate * 1_000_000)),
             constants.PERIODS_PER_YEAR,
             storedInstrument.name,
-            storedInstrument.annualLimit
+            BigInt(Math.round(storedInstrument.annualLimit * 100))
           );
-          inst.id = storedInstrument.id;
-          return inst;
+          const uiInst = toUIInstrument(biInst);
+          uiInst.id = storedInstrument.id;
+          return uiInst;
         }
       );
     if (storedSelectedCareerBudgetId)
@@ -1058,11 +1122,14 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     }
   };
 
-  const avalanche = (): instrument.Instrument[] =>
-    sorting.sortWith(
-      sorting.sortWith(instruments.value, sorting.snowball),
+  const avalanche = (): UIInstrument[] => {
+    const biInsts = instruments.value.map(toBigIntInstrument);
+    const sortedBi = sorting.sortWith(
+      sorting.sortWith(biInsts, sorting.snowball),
       sorting.avalanche
     );
+    return sortedBi.map(bi => instruments.value.find(ui => ui.id === bi.id)!);
+  };
 
   const deflate = (amount: number, periods: number): number =>
     amount * (1 - inflationRate.value / constants.PERIODS_PER_YEAR) ** periods;
@@ -1095,12 +1162,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   // Instruments
-  const getInstrument = (id: string): instrument.IInstrument | undefined =>
+  const getInstrument = (id: string): UIInstrument | undefined =>
     instrumentsWithTotals.value.find((instrument) => instrument.id === id);
 
   const deleteInstrument = (id: string): void => {
     instruments.value = instruments.value.filter(
-      (instrument: instrument.Instrument) => instrument.id !== id
+      (instrument: UIInstrument) => instrument.id !== id
     );
   };
   const editInstrument = (id: string): void => {
@@ -1109,7 +1176,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
   const getInstrumentIndex = (id: string): number =>
     instrumentsWithTotals.value.findIndex(
-      (instrument: instrument.IInstrument) => instrument.id === id
+      (instrument: UIInstrument) => instrument.id === id
     );
   const getInstrumentName = (id: string): string => getInstrument(id)!.name;
   const unviewInstrument = (): void => {
@@ -1178,7 +1245,6 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   const editWithdrawalBudget = (id: string): void => {
-    // Reuse budget form logic but targeted at withdrawal budgets
     currentBudgetId.value = id;
     openBudgetForm();
   };
@@ -1223,13 +1289,14 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     name: string,
     annualLimit: number
   ): string => {
-    const createdInstrument = new instrument.Instrument(
-      currentBalance,
-      interestRate,
+    const biInst = new instrument.Instrument(
+      BigInt(Math.round(currentBalance * 100)),
+      BigInt(Math.round(interestRate * 1_000_000)),
       constants.PERIODS_PER_YEAR,
       name,
-      annualLimit
+      annualLimit ? BigInt(Math.round(annualLimit * 100)) : undefined
     );
+    const uiInst = toUIInstrument(biInst);
     if (
       currentInstrumentId.value &&
       currentInstrumentId.value !== constants.TOTALS
@@ -1237,9 +1304,9 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       deleteInstrument(currentInstrumentId.value);
       currentInstrumentId.value = null;
     }
-    instruments.value.push(createdInstrument);
+    instruments.value.push(uiInst);
     sortInstruments();
-    return createdInstrument.id;
+    return uiInst.id;
   };
 
   // ease-of-use getters over computed values
@@ -1273,9 +1340,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   ): number =>
     getContributionSchedule(instrumentId, budgetId).amortizationSchedule.length;
 
-  // budgets is sorted on every create; order preserved on delete
   const getMaxMoney = (instrumentId: string): number => {
-    // monthly budgets is sorted every change; the first one yields the most money
     const bestSchedule = getContributionSchedule(
       instrumentId,
       monthlyBudgets.value[0].id
@@ -1370,9 +1435,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     return totals;
   };
 
-  // title building functions
   const buildAmortizationTableTitle = (
-    instrument: instrument.IInstrument,
+    instrument: UIInstrument,
     monthlyBudget: Budget
   ): string => {
     const budgetRate = viewPhase.value === constants.PHASE_CAREER
@@ -1385,7 +1449,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   const buildAmortizationTableSubtitle = (
-    instrument: instrument.IInstrument,
+    instrument: UIInstrument,
     monthlyBudget: Budget
   ): string => {
     const countLabel = viewPhase.value === constants.PHASE_CAREER ? 'Contributions' : 'Withdrawals';
@@ -1403,7 +1467,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   const buildInstrumentSubtitle = (
-    instrument: instrument.IInstrument
+    instrument: UIInstrument
   ): string =>
     `(${globalOptions.Money(
       instrument.currentBalance

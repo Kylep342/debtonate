@@ -59,55 +59,55 @@ const buttons: ComputedRef<Button[]> = computed(() => props.loan.id === constant
 </script>
 
 <template>
-  <base-card :class="['w-full', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']" :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']">
     <template #cardTitle>
-      <div :class="['card-actions', 'flow-root', 'p-0']">
-        <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ loanName }}</h2>
+      <div :class="['card-actions', 'flow-root', 'p-0', 'w-full', 'min-w-0']">
+        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
+          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">{{ loanName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.loans.length">{{ header }}</h3>
+      <h3 v-if="state.loans.length" class="text-center font-medium text-sm truncate mb-1">{{ header }}</h3>
       <donut-graph
         v-if="state.loans.length"
         :config="state.loanCardGraphConfig"
         :graph="graphContent"
         :anchorId="loan.id"
       />
-      <base-table :class="['table-xs', 'sm:table-sm']">
+      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
         <template #body>
           <tbody>
             <tr v-if="state.loans.length" v-for="(datum) in graphContent" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']">
+              <td class="truncate max-w-[110px]"><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ globalOptions.Money(datum.value) }}</b>
               </td>
             </tr>
             <tr>
-              <td>Principal</td>
-              <td :class="['text-right']"><b>{{ loanPrincipal }}</b></td>
+              <td class="truncate max-w-[110px]">Principal</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanPrincipal }}</b></td>
             </tr>
             <tr>
-              <td>Interest Rate</td>
-              <td :class="['text-right']"><b>{{ loanInterestRate }}</b></td>
+              <td class="truncate max-w-[110px]">Interest Rate</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanInterestRate }}</b></td>
             </tr>
             <tr>
-              <td>Term</td>
-              <td :class="['text-right']"><b>{{ loanTermInYears }} years</b></td>
+              <td class="truncate max-w-[110px]">Term</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanTermInYears }} years</b></td>
             </tr>
             <tr>
-              <td>{{ isMobile ? 'Min Payment' : 'Minimum Payment' }}</td>
-              <td :class="['text-right']"><b>{{ loanMinPayment }}</b></td>
+              <td class="truncate max-w-[110px]">{{ isMobile ? 'Min Payment' : 'Minimum Payment' }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanMinPayment }}</b></td>
             </tr>
             <tr v-if="loanPrincipal !== loanCurrentBalance">
-              <td>Current Balance</td>
-              <td :class="['text-right']"><b>{{ loanCurrentBalance }}</b></td>
+              <td class="truncate max-w-[110px]">Current Balance</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanCurrentBalance }}</b></td>
             </tr>
             <tr v-if="loanFees">
-              <td>Fees</td>
-              <td :class="['text-right']"><b>{{ loanFees }}</b></td>
+              <td class="truncate max-w-[110px]">Fees</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ loanFees }}</b></td>
             </tr>
           </tbody>
         </template>

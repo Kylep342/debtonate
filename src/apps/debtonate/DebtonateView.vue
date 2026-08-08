@@ -20,7 +20,7 @@ import { useModal } from '@/apps/shared/composables/useModal';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
-const { isMobile } = useBreakpoint();
+const { isDesktop } = useBreakpoint();
 
 const activeTab = ref('analysis');
 
@@ -51,15 +51,15 @@ const tabClass = (tab: string) => [
     <OptionsForm :id="constants.OPTIONS_FORM_ID" />
     <RefinancingForm :id="constants.REFINANCING_FORM_ID" />
 
-    <!-- Mobile Tabs -->
-    <div v-if="isMobile" class="tabs tabs-boxed bg-base-100 flex-none rounded-none border-b">
+    <!-- Mobile/Tablet Tabs -->
+    <div v-if="!isDesktop" class="tabs tabs-boxed bg-base-100 flex-none rounded-none border-b">
       <a :class="tabClass('loans')" @click="activeTab = 'loans'">Loans</a>
       <a :class="tabClass('budgets')" @click="activeTab = 'budgets'">Budgets</a>
       <a :class="tabClass('analysis')" @click="activeTab = 'analysis'">Analysis</a>
     </div>
 
-    <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-screen', { 'flex-col': isMobile }]">
-      <template v-if="!isMobile">
+    <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-full', 'max-w-full', 'min-w-0', 'min-h-0', { 'flex-col': !isDesktop }]">
+      <template v-if="isDesktop">
         <LoansPanel />
         <BudgetsPanel />
       </template>
@@ -69,8 +69,9 @@ const tabClass = (tab: string) => [
       </template>
 
       <div
-        v-if="!isMobile || activeTab === 'analysis'"
-        :class="['flex-1', 'flex', 'flex-col', 'items-center', 'overflow-y-auto']"
+        v-if="isDesktop || activeTab === 'analysis'"
+        :class="['flex-1', 'flex', 'flex-col', 'items-center', 'overflow-y-auto', 'min-h-0', 'h-full']"
+        style="-webkit-overflow-scrolling: touch;"
       >
         <div
           v-if="!state.loans.length"
@@ -93,6 +94,6 @@ const tabClass = (tab: string) => [
       <LoanDetailsPanel :id="constants.LOAN_DETAILS_ID" />
     </div>
 
-    <FooterBar />
+    <FooterBar :class="['flex-none']" />
   </div>
 </template>

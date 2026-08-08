@@ -31,6 +31,8 @@ const initializeChart = () => {
 
   const svg = d3.select(`#${elId}`)
     .html("")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
     .append("g")
     .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
@@ -76,15 +78,13 @@ watch(
 </script>
 
 <template>
-  <div>
-    <svg :id="elId" width="300" height="300"></svg>
+  <div class="flex justify-center w-full min-w-0 overflow-hidden my-2">
+    <svg :id="elId" viewBox="0 0 300 300" class="w-full max-w-[180px] h-auto max-h-[180px]"></svg>
   </div>
 </template>
 
-<style>
-/* svg {
-  pointer-events: none;
-  position: absolute;
-  transition: transform 0.1s ease;
-} */
+<style scoped>
+svg {
+  display: block;
+}
 </style>

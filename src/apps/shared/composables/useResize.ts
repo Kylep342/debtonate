@@ -1,6 +1,6 @@
 import { ref, Ref, watch, nextTick } from 'vue';
 
-import { useEvent} from '@/apps/shared/composables/useEvent';
+import { useEvent } from '@/apps/shared/composables/useEvent';
 import { fillHeight } from '@/apps/shared/functions/viewport';
 
 export function useResize(callOnMount: boolean=true, dependency?: Ref<any>) {
@@ -10,7 +10,7 @@ export function useResize(callOnMount: boolean=true, dependency?: Ref<any>) {
     if (scrollContainer.value) {
       scrollContainer.value.style.maxHeight = `${fillHeight(scrollContainer, 26)}px`;
     }
-  }
+  };
 
   useEvent(window, 'resize', resize, callOnMount);
 
@@ -22,5 +22,5 @@ export function useResize(callOnMount: boolean=true, dependency?: Ref<any>) {
     });
   }
 
-  return { scrollContainer }
+  return { scrollContainer };
 }
