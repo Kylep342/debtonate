@@ -121,41 +121,41 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
 </script>
 
 <template>
-  <base-card :class="['w-full', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']" :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']">
     <template #cardTitle>
-      <div class="card-actions flow-root">
-        <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ budgetName }}</h2>
+      <div class="card-actions flow-root w-full min-w-0">
+        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
+          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">{{ budgetName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length">{{ header }}</h3>
+      <h3 v-if="state.instruments.length" class="text-center font-medium text-sm truncate mb-1">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.budgetCardGraphConfig"
         :graph="graphContent"
         :anchorId="budget.id"
       />
-      <base-table :class="['table-xs', 'sm:table-sm']">
+      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
         <template #body>
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
+              <td class="truncate max-w-[110px]"><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
             <tr>
-              <td>Amount</td>
-              <td :class="['text-right']"><b>{{ budgetAmount }}</b></td>
+              <td class="truncate max-w-[110px]">Amount</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetAmount }}</b></td>
             </tr>
             <tr>
-              <td>{{ periodLabel }}</td>
-              <td :class="['text-right']"><b>{{ budgetPeriodCount }}</b></td>
+              <td class="truncate max-w-[110px]">{{ periodLabel }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetPeriodCount }}</b></td>
             </tr>
             <tr>
-              <td>{{ netWorthLabel }}</td>
-              <td :class="['text-right']"><b>{{ budgetNetWorth }}</b></td>
+              <td class="truncate max-w-[110px]">{{ netWorthLabel }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetNetWorth }}</b></td>
             </tr>
           </tbody>
         </template>

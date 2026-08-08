@@ -79,7 +79,7 @@ const tableRows: ComputedRef<TableRow[]> = computed(() => {
         {{ title }}
       </h3>
     </div>
-    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto']">
+    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto', 'overflow-x-auto', 'w-full', 'max-w-full']">
       <base-table :class="['table-sm']">
         <template #header>
           <thead>

@@ -11,10 +11,11 @@ defineProps<{
     @close="$emit('exit')"
     :class="['modal', 'modal-bottom', 'sm:modal-middle']"
   >
-    <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit', 'max-h-[90vh]']">
+    <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit', 'max-h-[90vh]', 'min-w-0', 'max-w-full', 'overflow-hidden']">
       <base-card
-        :class="['overflow-hidden', 'flex-1', 'flex', 'flex-col', 'min-h-0']"
-        :body-classes="['overflow-y-auto', 'flex-1', ...(bodyClasses || [])]"
+        :class="['overflow-hidden', 'flex-1', 'flex', 'flex-col', 'min-h-0', 'h-full', 'w-full', 'max-w-full']"
+        :body-classes="['overflow-y-auto', 'overflow-x-hidden', 'flex-1', 'min-h-0', 'w-full', 'max-w-full', ...(bodyClasses || [])]"
+        style="-webkit-overflow-scrolling: touch;"
       >
         <template #cardTitle>
           <header class="navbar bg-secondary">

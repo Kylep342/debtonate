@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import OptionsGear from '@/apps/shared/components/OptionsGear.vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Button } from '@/apps/shared/types/app';
 
 defineProps({
@@ -16,14 +16,59 @@ defineProps({
     required: true
   }
 });
+
+const isOpen = ref(false);
+const menuRef = ref<HTMLElement | null>(null);
+
+const toggleMenu = () => {
+  isOpen.value = !isOpen.value;
+};
+
+const closeMenu = () => {
+  isOpen.value = false;
+};
+
+const handleItemClick = (button: Button) => {
+  closeMenu();
+  button.onClick();
+};
+
+const handleDocumentClick = (event: MouseEvent) => {
+  if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
+    closeMenu();
+  }
+};
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    closeMenu();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick);
+  document.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <template>
-  <div :class="['dropdown', 'dropdown-bottom', 'dropdown-end']">
-    <base-button :class="classes">{{ text }}</base-button>
-    <ul tabIndex="{0}"
-      :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[1]', 'w-fit', 'p-2', 'shadow']">
-      <li v-for="(button) in buttons" :key="button.text" @click.prevent="button.onClick()">
+  <div
+    ref="menuRef"
+    :class="['dropdown', 'dropdown-bottom', 'dropdown-end', { 'dropdown-open': isOpen }]"
+  >
+    <base-button :class="classes" @click.stop="toggleMenu">
+      {{ text }}
+    </base-button>
+    <ul
+      tabindex="0"
+      :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[50]', 'w-max', 'min-w-[120px]', 'p-2', 'shadow']"
+    >
+      <li v-for="button in buttons" :key="button.text" @click.prevent="handleItemClick(button)">
         <a>{{ button.text }}</a>
       </li>
     </ul>

@@ -72,53 +72,53 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
 </script>
 
 <template>
-  <base-card :class="['w-full', 'bg-base-100']">
+  <base-card :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']" :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']">
     <template #cardTitle>
-      <div :class="['card-actions', 'flow-root', 'p-0']">
-        <div :class="['flex', 'justify-between', 'pr-4']">
-          <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">{{ instrumentName }}</h2>
+      <div :class="['card-actions', 'flow-root', 'p-0', 'w-full', 'min-w-0']">
+        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
+          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">{{ instrumentName }}</h2>
           <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length">{{ header }}</h3>
+      <h3 v-if="state.instruments.length" class="text-center font-medium text-sm truncate mb-1">{{ header }}</h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.instrumentCardGraphConfig"
         :graph="graphContent"
         :anchorId="instrument.id"
       />
-      <base-table :class="['table-xs', 'sm:table-sm']">
+      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
         <template #body>
           <tbody>
             <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
-              <td><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
+              <td class="truncate max-w-[110px]"><ColorDot :color="datum.color" />{{ datum.label }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
             </tr>
             <tr v-if="isCareerPhase">
-              <td>Current Balance</td>
-              <td :class="['text-right']"><b>{{ instrumentCurrentBalance }}</b></td>
+              <td class="truncate max-w-[110px]">Current Balance</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentCurrentBalance }}</b></td>
             </tr>
             <tr v-else>
-              <td>Starting Balance</td>
-              <td :class="['text-right']">
+              <td class="truncate max-w-[110px]">Starting Balance</td>
+              <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ globalOptions.Money(
                   state.getContributionSchedule(props.instrument.id, state.selectedCareerBudgetId || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0
                 ) }}</b>
               </td>
             </tr>
             <tr>
-              <td>Interest Rate</td>
-              <td :class="['text-right']"><b>{{ instrumentInterestRate }}</b></td>
+              <td class="truncate max-w-[110px]">Interest Rate</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentInterestRate }}</b></td>
             </tr>
             <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td>Annual Limit</td>
-              <td :class="['text-right']"><b>{{ instrumentAnnualLimit }}</b></td>
+              <td class="truncate max-w-[110px]">Annual Limit</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentAnnualLimit }}</b></td>
             </tr>
             <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td>{{ isMobile ? 'Max Monthly' : 'Max Contribution' }}</td>
-              <td :class="['text-right']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
+              <td class="truncate max-w-[110px]">{{ isMobile ? 'Max Monthly' : 'Max Contribution' }}</td>
+              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
             </tr>
           </tbody>
         </template>

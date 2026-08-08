@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router';
 <template>
   <div
     id="debtonate"
-    :class="['font-mono']"
+    :class="['font-mono', 'h-screen', 'overflow-hidden']"
   >
     <RouterView />
   </div>

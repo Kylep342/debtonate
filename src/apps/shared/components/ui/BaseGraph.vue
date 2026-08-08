@@ -61,7 +61,7 @@ const initializeChart = () => {
 
   const graph = chart.graphs[props.anchorId];
 
-  const totalWidth = containerWidth.value;
+  const totalWidth = Math.max(containerWidth.value, 800);
   const totalHeight = isMobile.value ? 300 : 500;
 
   const margin = { top: 20, right: 50, bottom: 40, left: 70 };
@@ -228,5 +228,6 @@ watch(
 /* Ensure the wrapper takes full width so ResizeObserver works */
 .chartWrapper {
   width: 100%;
+  overflow-x: auto;
 }
 </style>
