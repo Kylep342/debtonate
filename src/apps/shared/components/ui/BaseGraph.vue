@@ -8,7 +8,6 @@ import {
   shallowRef,
   watch,
   Ref,
-  ShallowReactive,
   ShallowRef,
 } from 'vue';
 
@@ -27,7 +26,7 @@ const props = defineProps<{
   anchorId: string
 }>();
 
-const chart: ShallowReactive<GraphConfig> = shallowReactive({});
+const chart = shallowReactive<Record<string, any>>({});
 const tooltipContent: ShallowRef<typeof HoverTemplate|null> = shallowRef(null);
 const tooltipPosition: Ref<TooltipPosition> = ref({ left: 0, top: 0 });
 const tooltipTransform: Ref<string> = ref('translateX(0%) translateY(0%)');
@@ -77,7 +76,7 @@ const initializeChart = () => {
   const tempAxis = svg.append('g')
     .attr('class', 'temp-axis')
     .style('opacity', '0')
-    .call(d3.axisLeft(tempY).tickFormat(chart.yFormat));
+    .call(d3.axisLeft(tempY).tickFormat(chart.yFormat as any));
 
   // measure the widest tick label to adjust margin.left dynamically
   let maxLabelWidth = 0;
@@ -104,7 +103,7 @@ const initializeChart = () => {
     .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
     .range([innerHeight, 0]);
 
-  const draw = d3.line()
+  const draw: any = d3.line<Point>()
     .x((point: Point) => x(chart.x(point.x)))
     .y((point: Point) => y(chart.y(point.y)));
 
@@ -113,13 +112,13 @@ const initializeChart = () => {
     .call(d3.axisBottom(x).ticks(innerWidth / 80).tickSizeOuter(0).tickFormat(chart.xFormat as any));
 
   g.append('g')
-    .call(d3.axisLeft(y).ticks(innerHeight / 40).tickFormat(chart.yFormat))
+    .call(d3.axisLeft(y).ticks(innerHeight / 40).tickFormat(chart.yFormat as any))
     .call((g) => g.select('.domain').remove())
     .call((g) => g.selectAll('.tick line').clone()
       .attr('x2', innerWidth)
       .attr('stroke-opacity', 0.1));
 
-  Object.entries(graph.lines).forEach(([id, line]) => {
+  Object.entries(graph.lines).forEach(([id, line]: [string, any]) => {
     g.append('path')
       .datum(line)
       .attr('fill', 'none')
@@ -200,7 +199,10 @@ watch(
 </script>
 
 <template>
-  <div class="chartWrapper" ref="containerRef">
+  <div
+    ref="containerRef"
+    class="chartWrapper"
+  >
     <h2 class="text-center">
       {{ chart.header(anchorId) }}
     </h2>
@@ -208,13 +210,20 @@ watch(
       {{ chart.subheader(anchorId) }}
     </h2>
     <svg :id="`graph-${anchorId}`" />
-    <div id="tooltip" :style="{
-      left: tooltipPosition.left + 'px',
-      top: tooltipPosition.top + 'px',
-      transform: tooltipTransform,
-      opacity: tooltipContent ? 1 : 0
-    }">
-      <component :is="tooltipContent" v-bind="tooltipProps" />
+    <div
+      id="tooltip"
+      :style="{
+        left: tooltipPosition.left + 'px',
+        top: tooltipPosition.top + 'px',
+        transform: tooltipTransform,
+        opacity: tooltipContent ? 1 : 0
+      }"
+    >
+      <component
+        :is="tooltipContent"
+        v-if="tooltipProps"
+        v-bind="tooltipProps"
+      />
     </div>
   </div>
 </template>

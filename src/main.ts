@@ -16,7 +16,6 @@ import CollapsibleCard from '@/apps/shared/components/ui/CollapsibleCard.vue';
 import DonutGraph from '@/apps/shared/components/ui/DonutGraph.vue';
 
 import '@/assets/main.css';
-import '@/assets/built.css';
 
 const app = createApp(App);
 const pinia = createPinia();

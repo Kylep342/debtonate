@@ -62,21 +62,36 @@ const summaryRows: ComputedRef<SummaryRow[]> = computed(() => {
 
 <template>
   <div :class="['card', 'bg-base-200', 'shadow-xl', 'p-4']">
-    <h3 :class="['text-xl', 'font-bold', 'mb-4', 'text-center']">Retirement Comparison (by Career Budget)</h3>
+    <h3 :class="['text-xl', 'font-bold', 'mb-4', 'text-center']">
+      Retirement Comparison (by Career Budget)
+    </h3>
     <div :class="['overflow-x-auto']">
       <table :class="['table', 'table-zebra', 'w-full']">
         <thead>
           <tr>
             <th>Metric</th>
-            <th v-for="budget in careerBudgets" :key="budget.id" :class="['text-right']">
+            <th
+              v-for="budget in careerBudgets"
+              :key="budget.id"
+              :class="['text-right']"
+            >
               {{ state.getBudgetName(budget.id) }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in summaryRows" :key="row.label">
-            <td :class="['font-semibold']">{{ row.label }}</td>
-            <td v-for="(val, index) in row.values" :key="index" :class="['text-right']">
+          <tr
+            v-for="row in summaryRows"
+            :key="row.label"
+          >
+            <td :class="['font-semibold']">
+              {{ row.label }}
+            </td>
+            <td
+              v-for="(val, index) in row.values"
+              :key="index"
+              :class="['text-right']"
+            >
               {{ val }}
             </td>
           </tr>

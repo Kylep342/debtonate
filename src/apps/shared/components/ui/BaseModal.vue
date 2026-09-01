@@ -3,13 +3,16 @@ defineProps<{
   id: string,
   bodyClasses?: string[],
 }>();
+defineEmits<{
+  (e: 'exit'): void;
+}>();
 </script>
 
 <template>
   <dialog
     :id="id"
-    @close="$emit('exit')"
     :class="['modal', 'modal-bottom', 'sm:modal-middle']"
+    @close="$emit('exit')"
   >
     <div :class="['modal-box', 'p-0', 'flex', 'flex-col', 'min-w-40', 'max-w-fit', 'max-h-[90vh]', 'min-w-0', 'max-w-full', 'overflow-hidden']">
       <base-card

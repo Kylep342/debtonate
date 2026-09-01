@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { contributionTypes, withdrawalTypes } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
@@ -7,6 +7,7 @@ import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/s
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { UIInstrument } from '@/apps/appreciate/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
@@ -15,15 +16,21 @@ const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
-const currentInstrument: ComputedRef<moneyfunx.IInstrument|null> = computed(() => {
+const currentInstrument: ComputedRef<UIInstrument | null> = computed(() => {
   if (!viewedItemId.value) return null;
-  return state.getInstrument(viewedItemId.value)!;
+  return state.getInstrument(viewedItemId.value) || null;
 });
 
 const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
 
-const schedule: ComputedRef<moneyfunx.ContributionSchedule | moneyfunx.WithdrawalSchedule> = computed(() => {
-  if (!currentBudget.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
+const schedule: ComputedRef<contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule> = computed(() => {
+  if (!currentBudget.value || !viewedItemId.value) {
+    return {
+      lifetimeGrowth: 0n,
+      lifetimeContribution: 0n,
+      amortizationSchedule: [],
+    };
+  }
   return isCareerPhase.value
     ? state.getContributionSchedule(viewedItemId.value, currentBudget.value.id)
     : state.getWithdrawalSchedule(viewedItemId.value, currentBudget.value.id);
@@ -77,17 +84,28 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.BUDGET_DETAILS_ID" @exit="state.unviewBudget">
+  <base-modal
+    :id="constants.BUDGET_DETAILS_ID"
+    @exit="state.unviewBudget"
+  >
     <template #header>
-      <h2 :class="['pl-4']">{{ title }}</h2>
+      <h2 :class="['pl-4']">
+        {{ title }}
+      </h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewBudget">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="state.unviewBudget"
+      >
         x
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentBudget" :class="['tabframe', 'w-auto', 'pb-10']">
+      <div
+        v-if="currentBudget"
+        :class="['tabframe', 'w-auto', 'pb-10']"
+      >
         <base-tabs
           :get-item-name="state.getInstrumentName"
           :pivot="state.instrumentsWithTotals"

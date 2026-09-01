@@ -40,8 +40,15 @@ const createButton: ComputedRef<Button> = computed(() => ({
         style="-webkit-overflow-scrolling: touch;"
       >
         <ul class="w-full min-w-0">
-          <li v-for="item in items" :key="item.id" class="w-full min-w-0 mb-2">
-            <slot name="item" :item="item"></slot>
+          <li
+            v-for="item in items"
+            :key="item.id"
+            class="w-full min-w-0 mb-2"
+          >
+            <slot
+              name="item"
+              :item="item"
+            />
           </li>
         </ul>
       </div>

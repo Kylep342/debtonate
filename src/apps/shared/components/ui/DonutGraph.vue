@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
-import { onMounted, shallowReactive, watch, ShallowReactive } from 'vue';
+import { onMounted, shallowReactive, watch } from 'vue';
 
-import { Arc, GraphConfig } from '@/apps/shared/types/graph';
+import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps({
   config: {
@@ -21,7 +21,7 @@ const props = defineProps({
 
 const elId = `donut-graph-${props.anchorId}`;
 
-const chart: ShallowReactive<GraphConfig> = shallowReactive({});
+const chart = shallowReactive<Record<string, any>>({});
 
 const initializeChart = () => {
   const width = 300;
@@ -53,9 +53,9 @@ const initializeChart = () => {
     .enter()
     .append("path")
     .attr("d", arc)
-    .attr("fill", d => d.data.color || color(d.data.label))
+    .attr("fill", (d: any) => d.data.color || (color(d.data.label) as string))
     .style("stroke-width", "2px")
-    .style("opacity", 0.8)
+    .style("opacity", 0.8);
 };
 
 onMounted(() => {
@@ -79,7 +79,11 @@ watch(
 
 <template>
   <div class="flex justify-center w-full min-w-0 overflow-hidden my-2">
-    <svg :id="elId" viewBox="0 0 300 300" class="w-full max-w-[180px] h-auto max-h-[180px]"></svg>
+    <svg
+      :id="elId"
+      viewBox="0 0 300 300"
+      class="w-full max-w-[180px] h-auto max-h-[180px]"
+    />
   </div>
 </template>
 

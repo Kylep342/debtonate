@@ -51,7 +51,9 @@ const submit = () => {
     @exit="exit"
   >
     <template #header>
-      <h2 :class="['pl-4']">{{ title }}</h2>
+      <h2 :class="['pl-4']">
+        {{ title }}
+      </h2>
     </template>
     <template #headerActions>
       <base-button
@@ -63,7 +65,10 @@ const submit = () => {
     </template>
     <template #body>
       <div :class="['formInputs', 'pb-10']">
-        <div v-for="field in fields" :key="field.key">
+        <div
+          v-for="field in fields"
+          :key="field.key"
+        >
           <div :class="['label']">
             <span :class="['label-text']">{{ field.label }}</span>
           </div>

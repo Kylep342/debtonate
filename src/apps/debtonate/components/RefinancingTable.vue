@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { loan } from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import constants from '@/apps/debtonate/constants/constants';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
-import { PaymentScenario } from '@/apps/debtonate/types/core';
+import { PaymentScenario, UIDebtLoan } from '@/apps/debtonate/types/core';
 
 const props = defineProps<{
   parentId: string,
-  scenarios: moneyfunx.Loan[],
+  scenarios: (loan.Loan | UIDebtLoan)[],
   schedules: Record<string, PaymentScenario>,
 }>();
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const parentLoan: ComputedRef<moneyfunx.ILoan> = computed(() => state.getLoan(props.parentId));
+const parentLoan: ComputedRef<loan.ILoan | UIDebtLoan | undefined> = computed(() => state.getLoan(props.parentId));
 const title: ComputedRef<string> = computed(() => `Refinancing Scenarios - ${parentLoan.value?.name ?? ''}`);
 
 type TableRow = {
@@ -39,12 +39,12 @@ const tableRows: ComputedRef<TableRow[]> = computed(() => {
     id: parentLoan.value.id,
     isParent: true,
     name: state.getLoanName(parentLoan.value.id),
-    interestRate: globalOptions.Percent(parentLoan.value.annualRate * 100),
+    interestRate: globalOptions.Percent(Number(parentLoan.value.annualRate) * 100),
     term: parentLoan.value.termInYears,
     monthlyPayment: globalOptions.Money(parentLoan.value.minPayment),
     lifetimeInterest: globalOptions.Money(state.getLifetimeInterest(parentLoan.value.id, constants.DEFAULT)),
-    fees: globalOptions.Money(parentLoan.value.fees),
-    totalPremium: globalOptions.Money(state.getLifetimeInterest(parentLoan.value.id, constants.DEFAULT) + parentLoan.value.fees),
+    fees: globalOptions.Money(parentLoan.value.fees || 0),
+    totalPremium: globalOptions.Money(state.getLifetimeInterest(parentLoan.value.id, constants.DEFAULT) + Number(parentLoan.value.fees || 0)),
     totalPayments: state.getNumPayments(parentLoan.value.id, constants.DEFAULT),
   };
 
@@ -58,12 +58,12 @@ const tableRows: ComputedRef<TableRow[]> = computed(() => {
       id: scenario.id,
       isParent: false,
       name: scenario.name,
-      interestRate: globalOptions.Percent(scenario.annualRate * 100),
+      interestRate: globalOptions.Percent(Number(scenario.annualRate) * 100),
       term: scenario.termInYears,
       monthlyPayment: globalOptions.Money(scenarioData.paymentAmount),
       lifetimeInterest: globalOptions.Money(lifetimeInterest),
-      fees: globalOptions.Money(scenario.fees),
-      totalPremium: globalOptions.Money(lifetimeInterest + scenario.fees),
+      fees: globalOptions.Money(scenario.fees || 0),
+      totalPremium: globalOptions.Money(Number(lifetimeInterest) + Number(scenario.fees || 0)),
       totalPayments: specificSchedule.amortizationSchedule.length,
     };
   });
@@ -88,25 +88,44 @@ const tableRows: ComputedRef<TableRow[]> = computed(() => {
               <th><b>Interest Rate</b></th>
               <th><b>Term</b></th>
               <th><b>Monthly Payment</b></th>
-              <th :class="['text-right']"><b>Lifetime Interest</b></th>
-              <th :class="['text-right']"><b>Fees</b></th>
-              <th :class="['text-right']"><b>Total Premium</b></th>
-              <th :class="['text-right']"><b>Total Payments</b></th>
+              <th :class="['text-right']">
+                <b>Lifetime Interest</b>
+              </th>
+              <th :class="['text-right']">
+                <b>Fees</b>
+              </th>
+              <th :class="['text-right']">
+                <b>Total Premium</b>
+              </th>
+              <th :class="['text-right']">
+                <b>Total Payments</b>
+              </th>
               <th><b>Actions</b></th>
             </tr>
           </thead>
         </template>
         <template #body>
           <tbody>
-            <tr v-for="row in tableRows" :key="row.id">
+            <tr
+              v-for="row in tableRows"
+              :key="row.id"
+            >
               <td>{{ row.name }}</td>
               <td>{{ row.interestRate }}</td>
               <td>{{ row.term }}</td>
               <td>{{ row.monthlyPayment }}</td>
-              <td :class="['text-right']">{{ row.lifetimeInterest }}</td>
-              <td :class="['text-right']">{{ row.fees }}</td>
-              <td :class="['text-right']">{{ row.totalPremium }}</td>
-              <td :class="['text-right']">{{ row.totalPayments }}</td>
+              <td :class="['text-right']">
+                {{ row.lifetimeInterest }}
+              </td>
+              <td :class="['text-right']">
+                {{ row.fees }}
+              </td>
+              <td :class="['text-right']">
+                {{ row.totalPremium }}
+              </td>
+              <td :class="['text-right']">
+                {{ row.totalPayments }}
+              </td>
               <td>
                 <base-button
                   v-if="!row.isParent"

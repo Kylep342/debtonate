@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
+import { contributionTypes, withdrawalTypes } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { Budget } from '@/apps/shared/types/core';
+import { UIInstrument } from '@/apps/appreciate/types/core';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const currentInstrument: Ref<moneyfunx.IInstrument|null> = ref(null);
+const currentInstrument: Ref<UIInstrument|null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
@@ -22,8 +23,14 @@ const currentBudget: ComputedRef<Budget|null> = computed(() => {
     : state.getWithdrawalBudget(viewedItemId.value)!;
 });
 
-const schedule: ComputedRef<moneyfunx.ContributionSchedule | moneyfunx.WithdrawalSchedule> = computed(() => {
-  if (!currentInstrument.value || !viewedItemId.value) return <moneyfunx.ContributionSchedule>{};
+const schedule: ComputedRef<contributionTypes.ContributionSchedule | withdrawalTypes.WithdrawalSchedule> = computed(() => {
+  if (!currentInstrument.value || !viewedItemId.value) {
+    return {
+      lifetimeGrowth: 0n,
+      lifetimeContribution: 0n,
+      amortizationSchedule: [],
+    };
+  }
   return isCareerPhase.value
     ? state.getContributionSchedule(currentInstrument.value.id, viewedItemId.value)
     : state.getWithdrawalSchedule(currentInstrument.value.id, viewedItemId.value);
@@ -49,9 +56,9 @@ const tableFooter: ComputedRef<{}> = computed(() => {
   return state.amortizationTableTotals(schedule.value)
 });
 
-const buildInstrumentDetailsTitle = (instrument: moneyfunx.IInstrument | null): string => instrument
-  ? `Instrument Details - ${state.getInstrumentName(instrument.id)} | `
-    + `${state.buildInstrumentSubtitle(instrument)}`
+const buildInstrumentDetailsTitle = (inst: UIInstrument | null): string => inst
+  ? `Instrument Details - ${state.getInstrumentName(inst.id)} | `
+    + `${state.buildInstrumentSubtitle(inst)}`
   : constants.INSTRUMENT_DETAILS;
 
 const title: ComputedRef<string> = computed(() => buildInstrumentDetailsTitle(currentInstrument.value));
@@ -68,17 +75,28 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.INSTRUMENT_DETAILS_ID" @exit="state.unviewInstrument">
+  <base-modal
+    :id="constants.INSTRUMENT_DETAILS_ID"
+    @exit="state.unviewInstrument"
+  >
     <template #header>
-      <h2 :class="['pl-4']">{{ title }}</h2>
+      <h2 :class="['pl-4']">
+        {{ title }}
+      </h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewInstrument">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="state.unviewInstrument"
+      >
         x
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentInstrument" :class="['tabframe', 'w-auto', 'pb-10']">
+      <div
+        v-if="currentInstrument"
+        :class="['tabframe', 'w-auto', 'pb-10']"
+      >
         <base-tabs
           :get-item-name="state.getBudgetName"
           :pivot="state.monthlyBudgets"

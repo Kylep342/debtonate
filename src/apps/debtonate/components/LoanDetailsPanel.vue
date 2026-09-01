@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { loan, paymentTypes, payments } from 'moneyfunx';
+import { loan, paymentTypes } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -7,10 +7,11 @@ import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { MonthlyBudget } from '@/apps/shared/types/core';
+import { UIDebtLoan } from '@/apps/debtonate/types/core';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const currentLoan: Ref<loan.ILoan|null> = ref(null);
+const currentLoan: Ref<loan.ILoan | UIDebtLoan | null> = ref(null);
 
 const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
@@ -20,7 +21,13 @@ const currentBudget: ComputedRef<MonthlyBudget|null> = computed(() => {
 });
 
 const paymentSchedule: ComputedRef<paymentTypes.PaymentSchedule> = computed(() => {
-  if (!currentLoan.value || !viewedItemId.value) return <paymentTypes.PaymentSchedule>{};
+  if (!currentLoan.value || !viewedItemId.value) {
+    return {
+      lifetimeInterest: 0n,
+      lifetimePrincipal: 0n,
+      amortizationSchedule: [],
+    };
+  }
   return state.getPaymentSchedule(currentLoan.value.id, viewedItemId.value);
 });
 
@@ -45,18 +52,18 @@ const tableFooter: ComputedRef<{}> = computed(() => {
 });
 
 
-const buildLoanDetailsTitle = (loan: loan.ILoan): string => loan
-  ? `Loan Details - ${state.getLoanName(loan.id)} | `
-  + `${state.buildLoanSubtitle(loan)}`
+const buildLoanDetailsTitle = (loanItem: loan.ILoan | UIDebtLoan): string => loanItem
+  ? `Loan Details - ${state.getLoanName(loanItem.id)} | `
+  + `${state.buildLoanSubtitle(loanItem)}`
   : constants.LOAN_DETAILS;
 
-const title: ComputedRef<string> = computed(() => buildLoanDetailsTitle(currentLoan.value!));
+const title: ComputedRef<string> = computed(() => currentLoan.value ? buildLoanDetailsTitle(currentLoan.value) : constants.LOAN_DETAILS);
 
 watch(
   () => state.currentLoanId,
   (newId) => {
     if (newId && state.loanDetailsPanelActive) {
-      currentLoan.value = state.getLoan(newId);
+      currentLoan.value = state.getLoan(newId) || null;
     }
   },
   { immediate: true },
@@ -64,17 +71,28 @@ watch(
 </script>
 
 <template>
-  <base-modal :id="constants.LOAN_DETAILS_ID" @exit="state.unviewLoan">
+  <base-modal
+    :id="constants.LOAN_DETAILS_ID"
+    @exit="state.unviewLoan"
+  >
     <template #header>
-      <h2 :class="['pl-4']">{{ title }}</h2>
+      <h2 :class="['pl-4']">
+        {{ title }}
+      </h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="state.unviewLoan">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="state.unviewLoan"
+      >
         x
       </base-button>
     </template>
     <template #body>
-      <div v-if="currentLoan" :class="['tabframe', 'w-auto', 'pb-10']">
+      <div
+        v-if="currentLoan"
+        :class="['tabframe', 'w-auto', 'pb-10']"
+      >
         <RefinancingTable
           v-if="state.refinancingScenarios[currentLoan.id]?.length"
           :parent-id="currentLoan.id"

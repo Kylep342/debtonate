@@ -52,10 +52,22 @@ const tabClass = (tab: string) => [
     <RefinancingForm :id="constants.REFINANCING_FORM_ID" />
 
     <!-- Mobile/Tablet Tabs -->
-    <div v-if="!isDesktop" class="tabs tabs-boxed bg-base-100 flex-none rounded-none border-b">
-      <a :class="tabClass('loans')" @click="activeTab = 'loans'">Loans</a>
-      <a :class="tabClass('budgets')" @click="activeTab = 'budgets'">Budgets</a>
-      <a :class="tabClass('analysis')" @click="activeTab = 'analysis'">Analysis</a>
+    <div
+      v-if="!isDesktop"
+      class="tabs tabs-boxed bg-base-100 flex-none rounded-none border-b"
+    >
+      <a
+        :class="tabClass('loans')"
+        @click="activeTab = 'loans'"
+      >Loans</a>
+      <a
+        :class="tabClass('budgets')"
+        @click="activeTab = 'budgets'"
+      >Budgets</a>
+      <a
+        :class="tabClass('analysis')"
+        @click="activeTab = 'analysis'"
+      >Analysis</a>
     </div>
 
     <div :class="['flex-1', 'flex', 'bg-base-100', 'overflow-hidden', 'w-full', 'max-w-full', 'min-w-0', 'min-h-0', { 'flex-col': !isDesktop }]">
@@ -64,8 +76,16 @@ const tabClass = (tab: string) => [
         <BudgetsPanel />
       </template>
       <template v-else>
-        <LoansPanel v-if="activeTab === 'loans'" :class="['!w-full']" :active-tab="ref(activeTab)" />
-        <BudgetsPanel v-if="activeTab === 'budgets'" :class="['!w-full']" :active-tab="ref(activeTab)" />
+        <LoansPanel
+          v-if="activeTab === 'loans'"
+          :class="['!w-full']"
+          :active-tab="ref(activeTab)"
+        />
+        <BudgetsPanel
+          v-if="activeTab === 'budgets'"
+          :class="['!w-full']"
+          :active-tab="ref(activeTab)"
+        />
       </template>
 
       <div
@@ -84,7 +104,10 @@ const tabClass = (tab: string) => [
             budget-action="payments"
           />
         </div>
-        <div v-else :class="['w-full']">
+        <div
+          v-else
+          :class="['w-full']"
+        >
           <RepatriateApplet v-if="isRepatriatePhase" />
           <DebtonateApplet v-else />
         </div>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
 import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
@@ -23,9 +22,9 @@ const {
 } = usePivot(constants.TOTALS);
 
 const loanSelectors: ComputedRef<Button[]> = computed(
-  () => (state.loansWithTotals.map((loan: moneyfunx.ILoan) => ({
-    text: state.getLoanName(loan.id),
-    onClick: () => setViewedLoanId(loan.id),
+  () => (state.loansWithTotals.map((l: any) => ({
+    text: state.getLoanName(l.id),
+    onClick: () => setViewedLoanId(l.id),
   })))
 );
 
@@ -59,7 +58,7 @@ const orderedBudgets: ComputedRef<MonthlyBudget[]> = computed(() => [
     <template #item="{ item }">
       <BudgetCard
         :budget="item"
-        :viewed-loan-id="viewedLoanId"
+        :viewed-loan-id="viewedLoanId || constants.TOTALS"
       />
     </template>
   </ListPanel>

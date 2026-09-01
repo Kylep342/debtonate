@@ -8,7 +8,7 @@ const props = defineProps<{
   updateTooltipSize: (size: TooltipSize) => void,
 }>();
 
-const templateRef = ref(null);
+const templateRef = ref<any>(null);
 
 const reportSize = () => {
   if (templateRef.value?.$el) {
@@ -22,7 +22,10 @@ onUpdated(reportSize);
 </script>
 
 <template>
-  <base-table ref="templateRef" :class="['table-xs']">
+  <base-table
+    ref="templateRef"
+    :class="['table-xs']"
+  >
     <template #header>
       <thead>
         <tr :class="['bg-transparent']">
@@ -36,10 +39,21 @@ onUpdated(reportSize);
     </template>
     <template #body>
       <tbody>
-        <tr v-for="(line, id) in tooltipConfig.lines" :key="id">
+        <tr
+          v-for="(line, id) in tooltipConfig.lines"
+          :key="id"
+        >
           <td>
-            <svg width="10" height="10">
-              <circle cx="5" cy="5" r="5" :fill="tooltipConfig.color(id)" />
+            <svg
+              width="10"
+              height="10"
+            >
+              <circle
+                cx="5"
+                cy="5"
+                r="5"
+                :fill="tooltipConfig.color(id)"
+              />
             </svg>
           </td>
           <td>{{ tooltipConfig.lineName(id) }}</td>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { loan } from 'moneyfunx';
 import { computed, ref, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -37,10 +36,10 @@ const toggleAllCards = (): void => {
   const action = allCollapsed.value ? 'collapse' : 'expand';
   const childAction = allCollapsed.value ? 'collapseAll' : 'expandAll';
 
-  cardRefs.value.forEach(card => card[action]());
+  cardRefs.value.forEach((card: any) => card && card[action] && card[action]());
 
   if (globalOptionsFormletRef.value) {
-    globalOptionsFormletRef.value[childAction]();
+    (globalOptionsFormletRef.value as any)[childAction]();
   }
 };
 
@@ -58,7 +57,7 @@ const refinancingUseHighestPaymentExample: ComputedRef<string> = computed(() => 
   return '';
 });
 const repaymentPriorityExample: ComputedRef<string> = computed(
-  () => (state.loans.length ? (`(Priority: ${state.loans.map((loan: loan.Loan) => state.getLoanName(loan.id)).join(', ')})`) : ''),
+  () => (state.loans.length ? (`(Priority: ${state.loans.map((l: any) => state.getLoanName(l.id)).join(', ')})`) : ''),
 );
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
@@ -71,17 +70,23 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
     @exit="state.exitOptionsForm"
   >
     <template #header>
-      <h2 :class="['pl-4']">Options</h2>
+      <h2 :class="['pl-4']">
+        Options
+      </h2>
     </template>
     <template #headerActions>
       <base-button
         :class="['btn btn-circle btn-ghost']"
         @click="state.exitOptionsForm"
-      >x</base-button>
+      >
+        x
+      </base-button>
     </template>
     <template #body>
       <div class="flex justify-between items-center">
-        <h3 :class="['pl-4']">Debtonate Options</h3>
+        <h3 :class="['pl-4']">
+          Debtonate Options
+        </h3>
         <base-button
           :class="['btn-sm']"
           @click="toggleAllCards"
@@ -101,10 +106,18 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button @click="state.loadState">{{ constants.BTN_LOAD }}</base-button>
-              <base-button @click="state.saveState">{{ constants.BTN_SAVE }}</base-button>
-              <base-button @click="state.clearState">{{ constants.BTN_CLEAR }}</base-button>
-              <base-button @click="copyStateToClipboard">{{ constants.BTN_COPY }}</base-button>
+              <base-button @click="state.loadState">
+                {{ constants.BTN_LOAD }}
+              </base-button>
+              <base-button @click="state.saveState">
+                {{ constants.BTN_SAVE }}
+              </base-button>
+              <base-button @click="state.clearState">
+                {{ constants.BTN_CLEAR }}
+              </base-button>
+              <base-button @click="copyStateToClipboard">
+                {{ constants.BTN_COPY }}
+              </base-button>
             </div>
           </template>
           <template #cardBody>
@@ -125,10 +138,16 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(!state.snowballSort)" @click="state.toggleAvalancheSort">
+              <base-button
+                :class="buttonStyle(!state.snowballSort)"
+                @click="state.toggleAvalancheSort"
+              >
                 Avalanche
               </base-button>
-              <base-button :class="buttonStyle(state.snowballSort)" @click="state.toggleSnowballSort">
+              <base-button
+                :class="buttonStyle(state.snowballSort)"
+                @click="state.toggleSnowballSort"
+              >
                 Snowball
               </base-button>
             </div>
@@ -152,7 +171,10 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(state.reducePayments)" @click="state.toggleReducePayments">
+              <base-button
+                :class="buttonStyle(state.reducePayments)"
+                @click="state.toggleReducePayments"
+              >
                 {{
                   buttonText(state.reducePayments) }}
               </base-button>
@@ -179,8 +201,10 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button :class="buttonStyle(state.refinancingUseHighestPayment)"
-                @click="state.toggleRefinancingUseHighestPayment">
+              <base-button
+                :class="buttonStyle(state.refinancingUseHighestPayment)"
+                @click="state.toggleRefinancingUseHighestPayment"
+              >
                 {{
                   buttonText(state.refinancingUseHighestPayment) }}
               </base-button>
@@ -212,10 +236,18 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
               <div :class="['label']">
                 <span :class="['label-text']">scale:</span>
               </div>
-              <input :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`" v-model.number="state.roundingScale"
-                :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="scale">
-              <base-button :class="buttonStyle(state.roundingEnabled)"
-                @click="state.toggleRounding(state.roundingScale)">
+              <input
+                :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
+                v-model.number="state.roundingScale"
+                :class="['input input-bordered input-secondary w-full max-ws']"
+                type="number"
+                step="0.01"
+                label="scale"
+              >
+              <base-button
+                :class="buttonStyle(state.roundingEnabled)"
+                @click="state.toggleRounding(state.roundingScale)"
+              >
                 {{ buttonText(state.roundingEnabled) }}
               </base-button>
             </div>

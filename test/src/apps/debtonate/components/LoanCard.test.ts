@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { setActivePinia } from 'pinia';
 
-import BudgetCard from '@/apps/debtonate/components/BudgetCard.vue';
+import LoanCard from '@/apps/debtonate/components/LoanCard.vue';
 import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
@@ -12,9 +12,18 @@ import BaseTable from '@/apps/shared/components/ui/BaseTable.vue';
 import DonutGraph from '@/apps/shared/components/ui/DonutGraph.vue';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
 
-describe('BudgetCard Component (Debtonate)', () => {
-  const mockBudget = { id: 'b1', relative: 1000, absolute: 4000 };
-  const mockLoanId = 'loan1';
+describe('LoanCard Component (Debtonate)', () => {
+  const mockLoan = {
+    id: 'loan1',
+    name: 'Car Loan',
+    principal: 20000,
+    currentBalance: 18000,
+    annualRate: 0.05,
+    termInYears: 5,
+    minPayment: 380,
+    fees: 0
+  };
+  const mockBudgetId = 'budget1';
 
   beforeEach(() => {
     const pinia = createTestingPinia({ createSpy: vi.fn });
@@ -33,43 +42,35 @@ describe('BudgetCard Component (Debtonate)', () => {
   };
 
   const mockGraphConfig = {
-    header: vi.fn().mockReturnValue('Cost Header'),
-    id: 'test',
+    header: vi.fn().mockReturnValue('Loan Cost Header'),
+    id: 'loanDonut',
     type: 'donut'
   };
 
   it('renders correctly', async () => {
     const store = useDebtonateCoreStore();
-    store.loans = [{ id: 'loan1' }] as any;
+    store.loans = [mockLoan] as any;
 
-    // Mock getters/state
-    vi.mocked(store.getBudgetName).mockReturnValue('Debt Budget 1');
-    vi.mocked(store.getPaymentSchedule).mockReturnValue({
-      lifetimePrincipal: 5000,
-      lifetimeInterest: 2000,
-      amortizationSchedule: new Array(60).fill({})
-    } as any);
-    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    vi.mocked(store.getLoanName).mockReturnValue('Car Loan');
+    (store as any).loanCardGraphConfig = mockGraphConfig;
     (store as any).cardGraphs = {
-      [mockLoanId]: {
-        [mockBudget.id]: [
-          { label: 'Interest', value: 1000, color: 'red' },
-          { label: 'Principal', value: 2000, color: 'blue' }
+      [mockLoan.id]: {
+        [mockBudgetId]: [
+          { label: 'Lifetime Interest', value: 2500, color: 'red' },
+          { label: 'Lifetime Principal', value: 18000, color: 'blue' }
         ]
       }
     };
 
-    const wrapper = mount(BudgetCard, {
+    const wrapper = mount(LoanCard, {
       props: {
-        budget: mockBudget as any,
-        viewedLoanId: mockLoanId
+        loan: mockLoan as any,
+        viewedBudgetId: mockBudgetId
       },
       global: globalConfig
     });
 
-    expect(wrapper.find('h2').text()).toBe('Debt Budget 1');
-    expect(wrapper.text()).toContain('Amount');
-    expect(wrapper.text()).toContain('Payments');
-    expect(wrapper.text()).toContain('Total Paid');
+    expect(wrapper.find('h2').text()).toBe('Car Loan');
+    expect(wrapper.findComponent(DonutGraph).exists()).toBe(true);
   });
 });

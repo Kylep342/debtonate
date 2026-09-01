@@ -64,14 +64,14 @@ describe('BudgetCard Component (Appreciate)', () => {
     } as any);
 
     (store as any).budgetCardGraphConfig = mockGraphConfig;
-    store.cardGraphs = {
+    (store as any).cardGraphs = {
       [mockInstrumentId]: {
         [mockBudget.id]: [
           { label: 'Growth', value: 1000, color: 'green' },
           { label: 'Contribution', value: 2000, color: 'blue' }
         ]
       }
-    } as any;
+    };
 
     const wrapper = mount(BudgetCard, {
       props: {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
 import { computed, reactive, ComputedRef, Reactive } from 'vue';
 
 import BudgetCard from '@/apps/appreciate/components/BudgetCard.vue';
@@ -23,7 +22,7 @@ const {
 } = usePivot(constants.TOTALS);
 
 const instrumentSelectors: ComputedRef<Button[]> = computed(
-  () => (state.instrumentsWithTotals.map((instrument: moneyfunx.IInstrument) => ({
+  () => (state.instrumentsWithTotals.map((instrument: any) => ({
     text: state.getInstrumentName(instrument.id),
     onClick: () => setViewedInstrumentId(instrument.id),
   })))
@@ -58,7 +57,7 @@ const createBudgetAction = () => isCareerPhase.value ? state.openBudgetForm() : 
     panel-id="budgetManagementPanel"
     :title="panelTitle"
     :items="orderedBudgets"
-    :create-item="state.openBudgetForm"
+    :create-item="createBudgetAction"
     :pivot-menu="pivotMenu"
     :create-text="constants.BTN_CREATE"
     :active-tab="activeTab"
@@ -66,7 +65,7 @@ const createBudgetAction = () => isCareerPhase.value ? state.openBudgetForm() : 
     <template #item="{ item }">
       <BudgetCard
         :budget="item"
-        :viewed-instrument-id="viewedInstrumentId"
+        :viewed-instrument-id="viewedInstrumentId || constants.TOTALS"
       />
     </template>
   </ListPanel>

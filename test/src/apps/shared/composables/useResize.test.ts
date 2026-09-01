@@ -28,7 +28,7 @@ describe('useResize composable (with real useEvent)', () => {
 
   it('should set the initial height on mount', () => {
     const MOCK_HEIGHT = 500;
-    fillHeight.mockReturnValue(MOCK_HEIGHT);
+    vi.mocked(fillHeight).mockReturnValue(MOCK_HEIGHT);
 
     const wrapper = mountComposable(() => useResize());
 
@@ -42,13 +42,13 @@ describe('useResize composable (with real useEvent)', () => {
     const INITIAL_HEIGHT = 500;
     const RESIZE_HEIGHT = 300;
 
-    fillHeight.mockReturnValue(INITIAL_HEIGHT);
+    vi.mocked(fillHeight).mockReturnValue(INITIAL_HEIGHT);
 
     const wrapper = mountComposable(() => useResize());
 
     expect(wrapper.vm.scrollContainer.style.maxHeight).toBe(`${INITIAL_HEIGHT}px`);
 
-    fillHeight.mockReturnValue(RESIZE_HEIGHT);
+    vi.mocked(fillHeight).mockReturnValue(RESIZE_HEIGHT);
     window.dispatchEvent(new Event('resize'));
     await wrapper.vm.$nextTick();
 

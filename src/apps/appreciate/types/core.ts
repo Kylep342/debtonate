@@ -1,8 +1,8 @@
-import { InstrumentsContributionSchedule } from 'moneyfunx';
+import { contributionTypes } from 'moneyfunx';
 
 export type ContributionScenario = {
   contributionAmount: number
-  contributionSchedule: InstrumentsContributionSchedule
+  contributionSchedule: contributionTypes.InstrumentsContributionSchedule
 };
 
 export interface UIInstrument {

@@ -4,8 +4,6 @@ import GraphsPanel from '@/apps/debtonate/components/GraphsPanel.vue';
 import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import constants from '@/apps/debtonate/constants/constants';
-import { Button } from '@/apps/shared/types/app';
-import { ILoan } from 'moneyfunx';
 
 const state = useDebtonateCoreStore();
 

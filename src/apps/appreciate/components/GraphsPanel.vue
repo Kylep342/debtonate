@@ -21,8 +21,15 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
     :initial-item-id="constants.TOTALS"
     :initial-graph-id="constants.GRAPH_BALANCES_OVER_TIME"
   >
-    <template v-for="id in extraViewIds" :key="id" #[`view-${id}`]="slotProps">
-      <slot :name="`view-${id}`" v-bind="slotProps" />
+    <template
+      v-for="id in extraViewIds"
+      :key="id"
+      #[`view-${id}`]="slotProps"
+    >
+      <slot
+        :name="`view-${id}`"
+        v-bind="slotProps"
+      />
     </template>
   </GraphsFrame>
 </template>

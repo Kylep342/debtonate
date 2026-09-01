@@ -41,12 +41,12 @@ const toggleAllCards = (): void => {
   const action = allCollapsed.value ? 'collapse' : 'expand';
   const childAction = allCollapsed.value ? 'collapseAll' : 'expandAll';
 
-  cardRefs.value.forEach(card => card[action]());
+  cardRefs.value.forEach((card: any) => card && card[action] && card[action]());
 
   if (globalOptionsFormletRef.value) {
-    globalOptionsFormletRef.value[childAction]();
+    (globalOptionsFormletRef.value as any)[childAction]();
   }
-}
+};
 
 const deflationExample: ComputedRef<string> = computed(() => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`)
 
@@ -60,17 +60,23 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
     @exit="state.exitOptionsForm"
   >
     <template #header>
-      <h2 :class="['pl-4']">Options</h2>
+      <h2 :class="['pl-4']">
+        Options
+      </h2>
     </template>
     <template #headerActions>
       <base-button
         :class="['btn btn-circle btn-ghost']"
         @click="state.exitOptionsForm"
-      >x</base-button>
+      >
+        x
+      </base-button>
     </template>
     <template #body>
       <div class="flex justify-between items-center">
-        <h3 :class="['pl-4']">Appreciate Options</h3>
+        <h3 :class="['pl-4']">
+          Appreciate Options
+        </h3>
         <base-button
           :class="['btn-sm']"
           @click="toggleAllCards"
@@ -88,10 +94,18 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
           </template>
           <template #cardTitleActions>
             <div>
-              <base-button @click="state.loadState">{{ constants.BTN_LOAD }}</base-button>
-              <base-button @click="state.saveState">{{ constants.BTN_SAVE }}</base-button>
-              <base-button @click="state.clearState">{{ constants.BTN_CLEAR }}</base-button>
-              <base-button @click="copyStateToClipboard">{{ constants.BTN_COPY }}</base-button>
+              <base-button @click="state.loadState">
+                {{ constants.BTN_LOAD }}
+              </base-button>
+              <base-button @click="state.saveState">
+                {{ constants.BTN_SAVE }}
+              </base-button>
+              <base-button @click="state.clearState">
+                {{ constants.BTN_CLEAR }}
+              </base-button>
+              <base-button @click="copyStateToClipboard">
+                {{ constants.BTN_COPY }}
+              </base-button>
             </div>
           </template>
           <template #cardBody>

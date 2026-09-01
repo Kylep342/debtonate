@@ -4,7 +4,7 @@ import constants from '@/apps/shared/constants/constants';
 import keys from '@/apps/shared/constants/keys';
 
 const darkMode: Ref<boolean> = ref(false);
-const colorPalate: ComputedRef<string[]> = computed(() => constants.COLOR_PALETTE);
+const colorPalette: ComputedRef<string[]> = computed(() => constants.COLOR_PALETTE);
 
 // set initial theme on composable initalization
 if (typeof window !== 'undefined') {
@@ -48,7 +48,7 @@ export function useTheme() {
 
   return {
     darkMode: readonly(darkMode),
-    colorPalate: colorPalate,
+    colorPalette,
     toggleTheme
   };
-};
+}

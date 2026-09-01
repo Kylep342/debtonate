@@ -8,7 +8,7 @@ import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
-import { DonutGraphContent } from '@/apps/shared/types/graph';
+import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
   budget: MonthlyBudget,
@@ -32,16 +32,17 @@ const viewedWithdrawalSummary: ComputedRef<withdrawalTypes.WithdrawalSchedule | 
 
 const netWorth: ComputedRef<number> = computed(() => {
   if (isCareerPhase.value && viewedContributionSummary.value) {
+    const total = Number(viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth);
     return state.deflateAllMoney
       ? state.deflate(
-        viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth,
+        total,
         state.getNumContributions(constants.TOTALS, props.budget.id)
       )
-      : viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth;
+      : total;
   } else if (viewedWithdrawalSummary.value) {
     // In retirement, show ending balance
     const schedule = viewedWithdrawalSummary.value.amortizationSchedule;
-    const finalBalance = schedule.length > 0 ? schedule.slice(-1)[0].currentBalance : 0;
+    const finalBalance = schedule.length > 0 ? Number(schedule.slice(-1)[0].currentBalance) : 0;
     return state.deflateAllMoney
       ? state.deflate(finalBalance, state.getNumWithdrawals(constants.TOTALS, props.budget.id))
       : finalBalance;
@@ -54,9 +55,20 @@ const netWorthLabel: ComputedRef<string> = computed(() => isCareerPhase.value
   : (state.deflateAllMoney ? 'Ending Balance (CYM)' : 'Ending Balance')
 );
 
-const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
+const budgetAmount: ComputedRef<string> = computed(() => isCareerPhase.value
+  ? `${globalOptions.Money(props.budget.absolute)}/month`
+  : `${globalOptions.Money(props.budget.absolute)}/year`
+);
 
-const budgetPeriodCount: ComputedRef<string|number|Date> = computed(() => {
+const periodLabel: ComputedRef<string> = computed(() => {
+  if (isCareerPhase.value) {
+    return globalOptions.periodsAsDates ? 'Retire on' : 'Contributions';
+  } else {
+    return globalOptions.periodsAsDates ? 'Deplete on' : 'Withdrawals';
+  }
+});
+
+const budgetPeriodCount: ComputedRef<string | number | Date> = computed(() => {
   if (isCareerPhase.value && viewedContributionSummary.value) {
     return globalOptions.Period(viewedContributionSummary.value.amortizationSchedule.length, true);
   } else if (viewedWithdrawalSummary.value) {
@@ -67,14 +79,6 @@ const budgetPeriodCount: ComputedRef<string|number|Date> = computed(() => {
 
 const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
-const periodLabel: ComputedRef<string> = computed(() => {
-  if (isCareerPhase.value) {
-    return globalOptions.periodsAsDates ? 'Retire on' : 'Contributions';
-  } else {
-    return globalOptions.periodsAsDates ? 'Deplete on' : 'Withdrawals';
-  }
-});
-
 const budgetName: ComputedRef<string> = computed(() => isCareerPhase.value
   ? state.getBudgetName(props.budget.id)
   : state.getWithdrawalBudgetName(props.budget.id)
@@ -82,7 +86,7 @@ const budgetName: ComputedRef<string> = computed(() => isCareerPhase.value
 
 const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.header(props.viewedInstrumentId));
 
-const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
+const graphContent: ComputedRef<Arc[]> = computed(() => {
   if (isCareerPhase.value) {
     return state.cardGraphs[props.viewedInstrumentId][props.budget.id];
   } else {
@@ -90,8 +94,8 @@ const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
     const summary = viewedWithdrawalSummary.value;
     if (!summary) return [];
     return [
-      { label: 'Growth', value: summary.lifetimeGrowth, color: globalOptions.colorPalate[0] },
-      { label: 'Withdrawals', value: summary.lifetimeWithdrawal, color: globalOptions.colorPalate[2] },
+      { label: 'Growth', value: Number(summary.lifetimeGrowth), color: globalOptions.colorPalette[0] },
+      { label: 'Withdrawals', value: Number(summary.lifetimeWithdrawal), color: globalOptions.colorPalette[2] },
     ];
   }
 });
@@ -121,41 +125,76 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
 </script>
 
 <template>
-  <base-card :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']" :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']">
+  <base-card
+    :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']"
+    :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']"
+  >
     <template #cardTitle>
       <div class="card-actions flow-root w-full min-w-0">
         <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">{{ budgetName }}</h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
+          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
+            {{ budgetName }}
+          </h2>
+          <base-menu
+            :text="constants.BTN_MENU"
+            :buttons="buttons"
+            :classes="['btn-sm']"
+          />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length" class="text-center font-medium text-sm truncate mb-1">{{ header }}</h3>
+      <h3
+        v-if="state.instruments.length"
+        class="text-center font-medium text-sm truncate mb-1"
+      >
+        {{ header }}
+      </h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.budgetCardGraphConfig"
         :graph="graphContent"
-        :anchorId="budget.id"
+        :anchor-id="budget.id"
       />
       <base-table :class="['table-xs', 'w-full', 'max-w-full']">
         <template #body>
           <tbody>
-            <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
-              <td class="truncate max-w-[110px]"><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
+            <template v-if="state.instruments.length">
+              <tr
+                v-for="(datum) in graphContent"
+                :key="datum.label"
+              >
+                <td class="truncate max-w-[110px]">
+                  <ColorDot :color="datum.color || ''" />{{ datum.label }}
+                </td>
+                <td :class="['text-right', 'whitespace-nowrap']">
+                  <b>{{ globalOptions.Money(datum.value) }}</b>
+                </td>
+              </tr>
+            </template>
+            <tr>
+              <td class="truncate max-w-[110px]">
+                Amount
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ budgetAmount }}</b>
+              </td>
             </tr>
             <tr>
-              <td class="truncate max-w-[110px]">Amount</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetAmount }}</b></td>
+              <td class="truncate max-w-[110px]">
+                {{ periodLabel }}
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ budgetPeriodCount }}</b>
+              </td>
             </tr>
             <tr>
-              <td class="truncate max-w-[110px]">{{ periodLabel }}</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetPeriodCount }}</b></td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">{{ netWorthLabel }}</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ budgetNetWorth }}</b></td>
+              <td class="truncate max-w-[110px]">
+                {{ netWorthLabel }}
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ budgetNetWorth }}</b>
+              </td>
             </tr>
           </tbody>
         </template>

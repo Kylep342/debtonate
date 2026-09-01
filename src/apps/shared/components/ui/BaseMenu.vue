@@ -61,14 +61,21 @@ onUnmounted(() => {
     ref="menuRef"
     :class="['dropdown', 'dropdown-bottom', 'dropdown-end', { 'dropdown-open': isOpen }]"
   >
-    <base-button :class="classes" @click.stop="toggleMenu">
+    <base-button
+      :class="classes"
+      @click.stop="toggleMenu"
+    >
       {{ text }}
     </base-button>
     <ul
       tabindex="0"
       :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[50]', 'w-max', 'min-w-[120px]', 'p-2', 'shadow']"
     >
-      <li v-for="button in buttons" :key="button.text" @click.prevent="handleItemClick(button)">
+      <li
+        v-for="button in buttons"
+        :key="button.text"
+        @click.prevent="handleItemClick(button)"
+      >
         <a>{{ button.text }}</a>
       </li>
     </ul>
