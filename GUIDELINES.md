@@ -12,6 +12,9 @@
 ## Development
  - All code should be linted and covered by unit tests
  - Everything Javascript is Typescript
+ - Standard verification commands:
+   - `npm run lint`: Single-pass pipeline that runs ESLint auto-fix followed by `vue-tsc --noEmit` type checking.
+   - `npm run test:run`: Executes all Vitest unit tests non-interactively.
 
 
 ## Discovered Guidelines
