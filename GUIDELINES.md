@@ -12,7 +12,14 @@
 ## Development
  - All code should be linted and covered by unit tests
  - Everything Javascript is Typescript
+ - Standard verification commands:
+   - `npm run lint`: Single-pass pipeline that runs ESLint auto-fix followed by `vue-tsc --noEmit` type checking.
+   - `npm run test:run`: Executes all Vitest unit tests non-interactively.
 
 
 ## Discovered Guidelines
- - (TODO: Hi germini, thanks for your help! Please replace this comment with our first guideline :D)
+- **Unused Parameters & Code Cleanliness**: Omit unused callback parameters completely (e.g. `() => ...`) rather than keeping unused identifiers or underscore prefixes.
+- **Global Formatting**: Always use `useGlobalOptionsStore` methods (`Money`, `Percent`, `Period`, `CurrencySymbol`) for currency and date formatting to ensure internationalization consistency across Debtonate and Appreciate.
+- **Pinia Store Architecture**: Stores use the Setup syntax (`defineStore('name', () => { ... })`) with explicit TypeScript interfaces for State, Getters, and Actions.
+- **Chart Configurations**: All charts must strictly adhere to `GraphConfig<T>` with standard D3 scales and reactive series generation.
+- **Tailwind & DaisyUI Styling**: Styling uses Tailwind 3 + DaisyUI themes (`retro` and `synthwave`) with responsive utility classes and viewport composables.

@@ -25,33 +25,33 @@ type LanguageCode = (typeof constants.LOCALES)[number]['code'];
 
 export interface GlobalOptionsState {
   baseDate: Ref<number>;
-  colorPalate: ComputedRef<string[]>;
+  colorPalette: ComputedRef<string[]>;
   currency: Ref<CurrencyCode>;
   darkMode: Ref<boolean>;
   language: Ref<LanguageCode>;
   locales: Locale[];
   periodsAsDates: Ref<boolean>;
-};
+}
 
 export interface GlobalOptionsGetters {
   /** State-aware label for periods in either period or date format */
   Time: ComputedRef<string>;
-};
+}
 
 export interface GlobalOptionsActions {
   clearState: () => void;
   CurrencySymbol: (currency: CurrencyCode, localeCode: LanguageCode) => string;
   exportState: () => Record<string, string | boolean>;
   loadState: () => void;
-  Money: (amount: number) => string;
-  Percent: (amount: number) => string;
-  Period: (period: number, asStr?: boolean) => string | number | Date;
+  Money: (amount: number | bigint) => string;
+  Percent: (amount: number | bigint) => string;
+  Period: (period: number | Date, asStr?: boolean) => string | number | Date;
   saveState: () => void;
   setCurrency: (newCurrency: CurrencyCode) => void;
   setLanguage: (newLanguage: LanguageCode) => void;
   togglePeriodsAsDates: () => void;
   toggleTheme: () => void;
-};
+}
 
 // --- Store --- //
 
@@ -62,14 +62,16 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   const baseDate: Ref<number> = ref(Date.now()); // TODO: consider letting users modify the base date
   const periodsAsDates: Ref<boolean> = ref(false);
   const locales: Locale[] = constants.LOCALES;
-  const defaultLocale: Locale = locales.find((locale: Locale) => locale.code === (navigator.language || 'en-US'));
+  const defaultLocale: Locale = locales.find((locale: Locale) => locale.code === navigator.language)
+    || locales.find((locale: Locale) => locale.code === 'en-US')
+    || locales[0];
   const currency: Ref<CurrencyCode> = ref(defaultLocale.currency);
   const language: Ref<LanguageCode> = ref(defaultLocale.code);
 
 
   /** COMPOSABLES */
 
-  const { darkMode, colorPalate, toggleTheme } = useTheme();
+  const { darkMode, colorPalette, toggleTheme } = useTheme();
 
   /** ACTIONS */
 
@@ -126,10 +128,10 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
 
   /**
    * Formats a number as locale-aware currency
-   * @param {number} amount The amount to display
+   * @param {number | bigint} amount The amount to display
    * @returns {string} The formatted currency of `amount`
    */
-  const Money = (amount: number): string => (
+  const Money = (amount: number | bigint): string => (
     Intl.NumberFormat(
       language.value,
       {
@@ -141,10 +143,10 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
 
   /**
    * Formats a number as locale-aware percent
-   * @param {number} amount The amount to display
+   * @param {number | bigint} amount The amount to display
    * @returns {string} the formatted percent of `amount`
    */
-  const Percent = (amount: number): string => (
+  const Percent = (amount: number | bigint): string => (
     Intl.NumberFormat(
       language.value,
       {
@@ -230,7 +232,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   return {
     baseDate,
     clearState,
-    colorPalate,
+    colorPalette,
     currency,
     CurrencySymbol,
     darkMode,

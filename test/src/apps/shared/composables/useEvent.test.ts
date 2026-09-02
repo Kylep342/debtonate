@@ -35,7 +35,6 @@ describe('useEvent composable', () => {
 
     const addListenerSpy = vi.spyOn(window, 'addEventListener');
     const removeListenerSpy = vi.spyOn(window, 'removeEventListener');
-    const matchMediaSpy = vi.spyOn(window, 'matchMedia');
     const callback = vi.fn(() => true);
 
     const wrapper = mountComposable(() => {

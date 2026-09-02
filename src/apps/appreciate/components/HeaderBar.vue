@@ -35,9 +35,15 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
 </script>
 
 <template>
-  <header id="header-bar" :class="['navbar', 'bg-secondary', 'px-2', 'md:px-4', 'sticky', 'top-0', 'z-30']">
+  <header
+    id="header-bar"
+    :class="['navbar', 'bg-secondary', 'px-2', 'md:px-4', 'sticky', 'top-0', 'z-30']"
+  >
     <div :class="['flex-1']">
-      <img v-if="!isMobile" src="/icon.png">
+      <img
+        v-if="!isMobile"
+        src="/icon.png"
+      >
       <div :class="['flex', 'items-center']">
         <base-menu
           :text="isMobile ? 'Appreciate' : constants.NAME_APPRECIATE"
@@ -45,20 +51,26 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
           :classes="['btn-secondary', 'btn-sm', 'px-1']"
           style="filter: brightness(0.9);"
         />
-        <span v-if="!isMobile" class="text-xl font-bold mx-2">&nbsp|&nbsp</span>
+        <span
+          v-if="!isMobile"
+          class="text-xl font-bold mx-2"
+        >&nbsp;|&nbsp;</span>
         <div :class="['flex', 'items-center', 'gap-1']">
           <base-button
             v-for="(button) in phaseButtons"
             :key="button.text"
-            @click.prevent="button.onClick"
             :class="['btn-xs', 'sm:btn-sm', ...button.classes]"
+            @click.prevent="button.onClick"
           >
-          {{ button.text }}
+            {{ button.text }}
           </base-button>
         </div>
       </div>
     </div>
-    <base-button :class="['btn-sm']" @click="state.openOptionsForm">
+    <base-button
+      :class="['btn-sm']"
+      @click="state.openOptionsForm"
+    >
       {{ isMobile ? 'Opts' : constants.BTN_OPTIONS }}
     </base-button>
   </header>

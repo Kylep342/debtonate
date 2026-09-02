@@ -5,14 +5,14 @@ import constants from '@/apps/shared/constants/constants';
 
 describe('useTheme composable', () => {
   it('does a thing', () => {
-    const { darkMode, colorPalate, toggleTheme } = useTheme();
+    const { darkMode, colorPalette, toggleTheme } = useTheme();
     // initialize as off
     expect(darkMode.value).toBe(false);
-    expect(colorPalate.value).toStrictEqual(constants.COLOR_PALETTE);
+    expect(colorPalette.value).toStrictEqual(constants.COLOR_PALETTE);
     // toggle on
     toggleTheme();
     expect(darkMode.value).toBe(true);
-    expect(colorPalate.value).toStrictEqual(constants.COLOR_PALETTE);
+    expect(colorPalette.value).toStrictEqual(constants.COLOR_PALETTE);
     // toggle back off
     toggleTheme();
     expect(darkMode.value).toBe(false);

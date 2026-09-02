@@ -8,7 +8,7 @@ import keys from '@/apps/appreciate/constants/keys';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
-import { MonthlyBudget } from '@/apps/shared/types/core';
+import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
 import { UIInstrument } from '@/apps/appreciate/types/core';
 
 function mockInstrument(
@@ -41,7 +41,7 @@ const Instruments = (): UIInstrument[] => [
   mockInstrument(45000, 0.085, '401(K)', 23500),
 ];
 
-const Budgets = (): MonthlyBudget[] => [
+const Budgets = (): Budget[] => [
   { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
   { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
@@ -140,10 +140,10 @@ describe('Appreciate Core Store', () => {
       state.budgets = Budgets();
       const firstBudgetId = state.monthlyBudgets[0].id;
       expect(state.getBudgetIndex(constants.DEFAULT)).toBe(4);
-      expect(state.getBudgetColor(constants.DEFAULT)).toBe(globalOptions.colorPalate[4 % globalOptions.colorPalate.length]);
+      expect(state.getBudgetColor(constants.DEFAULT)).toBe(globalOptions.colorPalette[4 % globalOptions.colorPalette.length]);
       expect(state.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
       expect(state.getBudgetIndex(firstBudgetId)).toBe(1);
-      expect(state.getBudgetColor(firstBudgetId)).toBe(globalOptions.colorPalate[1]);
+      expect(state.getBudgetColor(firstBudgetId)).toBe(globalOptions.colorPalette[1]);
       expect(state.getBudgetName(firstBudgetId)).toBe('Budget 1');
     });
 
@@ -568,8 +568,8 @@ describe('Appreciate Core Store', () => {
       globalOptions.togglePeriodsAsDates();
       expect(state.graphXScale).toStrictEqual(d3.scaleTime);
 
-      const i1B1Interest = state.cardGraphs[firstInstrumentId][firstBudgetId][0];
-      const i1B1Contribution = state.cardGraphs[firstInstrumentId][firstBudgetId][1];
+      const i1B1Interest = (state.cardGraphs[firstInstrumentId][firstBudgetId] as any)[0];
+      const i1B1Contribution = (state.cardGraphs[firstInstrumentId][firstBudgetId] as any)[1];
 
       expect(Object.keys(i1B1Interest)).toStrictEqual([
         'label',
@@ -610,7 +610,7 @@ describe('Appreciate Core Store', () => {
       state.instruments = Instruments();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs).sort()
+        Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs || {}).sort()
       ).toStrictEqual(
         state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );
@@ -622,7 +622,7 @@ describe('Appreciate Core Store', () => {
       state.instruments = Instruments();
 
       expect(
-        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs).sort()
+        Object.keys(state.graphs[constants.GRAPH_PURCHASING_POWER_OVER_TIME].graphs || {}).sort()
       ).toStrictEqual(
         state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );

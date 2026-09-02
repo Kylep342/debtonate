@@ -4,12 +4,12 @@ import BaseGraph from '@/apps/shared/components/ui/BaseGraph.vue';
 import * as d3 from 'd3';
 
 describe('BaseGraph Component', () => {
-  let resizeCallback: ResizeObserverCallback;
+  let resizeCallback: (entries: any[], observer: any) => void;
 
   beforeEach(() => {
     // Mock getBBox for JSDOM
-    if (!SVGElement.prototype.getBBox) {
-      SVGElement.prototype.getBBox = vi.fn().mockReturnValue({
+    if (!(SVGElement.prototype as any).getBBox) {
+      (SVGElement.prototype as any).getBBox = vi.fn().mockReturnValue({
         x: 0,
         y: 0,
         width: 20,
@@ -18,8 +18,8 @@ describe('BaseGraph Component', () => {
     }
 
     // Mock ResizeObserver
-    global.ResizeObserver = class ResizeObserver {
-      constructor(callback: ResizeObserverCallback) {
+    (globalThis as any).ResizeObserver = class ResizeObserver {
+      constructor(callback: (entries: any[], observer: any) => void) {
         resizeCallback = callback;
       }
       observe = vi.fn();
@@ -34,6 +34,7 @@ describe('BaseGraph Component', () => {
 
   const mockGraphConfig = {
     id: 'test-graph',
+    type: 'line' as const,
     header: (id: string) => `Header ${id}`,
     subheader: (id: string) => `Subheader ${id}`,
     xScale: d3.scaleLinear,

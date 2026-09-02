@@ -13,15 +13,23 @@ defineProps<{
 <template>
   <div>
     <header>
-      <h3 :class="['text-center']">{{ title }}</h3>
-      <h5 :class="['text-center']">{{ subtitle }}</h5>
+      <h3 :class="['text-center']">
+        {{ title }}
+      </h3>
+      <h5 :class="['text-center']">
+        {{ subtitle }}
+      </h5>
     </header>
     <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto', 'overflow-x-auto']">
       <base-table :class="['table-sm']">
         <template #header>
           <thead>
             <tr>
-              <th v-for="header in headers" :key="header.key" :class="header.class || 'text-right'">
+              <th
+                v-for="header in headers"
+                :key="header.key"
+                :class="header.class || 'text-right'"
+              >
                 {{ header.label }}
               </th>
             </tr>
@@ -29,8 +37,15 @@ defineProps<{
         </template>
         <template #body>
           <tbody>
-            <tr v-for="(row, index) in rows" :key="index">
-              <td v-for="header in headers" :key="header.key" :class="header.class || 'text-right'">
+            <tr
+              v-for="(row, index) in rows"
+              :key="index"
+            >
+              <td
+                v-for="header in headers"
+                :key="header.key"
+                :class="header.class || 'text-right'"
+              >
                 {{ row[header.key] }}
               </td>
             </tr>
@@ -39,7 +54,11 @@ defineProps<{
         <template #footer>
           <tfoot>
             <tr>
-              <td v-for="header in headers" :key="header.key" :class="header.class || 'text-right'">
+              <td
+                v-for="header in headers"
+                :key="header.key"
+                :class="header.class || 'text-right'"
+              >
                 <b>{{ totals[header.key] }}</b>
               </td>
             </tr>

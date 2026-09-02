@@ -66,12 +66,22 @@ watch(() => props.watchedItems, (newItems) => {
         <h2 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           {{ viewedGraphId }}
         </h2>
-        <base-menu :text="constants.BTN_SELECT" :buttons="buttons" :classes="['btn-sm']"/>
+        <base-menu
+          :text="constants.BTN_SELECT"
+          :buttons="buttons"
+          :classes="['btn-sm']"
+        />
       </div>
     </div>
     <div :class="['tabframe', 'w-full']">
-      <div v-if="isExtraView" :class="['p-4']">
-        <slot :name="`view-${viewedGraphId}`" :viewedItemId="viewedItemId" />
+      <div
+        v-if="isExtraView"
+        :class="['p-4']"
+      >
+        <slot
+          :name="`view-${viewedGraphId}`"
+          :viewed-item-id="viewedItemId"
+        />
       </div>
       <base-tabs
         v-else

@@ -8,7 +8,11 @@ import { Locale } from '@/apps/shared/types/app';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 
-const cardRefs = ref([]);
+const cardRefs = ref<any[]>([]);
+
+const setCardRef = (el: any) => {
+  if (el) cardRefs.value.push(el);
+};
 
 onBeforeUpdate(() => {
   cardRefs.value = [];
@@ -58,12 +62,14 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
 </script>
 
 <template>
-  <h3 :class="['pl-4']">Global Options</h3>
+  <h3 :class="['pl-4']">
+    Global Options
+  </h3>
   <br>
   <hr>
   <br>
   <div :class="['formInputs']">
-    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+    <collapsible-card :ref="setCardRef">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Periods as Dates
@@ -90,7 +96,7 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
         </div>
       </template>
     </collapsible-card>
-    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+    <collapsible-card :ref="setCardRef">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Currency
@@ -117,7 +123,7 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
         <p>Money: {{ globalOptions.Money(100) }}</p>
       </template>
     </collapsible-card>
-    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+    <collapsible-card :ref="setCardRef">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Locale
@@ -148,7 +154,7 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
         <p>Percent: {{ globalOptions.Percent(3.42) }}</p>
       </template>
     </collapsible-card>
-    <collapsible-card :ref="el => { if (el) cardRefs.push(el) }">
+    <collapsible-card :ref="setCardRef">
       <template #cardTitle>
         <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
           Theme
@@ -159,7 +165,9 @@ const themeButtonText = (isDark: boolean): string => (isDark ? 'Light' : 'Dark')
           <base-button
             :class="buttonStyle(globalOptions.darkMode)"
             @click="globalOptions.toggleTheme"
-          >{{ themeButtonText(globalOptions.darkMode) }}</base-button>
+          >
+            {{ themeButtonText(globalOptions.darkMode) }}
+          </base-button>
         </div>
       </template>
       <template #cardBody>

@@ -48,7 +48,7 @@ const pivotMenu: Reactive<Menu> = reactive({
     <template #item="{ item }">
       <LoanCard
         :loan="item"
-        :viewed-budget-id="viewedBudgetId"
+        :viewed-budget-id="viewedBudgetId || constants.DEFAULT"
       />
     </template>
   </ListPanel>

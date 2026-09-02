@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import moneyfunx from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
@@ -7,11 +6,12 @@ import constants from '@/apps/appreciate/constants/constants';
 import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
-import { DonutGraphContent } from '@/apps/shared/types/graph';
+import { Arc } from '@/apps/shared/types/graph';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
+import { UIInstrument } from '@/apps/appreciate/types/core';
 
 const props = defineProps<{
-  instrument: moneyfunx.IInstrument,
+  instrument: UIInstrument,
   viewedBudgetId: string,
 }>();
 
@@ -29,7 +29,7 @@ const instrumentMaxMonthlyContribution: ComputedRef<string> = computed(() => `${
 const instrumentName: ComputedRef<string> = computed(() => state.getInstrumentName(props.instrument.id));
 const header: ComputedRef<string> = computed(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
 
-const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
+const graphContent: ComputedRef<Arc[]> = computed(() => {
   if (isCareerPhase.value) {
     return state.cardGraphs[props.instrument.id][props.viewedBudgetId];
   } else {
@@ -41,8 +41,8 @@ const graphContent: ComputedRef<DonutGraphContent> = computed(() => {
     }
     const summary = scheduleMap[props.viewedBudgetId];
     return [
-      { label: 'Growth', value: summary.lifetimeGrowth, color: globalOptions.colorPalate[0] },
-      { label: 'Withdrawals', value: summary.lifetimeWithdrawal, color: globalOptions.colorPalate[2] },
+      { label: 'Growth', value: Number(summary.lifetimeGrowth), color: globalOptions.colorPalette[0] },
+      { label: 'Withdrawals', value: Number(summary.lifetimeWithdrawal), color: globalOptions.colorPalette[2] },
     ];
   }
 });
@@ -72,36 +72,65 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
 </script>
 
 <template>
-  <base-card :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']" :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']">
+  <base-card
+    :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']"
+    :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']"
+  >
     <template #cardTitle>
       <div :class="['card-actions', 'flow-root', 'p-0', 'w-full', 'min-w-0']">
         <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">{{ instrumentName }}</h2>
-          <base-menu :text="constants.BTN_MENU" :buttons="buttons" :classes="['btn-sm']" />
+          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
+            {{ instrumentName }}
+          </h2>
+          <base-menu
+            :text="constants.BTN_MENU"
+            :buttons="buttons"
+            :classes="['btn-sm']"
+          />
         </div>
       </div>
     </template>
     <template #cardBody>
-      <h3 v-if="state.instruments.length" class="text-center font-medium text-sm truncate mb-1">{{ header }}</h3>
+      <h3
+        v-if="state.instruments.length"
+        class="text-center font-medium text-sm truncate mb-1"
+      >
+        {{ header }}
+      </h3>
       <donut-graph
         v-if="state.instruments.length"
         :config="state.instrumentCardGraphConfig"
         :graph="graphContent"
-        :anchorId="instrument.id"
+        :anchor-id="instrument.id"
       />
       <base-table :class="['table-xs', 'w-full', 'max-w-full']">
         <template #body>
           <tbody>
-            <tr v-if="state.instruments.length" v-for="(datum) in graphContent" :key="datum.label">
-              <td class="truncate max-w-[110px]"><ColorDot :color="datum.color" />{{ datum.label }}</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ globalOptions.Money(datum.value) }}</b></td>
-            </tr>
+            <template v-if="state.instruments.length">
+              <tr
+                v-for="(datum) in graphContent"
+                :key="datum.label"
+              >
+                <td class="truncate max-w-[110px]">
+                  <ColorDot :color="datum.color || ''" />{{ datum.label }}
+                </td>
+                <td :class="['text-right', 'whitespace-nowrap']">
+                  <b>{{ globalOptions.Money(datum.value) }}</b>
+                </td>
+              </tr>
+            </template>
             <tr v-if="isCareerPhase">
-              <td class="truncate max-w-[110px]">Current Balance</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentCurrentBalance }}</b></td>
+              <td class="truncate max-w-[110px]">
+                Current Balance
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ instrumentCurrentBalance }}</b>
+              </td>
             </tr>
             <tr v-else>
-              <td class="truncate max-w-[110px]">Starting Balance</td>
+              <td class="truncate max-w-[110px]">
+                Starting Balance
+              </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ globalOptions.Money(
                   state.getContributionSchedule(props.instrument.id, state.selectedCareerBudgetId || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0
@@ -109,16 +138,28 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
               </td>
             </tr>
             <tr>
-              <td class="truncate max-w-[110px]">Interest Rate</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentInterestRate }}</b></td>
+              <td class="truncate max-w-[110px]">
+                Interest Rate
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ instrumentInterestRate }}</b>
+              </td>
             </tr>
             <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td class="truncate max-w-[110px]">Annual Limit</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentAnnualLimit }}</b></td>
+              <td class="truncate max-w-[110px]">
+                Annual Limit
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ instrumentAnnualLimit }}</b>
+              </td>
             </tr>
             <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td class="truncate max-w-[110px]">{{ isMobile ? 'Max Monthly' : 'Max Contribution' }}</td>
-              <td :class="['text-right', 'whitespace-nowrap']"><b>{{ instrumentMaxMonthlyContribution }}</b></td>
+              <td class="truncate max-w-[110px]">
+                {{ isMobile ? 'Max Monthly' : 'Max Contribution' }}
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ instrumentMaxMonthlyContribution }}</b>
+              </td>
             </tr>
           </tbody>
         </template>

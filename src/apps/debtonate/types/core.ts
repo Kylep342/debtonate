@@ -1,8 +1,8 @@
-import { LoansPaymentSchedule } from 'moneyfunx';
+import { paymentTypes } from 'moneyfunx';
 
 export type PaymentScenario = {
   paymentAmount: number
-  paymentSchedule: LoansPaymentSchedule
+  paymentSchedule: paymentTypes.LoansPaymentSchedule
 };
 
 export interface UIDebtLoan {

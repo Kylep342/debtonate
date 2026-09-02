@@ -46,12 +46,12 @@ const exit = () => {
 
 const refinanceLoan = () => {
   state.createRefinanceScenario(
-    loanId.value,
-    currentBalance.value,
-    interestRate.value! / 100,
-    termInYears.value,
-    name.value,
-    fees.value,
+    loanId.value || '',
+    currentBalance.value || 0,
+    (interestRate.value || 0) / 100,
+    termInYears.value || 0,
+    name.value || '',
+    fees.value || 0,
   );
   exit();
 };
@@ -63,7 +63,10 @@ const refinanceLoan = () => {
       <h2>{{ state.refinancingFormTitle }}</h2>
     </template>
     <template #headerActions>
-      <base-button :class="['btn btn-circle btn-ghost']" @click="exit">
+      <base-button
+        :class="['btn btn-circle btn-ghost']"
+        @click="exit"
+      >
         x
       </base-button>
     </template>
@@ -72,33 +75,64 @@ const refinanceLoan = () => {
         <div :class="['label']">
           <span :class="['label-text']">Principal</span>
         </div>
-        <input :id="`${constants.REFINANCING_FORM_ID}-current-balance`" v-model.number="currentBalance"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="Principal">
+        <input
+          :id="`${constants.REFINANCING_FORM_ID}-current-balance`"
+          v-model.number="currentBalance"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          step="0.01"
+          label="Principal"
+        >
         <div :class="['label']">
           <span :class="['label-text']">Interest Rate</span>
         </div>
-        <input :id="`${constants.REFINANCING_FORM_ID}-interest-rate`" v-model.number="interestRate"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01"
-          label="Interest Rate">
+        <input
+          :id="`${constants.REFINANCING_FORM_ID}-interest-rate`"
+          v-model.number="interestRate"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          step="0.01"
+          label="Interest Rate"
+        >
         <div :class="['label']">
           <span :class="['label-text']">Term (In Years)</span>
         </div>
-        <input :id="`${constants.REFINANCING_FORM_ID}-term-in-years`" v-model.number="termInYears"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="number" label="Term In Years">
+        <input
+          :id="`${constants.REFINANCING_FORM_ID}-term-in-years`"
+          v-model.number="termInYears"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          label="Term In Years"
+        >
         <div :class="['label']">
           <span :class="['label-text']">Name (Optional)</span>
         </div>
-        <input :id="`${constants.REFINANCING_FORM_ID}-name`" v-model="name"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="string" label="Name">
+        <input
+          :id="`${constants.REFINANCING_FORM_ID}-name`"
+          v-model="name"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="string"
+          label="Name"
+        >
         <div :class="['label']">
           <span :class="['label-text']">Fees (Optional)</span>
         </div>
-        <input :id="`${constants.REFINANCING_FORM_ID}-fees`" v-model.number="fees"
-          :class="['input input-bordered input-secondary w-full max-ws']" type="number" step="0.01" label="Fees">
+        <input
+          :id="`${constants.REFINANCING_FORM_ID}-fees`"
+          v-model.number="fees"
+          :class="['input input-bordered input-secondary w-full max-ws']"
+          type="number"
+          step="0.01"
+          label="Fees"
+        >
       </div>
     </template>
     <template #actions>
-      <base-button :disabled="!createButtonEnabled" :class="'btn-success'" @click="refinanceLoan">
+      <base-button
+        :disabled="!createButtonEnabled"
+        :class="'btn-success'"
+        @click="refinanceLoan"
+      >
         {{ constants.BTN_REFINANCE }}
       </base-button>
     </template>

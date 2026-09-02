@@ -1,11 +1,16 @@
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue';
 
-export function useEvent(target, event, callback, callOnMount=false) {
+export function useEvent(
+  target: EventTarget | Window,
+  event: string,
+  callback: EventListenerOrEventListenerObject | ((...args: any[]) => void),
+  callOnMount: boolean = false
+) {
   onMounted(() => {
     if (callOnMount) {
-      callback();
+      (callback as any)();
     }
-    target.addEventListener(event, callback);
+    target.addEventListener(event, callback as EventListener);
   });
-  onUnmounted(() => target.removeEventListener(event, callback));
+  onUnmounted(() => target.removeEventListener(event, callback as EventListener));
 }

@@ -1,5 +1,8 @@
 <template>
-  <span class="color-dot" :style="{ backgroundColor: color }" />
+  <span
+    class="color-dot"
+    :style="{ backgroundColor: color }"
+  />
 </template>
 
 <script setup lang="ts">

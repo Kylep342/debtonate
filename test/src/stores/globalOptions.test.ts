@@ -123,6 +123,6 @@ describe('Global Options Store', () => {
 
     globalOptions.setCurrency('WTF');
 
-    expect(globalOptions.CurrencySymbol('WTF', globalOptions.locale)).toBe('$');
+    expect(globalOptions.CurrencySymbol('WTF', globalOptions.language)).toBe('$');
   });
 });
