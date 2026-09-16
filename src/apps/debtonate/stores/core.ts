@@ -143,6 +143,7 @@ export interface DebtonateCoreActions {
     loanId: string,
     budgetId: string
   ) => paymentTypes.PaymentSchedule;
+  importState: (data: Record<string, any>) => void;
   loadState: () => void;
   openBudgetForm: () => void;
   openLoanForm: () => void;
@@ -985,16 +986,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     viewPhase.value = constants.PHASE_DEBTONATE;
   };
 
-  const loadState = () => {
-    globalOptions.loadState();
+  const importState = (data: Record<string, any>): void => {
+    globalOptions.importState(data);
 
-    // Safer loading
-    const storedBudgets = localStorage.getItem(keys.LS_BUDGETS);
-    if (storedBudgets) budgets.value = JSON.parse(storedBudgets);
+    if (data[keys.LS_BUDGETS]) {
+      budgets.value = data[keys.LS_BUDGETS];
+    }
 
-    const storedLoans = localStorage.getItem(keys.LS_LOANS);
-    if (storedLoans) {
-      loans.value = JSON.parse(storedLoans).map((storedLoan: any) => {
+    if (data[keys.LS_LOANS]) {
+      loans.value = data[keys.LS_LOANS].map((storedLoan: any) => {
         const biLoan = new loan.Loan(
           BigInt(Math.round(storedLoan.principal * 100)),
           BigInt(Math.round(storedLoan.annualRate * 1_000_000)),
@@ -1010,11 +1010,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       });
     }
 
-    const storedRefinancingScenarios = localStorage.getItem(
-      keys.LS_REFINANCING_SCENARIOS
-    );
-    if (storedRefinancingScenarios) {
-      const parsedScenarios = JSON.parse(storedRefinancingScenarios);
+    if (data[keys.LS_REFINANCING_SCENARIOS]) {
+      const parsedScenarios = data[keys.LS_REFINANCING_SCENARIOS];
       const reconstructedScenarios: Record<string, UIDebtLoan[]> = {};
 
       const loanIdsToLoad = [...loans.value.map((l) => l.id), constants.TOTALS];
@@ -1042,33 +1039,83 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       refinancingScenarios.value = reconstructedScenarios;
     }
 
+    if (data[keys.LS_REDUCE_PAYMENTS] !== undefined) {
+      reducePayments.value = data[keys.LS_REDUCE_PAYMENTS];
+    }
+
+    if (data[keys.LS_REFINANCING_USE_HIGHEST_PAYMENT] !== undefined) {
+      refinancingUseHighestPayment.value = data[keys.LS_REFINANCING_USE_HIGHEST_PAYMENT];
+    }
+
+    if (data[keys.LS_ROUNDING_ENABLED] !== undefined) {
+      roundingEnabled.value = data[keys.LS_ROUNDING_ENABLED];
+    }
+
+    if (data[keys.LS_ROUNDING_SCALE] !== undefined) {
+      roundingScale.value = data[keys.LS_ROUNDING_SCALE];
+    }
+
+    if (data[keys.LS_SNOWBALL_SORT] !== undefined) {
+      snowballSort.value = data[keys.LS_SNOWBALL_SORT];
+    }
+
+    if (data[keys.LS_VIEW_PHASE] !== undefined) {
+      viewPhase.value = data[keys.LS_VIEW_PHASE];
+    }
+  };
+
+  const loadState = (): void => {
+    globalOptions.loadState();
+    const data: Record<string, any> = {};
+
+    const storedBudgets = localStorage.getItem(keys.LS_BUDGETS);
+    if (storedBudgets) data[keys.LS_BUDGETS] = JSON.parse(storedBudgets);
+
+    const storedLoans = localStorage.getItem(keys.LS_LOANS);
+    if (storedLoans) data[keys.LS_LOANS] = JSON.parse(storedLoans);
+
+    const storedRefinancingScenarios = localStorage.getItem(
+      keys.LS_REFINANCING_SCENARIOS
+    );
+    if (storedRefinancingScenarios) {
+      data[keys.LS_REFINANCING_SCENARIOS] = JSON.parse(storedRefinancingScenarios);
+    }
+
     const storedReducePayments = localStorage.getItem(keys.LS_REDUCE_PAYMENTS);
-    if (storedReducePayments)
-      reducePayments.value = JSON.parse(storedReducePayments);
+    if (storedReducePayments) {
+      data[keys.LS_REDUCE_PAYMENTS] = JSON.parse(storedReducePayments);
+    }
 
     const storedRefinancingUseHighestPayment = localStorage.getItem(
       keys.LS_REFINANCING_USE_HIGHEST_PAYMENT
     );
-    if (storedRefinancingUseHighestPayment)
-      refinancingUseHighestPayment.value = JSON.parse(
+    if (storedRefinancingUseHighestPayment) {
+      data[keys.LS_REFINANCING_USE_HIGHEST_PAYMENT] = JSON.parse(
         storedRefinancingUseHighestPayment
       );
+    }
 
     const storedRoundingEnabled = localStorage.getItem(keys.LS_ROUNDING_ENABLED);
-    if (storedRoundingEnabled)
-      roundingEnabled.value = JSON.parse(storedRoundingEnabled);
+    if (storedRoundingEnabled) {
+      data[keys.LS_ROUNDING_ENABLED] = JSON.parse(storedRoundingEnabled);
+    }
 
     const storedRoundingScale = localStorage.getItem(keys.LS_ROUNDING_SCALE);
-    if (storedRoundingScale)
-      roundingScale.value = JSON.parse(storedRoundingScale);
+    if (storedRoundingScale) {
+      data[keys.LS_ROUNDING_SCALE] = JSON.parse(storedRoundingScale);
+    }
 
     const storedSnowballSort = localStorage.getItem(keys.LS_SNOWBALL_SORT);
-    if (storedSnowballSort)
-      snowballSort.value = JSON.parse(storedSnowballSort);
+    if (storedSnowballSort) {
+      data[keys.LS_SNOWBALL_SORT] = JSON.parse(storedSnowballSort);
+    }
 
     const storedViewPhase = localStorage.getItem(keys.LS_VIEW_PHASE);
-    if (storedViewPhase)
-      viewPhase.value = JSON.parse(storedViewPhase);
+    if (storedViewPhase) {
+      data[keys.LS_VIEW_PHASE] = JSON.parse(storedViewPhase);
+    }
+
+    importState(data);
   };
 
   const saveState = (): void => {
@@ -1539,6 +1586,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     getLoanName,
     getNumPayments,
     getPaymentSchedule,
+    importState,
     loadState,
     openBudgetForm,
     openLoanForm,

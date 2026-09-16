@@ -72,6 +72,7 @@ const RefinancingScenarios = (baseLoan: UIDebtLoan): UIDebtLoan[] => [
 
 describe('Debtonate Core Store', () => {
   beforeEach(() => {
+    localStorage.clear();
     setActivePinia(createPinia());
   });
 
@@ -567,16 +568,16 @@ describe('Debtonate Core Store', () => {
     state.loans = Loans();
 
     expect(
-      Object.keys(state.paymentSchedules)
+      Object.keys(state.paymentSchedules).sort()
     ).toStrictEqual(
-      state.loansWithTotals.map((loan: UIDebtLoan) => loan.id)
+      state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
     );
 
     Object.keys(state.paymentSchedules).forEach((loanId) => {
       expect(
-        Object.keys(state.paymentSchedules[loanId])
+        Object.keys(state.paymentSchedules[loanId]).sort()
       ).toStrictEqual(
-        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
+        state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id).sort()
       );
     });
   });
@@ -676,5 +677,38 @@ describe('Debtonate Core Store', () => {
         state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
       );
     });
+  });
+
+  it('imports state directly from external object', () => {
+    const state: DebtonateCoreStore = useDebtonateCoreStore();
+    const globalOptions = useGlobalOptionsStore();
+
+    state.importState({
+      [keys.LS_BUDGETS]: [{ id: 'b-999', relative: 450 }],
+      [keys.LS_LOANS]: [{
+        id: 'l-999',
+        name: 'Imported Loan',
+        principal: 15000,
+        annualRate: 0.06,
+        termInYears: 5,
+        currentBalance: 12000,
+        fees: 50,
+      }],
+      [keys.LS_REDUCE_PAYMENTS]: true,
+      [keys.LS_SNOWBALL_SORT]: true,
+      [keys.LS_ROUNDING_ENABLED]: true,
+      [keys.LS_ROUNDING_SCALE]: 25,
+      [sharedKeys.LS_CURRENCY]: 'EUR',
+    });
+
+    expect(state.budgets.length).toBe(1);
+    expect(state.budgets[0].relative).toBe(450);
+    expect(state.loans.length).toBe(1);
+    expect(state.loans[0].name).toBe('Imported Loan');
+    expect(state.reducePayments).toBe(true);
+    expect(state.snowballSort).toBe(true);
+    expect(state.roundingEnabled).toBe(true);
+    expect(state.roundingScale).toBe(25);
+    expect(globalOptions.currency).toBe('EUR');
   });
 });

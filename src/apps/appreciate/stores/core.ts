@@ -140,6 +140,7 @@ export interface AppreciateCoreActions {
   getMaxWithdrawalMoney: (instrumentId: string) => number;
   getNumContributions: (instrumentId: string, budgetId: string) => number;
   getNumWithdrawals: (instrumentId: string, budgetId: string) => number;
+  importState: (data: Record<string, any>) => void;
   loadState: () => void;
   openBudgetForm: () => void;
   openInstrumentForm: () => void;
@@ -926,8 +927,63 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     yearsToSpend.value = constants.DEFAULT_YEARS_TO_SPEND;
   };
 
+  const importState = (data: Record<string, any>): void => {
+    globalOptions.importState(data);
+
+    if (data[keys.LS_ACCRUE_BEFORE_CONTRIBUTION] !== undefined) {
+      accrueBeforeContribution.value = data[keys.LS_ACCRUE_BEFORE_CONTRIBUTION];
+    }
+    if (data[keys.LS_BUDGETS]) {
+      budgets.value = data[keys.LS_BUDGETS];
+    }
+    if (data[keys.LS_DEFLATE_ALL_MONEY] !== undefined) {
+      deflateAllMoney.value = data[keys.LS_DEFLATE_ALL_MONEY];
+    }
+    if (data[keys.LS_DESIRED_NET_INCOME] !== undefined) {
+      desiredNetIncome.value = data[keys.LS_DESIRED_NET_INCOME];
+    }
+    if (data[keys.LS_RETIREMENT_TAX_RATE] !== undefined) {
+      retirementTaxRate.value = data[keys.LS_RETIREMENT_TAX_RATE];
+    }
+    if (data[keys.LS_INFLATION_FACTOR] !== undefined) {
+      inflationFactor.value = data[keys.LS_INFLATION_FACTOR];
+    }
+    if (data[keys.LS_INSTRUMENTS]) {
+      instruments.value = data[keys.LS_INSTRUMENTS].map(
+        (storedInstrument: any) => {
+          const biInst = new instrument.Instrument(
+            BigInt(Math.round(storedInstrument.currentBalance * 100)),
+            BigInt(Math.round(storedInstrument.annualRate * 1_000_000)),
+            constants.PERIODS_PER_YEAR,
+            storedInstrument.name,
+            BigInt(Math.round(storedInstrument.annualLimit * 100))
+          );
+          const uiInst = toUIInstrument(biInst);
+          uiInst.id = storedInstrument.id;
+          return uiInst;
+        }
+      );
+    }
+    if (data[keys.LS_SELECTED_CAREER_BUDGET_ID] !== undefined) {
+      selectedCareerBudgetId.value = data[keys.LS_SELECTED_CAREER_BUDGET_ID];
+    }
+    if (data[keys.LS_VIEW_PHASE] !== undefined) {
+      viewPhase.value = data[keys.LS_VIEW_PHASE];
+    }
+    if (data[keys.LS_WITHDRAWAL_BUDGETS]) {
+      withdrawalBudgets.value = data[keys.LS_WITHDRAWAL_BUDGETS];
+    }
+    if (data[keys.LS_YEARS_TO_CONTRIBUTE] !== undefined) {
+      yearsToContribute.value = data[keys.LS_YEARS_TO_CONTRIBUTE];
+    }
+    if (data[keys.LS_YEARS_TO_SPEND] !== undefined) {
+      yearsToSpend.value = data[keys.LS_YEARS_TO_SPEND];
+    }
+  };
+
   const loadState = (): void => {
     globalOptions.loadState();
+    const data: Record<string, any> = {};
 
     const storedAccrueBeforeContribution = localStorage.getItem(
       keys.LS_ACCRUE_BEFORE_CONTRIBUTION
@@ -954,44 +1010,44 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     );
     const storedYearsToSpend = localStorage.getItem(keys.LS_YEARS_TO_SPEND);
 
-    if (storedAccrueBeforeContribution)
-      accrueBeforeContribution.value = JSON.parse(
+    if (storedAccrueBeforeContribution) {
+      data[keys.LS_ACCRUE_BEFORE_CONTRIBUTION] = JSON.parse(
         storedAccrueBeforeContribution
       );
-    if (storedBudgets) budgets.value = JSON.parse(storedBudgets);
-    if (storedDeflateAllMoney)
-      deflateAllMoney.value = JSON.parse(storedDeflateAllMoney);
-    if (storedDesiredNetIncome)
-      desiredNetIncome.value = JSON.parse(storedDesiredNetIncome);
-    if (storedRetirementTaxRate)
-      retirementTaxRate.value = JSON.parse(storedRetirementTaxRate);
-    if (storedInflationFactor)
-      inflationFactor.value = JSON.parse(storedInflationFactor);
-    if (storedInstruments)
-      instruments.value = JSON.parse(storedInstruments).map(
-        (storedInstrument: any) => {
-          const biInst = new instrument.Instrument(
-            BigInt(Math.round(storedInstrument.currentBalance * 100)),
-            BigInt(Math.round(storedInstrument.annualRate * 1_000_000)),
-            constants.PERIODS_PER_YEAR,
-            storedInstrument.name,
-            BigInt(Math.round(storedInstrument.annualLimit * 100))
-          );
-          const uiInst = toUIInstrument(biInst);
-          uiInst.id = storedInstrument.id;
-          return uiInst;
-        }
-      );
-    if (storedSelectedCareerBudgetId)
-      selectedCareerBudgetId.value = JSON.parse(storedSelectedCareerBudgetId);
-    if (storedViewPhase)
-      viewPhase.value = JSON.parse(storedViewPhase);
-    if (storedWithdrawalBudgets)
-      withdrawalBudgets.value = JSON.parse(storedWithdrawalBudgets);
-    if (storedYearsToContribute)
-      yearsToContribute.value = JSON.parse(storedYearsToContribute);
-    if (storedYearsToSpend)
-      yearsToSpend.value = JSON.parse(storedYearsToSpend);
+    }
+    if (storedBudgets) data[keys.LS_BUDGETS] = JSON.parse(storedBudgets);
+    if (storedDeflateAllMoney) {
+      data[keys.LS_DEFLATE_ALL_MONEY] = JSON.parse(storedDeflateAllMoney);
+    }
+    if (storedDesiredNetIncome) {
+      data[keys.LS_DESIRED_NET_INCOME] = JSON.parse(storedDesiredNetIncome);
+    }
+    if (storedRetirementTaxRate) {
+      data[keys.LS_RETIREMENT_TAX_RATE] = JSON.parse(storedRetirementTaxRate);
+    }
+    if (storedInflationFactor) {
+      data[keys.LS_INFLATION_FACTOR] = JSON.parse(storedInflationFactor);
+    }
+    if (storedInstruments) {
+      data[keys.LS_INSTRUMENTS] = JSON.parse(storedInstruments);
+    }
+    if (storedSelectedCareerBudgetId) {
+      data[keys.LS_SELECTED_CAREER_BUDGET_ID] = JSON.parse(storedSelectedCareerBudgetId);
+    }
+    if (storedViewPhase) {
+      data[keys.LS_VIEW_PHASE] = JSON.parse(storedViewPhase);
+    }
+    if (storedWithdrawalBudgets) {
+      data[keys.LS_WITHDRAWAL_BUDGETS] = JSON.parse(storedWithdrawalBudgets);
+    }
+    if (storedYearsToContribute) {
+      data[keys.LS_YEARS_TO_CONTRIBUTE] = JSON.parse(storedYearsToContribute);
+    }
+    if (storedYearsToSpend) {
+      data[keys.LS_YEARS_TO_SPEND] = JSON.parse(storedYearsToSpend);
+    }
+
+    importState(data);
   };
 
   const saveState = (): void => {
@@ -1565,6 +1621,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     getMaxWithdrawalMoney,
     getNumContributions,
     getNumWithdrawals,
+    importState,
     loadState,
     openBudgetForm,
     openInstrumentForm,

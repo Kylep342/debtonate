@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import DataTable from '@/apps/shared/components/DataTable.vue';
+import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseTable from '@/apps/shared/components/ui/BaseTable.vue';
+import elementIds from '@/apps/shared/constants/elementIds';
+import * as exportUtils from '@/apps/shared/functions/export';
 
 describe('DataTable Component', () => {
   const mockHeaders = [
@@ -19,7 +22,7 @@ describe('DataTable Component', () => {
     col2: 'Total 2'
   };
 
-  it('renders correctly with props', () => {
+  it('renders correctly with props and export buttons', () => {
     const wrapper = mount(DataTable, {
       props: {
         title: 'Test Table',
@@ -30,6 +33,7 @@ describe('DataTable Component', () => {
       },
       global: {
         components: {
+          BaseButton,
           BaseTable
         }
       }
@@ -53,5 +57,41 @@ describe('DataTable Component', () => {
     expect(totalCells.length).toBe(2);
     expect(totalCells[0].text()).toBe('Total 1');
     expect(totalCells[1].text()).toBe('Total 2');
+
+    const buttons = wrapper.findAllComponents(BaseButton);
+    expect(buttons.length).toBe(2);
+    expect(buttons[0].text()).toBe('Export CSV');
+    expect(buttons[1].text()).toBe('Export JSON');
+  });
+
+  it('triggers exportToCsv and exportToJson when buttons clicked', async () => {
+    const csvSpy = vi.spyOn(exportUtils, 'exportToCsv').mockImplementation(() => {});
+    const jsonSpy = vi.spyOn(exportUtils, 'exportToJson').mockImplementation(() => {});
+
+    const wrapper = mount(DataTable, {
+      props: {
+        title: 'Mortgage Schedule',
+        subtitle: '30 Year Fixed',
+        headers: mockHeaders,
+        rows: mockRows,
+        totals: mockTotals
+      },
+      global: {
+        components: {
+          BaseButton,
+          BaseTable
+        }
+      }
+    });
+
+    const csvBtn = wrapper.find(`#${elementIds.BTN_EXPORT_SCHEDULE_CSV}`);
+    expect(csvBtn.exists()).toBe(true);
+    await csvBtn.trigger('click');
+    expect(csvSpy).toHaveBeenCalledWith('mortgage_schedule', mockHeaders, mockRows, mockTotals);
+
+    const jsonBtn = wrapper.find(`#${elementIds.BTN_EXPORT_SCHEDULE_JSON}`);
+    expect(jsonBtn.exists()).toBe(true);
+    await jsonBtn.trigger('click');
+    expect(jsonSpy).toHaveBeenCalled();
   });
 });

@@ -125,4 +125,41 @@ describe('Global Options Store', () => {
 
     expect(globalOptions.CurrencySymbol('WTF', globalOptions.language)).toBe('$');
   });
+
+  it('manages glossary modal state', () => {
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+
+    expect(globalOptions.isGlossaryActive).toBe(false);
+    globalOptions.openGlossary();
+    expect(globalOptions.isGlossaryActive).toBe(true);
+    globalOptions.closeGlossary();
+    expect(globalOptions.isGlossaryActive).toBe(false);
+    globalOptions.toggleGlossary();
+    expect(globalOptions.isGlossaryActive).toBe(true);
+    globalOptions.clearState();
+    expect(globalOptions.isGlossaryActive).toBe(false);
+  });
+
+  it('manages share & export modal state and importState', () => {
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+
+    expect(globalOptions.isShareExportActive).toBe(false);
+    globalOptions.openShareExport();
+    expect(globalOptions.isShareExportActive).toBe(true);
+    globalOptions.closeShareExport();
+    expect(globalOptions.isShareExportActive).toBe(false);
+    globalOptions.toggleShareExport();
+    expect(globalOptions.isShareExportActive).toBe(true);
+    globalOptions.clearState();
+    expect(globalOptions.isShareExportActive).toBe(false);
+
+    globalOptions.importState({
+      [keys.LS_CURRENCY]: 'EUR',
+      [keys.LS_LANGUAGE]: 'de-DE',
+      [keys.LS_PERIODS_AS_DATES]: true,
+    });
+    expect(globalOptions.currency).toBe('EUR');
+    expect(globalOptions.language).toBe('de-DE');
+    expect(globalOptions.periodsAsDates).toBe(true);
+  });
 });

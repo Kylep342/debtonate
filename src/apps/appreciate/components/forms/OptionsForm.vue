@@ -106,12 +106,17 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
               <base-button @click="copyStateToClipboard">
                 {{ constants.BTN_COPY }}
               </base-button>
+              <base-button
+                @click="globalOptions.openShareExport"
+              >
+                {{ constants.BTN_SHARE_EXPORT }}
+              </base-button>
             </div>
           </template>
           <template #cardBody>
             <div :class="['text-base', 'max-w-prose']">
               <p>
-                Manage your application state: load from the browser's local storage, save to the browser's local storage, clear all data, or copy state to clipboard.
+                Manage your application state: load from or save to local storage, clear all data, copy state, or share & export your investment plan via link, CSV, or JSON.
               </p>
             </div>
           </template>

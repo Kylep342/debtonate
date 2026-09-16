@@ -40,11 +40,9 @@ View the app [in your browser](http://localhost:5173)
     • For Appreciate: an auto-allocate toggle that fills tax-advantaged accounts (401k,
     IRA, HSA) up to statutory annual limits before allocating remaining budget to
     taxable accounts.
-5. Contextual Financial Glossaries (HoverHelp) (from README.md:37):
-    • A togglable contextual help mode explaining financial metrics throughout the UI
-    (e.g., Effective APR, Amortization, Purchasing Power / Inflation Deflation, Snowball
-    vs. Avalanche).
-6. Plan Sharing & Exporting:
-    • Export amortization schedules to CSV/JSON.
-    • Enable plan sharing via encoded URL state or compressed URL hash so users can
-    share or bookmark their payoff/investment plans.
+5. [Completed] Contextual Financial Glossaries:
+    • On-demand financial glossary modal explaining metrics and formulas across Debtonate and Appreciate (Effective APR, Amortization, Purchasing Power, Snowball vs. Avalanche).
+6. [Completed] Plan Sharing & Exporting:
+    • Export amortization, contribution, and withdrawal schedules directly to RFC 4180 CSV and formatted JSON.
+    • Client-side shareable and bookmarkable URL hashes (#plan=cz:...) with zero server dependency.
+    • Full workspace JSON backup and file restore.

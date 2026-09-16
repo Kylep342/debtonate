@@ -4,12 +4,14 @@ import { useRouter, Router } from 'vue-router';
 
 import constants from '@/apps/appreciate/constants/constants';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Button } from '@/apps/shared/types/app';
 import routes from '@/apps/shared/constants/routes';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const router: Router = useRouter();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const { isMobile } = useBreakpoint();
 
 const isCareer = computed(() => state.viewPhase === constants.PHASE_CAREER);
@@ -18,6 +20,8 @@ const isRetirement = computed(() => state.viewPhase === constants.PHASE_RETIREME
 const appButtons: Button[] = [
   { text: constants.NAME_APPRECIATE, onClick: () => router.push(routes.ROUTE_APPRECIATE) },
   { text: constants.NAME_DEBTONATE, onClick: () => router.push(routes.ROUTE_DEBTONATE) },
+  { text: constants.BTN_GLOSSARY, onClick: () => globalOptions.openGlossary() },
+  { text: constants.BTN_SHARE_EXPORT, onClick: () => globalOptions.openShareExport() },
 ];
 
 const phaseButtons: ComputedRef<Button[]> = computed(() => [

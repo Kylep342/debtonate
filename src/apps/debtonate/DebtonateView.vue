@@ -13,14 +13,24 @@ import LoanForm from '@/apps/debtonate/components/forms/LoanForm.vue';
 import LoansPanel from '@/apps/debtonate/components/LoansPanel.vue';
 import OptionsForm from '@/apps/debtonate/components/forms/OptionsForm.vue';
 import RefinancingForm from '@/apps/debtonate/components/forms/RefinancingForm.vue';
+import GlossaryModal from '@/apps/shared/components/GlossaryModal.vue';
+import ShareExportModal from '@/apps/shared/components/ShareExportModal.vue';
 import SiteIntro from '@/apps/shared/components/SiteIntro.vue';
 import constants from '@/apps/debtonate/constants/constants';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { useModal } from '@/apps/shared/composables/useModal';
+import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const { isDesktop } = useBreakpoint();
+
+const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
+  appType: 'debtonate',
+  importState: state.importState,
+});
 
 const activeTab = ref('analysis');
 
@@ -32,6 +42,8 @@ useModal(computed<boolean>(() => state.loanDetailsPanelActive), constants.LOAN_D
 useModal(computed<boolean>(() => state.loanFormActive), constants.LOAN_FORM_ID);
 useModal(computed<boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
 useModal(computed<boolean>(() => state.refinancingFormActive), constants.REFINANCING_FORM_ID);
+useModal(computed<boolean>(() => globalOptions.isGlossaryActive), constants.GLOSSARY_MODAL_ID);
+useModal(computed<boolean>(() => globalOptions.isShareExportActive), constants.SHARE_EXPORT_MODAL_ID);
 
 const tabClass = (tab: string) => [
   'tab',
@@ -50,6 +62,24 @@ const tabClass = (tab: string) => [
     <LoanForm :id="constants.LOAN_FORM_ID" />
     <OptionsForm :id="constants.OPTIONS_FORM_ID" />
     <RefinancingForm :id="constants.REFINANCING_FORM_ID" />
+    <GlossaryModal :id="constants.GLOSSARY_MODAL_ID" />
+    <ShareExportModal
+      :id="constants.SHARE_EXPORT_MODAL_ID"
+      app-type="debtonate"
+    />
+
+    <!-- Shared Plan Notification Alert -->
+    <div
+      v-if="isPlanLoadedFromUrl"
+      class="fixed top-14 right-4 z-50 max-w-sm cursor-pointer"
+      @click="dismissPlanAlert"
+    >
+      <base-alert
+        id="url-plan-alert"
+        :message="planLoadedMessage"
+        class="alert-success shadow-lg"
+      />
+    </div>
 
     <!-- Mobile/Tablet Tabs -->
     <div

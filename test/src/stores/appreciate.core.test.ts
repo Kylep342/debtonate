@@ -49,6 +49,7 @@ const Budgets = (): Budget[] => [
 
 describe('Appreciate Core Store', () => {
   beforeEach(() => {
+    localStorage.clear();
     setActivePinia(createPinia());
   });
 
@@ -627,5 +628,38 @@ describe('Appreciate Core Store', () => {
         state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );
     });
+  });
+
+  it('imports state directly from external object', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    const globalOptions = useGlobalOptionsStore();
+
+    state.importState({
+      [keys.LS_BUDGETS]: [{ id: 'b-999', relative: 600 }],
+      [keys.LS_INSTRUMENTS]: [{
+        id: 'inst-999',
+        name: 'Imported 401k',
+        currentBalance: 50000,
+        annualRate: 0.07,
+        annualLimit: 23000,
+      }],
+      [keys.LS_DESIRED_NET_INCOME]: 8000,
+      [keys.LS_RETIREMENT_TAX_RATE]: 18,
+      [keys.LS_YEARS_TO_CONTRIBUTE]: 25,
+      [keys.LS_YEARS_TO_SPEND]: 30,
+      [keys.LS_ACCRUE_BEFORE_CONTRIBUTION]: true,
+      [sharedKeys.LS_CURRENCY]: 'GBP',
+    });
+
+    expect(state.budgets.length).toBe(1);
+    expect(state.budgets[0].relative).toBe(600);
+    expect(state.instruments.length).toBe(1);
+    expect(state.instruments[0].name).toBe('Imported 401k');
+    expect(state.desiredNetIncome).toBe(8000);
+    expect(state.retirementTaxRate).toBe(18);
+    expect(state.yearsToContribute).toBe(25);
+    expect(state.yearsToSpend).toBe(30);
+    expect(state.accrueBeforeContribution).toBe(true);
+    expect(globalOptions.currency).toBe('GBP');
   });
 });

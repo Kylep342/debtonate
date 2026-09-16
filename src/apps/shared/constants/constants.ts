@@ -17,6 +17,7 @@ const BTN_CREATE = 'Create';
 const BTN_DELETE = 'Delete';
 const BTN_DETAILS = 'Details';
 const BTN_EDIT = 'Edit';
+const BTN_GLOSSARY = 'Glossary & Guide';
 const BTN_LOAD = 'Load';
 const BTN_MENU = 'Menu';
 const BTN_OFF = 'Off';
@@ -26,6 +27,7 @@ const BTN_PIVOT = 'Pivot';
 const BTN_REFINANCE = 'Refinancing';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
+const BTN_SHARE_EXPORT = 'Share & Export';
 
 // Budgets
 const BUDGET = 'Budget';
@@ -46,6 +48,10 @@ const COLOR_PALETTE = [
 
 const DATE = 'Date'
 const DEFAULT = 'default';
+const GLOSSARY_MODAL_ID = 'glossaryModal';
+const GLOSSARY_MODAL_TITLE = 'Financial Glossary & Guide';
+const SHARE_EXPORT_MODAL_ID = 'shareExportModal';
+const SHARE_EXPORT_MODAL_TITLE = 'Share & Export Plan';
 const GRAPHS = 'Graphs';
 
 // Internationalization metadata
@@ -142,6 +148,7 @@ export default Object.freeze({
   BTN_DELETE,
   BTN_DETAILS,
   BTN_EDIT,
+  BTN_GLOSSARY,
   BTN_LOAD,
   BTN_MENU,
   BTN_OFF,
@@ -151,6 +158,7 @@ export default Object.freeze({
   BTN_REFINANCE,
   BTN_SAVE,
   BTN_SELECT,
+  BTN_SHARE_EXPORT,
   BUDGET,
   BUDGET_DETAILS,
   BUDGET_FORM_ID,
@@ -159,6 +167,8 @@ export default Object.freeze({
   COLOR_PALETTE,
   DATE,
   DEFAULT,
+  GLOSSARY_MODAL_ID,
+  GLOSSARY_MODAL_TITLE,
   GRAPHS,
   LOCALES,
   NAME_APPRECIATE,
@@ -170,6 +180,8 @@ export default Object.freeze({
   PT_CURRENT_DEBT,
   PT_REFINANCING,
   PT_RETIREMENT,
+  SHARE_EXPORT_MODAL_ID,
+  SHARE_EXPORT_MODAL_TITLE,
   TABLES,
   THEME,
   THEME_DARK,

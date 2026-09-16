@@ -92,4 +92,26 @@ describe('HeaderBar Component (Appreciate)', () => {
 
     expect(pushMock).toHaveBeenCalled();
   });
+
+  it('opens glossary modal via app menu', async () => {
+    const wrapper = mount(HeaderBar, { global: globalConfig });
+
+    const appMenu = wrapper.findAllComponents(BaseMenu)[0];
+    const menuItems = appMenu.findAll('li a');
+    const glossaryItem = menuItems.find(item => item.text() === constants.BTN_GLOSSARY);
+
+    expect(glossaryItem?.exists()).toBe(true);
+    await glossaryItem?.trigger('click');
+  });
+
+  it('opens share & export modal via app menu', async () => {
+    const wrapper = mount(HeaderBar, { global: globalConfig });
+
+    const appMenu = wrapper.findAllComponents(BaseMenu)[0];
+    const menuItems = appMenu.findAll('li a');
+    const shareExportItem = menuItems.find(item => item.text() === constants.BTN_SHARE_EXPORT);
+
+    expect(shareExportItem?.exists()).toBe(true);
+    await shareExportItem?.trigger('click');
+  });
 });

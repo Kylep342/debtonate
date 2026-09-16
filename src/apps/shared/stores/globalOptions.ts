@@ -28,6 +28,8 @@ export interface GlobalOptionsState {
   colorPalette: ComputedRef<string[]>;
   currency: Ref<CurrencyCode>;
   darkMode: Ref<boolean>;
+  isGlossaryActive: Ref<boolean>;
+  isShareExportActive: Ref<boolean>;
   language: Ref<LanguageCode>;
   locales: Locale[];
   periodsAsDates: Ref<boolean>;
@@ -40,16 +42,23 @@ export interface GlobalOptionsGetters {
 
 export interface GlobalOptionsActions {
   clearState: () => void;
+  closeGlossary: () => void;
+  closeShareExport: () => void;
   CurrencySymbol: (currency: CurrencyCode, localeCode: LanguageCode) => string;
   exportState: () => Record<string, string | boolean>;
+  importState: (data: Record<string, any>) => void;
   loadState: () => void;
   Money: (amount: number | bigint) => string;
+  openGlossary: () => void;
+  openShareExport: () => void;
   Percent: (amount: number | bigint) => string;
   Period: (period: number | Date, asStr?: boolean) => string | number | Date;
   saveState: () => void;
   setCurrency: (newCurrency: CurrencyCode) => void;
   setLanguage: (newLanguage: LanguageCode) => void;
+  toggleGlossary: () => void;
   togglePeriodsAsDates: () => void;
+  toggleShareExport: () => void;
   toggleTheme: () => void;
 }
 
@@ -61,6 +70,8 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
 
   const baseDate: Ref<number> = ref(Date.now()); // TODO: consider letting users modify the base date
   const periodsAsDates: Ref<boolean> = ref(false);
+  const isGlossaryActive: Ref<boolean> = ref(false);
+  const isShareExportActive: Ref<boolean> = ref(false);
   const locales: Locale[] = constants.LOCALES;
   const defaultLocale: Locale = locales.find((locale: Locale) => locale.code === navigator.language)
     || locales.find((locale: Locale) => locale.code === 'en-US')
@@ -81,6 +92,19 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     currency.value = defaultLocale.currency;
     language.value = defaultLocale.code;
     periodsAsDates.value = false;
+    isGlossaryActive.value = false;
+    isShareExportActive.value = false;
+  };
+
+  /**
+   * Imports state from an object (e.g. from local storage, URL hash, or file)
+   */
+  const importState = (data: Record<string, any>): void => {
+    if (data[keys.LS_CURRENCY] !== undefined) currency.value = data[keys.LS_CURRENCY];
+    if (data[keys.LS_LANGUAGE] !== undefined) language.value = data[keys.LS_LANGUAGE];
+    if (data[keys.LS_PERIODS_AS_DATES] !== undefined) {
+      periodsAsDates.value = Boolean(data[keys.LS_PERIODS_AS_DATES]);
+    }
   };
 
   /**
@@ -88,15 +112,16 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
    * See keys.ts for naming structure
    */
   const loadState = (): void => {
+    const data: Record<string, any> = {};
     const storedCurrency = localStorage.getItem(keys.LS_CURRENCY);
     const storedLanguage = localStorage.getItem(keys.LS_LANGUAGE);
     const storedPeriodsAsDates = localStorage.getItem(keys.LS_PERIODS_AS_DATES);
 
-    if (storedCurrency) currency.value = JSON.parse(localStorage.getItem(keys.LS_CURRENCY)!);
-    if (storedLanguage) language.value = JSON.parse(localStorage.getItem(keys.LS_LANGUAGE)!);
-    if (storedPeriodsAsDates) periodsAsDates.value = JSON.parse(
-      localStorage.getItem(keys.LS_PERIODS_AS_DATES)!,
-    );
+    if (storedCurrency) data[keys.LS_CURRENCY] = JSON.parse(storedCurrency);
+    if (storedLanguage) data[keys.LS_LANGUAGE] = JSON.parse(storedLanguage);
+    if (storedPeriodsAsDates) data[keys.LS_PERIODS_AS_DATES] = JSON.parse(storedPeriodsAsDates);
+
+    importState(data);
   };
 
   /**
@@ -223,6 +248,48 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     periodsAsDates.value = !periodsAsDates.value;
   };
 
+  /**
+   * Opens the financial glossary modal
+   */
+  const openGlossary = (): void => {
+    isGlossaryActive.value = true;
+  };
+
+  /**
+   * Closes the financial glossary modal
+   */
+  const closeGlossary = (): void => {
+    isGlossaryActive.value = false;
+  };
+
+  /**
+   * Toggles the financial glossary modal
+   */
+  const toggleGlossary = (): void => {
+    isGlossaryActive.value = !isGlossaryActive.value;
+  };
+
+  /**
+   * Opens the share & export modal
+   */
+  const openShareExport = (): void => {
+    isShareExportActive.value = true;
+  };
+
+  /**
+   * Closes the share & export modal
+   */
+  const closeShareExport = (): void => {
+    isShareExportActive.value = false;
+  };
+
+  /**
+   * Toggles the share & export modal
+   */
+  const toggleShareExport = (): void => {
+    isShareExportActive.value = !isShareExportActive.value;
+  };
+
   /** GETTERS */
 
   /** state-aware label for periods in either period or date format */
@@ -232,15 +299,22 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   return {
     baseDate,
     clearState,
+    closeGlossary,
+    closeShareExport,
     colorPalette,
     currency,
     CurrencySymbol,
     darkMode,
     exportState,
+    importState,
+    isGlossaryActive,
+    isShareExportActive,
     language,
     loadState,
     locales,
     Money,
+    openGlossary,
+    openShareExport,
     Percent,
     Period,
     periodsAsDates,
@@ -248,7 +322,9 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     setCurrency,
     setLanguage,
     Time,
+    toggleGlossary,
     togglePeriodsAsDates,
+    toggleShareExport,
     toggleTheme,
   };
 });

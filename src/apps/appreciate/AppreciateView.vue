@@ -13,13 +13,23 @@ import InstrumentDetailsPanel from '@/apps/appreciate/components/InstrumentDetai
 import InstrumentForm from '@/apps/appreciate/components/forms/InstrumentForm.vue';
 import InstrumentsPanel from '@/apps/appreciate/components/InstrumentsPanel.vue';
 import OptionsForm from '@/apps/appreciate/components/forms/OptionsForm.vue';
+import GlossaryModal from '@/apps/shared/components/GlossaryModal.vue';
+import ShareExportModal from '@/apps/shared/components/ShareExportModal.vue';
 import SiteIntro from '@/apps/shared/components/SiteIntro.vue';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { useModal } from '@/apps/shared/composables/useModal';
+import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const { isDesktop } = useBreakpoint();
+
+const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
+  appType: 'appreciate',
+  importState: state.importState,
+});
 
 const activeTab = ref('analysis');
 
@@ -30,6 +40,8 @@ useModal(computed<boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_
 useModal(computed<boolean>(() => state.instrumentDetailsPanelActive), constants.INSTRUMENT_DETAILS_ID);
 useModal(computed<boolean>(() => state.instrumentFormActive), constants.INSTRUMENT_FORM_ID);
 useModal(computed<boolean>(() => state.optionsFormActive), constants.OPTIONS_FORM_ID);
+useModal(computed<boolean>(() => globalOptions.isGlossaryActive), constants.GLOSSARY_MODAL_ID);
+useModal(computed<boolean>(() => globalOptions.isShareExportActive), constants.SHARE_EXPORT_MODAL_ID);
 
 const tabClass = (tab: string) => [
   'tab',
@@ -47,6 +59,24 @@ const tabClass = (tab: string) => [
     <BudgetForm :id="constants.BUDGET_FORM_ID" />
     <InstrumentForm :id="constants.INSTRUMENT_FORM_ID" />
     <OptionsForm :id="constants.OPTIONS_FORM_ID" />
+    <GlossaryModal :id="constants.GLOSSARY_MODAL_ID" />
+    <ShareExportModal
+      :id="constants.SHARE_EXPORT_MODAL_ID"
+      app-type="appreciate"
+    />
+
+    <!-- Shared Plan Notification Alert -->
+    <div
+      v-if="isPlanLoadedFromUrl"
+      class="fixed top-14 right-4 z-50 max-w-sm cursor-pointer"
+      @click="dismissPlanAlert"
+    >
+      <base-alert
+        id="url-plan-alert"
+        :message="planLoadedMessage"
+        class="alert-success shadow-lg"
+      />
+    </div>
 
     <!-- Mobile/Tablet Tabs -->
     <div

@@ -23,3 +23,7 @@
 - **Pinia Store Architecture**: Stores use the Setup syntax (`defineStore('name', () => { ... })`) with explicit TypeScript interfaces for State, Getters, and Actions.
 - **Chart Configurations**: All charts must strictly adhere to `GraphConfig<T>` with standard D3 scales and reactive series generation.
 - **Tailwind & DaisyUI Styling**: Styling uses Tailwind 3 + DaisyUI themes (`retro` and `synthwave`) with responsive utility classes and viewport composables.
+- **Financial Glossary & Reference**: Financial definitions and calculation formulas live in `src/apps/shared/constants/glossary.ts` and are surfaced via the on-demand `<GlossaryModal>` controlled by `globalOptionsStore.isGlossaryActive`. This keeps primary calculation cards and tables clean and distraction-free.
+- **No Emojis**: Do not use emojis anywhere in the codebase (UI templates, button labels, icons, notifications, fixtures, or tests). Use clean text, standard characters (e.g. `x`), or SVG icons.
+- **Explicit Element IDs**: Interactive UI components, modal triggers, tabs, action buttons, and form inputs should define and bind dedicated, typed IDs from `src/apps/shared/constants/elementIds.ts` for clean, reliable DOM querying in tests and automation.
+- **Plan Sharing & Exporting**: Plan states are shared client-side via compressed URL hashes (`#plan=cz:...` using native deflate Web Streams or UTF-8 base64url fallback) or backed up to JSON files. Amortization and distribution schedules export to RFC 4180-compliant CSV and JSON directly from data tables.
