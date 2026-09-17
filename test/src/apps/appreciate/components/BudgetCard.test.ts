@@ -86,6 +86,47 @@ describe('BudgetCard Component (Appreciate)', () => {
     expect(wrapper.text()).toContain('Contributions');
   });
 
+  it('renders appreciation delta badge when ahead of baseline', async () => {
+    const store = useAppreciateCoreStore();
+    store.viewPhase = constants.PHASE_CAREER;
+    store.instruments = [{ id: 'inst1' }] as any;
+
+    vi.mocked(store.getBudgetName).mockReturnValue('Accelerated Savings');
+    vi.mocked(store.getContributionSchedule).mockImplementation((instId: string, budgetId: string) => {
+      if (budgetId === 'default') {
+        return {
+          lifetimeContribution: 10000,
+          lifetimeGrowth: 5000,
+          amortizationSchedule: [{ currentBalance: 15000 }]
+        } as any;
+      }
+      return {
+        lifetimeContribution: 20000,
+        lifetimeGrowth: 15000,
+        amortizationSchedule: [{ currentBalance: 35000 }]
+      } as any;
+    });
+
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {
+      [mockInstrumentId]: {
+        [mockBudget.id]: []
+      }
+    };
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    // 35000 - 15000 = 20000 extra net worth
+    expect(wrapper.text()).toContain('Extra Net Worth');
+  });
+
+
   it('renders Retirement phase correctly', async () => {
     const store = useAppreciateCoreStore();
     store.viewPhase = constants.PHASE_RETIREMENT;

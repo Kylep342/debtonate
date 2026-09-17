@@ -92,6 +92,26 @@ describe('GraphsFrame Component', () => {
     expect(wrapper.find('h2').text()).toBe('Graph 2');
   });
 
+  it('switches between graphs via pill buttons', async () => {
+    const wrapper = mount(GraphsFrame, {
+      props: {
+        graphs: mockGraphs,
+        pivotItems: mockPivotItems,
+        watchedItems: mockWatchedItems,
+        getItemName: mockGetItemName,
+        initialItemId: 'item1',
+        initialGraphId: 'Graph 1'
+      },
+      global: globalConfig
+    });
+
+    const buttons = wrapper.findAll('button');
+    const graph2Btn = buttons.find(btn => btn.text() === 'Graph 2');
+    await graph2Btn?.trigger('click');
+
+    expect(wrapper.find('h2').text()).toBe('Graph 2');
+  });
+
   it('renders extra views correctly', async () => {
     const wrapper = mount(GraphsFrame, {
       props: {

@@ -101,6 +101,30 @@ const graphContent: ComputedRef<Arc[]> = computed(() => {
 
 const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
+const defaultContributionSummary = computed(() => {
+  if (!isCareerPhase.value || props.budget.id === constants.DEFAULT) return null;
+  try {
+    return state.getContributionSchedule(props.viewedInstrumentId, constants.DEFAULT);
+  } catch {
+    return null;
+  }
+});
+
+const appreciationDelta = computed(() => {
+  if (!isCareerPhase.value || props.budget.id === constants.DEFAULT || !defaultContributionSummary.value || !viewedContributionSummary.value) {
+    return null;
+  }
+  const defaultTotal = Number(defaultContributionSummary.value.lifetimeContribution + defaultContributionSummary.value.lifetimeGrowth);
+  const currentTotal = Number(viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth);
+  const extraTotal = currentTotal - defaultTotal;
+
+  if (extraTotal <= 0) return null;
+  return {
+    extraTotal,
+    extraTotalText: `+${globalOptions.Money(extraTotal)}`,
+  };
+});
+
 const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
@@ -131,9 +155,17 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
     <template #cardTitle>
       <div class="card-actions flow-root w-full min-w-0">
         <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
-            {{ budgetName }}
-          </h2>
+          <div class="flex items-center gap-1.5 min-w-0 truncate">
+            <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
+              {{ budgetName }}
+            </h2>
+            <span
+              v-if="appreciationDelta"
+              class="badge badge-success badge-xs sm:badge-sm font-semibold text-[11px] shrink-0"
+            >
+              {{ appreciationDelta.extraTotalText }}
+            </span>
+          </div>
           <base-menu
             :text="constants.BTN_MENU"
             :buttons="buttons"
@@ -177,6 +209,17 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ budgetAmount }}</b>
+              </td>
+            </tr>
+            <tr
+              v-if="isCareerPhase && budget.id !== constants.DEFAULT && appreciationDelta"
+              class="bg-success/10"
+            >
+              <td class="truncate max-w-[110px] text-success font-semibold">
+                Extra Net Worth
+              </td>
+              <td class="text-right whitespace-nowrap text-success">
+                <b>{{ appreciationDelta.extraTotalText }}</b>
               </td>
             </tr>
             <tr v-if="!isCareerPhase && budget.id !== constants.DEFAULT">

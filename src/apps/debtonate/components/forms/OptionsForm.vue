@@ -195,6 +195,7 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
                   :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
                   v-model.number="state.roundingScale"
                   type="number"
+                  inputmode="numeric"
                   step="1"
                   min="1"
                   class="input input-bordered input-xs sm:input-sm w-20 font-mono text-right bg-base-100/80"

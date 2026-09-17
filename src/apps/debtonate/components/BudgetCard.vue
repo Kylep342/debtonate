@@ -24,6 +24,50 @@ const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(
 const budgetPayments: ComputedRef<string | number | Date> = computed(() => globalOptions.Period(viewedPaymentSchedule.value.amortizationSchedule.length, true));
 const budgetTotalPaid: ComputedRef<string> = computed(() => `${globalOptions.Money(viewedPaymentSchedule.value.lifetimeInterest + viewedPaymentSchedule.value.lifetimePrincipal)}`);
 
+const defaultPaymentSchedule: ComputedRef<paymentTypes.PaymentSchedule | null> = computed(() => {
+  if (props.budget.id === constants.DEFAULT) return null;
+  try {
+    return state.getPaymentSchedule(props.viewedLoanId, constants.DEFAULT);
+  } catch {
+    return null;
+  }
+});
+
+const payoffDelta = computed(() => {
+  if (props.budget.id === constants.DEFAULT || !defaultPaymentSchedule.value || !viewedPaymentSchedule.value) {
+    return null;
+  }
+  const defaultMonths = defaultPaymentSchedule.value.amortizationSchedule?.length || 0;
+  const currentMonths = viewedPaymentSchedule.value.amortizationSchedule?.length || 0;
+  const monthsDiff = defaultMonths - currentMonths;
+
+  const defaultInterest = Number(defaultPaymentSchedule.value.lifetimeInterest) || 0;
+  const currentInterest = Number(viewedPaymentSchedule.value.lifetimeInterest) || 0;
+  const interestSaved = defaultInterest - currentInterest;
+
+  if (monthsDiff <= 0 && interestSaved <= 0) return null;
+
+  let timeText = '';
+  if (monthsDiff > 0) {
+    const years = Math.floor(monthsDiff / 12);
+    const months = monthsDiff % 12;
+    if (years > 0 && months > 0) {
+      timeText = `${years}y ${months}m sooner`;
+    } else if (years > 0) {
+      timeText = `${years}y sooner`;
+    } else {
+      timeText = `${months}m sooner`;
+    }
+  }
+
+  return {
+    monthsDiff,
+    interestSaved,
+    interestSavedText: interestSaved > 0 ? `${globalOptions.Money(interestSaved)} saved` : null,
+    timeText: timeText || null,
+  };
+});
+
 const paymentsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
 const budgetName: ComputedRef<string> = computed(() => state.getBudgetName(props.budget.id));
 const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.header(props.viewedLoanId));
@@ -62,9 +106,17 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
     <template #cardTitle>
       <div class="card-actions flow-root w-full min-w-0">
         <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
-            {{ budgetName }}
-          </h2>
+          <div class="flex items-center gap-1.5 min-w-0 truncate">
+            <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
+              {{ budgetName }}
+            </h2>
+            <span
+              v-if="payoffDelta && (payoffDelta.timeText || payoffDelta.interestSavedText)"
+              class="badge badge-success badge-xs sm:badge-sm font-semibold text-[11px] shrink-0"
+            >
+              {{ payoffDelta.timeText || payoffDelta.interestSavedText }}
+            </span>
+          </div>
           <base-menu
             :text="constants.BTN_MENU"
             :buttons="buttons"
@@ -116,6 +168,28 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b class="text-success font-semibold">+{{ globalOptions.Money(budget.relative) }}/mo</b>
+              </td>
+            </tr>
+            <tr
+              v-if="payoffDelta && payoffDelta.interestSavedText"
+              class="bg-success/10"
+            >
+              <td class="truncate max-w-[110px] text-success font-semibold">
+                Interest Saved
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap', 'text-success']">
+                <b>{{ payoffDelta.interestSavedText }}</b>
+              </td>
+            </tr>
+            <tr
+              v-if="payoffDelta && payoffDelta.timeText"
+              class="bg-success/10"
+            >
+              <td class="truncate max-w-[110px] text-success font-semibold">
+                Time Saved
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap', 'text-success']">
+                <b>{{ payoffDelta.timeText }}</b>
               </td>
             </tr>
             <tr>

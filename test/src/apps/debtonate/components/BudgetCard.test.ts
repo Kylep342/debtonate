@@ -73,4 +73,46 @@ describe('BudgetCard Component (Debtonate)', () => {
     expect(wrapper.text()).toContain('Payments');
     expect(wrapper.text()).toContain('Total Paid');
   });
+
+  it('renders payoff delta badge and savings when schedule is ahead of baseline', async () => {
+    const store = useDebtonateCoreStore();
+    store.loans = [{ id: 'loan1' }] as any;
+
+    vi.mocked(store.getBudgetName).mockReturnValue('Accelerated Budget');
+    vi.mocked(store.getPaymentSchedule).mockImplementation((loanId: string, budgetId: string) => {
+      if (budgetId === 'default') {
+        return {
+          lifetimePrincipal: 5000,
+          lifetimeInterest: 2000,
+          amortizationSchedule: new Array(60).fill({})
+        } as any;
+      }
+      return {
+        lifetimePrincipal: 5000,
+        lifetimeInterest: 1200,
+        amortizationSchedule: new Array(44).fill({})
+      } as any;
+    });
+
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {
+      [mockLoanId]: {
+        [mockBudget.id]: []
+      }
+    };
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedLoanId: mockLoanId
+      },
+      global: globalConfig
+    });
+
+    // 60 - 44 = 16 months = 1y 4m sooner
+    expect(wrapper.text()).toContain('1y 4m sooner');
+    expect(wrapper.text()).toContain('Interest Saved');
+    expect(wrapper.text()).toContain('Time Saved');
+  });
 });
+

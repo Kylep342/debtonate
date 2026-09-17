@@ -149,6 +149,7 @@ const getFieldPlaceholder = (field: FormField): string => {
                 :id="`${modalId}-${field.key}`"
                 v-model="formData[field.key]"
                 :type="field.type"
+                :inputmode="field.type === 'number' ? 'decimal' : undefined"
                 :step="field.step"
                 :placeholder="getFieldPlaceholder(field)"
                 class="input input-bordered input-sm sm:input-md w-full bg-base-200/40 focus:input-primary focus:bg-base-100 transition-all text-sm sm:text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

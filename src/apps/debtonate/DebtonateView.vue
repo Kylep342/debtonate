@@ -34,6 +34,21 @@ const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanShar
 
 const activeTab = ref('analysis');
 
+const totalDebtFormatted = computed<string>(() => {
+  const balance = state.totalCurrentBalance || state.totalPrincipal;
+  return globalOptions.Money(balance);
+});
+
+const payoffSummary = computed<{ debtFree: string | number | Date } | null>(() => {
+  if (!state.loans.length) return null;
+  const schedule = state.getPaymentSchedule(constants.TOTALS, constants.DEFAULT);
+  if (!schedule || !schedule.amortizationSchedule || !schedule.amortizationSchedule.length) return null;
+  const periodStr = globalOptions.Period(schedule.amortizationSchedule.length, true);
+  return {
+    debtFree: periodStr,
+  };
+});
+
 const isRepatriatePhase = computed<boolean>(() => state.viewPhase === constants.PHASE_REPATRIATE);
 
 useModal(computed<boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
@@ -125,7 +140,7 @@ const tabClass = (tab: string) => [
       >
         <div
           v-if="!state.loans.length"
-          :class="['m-4', 'text-wrap', 'text-pretty', 'w-30']"
+          :class="['m-4', 'text-wrap', 'text-pretty', 'w-full', 'max-w-xl', 'mx-auto']"
         >
           <SiteIntro
             app-name="Debtonate"
@@ -145,6 +160,27 @@ const tabClass = (tab: string) => [
 
       <BudgetDetailsPanel :id="constants.BUDGET_DETAILS_ID" />
       <LoanDetailsPanel :id="constants.LOAN_DETAILS_ID" />
+    </div>
+
+    <!-- Floating Mobile Summary Pill -->
+    <div
+      v-if="!isDesktop && activeTab !== 'analysis' && state.loans.length && payoffSummary"
+      class="fixed bottom-9 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none"
+    >
+      <button
+        type="button"
+        class="pointer-events-auto btn btn-sm h-auto py-2 px-3.5 shadow-xl border border-primary/30 bg-base-100/95 backdrop-blur text-xs flex items-center justify-between gap-2.5 rounded-full max-w-sm w-full transition-transform active:scale-95"
+        @click="activeTab = 'analysis'"
+      >
+        <div class="flex items-center gap-1.5 truncate">
+          <span class="badge badge-primary badge-xs py-2 px-2 font-semibold">Payoff</span>
+          <span class="font-medium truncate">{{ payoffSummary.debtFree }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-base-content/70 font-mono text-[11px] shrink-0">
+          <span>{{ totalDebtFormatted }}</span>
+          <span class="text-primary font-bold text-xs">&rarr;</span>
+        </div>
+      </button>
     </div>
 
     <FooterBar :class="['flex-none']" />

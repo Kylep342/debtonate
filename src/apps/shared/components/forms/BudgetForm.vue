@@ -163,6 +163,7 @@ const submit = () => {
               :id="`${modalId}-amount`"
               v-model.number="amount"
               type="number"
+              inputmode="decimal"
               step="0.01"
               :placeholder="inputPlaceholder"
               class="input input-bordered input-sm sm:input-md w-full pl-8 sm:pl-9 bg-base-100/80 focus:input-primary focus:bg-base-100 transition-all font-mono text-base"

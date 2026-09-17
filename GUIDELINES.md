@@ -27,3 +27,4 @@
 - **No Emojis**: Do not use emojis anywhere in the codebase (UI templates, button labels, icons, notifications, fixtures, or tests). Use clean text, standard characters (e.g. `x`), or SVG icons.
 - **Explicit Element IDs**: Interactive UI components, modal triggers, tabs, action buttons, and form inputs should define and bind dedicated, typed IDs from `src/apps/shared/constants/elementIds.ts` for clean, reliable DOM querying in tests and automation.
 - **Plan Sharing & Exporting**: Plan states are shared client-side via compressed URL hashes (`#plan=cz:...` using native deflate Web Streams or UTF-8 base64url fallback) or backed up to JSON files. Amortization and distribution schedules export to RFC 4180-compliant CSV and JSON directly from data tables.
+- **Multi-format UX**: The UI should be clear and functional on both desktop and mobile.
