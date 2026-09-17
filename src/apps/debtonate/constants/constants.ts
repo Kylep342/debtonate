@@ -8,6 +8,11 @@ const BTN_REFINANCE = 'Refinance';
 const BTN_REFINANCING_SUMMARY = "Refinancing Summary";
 const BUDGET_DETAILS_ID = 'budgetDetails';
 const BUDGET_FORM_ID = 'budgetForm';
+const BUDGET_OVER_MINIMUM = 'Budget (Over Minimum)';
+const BUDGET_OVER_MINIMUM_PLACEHOLDER = 'Amount over minimum';
+const LABEL_BASELINE_MINIMUM = 'Baseline Minimum';
+const LABEL_OVER_MINIMUM = 'Over Minimum';
+const LABEL_TOTAL_PAYMENT = 'Total Payment';
 const GRAPH_BALANCES_OVER_TIME = 'Balances | Time'
 const GRAPH_INTEREST_PAID_OVER_TIME = 'Interest Paid | Time'
 const GRAPH_INTEREST_SAVED_OVER_TIME = 'Interest Saved | Time'
@@ -38,6 +43,11 @@ export default Object.freeze({
   BTN_REFINANCING_SUMMARY,
   BUDGET_DETAILS_ID,
   BUDGET_FORM_ID,
+  BUDGET_OVER_MINIMUM,
+  BUDGET_OVER_MINIMUM_PLACEHOLDER,
+  LABEL_BASELINE_MINIMUM,
+  LABEL_OVER_MINIMUM,
+  LABEL_TOTAL_PAYMENT,
   GRAPH_BALANCES_OVER_TIME,
   GRAPH_INTEREST_PAID_OVER_TIME,
   GRAPH_INTEREST_SAVED_OVER_TIME,

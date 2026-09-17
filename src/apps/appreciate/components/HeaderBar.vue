@@ -43,16 +43,18 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
     id="header-bar"
     :class="['navbar', 'bg-secondary', 'px-2', 'md:px-4', 'sticky', 'top-0', 'z-30']"
   >
-    <div :class="['flex-1']">
+    <div :class="['flex-1', 'flex', 'items-center', 'min-w-0', 'gap-1']">
       <img
-        v-if="!isMobile"
         src="/icon.png"
+        alt="Appreciate logo"
+        class="shrink-0"
       >
-      <div :class="['flex', 'items-center']">
+      <div :class="['flex', 'items-center', 'min-w-0']">
         <base-menu
           :text="isMobile ? 'Appreciate' : constants.NAME_APPRECIATE"
           :buttons="appButtons"
           :classes="['btn-secondary', 'btn-sm', 'px-1']"
+          align="start"
           style="filter: brightness(0.9);"
         />
         <span
@@ -72,7 +74,7 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
       </div>
     </div>
     <base-button
-      :class="['btn-sm']"
+      :class="['btn-sm', 'shrink-0']"
       @click="state.openOptionsForm"
     >
       {{ isMobile ? 'Opts' : constants.BTN_OPTIONS }}

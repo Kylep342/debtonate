@@ -5,10 +5,12 @@ import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 import constants from '@/apps/debtonate/constants/constants';
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { usePivot } from '@/apps/shared/composables/usePivot';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { UIDebtLoan } from '@/apps/debtonate/types/core';
 
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const currentLoan: Ref<loan.ILoan | UIDebtLoan | null> = ref(null);
@@ -43,14 +45,13 @@ const amortizationSubtitle: ComputedRef<string> = computed(() => {
 
 const tableRows: ComputedRef<{}[]> = computed(() => {
   if (!paymentSchedule.value) return [];
-  return state.amortizationTableRows(paymentSchedule.value)
+  return state.amortizationTableRows(paymentSchedule.value);
 });
 
 const tableFooter: ComputedRef<{}> = computed(() => {
   if (!paymentSchedule.value) return [];
-  return state.amortizationTableTotals(paymentSchedule.value)
+  return state.amortizationTableTotals(paymentSchedule.value);
 });
-
 
 const buildLoanDetailsTitle = (loanItem: loan.ILoan | UIDebtLoan): string => loanItem
   ? `Loan Details - ${state.getLoanName(loanItem.id)} | `
@@ -73,16 +74,19 @@ watch(
 <template>
   <base-modal
     :id="constants.LOAN_DETAILS_ID"
+    :max-width="'4xl'"
     @exit="state.unviewLoan"
   >
     <template #header>
-      <h2 :class="['pl-4']">
-        {{ title }}
-      </h2>
+      <div class="flex items-center gap-2 pl-2">
+        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
+          {{ title }}
+        </h2>
+      </div>
     </template>
     <template #headerActions>
       <base-button
-        :class="['btn btn-circle btn-ghost']"
+        class="btn btn-circle btn-ghost btn-sm"
         @click="state.unviewLoan"
       >
         x
@@ -91,30 +95,73 @@ watch(
     <template #body>
       <div
         v-if="currentLoan"
-        :class="['tabframe', 'w-auto', 'pb-10']"
+        class="p-3 sm:p-4 flex flex-col gap-4"
       >
+        <!-- Top Stat Ribbon -->
+        <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-content/10 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Current Balance</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ globalOptions.Money(currentLoan.currentBalance) }}
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Interest Rate</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-secondary">
+              {{ (Number(currentLoan.annualRate) * 100).toFixed(2) }}% APR
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Minimum Monthly</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ globalOptions.Money(currentLoan.minPayment) }}
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Original Term</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ currentLoan.termInYears }} Years
+            </span>
+          </div>
+        </div>
+
+        <!-- Refinancing Scenarios (if available) -->
         <RefinancingTable
           v-if="state.refinancingScenarios[currentLoan.id]?.length"
           :parent-id="currentLoan.id"
           :scenarios="state.refinancingScenarios[currentLoan.id]"
           :schedules="state.refinancingSchedules[currentLoan.id]"
         />
-        <base-tabs
-          :get-item-name="state.getBudgetName"
-          :pivot="state.monthlyBudgets"
-          :is-viewed-item-id="isViewedItemId"
-          :set-viewed-item-id="setViewedItemId"
+
+        <!-- Amortization Schedules Pivot -->
+        <div class="tabframe w-auto">
+          <base-tabs
+            :get-item-name="state.getBudgetName"
+            :pivot="state.monthlyBudgets"
+            :is-viewed-item-id="isViewedItemId"
+            :set-viewed-item-id="setViewedItemId"
+          >
+            <template #tabContent>
+              <data-table
+                :title="amortizationTitle"
+                :subtitle="amortizationSubtitle"
+                :headers="state.amortizationTableHeaders"
+                :rows="tableRows"
+                :totals="tableFooter"
+              />
+            </template>
+          </base-tabs>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex items-center justify-end w-full">
+        <base-button
+          class="btn-sm btn-primary"
+          @click="state.unviewLoan"
         >
-          <template #tabContent>
-            <data-table
-              :title="amortizationTitle"
-              :subtitle="amortizationSubtitle"
-              :headers="state.amortizationTableHeaders"
-              :rows="tableRows"
-              :totals="tableFooter"
-            />
-          </template>
-        </base-tabs>
+          Done
+        </base-button>
       </div>
     </template>
   </base-modal>

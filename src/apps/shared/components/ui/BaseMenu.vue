@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, PropType } from 'vue';
 import { Button } from '@/apps/shared/types/app';
 
 defineProps({
@@ -8,12 +8,16 @@ defineProps({
     required: true
   },
   buttons: {
-    type: Array as () => Array<Button>,
+    type: Array as PropType<Array<Button>>,
     required: true
   },
   classes: {
-    type: Array as () => Array<string>,
+    type: Array as PropType<Array<string>>,
     required: true
+  },
+  align: {
+    type: String as PropType<'start' | 'end'>,
+    default: 'end'
   }
 });
 
@@ -59,7 +63,12 @@ onUnmounted(() => {
 <template>
   <div
     ref="menuRef"
-    :class="['dropdown', 'dropdown-bottom', 'dropdown-end', { 'dropdown-open': isOpen }]"
+    :class="[
+      'dropdown',
+      'dropdown-bottom',
+      align === 'end' ? 'dropdown-end' : '',
+      { 'dropdown-open': isOpen }
+    ]"
   >
     <base-button
       :class="classes"
@@ -69,7 +78,18 @@ onUnmounted(() => {
     </base-button>
     <ul
       tabindex="0"
-      :class="['dropdown-content', 'menu', 'bg-base-100', 'rounded-box', 'z-[50]', 'w-max', 'min-w-[120px]', 'p-2', 'shadow']"
+      :class="[
+        'dropdown-content',
+        'menu',
+        'bg-base-100',
+        'rounded-box',
+        'z-[50]',
+        'w-max',
+        'min-w-[120px]',
+        'p-2',
+        'shadow',
+        align === 'start' ? 'left-0' : ''
+      ]"
     >
       <li
         v-for="button in buttons"

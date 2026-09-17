@@ -30,4 +30,7 @@ export type FormField = {
   type: 'number' | 'text' | 'string';
   step?: string;
   required?: boolean;
+  placeholder?: string;
+  hint?: string;
 };
+

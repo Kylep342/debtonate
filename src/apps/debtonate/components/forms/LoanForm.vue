@@ -8,11 +8,11 @@ import { FormField } from '@/apps/shared/types/app';
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
 const fields: FormField[] = [
+  { key: 'name', label: 'Loan Name (Optional)', type: 'text', required: false },
   { key: 'principal', label: 'Principal', type: 'number', step: '0.01', required: true },
-  { key: 'interestRate', label: 'Interest Rate', type: 'number', step: '0.01', required: true },
-  { key: 'termInYears', label: 'Term (In Years)', type: 'number', required: true },
-  { key: 'name', label: 'Name (Optional)', type: 'text', required: false },
   { key: 'currentBalance', label: 'Current Balance (Optional)', type: 'number', step: '0.01', required: false },
+  { key: 'interestRate', label: 'Interest Rate', type: 'number', step: '0.01', required: true },
+  { key: 'termInYears', label: 'Loan Term', type: 'number', required: true },
   { key: 'fees', label: 'Fees (Optional)', type: 'number', step: '0.01', required: false },
 ];
 
@@ -20,23 +20,24 @@ const initialValues = computed(() => {
   if (state.currentLoanId && state.loanFormActive) {
     const currentLoan = state.getLoan(state.currentLoanId)!;
     return {
+      name: currentLoan.name,
       principal: currentLoan.principal,
+      currentBalance: currentLoan.currentBalance,
       interestRate: currentLoan.annualRate * 100,
       termInYears: currentLoan.termInYears,
-      name: currentLoan.name,
-      currentBalance: currentLoan.currentBalance,
       fees: currentLoan.fees,
     };
   }
   return {
+    name: null,
     principal: null,
+    currentBalance: null,
     interestRate: null,
     termInYears: null,
-    name: null,
-    currentBalance: null,
     fees: null,
   };
 });
+
 
 const saveButtonText = computed(() => state.currentLoanId ? constants.BTN_SAVE : constants.BTN_CREATE);
 

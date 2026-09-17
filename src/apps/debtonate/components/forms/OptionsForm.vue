@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, ComputedRef, Ref } from 'vue';
+import { computed, ref, ComputedRef } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
@@ -9,271 +9,286 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const repaymentCardRef = ref(null);
-const reducePaymentsCardRef = ref(null);
-const refinancingCardRef = ref(null);
-const roundingCardRef = ref(null);
-
-const globalOptionsFormletRef = ref(null);
-const appStateCardRef = ref(null);
+const activeTab = ref<'strategy' | 'display' | 'storage'>('strategy');
 
 const copyStateToClipboard = () => navigator.clipboard.writeText(
   JSON.stringify(state.exportState())
 );
 
-const cardRefs = computed(() => [
-  appStateCardRef.value,
-  repaymentCardRef.value,
-  reducePaymentsCardRef.value,
-  refinancingCardRef.value,
-  roundingCardRef.value,
-].filter(Boolean));
-
-const allCollapsed: Ref<boolean> = ref(false);
-
-const toggleAllCards = (): void => {
-  allCollapsed.value = !allCollapsed.value;
-  const action = allCollapsed.value ? 'collapse' : 'expand';
-  const childAction = allCollapsed.value ? 'collapseAll' : 'expandAll';
-
-  cardRefs.value.forEach((card: any) => card && card[action] && card[action]());
-
-  if (globalOptionsFormletRef.value) {
-    (globalOptionsFormletRef.value as any)[childAction]();
-  }
-};
-
 const reducePaymentsExample: ComputedRef<string> = computed(
-  () => (state.loans.length ? (`(Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)})`) : ''),
+  () => (state.loans.length ? (`Paying off ${state.getLoanName(state.loans[0].id)} reduces future payments by ${globalOptions.Money(state.loans[0].minPayment)}`) : ''),
 );
+
 const refinancingUseHighestPaymentExample: ComputedRef<string> = computed(() => {
   if (state.loans.length) {
-    const firstLoan = state.loans[0]
+    const firstLoan = state.loans[0];
     const basePayment = firstLoan.minPayment;
     const hypotheticalPayment = Math.max(firstLoan.minPayment - (firstLoan.minPayment % 10), 100);
     const usedPayment = state.refinancingUseHighestPayment ? Math.max(basePayment, hypotheticalPayment) : hypotheticalPayment;
-    return `(A scenario for ${state.getLoanName(firstLoan.id)} [${globalOptions.Money(basePayment)}] with a minimum payment of ${globalOptions.Money(hypotheticalPayment)} uses ${globalOptions.Money(usedPayment)})`;
+    return `A scenario for ${state.getLoanName(firstLoan.id)} [${globalOptions.Money(basePayment)}] with minimum ${globalOptions.Money(hypotheticalPayment)} uses ${globalOptions.Money(usedPayment)}`;
   }
   return '';
 });
+
 const repaymentPriorityExample: ComputedRef<string> = computed(
-  () => (state.loans.length ? (`(Priority: ${state.loans.map((l: any) => state.getLoanName(l.id)).join(', ')})`) : ''),
+  () => (state.loans.length ? (`Priority: ${state.loans.map((l: any) => state.getLoanName(l.id)).join(', ')}`) : ''),
 );
 
-const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');
+const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-ghost border border-base-content/20');
 const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constants.BTN_OFF);
 </script>
 
 <template>
   <base-modal
-    :body-classes="['overflow-y-auto']"
+    :max-width="'2xl'"
     @exit="state.exitOptionsForm"
   >
     <template #header>
-      <h2 :class="['pl-4']">
-        Options
-      </h2>
+      <div class="flex items-center gap-2 pl-2">
+        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
+          Debtonate Options
+        </h2>
+      </div>
     </template>
     <template #headerActions>
       <base-button
-        :class="['btn btn-circle btn-ghost']"
+        class="btn btn-circle btn-ghost btn-sm"
         @click="state.exitOptionsForm"
       >
         x
       </base-button>
     </template>
     <template #body>
-      <div class="flex justify-between items-center">
-        <h3 :class="['pl-4']">
-          Debtonate Options
-        </h3>
-        <base-button
-          :class="['btn-sm']"
-          @click="toggleAllCards"
+      <div class="p-3 sm:p-4 flex flex-col gap-4 min-h-[480px] sm:min-h-[575px]">
+        <!-- Segmented Navigation Tabs -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-1.5 p-1 bg-base-300/40 rounded-xl">
+          <button
+            type="button"
+            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
+            :class="activeTab === 'strategy' ? 'btn-primary' : 'btn-ghost'"
+            @click="activeTab = 'strategy'"
+          >
+            Strategy
+          </button>
+          <button
+            type="button"
+            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
+            :class="activeTab === 'display' ? 'btn-primary' : 'btn-ghost'"
+            @click="activeTab = 'display'"
+          >
+            Display
+          </button>
+          <button
+            type="button"
+            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
+            :class="activeTab === 'storage' ? 'btn-primary' : 'btn-ghost'"
+            @click="activeTab = 'storage'"
+          >
+            Data
+          </button>
+        </div>
+
+        <!-- Tab 1: Strategy & Priority -->
+        <div
+          v-if="activeTab === 'strategy'"
+          class="flex flex-col gap-3 flex-1"
         >
-          {{ allCollapsed ? '+' : '-' }}
-        </base-button>
-      </div>
-      <br>
-      <hr>
-      <br>
-      <div :class="['formInputs', 'pb-10']">
-        <collapsible-card ref="appStateCardRef">
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              App State
-            </h3>
-          </template>
-          <template #cardTitleActions>
+          <!-- Repayment Priority -->
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div>
+                <span class="font-bold text-sm text-base-content">Repayment Priority Method</span>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Choose how extra budget is directed across your debts.
+                </p>
+              </div>
+              <div class="join w-full sm:w-auto shrink-0">
+                <button
+                  type="button"
+                  class="join-item btn btn-xs sm:btn-sm flex-1 sm:flex-initial flex flex-col sm:flex-row sm:flex-nowrap h-auto min-h-[2.25rem] sm:min-h-[2rem] py-1.5 sm:py-1 px-2.5 sm:px-3 items-center justify-center leading-normal"
+                  :class="!state.snowballSort ? 'btn-primary' : 'btn-ghost border border-base-content/20'"
+                  @click="state.toggleAvalancheSort"
+                >
+                  <span class="font-semibold whitespace-nowrap">Avalanche</span>
+                  <span class="text-[10px] sm:text-xs opacity-75 font-normal whitespace-nowrap sm:ml-1.5">(High APR)</span>
+                </button>
+                <button
+                  type="button"
+                  class="join-item btn btn-xs sm:btn-sm flex-1 sm:flex-initial flex flex-col sm:flex-row sm:flex-nowrap h-auto min-h-[2.25rem] sm:min-h-[2rem] py-1.5 sm:py-1 px-2.5 sm:px-3 items-center justify-center leading-normal"
+                  :class="state.snowballSort ? 'btn-primary' : 'btn-ghost border border-base-content/20'"
+                  @click="state.toggleSnowballSort"
+                >
+                  <span class="font-semibold whitespace-nowrap">Snowball</span>
+                  <span class="text-[10px] sm:text-xs opacity-75 font-normal whitespace-nowrap sm:ml-1.5">(Low Balance)</span>
+                </button>
+              </div>
+            </div>
+            <div
+              v-if="repaymentPriorityExample"
+              class="font-mono text-xs bg-base-300/60 px-2.5 py-1.5 rounded-lg text-primary border border-base-content/10 mt-1 break-words"
+            >
+              {{ repaymentPriorityExample }}
+            </div>
+          </div>
+
+          <!-- Reduce Payments -->
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="font-bold text-sm text-base-content">Reduce Minimum Payments</span>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Lower your baseline monthly commitment as individual loans are paid off.
+                </p>
+              </div>
+              <base-button
+                :class="buttonStyle(state.reducePayments)"
+                class="btn-xs sm:btn-sm"
+                @click="state.toggleReducePayments"
+              >
+                {{ buttonText(state.reducePayments) }}
+              </base-button>
+            </div>
+            <div
+              v-if="reducePaymentsExample"
+              class="font-mono text-xs bg-base-300/60 px-2.5 py-1.5 rounded-lg text-primary border border-base-content/10 mt-1 break-words"
+            >
+              {{ reducePaymentsExample }}
+            </div>
+          </div>
+
+          <!-- Refinancing - Use Highest Payment -->
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="font-bold text-sm text-base-content">Refinancing - Use Highest Payment</span>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Maintain the original monthly payment amount after refinancing to accelerate payoff.
+                </p>
+              </div>
+              <base-button
+                :class="buttonStyle(state.refinancingUseHighestPayment)"
+                class="btn-xs sm:btn-sm"
+                @click="state.toggleRefinancingUseHighestPayment"
+              >
+                {{ buttonText(state.refinancingUseHighestPayment) }}
+              </base-button>
+            </div>
+            <div
+              v-if="refinancingUseHighestPaymentExample"
+              class="font-mono text-xs bg-base-300/60 px-2.5 py-1.5 rounded-lg text-primary border border-base-content/10 mt-1 break-words"
+            >
+              {{ refinancingUseHighestPaymentExample }}
+            </div>
+          </div>
+
+          <!-- Contribution Rounding -->
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span class="font-bold text-sm text-base-content">Round Minimum Contribution</span>
+                <p class="text-xs text-base-content/70 mt-0.5">
+                  Round your monthly payment up to the next multiple of your chosen scale.
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input
+                  :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
+                  v-model.number="state.roundingScale"
+                  type="number"
+                  step="1"
+                  min="1"
+                  class="input input-bordered input-xs sm:input-sm w-20 font-mono text-right bg-base-100/80"
+                >
+                <base-button
+                  :class="buttonStyle(state.roundingEnabled)"
+                  class="btn-xs sm:btn-sm"
+                  @click="state.toggleRounding(state.roundingScale)"
+                >
+                  {{ buttonText(state.roundingEnabled) }}
+                </base-button>
+              </div>
+            </div>
+            <div class="text-xs text-base-content/60 mt-1">
+              Current total minimum payment: <span class="font-mono font-semibold text-base-content">{{ globalOptions.Money(state.totalMinPayment) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Display & Regional -->
+        <div
+          v-if="activeTab === 'display'"
+          class="flex flex-col gap-3 flex-1"
+        >
+          <global-options-formlet />
+        </div>
+
+        <!-- Tab 3: Data & Storage -->
+        <div
+          v-if="activeTab === 'storage'"
+          class="flex flex-col gap-3 flex-1"
+        >
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-3">
             <div>
-              <base-button @click="state.loadState">
+              <span class="font-bold text-sm text-base-content">Browser Local Storage & State</span>
+              <p class="text-xs text-base-content/70 mt-1">
+                Save your current loan portfolio to this browser, reload saved data, or copy a snapshot to your clipboard.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2 pt-1">
+              <base-button
+                class="btn-xs sm:btn-sm btn-outline"
+                @click="state.loadState"
+              >
                 {{ constants.BTN_LOAD }}
               </base-button>
-              <base-button @click="state.saveState">
+              <base-button
+                class="btn-xs sm:btn-sm btn-primary"
+                @click="state.saveState"
+              >
                 {{ constants.BTN_SAVE }}
               </base-button>
-              <base-button @click="state.clearState">
-                {{ constants.BTN_CLEAR }}
-              </base-button>
-              <base-button @click="copyStateToClipboard">
+              <base-button
+                class="btn-xs sm:btn-sm btn-ghost border border-base-content/20"
+                @click="copyStateToClipboard"
+              >
                 {{ constants.BTN_COPY }}
               </base-button>
               <base-button
+                class="btn-xs sm:btn-sm btn-error btn-outline"
+                @click="state.clearState"
+              >
+                {{ constants.BTN_CLEAR }}
+              </base-button>
+            </div>
+          </div>
+
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="font-bold text-sm text-base-content">Share Plan & Export Schedules</span>
+                <p class="text-xs text-base-content/70 mt-1">
+                  Generate compressed URL links, download workspace backup JSON, or export amortization tables.
+                </p>
+              </div>
+              <base-button
+                class="btn-xs sm:btn-sm btn-primary"
                 @click="globalOptions.openShareExport"
               >
                 {{ constants.BTN_SHARE_EXPORT }}
               </base-button>
             </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                Manage your application state: load from or save to local storage, clear all data, copy state, or share & export your payoff plan via link, CSV, or JSON.
-              </p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card ref="repaymentCardRef">
-          <template #cardTitle>
-            <div :class="['flex', 'flex-row']">
-              <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-                Repayment Priority
-              </h3>
-            </div>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <base-button
-                :class="buttonStyle(!state.snowballSort)"
-                @click="state.toggleAvalancheSort"
-              >
-                Avalanche
-              </base-button>
-              <base-button
-                :class="buttonStyle(state.snowballSort)"
-                @click="state.toggleSnowballSort"
-              >
-                Snowball
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>Avalanche prioritizes loans by descending interest rate</p>
-              <p>Snowball prioritizes loans by ascending principal</p>
-              <br>
-              <p>
-                {{ repaymentPriorityExample }}
-              </p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card ref="reducePaymentsCardRef">
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Reduce Payments
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <base-button
-                :class="buttonStyle(state.reducePayments)"
-                @click="state.toggleReducePayments"
-              >
-                {{
-                  buttonText(state.reducePayments) }}
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this reduces your total minimum contribution each
-                time you pay off a loan
-              </p>
-              <br>
-              <p>
-                {{ reducePaymentsExample }}
-              </p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card ref="refinancingCardRef">
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Refinancing - Use Highest Payment
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div>
-              <base-button
-                :class="buttonStyle(state.refinancingUseHighestPayment)"
-                @click="state.toggleRefinancingUseHighestPayment"
-              >
-                {{
-                  buttonText(state.refinancingUseHighestPayment) }}
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this uses the higher value between
-                a refinanced loan's minimum payment
-                and its base loan's minimum payment
-                when projecting refinancing scenarios
-              </p>
-              <br>
-              <p>
-                {{ refinancingUseHighestPaymentExample }}
-              </p>
-            </div>
-          </template>
-        </collapsible-card>
-        <collapsible-card ref="roundingCardRef">
-          <template #cardTitle>
-            <h3 :class="['cardHeaderTitle', 'float-left', 'p-4']">
-              Rounding
-            </h3>
-          </template>
-          <template #cardTitleActions>
-            <div :class="['flex', 'flex-row']">
-              <div :class="['label']">
-                <span :class="['label-text']">scale:</span>
-              </div>
-              <input
-                :id="`${constants.OPTIONS_FORM_ID}-rounding-scale`"
-                v-model.number="state.roundingScale"
-                :class="['input input-bordered input-secondary w-full max-ws']"
-                type="number"
-                step="0.01"
-                label="scale"
-              >
-              <base-button
-                :class="buttonStyle(state.roundingEnabled)"
-                @click="state.toggleRounding(state.roundingScale)"
-              >
-                {{ buttonText(state.roundingEnabled) }}
-              </base-button>
-            </div>
-          </template>
-          <template #cardBody>
-            <div :class="['text-base', 'max-w-prose']">
-              <p>
-                When enabled this rounds your minimum contribution up to the next
-                multiple of {{ globalOptions.Money(state.roundingScale) }}
-              </p>
-              <br>
-              <p>
-                Minimum Monthly Payment: {{ globalOptions.Money(state.totalMinPayment) }}
-              </p>
-            </div>
-          </template>
-        </collapsible-card>
-        <br>
-        <hr>
-        <br>
-        <global-options-formlet ref="globalOptionsFormletRef" />
+          </div>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex items-center justify-end w-full">
+        <base-button
+          class="btn-sm btn-primary"
+          @click="state.exitOptionsForm"
+        >
+          Done
+        </base-button>
       </div>
     </template>
   </base-modal>

@@ -55,9 +55,8 @@ const netWorthLabel: ComputedRef<string> = computed(() => isCareerPhase.value
   : (state.deflateAllMoney ? 'Ending Balance (CYM)' : 'Ending Balance')
 );
 
-const budgetAmount: ComputedRef<string> = computed(() => isCareerPhase.value
-  ? `${globalOptions.Money(props.budget.absolute)}/month`
-  : `${globalOptions.Money(props.budget.absolute)}/year`
+const budgetAmount: ComputedRef<string> = computed(() =>
+  `${globalOptions.Money(props.budget.absolute)}/month`
 );
 
 const periodLabel: ComputedRef<string> = computed(() => {
@@ -178,6 +177,39 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ budgetAmount }}</b>
+              </td>
+            </tr>
+            <tr v-if="!isCareerPhase && budget.id !== constants.DEFAULT">
+              <td class="truncate max-w-[110px]">
+                vs Target
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b
+                  v-if="budget.relative > state.desiredNetIncome"
+                  class="text-success font-semibold"
+                >
+                  +{{ globalOptions.Money(budget.relative - state.desiredNetIncome) }}/mo
+                </b>
+                <b
+                  v-else-if="budget.relative < state.desiredNetIncome"
+                  class="text-warning font-semibold"
+                >
+                  -{{ globalOptions.Money(state.desiredNetIncome - budget.relative) }}/mo
+                </b>
+                <b
+                  v-else
+                  class="text-primary font-semibold"
+                >
+                  {{ globalOptions.Money(0) }}/mo
+                </b>
+              </td>
+            </tr>
+            <tr v-else-if="isCareerPhase && budget.id !== constants.DEFAULT">
+              <td class="truncate max-w-[110px]">
+                Extra
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b class="text-success font-semibold">+{{ globalOptions.Money(budget.relative) }}/mo</b>
               </td>
             </tr>
             <tr>

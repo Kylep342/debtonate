@@ -18,9 +18,19 @@ const initialAmount = computed(() => {
   return null;
 });
 
-const title = computed(() => isCareerPhase.value ? state.budgetFormTitle : 'Creating Withdrawal Scenario');
-const label = computed(() => isCareerPhase.value ? constants.BUDGET : constants.WITHDRAWAL);
+const title = computed(() => {
+  if (isCareerPhase.value) {
+    return state.budgetFormTitle;
+  }
+  return state.currentBudgetId && state.budgetFormActive
+    ? `Editing ${state.getWithdrawalBudgetName(state.currentBudgetId)}`
+    : 'Creating Withdrawal Scenario';
+});
+
+const label = computed(() => isCareerPhase.value ? constants.BUDGET : 'Monthly Withdrawal');
+const placeholder = computed(() => isCareerPhase.value ? 'Budget amount' : 'Monthly withdrawal amount');
 const saveButtonText = computed(() => state.currentBudgetId ? constants.BTN_SAVE : constants.BTN_CREATE);
+const targetAmount = computed(() => isCareerPhase.value ? null : state.desiredNetIncome);
 
 const handleSubmit = (amount: number) => {
   if (isCareerPhase.value) {
@@ -36,6 +46,8 @@ const handleSubmit = (amount: number) => {
     :modal-id="constants.BUDGET_FORM_ID"
     :title="title"
     :label="label"
+    :placeholder="placeholder"
+    :target-amount="targetAmount"
     :initial-amount="initialAmount"
     :save-button-text="saveButtonText"
     :is-active="state.budgetFormActive"

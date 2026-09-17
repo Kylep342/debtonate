@@ -110,6 +110,14 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
                 <b>{{ budgetAmount }}</b>
               </td>
             </tr>
+            <tr v-if="budget.id !== constants.DEFAULT">
+              <td class="truncate max-w-[110px]">
+                Over Minimum
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b class="text-success font-semibold">+{{ globalOptions.Money(budget.relative) }}/mo</b>
+              </td>
+            </tr>
             <tr>
               <td class="truncate max-w-[110px]">
                 {{ paymentsLabel }}

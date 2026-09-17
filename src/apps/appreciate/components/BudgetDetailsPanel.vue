@@ -63,10 +63,21 @@ const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget | null): string =>
     ? state.getBudgetName(monthlyBudget.id)
     : state.getWithdrawalBudgetName(monthlyBudget.id);
 
-  return `Budget Details - ${budgetName} | `
+  if (isCareerPhase.value) {
+    return `Budget Details - ${budgetName} | `
+      + `${globalOptions.Money(monthlyBudget.absolute)}/month `
+      + `(+${globalOptions.Money(monthlyBudget.relative)}/month)`;
+  }
+  const diff = monthlyBudget.relative - state.desiredNetIncome;
+  const diffStr = diff > 0
+    ? `(+${globalOptions.Money(diff)}/mo vs target)`
+    : diff < 0
+      ? `(-${globalOptions.Money(Math.abs(diff))}/mo vs target)`
+      : '(matches target)';
+  return `Withdrawal Details - ${budgetName} | `
     + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-    + (isCareerPhase.value ? `(+${globalOptions.Money(monthlyBudget.relative)}/month)` : '');
-}
+    + diffStr;
+};
 
 const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
 
@@ -86,16 +97,19 @@ watch(
 <template>
   <base-modal
     :id="constants.BUDGET_DETAILS_ID"
+    :max-width="'4xl'"
     @exit="state.unviewBudget"
   >
     <template #header>
-      <h2 :class="['pl-4']">
-        {{ title }}
-      </h2>
+      <div class="flex items-center gap-2 pl-2">
+        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
+          {{ title }}
+        </h2>
+      </div>
     </template>
     <template #headerActions>
       <base-button
-        :class="['btn btn-circle btn-ghost']"
+        class="btn btn-circle btn-ghost btn-sm"
         @click="state.unviewBudget"
       >
         x
@@ -104,24 +118,66 @@ watch(
     <template #body>
       <div
         v-if="currentBudget"
-        :class="['tabframe', 'w-auto', 'pb-10']"
+        class="p-3 sm:p-4 flex flex-col gap-4"
       >
-        <base-tabs
-          :get-item-name="state.getInstrumentName"
-          :pivot="state.instrumentsWithTotals"
-          :is-viewed-item-id="isViewedItemId"
-          :set-viewed-item-id="setViewedItemId"
+        <!-- Top Stat Ribbon -->
+        <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-content/10 shadow-sm grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span class="text-base-content/60 text-[11px] block">
+              {{ isCareerPhase ? 'Monthly Contribution' : 'Monthly Withdrawal' }}
+            </span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ globalOptions.Money(currentBudget.absolute) }}/mo
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">
+              {{ isCareerPhase ? 'Extra Relative Budget' : 'Target Net Income' }}
+            </span>
+            <span
+              class="font-mono font-bold text-sm sm:text-base"
+              :class="isCareerPhase ? 'text-primary' : 'text-base-content'"
+            >
+              {{ isCareerPhase ? `+${globalOptions.Money(currentBudget.relative)}/mo` : `${globalOptions.Money(state.desiredNetIncome)}/mo` }}
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Target Planning Phase</span>
+            <span class="badge badge-sm badge-primary uppercase text-[10px] mt-0.5">
+              {{ isCareerPhase ? 'Career Accumulation' : 'Retirement Drawdown' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Amortization Schedules Pivot -->
+        <div class="tabframe w-auto">
+          <base-tabs
+            :get-item-name="state.getInstrumentName"
+            :pivot="state.instrumentsWithTotals"
+            :is-viewed-item-id="isViewedItemId"
+            :set-viewed-item-id="setViewedItemId"
+          >
+            <template #tabContent>
+              <data-table
+                :title="amortizationTitle"
+                :subtitle="amortizationSubtitle"
+                :headers="state.amortizationTableHeaders"
+                :rows="tableRows"
+                :totals="tableFooter"
+              />
+            </template>
+          </base-tabs>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex items-center justify-end w-full">
+        <base-button
+          class="btn-sm btn-primary"
+          @click="state.unviewBudget"
         >
-          <template #tabContent>
-            <data-table
-              :title="amortizationTitle"
-              :subtitle="amortizationSubtitle"
-              :headers="state.amortizationTableHeaders"
-              :rows="tableRows"
-              :totals="tableFooter"
-            />
-          </template>
-        </base-tabs>
+          Done
+        </base-button>
       </div>
     </template>
   </base-modal>

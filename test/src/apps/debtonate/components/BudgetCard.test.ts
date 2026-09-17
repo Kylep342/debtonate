@@ -69,6 +69,7 @@ describe('BudgetCard Component (Debtonate)', () => {
 
     expect(wrapper.find('h2').text()).toBe('Debt Budget 1');
     expect(wrapper.text()).toContain('Amount');
+    expect(wrapper.text()).toContain('Over Minimum');
     expect(wrapper.text()).toContain('Payments');
     expect(wrapper.text()).toContain('Total Paid');
   });

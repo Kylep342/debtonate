@@ -55,7 +55,7 @@ const tableFooter: ComputedRef<{}> = computed(() => {
 const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
   ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
   + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-  + `(+${globalOptions.Money(monthlyBudget.relative)}/month)`
+  + `(+${globalOptions.Money(monthlyBudget.relative)} over minimum)`
   : constants.BUDGET_DETAILS;
 
 const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value!)))
@@ -74,16 +74,19 @@ watch(
 <template>
   <base-modal
     :id="constants.BUDGET_DETAILS_ID"
+    :max-width="'4xl'"
     @exit="state.unviewBudget"
   >
     <template #header>
-      <h2 :class="['pl-4']">
-        {{ title }}
-      </h2>
+      <div class="flex items-center gap-2 pl-2">
+        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
+          {{ title }}
+        </h2>
+      </div>
     </template>
     <template #headerActions>
       <base-button
-        :class="['btn btn-circle btn-ghost']"
+        class="btn btn-circle btn-ghost btn-sm"
         @click="state.unviewBudget"
       >
         x
@@ -92,24 +95,59 @@ watch(
     <template #body>
       <div
         v-if="currentBudget"
-        :class="['tabframe', 'w-auto', 'pb-10']"
+        class="p-3 sm:p-4 flex flex-col gap-4"
       >
-        <base-tabs
-          :get-item-name="state.getLoanName"
-          :pivot="state.loansWithTotals"
-          :is-viewed-item-id="isViewedItemId"
-          :set-viewed-item-id="setViewedItemId"
+        <!-- Top Stat Ribbon -->
+        <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-content/10 shadow-sm grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Monthly Budget</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ globalOptions.Money(currentBudget.absolute) }}/mo
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Over Minimum</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-success">
+              +{{ globalOptions.Money(currentBudget.relative) }}/mo
+            </span>
+          </div>
+          <div>
+            <span class="text-base-content/60 text-[11px] block">Baseline Minimum</span>
+            <span class="font-mono font-bold text-sm sm:text-base text-base-content">
+              {{ globalOptions.Money(state.totalMinPayment) }}/mo
+            </span>
+          </div>
+        </div>
+
+        <!-- Amortization Schedules Pivot -->
+        <div class="tabframe w-auto">
+          <base-tabs
+            :get-item-name="state.getLoanName"
+            :pivot="state.loansWithTotals"
+            :is-viewed-item-id="isViewedItemId"
+            :set-viewed-item-id="setViewedItemId"
+          >
+            <template #tabContent>
+              <data-table
+                :title="amortizationTitle"
+                :subtitle="amortizationSubtitle"
+                :headers="state.amortizationTableHeaders"
+                :rows="tableRows"
+                :totals="tableFooter"
+              />
+            </template>
+          </base-tabs>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex items-center justify-end w-full">
+        <base-button
+          class="btn-sm btn-primary"
+          @click="state.unviewBudget"
         >
-          <template #tabContent>
-            <data-table
-              :title="amortizationTitle"
-              :subtitle="amortizationSubtitle"
-              :headers="state.amortizationTableHeaders"
-              :rows="tableRows"
-              :totals="tableFooter"
-            />
-          </template>
-        </base-tabs>
+          Done
+        </base-button>
       </div>
     </template>
   </base-modal>

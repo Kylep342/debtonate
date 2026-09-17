@@ -24,16 +24,11 @@ describe('FooterBar Component', () => {
     expect(links[1].attributes('href')).toContain('forms.gle');
 
     const buttons = wrapper.findAll('button');
-    expect(buttons.length).toBe(2);
+    expect(buttons.length).toBe(1);
     expect(buttons[0].text()).toBe('glossary');
-    expect(buttons[1].text()).toBe('share & export');
 
     expect(globalOptions.isGlossaryActive).toBe(false);
     await buttons[0].trigger('click');
     expect(globalOptions.isGlossaryActive).toBe(true);
-
-    expect(globalOptions.isShareExportActive).toBe(false);
-    await buttons[1].trigger('click');
-    expect(globalOptions.isShareExportActive).toBe(true);
   });
 });

@@ -1317,6 +1317,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       id: String(Math.floor(Math.random() * Date.now())),
       relative: proposedBudget,
     };
+    if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
+      deleteWithdrawalBudget(currentBudgetId.value);
+      currentBudgetId.value = null;
+    }
     withdrawalBudgets.value.push(budget);
     withdrawalBudgets.value.sort((a: Budget, b: Budget) => b.relative - a.relative);
     return budget.id;

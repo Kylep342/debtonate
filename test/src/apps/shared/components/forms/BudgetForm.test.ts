@@ -64,4 +64,35 @@ describe('Shared BudgetForm Component', () => {
 
     expect(onSubmit).toHaveBeenCalledWith(1200);
   });
+
+  it('renders global minimum banner, in-addition notice, and dynamic breakdown when minimumAmount is provided', async () => {
+    const wrapper = mount(SharedBudgetForm, {
+      props: {
+        ...defaultProps,
+        minimumAmount: 1250,
+        initialAmount: 250
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Current Global Minimum');
+    expect(wrapper.text()).toContain('in addition');
+    expect(wrapper.text()).toContain('Baseline Minimum:');
+    expect(wrapper.text()).toContain('Extra (In Addition):');
+    expect(wrapper.text()).toContain('Total Monthly Payment:');
+  });
+
+  it('omits global minimum banner when minimumAmount is undefined (Appreciate behavior)', async () => {
+    const wrapper = mount(SharedBudgetForm, {
+      props: {
+        ...defaultProps,
+        minimumAmount: undefined
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).not.toContain('Current Global Minimum');
+    expect(wrapper.text()).not.toContain('in addition');
+    expect(wrapper.text()).toContain('This amount will be allocated toward your plan each monthly period.');
+  });
 });

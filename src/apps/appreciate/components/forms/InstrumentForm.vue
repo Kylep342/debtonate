@@ -8,9 +8,9 @@ import { FormField } from '@/apps/shared/types/app';
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const fields: FormField[] = [
+  { key: 'name', label: 'Instrument Name (Optional)', type: 'text', required: false },
   { key: 'currentBalance', label: 'Current Balance', type: 'number', step: '0.01', required: true },
   { key: 'interestRate', label: 'Interest Rate', type: 'number', step: '0.01', required: true },
-  { key: 'name', label: 'Name (Optional)', type: 'text', required: false },
   { key: 'annualLimit', label: 'Annual Limit (Optional)', type: 'number', step: '0.01', required: false },
 ];
 
@@ -18,19 +18,20 @@ const initialValues = computed(() => {
   if (state.currentInstrumentId && state.instrumentFormActive) {
     const currentInstrument = state.getInstrument(state.currentInstrumentId)!;
     return {
+      name: currentInstrument.name,
       currentBalance: currentInstrument.currentBalance,
       interestRate: currentInstrument.annualRate * 100,
-      name: currentInstrument.name,
       annualLimit: currentInstrument.annualLimit,
     };
   }
   return {
+    name: null,
     currentBalance: null,
     interestRate: null,
-    name: null,
     annualLimit: null,
   };
 });
+
 
 const saveButtonText = computed(() => state.currentInstrumentId ? constants.BTN_SAVE : constants.BTN_CREATE);
 

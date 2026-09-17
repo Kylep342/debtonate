@@ -25,7 +25,9 @@ const handleSubmit = (amount: number) => {
   <SharedBudgetForm
     :modal-id="constants.BUDGET_FORM_ID"
     :title="state.budgetFormTitle"
-    :label="constants.BUDGET"
+    :label="constants.BUDGET_OVER_MINIMUM"
+    :placeholder="constants.BUDGET_OVER_MINIMUM_PLACEHOLDER"
+    :minimum-amount="state.totalMinPayment"
     :initial-amount="initialAmount"
     :save-button-text="saveButtonText"
     :is-active="state.budgetFormActive"
