@@ -31,6 +31,7 @@ const label = computed(() => isCareerPhase.value ? constants.BUDGET : 'Monthly W
 const placeholder = computed(() => isCareerPhase.value ? 'Budget amount' : 'Monthly withdrawal amount');
 const saveButtonText = computed(() => state.currentBudgetId ? constants.BTN_SAVE : constants.BTN_CREATE);
 const targetAmount = computed(() => isCareerPhase.value ? null : state.desiredNetIncome);
+const helperText = computed(() => isCareerPhase.value ? 'How much in total per month you want to invest.' : undefined);
 
 const handleSubmit = (amount: number) => {
   if (isCareerPhase.value) {
@@ -51,6 +52,7 @@ const handleSubmit = (amount: number) => {
     :initial-amount="initialAmount"
     :save-button-text="saveButtonText"
     :is-active="state.budgetFormActive"
+    :helper-text="helperText"
     :on-exit="state.exitBudgetForm"
     :on-submit="handleSubmit"
   />

@@ -80,7 +80,11 @@ const isCurrencyField = (key: string): boolean => {
 
 const getFieldPlaceholder = (field: FormField): string => {
   if (field.placeholder) return field.placeholder;
-  if (field.key === 'name') return 'e.g., Auto Loan, Student Loan, Mortgage';
+  if (field.key === 'name') {
+    return field.label.toLowerCase().includes('instrument')
+      ? 'e.g., Pension, Stock, Property'
+      : 'e.g., Auto Loan, Student Loan, Mortgage';
+  }
   if (field.key === 'interestRate') return '0.00';
   if (field.key === 'termInYears') return '30';
   if (field.key === 'currentBalance') return '0.00';

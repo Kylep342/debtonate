@@ -8,7 +8,13 @@ import { FormField } from '@/apps/shared/types/app';
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const fields: FormField[] = [
-  { key: 'name', label: 'Instrument Name (Optional)', type: 'text', required: false },
+  {
+    key: 'name',
+    label: 'Instrument Name (Optional)',
+    type: 'text',
+    required: false,
+    placeholder: 'e.g., Pension, Stock, Property',
+  },
   { key: 'currentBalance', label: 'Current Balance', type: 'number', step: '0.01', required: true },
   { key: 'interestRate', label: 'Interest Rate', type: 'number', step: '0.01', required: true },
   { key: 'annualLimit', label: 'Annual Limit (Optional)', type: 'number', step: '0.01', required: false },

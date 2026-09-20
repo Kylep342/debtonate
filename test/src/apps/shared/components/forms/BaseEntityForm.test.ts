@@ -109,4 +109,26 @@ describe('BaseEntityForm Component', () => {
     await wrapper.find('button.btn-ghost').trigger('click');
     expect(onExit).toHaveBeenCalledTimes(1);
   });
+
+  it('renders appropriate placeholders for instrument and loan name fields', () => {
+    const fieldsWithPlaceholders: FormField[] = [
+      { key: 'name', label: 'Instrument Name (Optional)', type: 'text', required: false },
+      { key: 'name', label: 'Loan Name (Optional)', type: 'text', required: false },
+      { key: 'name', label: 'Custom Field', type: 'text', placeholder: 'Custom Placeholder', required: false },
+    ];
+
+    const wrapper = mount(BaseEntityForm, {
+      props: {
+        ...defaultProps,
+        fields: fieldsWithPlaceholders,
+        initialValues: {}
+      },
+      global: globalConfig
+    });
+
+    const inputs = wrapper.findAll('input[type="text"]');
+    expect(inputs[0].attributes('placeholder')).toBe('e.g., Pension, Stock, Property');
+    expect(inputs[1].attributes('placeholder')).toBe('e.g., Auto Loan, Student Loan, Mortgage');
+    expect(inputs[2].attributes('placeholder')).toBe('Custom Placeholder');
+  });
 });

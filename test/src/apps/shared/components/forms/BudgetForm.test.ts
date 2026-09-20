@@ -93,6 +93,33 @@ describe('Shared BudgetForm Component', () => {
 
     expect(wrapper.text()).not.toContain('Current Global Minimum');
     expect(wrapper.text()).not.toContain('in addition');
-    expect(wrapper.text()).toContain('This amount will be allocated toward your plan each monthly period.');
+    expect(wrapper.text()).toContain('How much in total per month you want to invest.');
+  });
+
+  it('renders custom helperText when provided', async () => {
+    const wrapper = mount(SharedBudgetForm, {
+      props: {
+        ...defaultProps,
+        helperText: 'Custom investment instructions.',
+        minimumAmount: undefined
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Custom investment instructions.');
+  });
+
+  it('displays annualized investment when amount is positive and minimumAmount is undefined', async () => {
+    const wrapper = mount(SharedBudgetForm, {
+      props: {
+        ...defaultProps,
+        initialAmount: 500,
+        minimumAmount: undefined
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Annualized Investment:');
+    expect(wrapper.text()).toContain('$6000.00/yr');
   });
 });

@@ -30,6 +30,9 @@ describe('InstrumentForm Component (Appreciate)', () => {
     const form = wrapper.findComponent(BaseEntityForm);
     expect(form.exists()).toBe(true);
     expect(form.props('title')).toBe('Create Instrument');
+    const fields = form.props('fields');
+    const nameField = fields.find((f: any) => f.key === 'name');
+    expect(nameField?.placeholder).toBe('e.g., Pension, Stock, Property');
   });
 
   it('submits instrument form with converted interest rate', async () => {

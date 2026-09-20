@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from 'vue';
+import { computed, ComputedRef, watch } from 'vue';
 
 import htmlid from '@/apps/shared/constants/elementIds';
 import constants from '@/apps/shared/constants/constants';
@@ -22,23 +22,52 @@ type Option = {
   label: string
 }
 
+const activeLocale = computed<Locale>(() => {
+  return globalOptions.locales.find((locale: Locale) => locale.code === globalOptions.language)
+    || globalOptions.locales[0];
+});
+
+const getCurrencyFlag = (currencyCode: string): string => {
+  if (activeLocale.value && activeLocale.value.currency === currencyCode) {
+    return activeLocale.value.flag;
+  }
+  if (currencyCode === 'EUR') {
+    return '🇪🇺';
+  }
+  const match = globalOptions.locales.find((l: Locale) => l.currency === currencyCode);
+  return match?.flag || '';
+};
+
 const sortedCurrencies: ComputedRef<Option[]> = computed(() => {
-  const options = globalOptions.locales.map((locale: Locale) => {
+  const uniqueCurrencies = Array.from(
+    new Set(globalOptions.locales.map((locale: Locale) => locale.currency)),
+  ).sort((a, b) => a.localeCompare(b));
+
+  return uniqueCurrencies.map((curr: string) => {
+    const flag = getCurrencyFlag(curr);
     return <Option>{
-      option: locale.currency,
-      label: `${locale.currency} (${locale.flag})`,
+      option: curr,
+      label: flag ? `${curr} (${flag})` : curr,
     };
   });
-  return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
 });
+
 const sortedLanguages: ComputedRef<Option[]> = computed(() => {
   const options = globalOptions.locales.map((locale: Locale) => {
     return <Option>{
       option: locale.code,
-      label: `${locale.code} (${locale.flag})`
+      label: `${locale.code} (${locale.flag})`,
     };
   });
   return options.sort((a: Option, b: Option) => a.option.localeCompare(b.option));
+});
+
+// Sync currency when locale/language changes
+watch(() => globalOptions.language, (newLanguage) => {
+  const match = globalOptions.locales.find((l: Locale) => l.code === newLanguage);
+  if (match) {
+    globalOptions.setCurrency(match.currency);
+  }
 });
 
 const buttonStyle = (flag: boolean): string => (flag ? 'btn-success' : 'btn-error');

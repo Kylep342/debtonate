@@ -15,6 +15,7 @@ const props = defineProps<{
   minimumAmount?: number | null;
   targetAmount?: number | null;
   placeholder?: string;
+  helperText?: string;
 }>();
 
 const globalOptions = getActivePinia() ? useGlobalOptionsStore() : null;
@@ -54,6 +55,11 @@ const formattedTotal = computed(() => {
   const min = props.minimumAmount || 0;
   const extra = amount.value || 0;
   return globalOptions ? globalOptions.Money(min + extra) : `$${(min + extra).toFixed(2)}`;
+});
+
+const formattedAnnual = computed(() => {
+  const annual = (amount.value || 0) * 12;
+  return globalOptions ? globalOptions.Money(annual) : `$${annual.toFixed(2)}`;
 });
 
 const amount: Ref<number | null> = ref(props.initialAmount);
@@ -233,12 +239,21 @@ const submit = () => {
             </p>
           </div>
 
-          <p
+          <div
             v-else
-            class="text-xs text-base-content/60 mt-1"
+            class="flex flex-col gap-1.5 mt-1"
           >
-            This amount will be allocated toward your plan each monthly period.
-          </p>
+            <p class="text-xs text-base-content/60">
+              {{ helperText || 'How much in total per month you want to invest.' }}
+            </p>
+            <div
+              v-if="amount !== null && amount > 0"
+              class="pt-2 border-t border-base-content/10 flex justify-between items-center text-xs"
+            >
+              <span class="text-base-content/70">Annualized Investment:</span>
+              <span class="font-mono text-primary font-semibold">{{ formattedAnnual }}/yr</span>
+            </div>
+          </div>
         </div>
       </div>
     </template>
