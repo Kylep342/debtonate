@@ -11,9 +11,21 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const activeTab = ref<'growth' | 'retirement' | 'display' | 'storage'>('growth');
 
-const copyStateToClipboard = () => navigator.clipboard.writeText(
-  JSON.stringify(state.exportState())
-);
+const isCopied = ref<boolean>(false);
+const copyTimeout = ref<any>(null);
+
+const copyStateToClipboard = async (): Promise<void> => {
+  const clipboard = (typeof navigator !== 'undefined' && navigator.clipboard)
+    || (typeof window !== 'undefined' && window.navigator && window.navigator.clipboard);
+  if (clipboard && clipboard.writeText) {
+    await clipboard.writeText(JSON.stringify(state.exportState()));
+    isCopied.value = true;
+    if (copyTimeout.value) clearTimeout(copyTimeout.value);
+    copyTimeout.value = setTimeout(() => {
+      isCopied.value = false;
+    }, 2000);
+  }
+};
 
 const deflationExample: ComputedRef<string> = computed(
   () => `When enabled this deflates all future money to current year money (CYM) at a rate of ${globalOptions.Percent(state.inflationFactor)} per year`
@@ -25,6 +37,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
 
 <template>
   <base-modal
+    :id="constants.OPTIONS_FORM_ID"
     :max-width="'2xl'"
     @exit="state.exitOptionsForm"
   >
@@ -259,6 +272,30 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
           v-if="activeTab === 'storage'"
           class="flex flex-col gap-3"
         >
+          <!-- Privacy & Data Ownership Disclaimer -->
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-primary shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+              <span class="font-bold text-sm text-base-content">Privacy & Data Ownership</span>
+            </div>
+            <p class="text-xs text-base-content/70 leading-relaxed">
+              All data and calculation activity remain strictly within your browser. No financial details are ever transmitted to or stored on an external server. Saving, exporting, sharing, or deleting your plan is completely at your discretion.
+            </p>
+          </div>
+
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-3">
             <div>
               <span class="font-bold text-sm text-base-content">Browser Local Storage & State</span>
@@ -268,7 +305,7 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
             </div>
             <div class="flex flex-wrap gap-2 pt-1">
               <base-button
-                class="btn-xs sm:btn-sm btn-outline"
+                class="btn-xs sm:btn-sm btn-info btn-outline"
                 @click="state.loadState"
               >
                 {{ constants.BTN_LOAD }}
@@ -280,10 +317,11 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
                 {{ constants.BTN_SAVE }}
               </base-button>
               <base-button
-                class="btn-xs sm:btn-sm btn-ghost border border-base-content/20"
+                class="btn-xs sm:btn-sm"
+                :class="isCopied ? 'btn-success' : 'btn-neutral btn-outline'"
                 @click="copyStateToClipboard"
               >
-                {{ constants.BTN_COPY }}
+                {{ isCopied ? 'Copied!' : constants.BTN_COPY }}
               </base-button>
               <base-button
                 class="btn-xs sm:btn-sm btn-error btn-outline"
