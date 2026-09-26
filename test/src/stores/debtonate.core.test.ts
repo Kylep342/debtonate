@@ -7,6 +7,7 @@ import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
+import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
 import { UIDebtLoan } from '@/apps/debtonate/types/core';
@@ -28,6 +29,7 @@ function mockLoan(
     currentBalance !== undefined ? BigInt(Math.round(currentBalance * 100)) : undefined,
     fees !== undefined ? BigInt(Math.round(fees * 100)) : undefined
   );
+  biLoan.id = generateId();
   return {
     id: biLoan.id,
     name: biLoan.name,
@@ -50,9 +52,9 @@ const Loans = (): UIDebtLoan[] => [
 ];
 
 const Budgets = (): Budget[] => [
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
+  { id: generateId(), relative: 1200 },
+  { id: generateId(), relative: 555 },
+  { id: generateId(), relative: 200 },
 ];
 
 const RefinancingScenarios = (baseLoan: UIDebtLoan): UIDebtLoan[] => [

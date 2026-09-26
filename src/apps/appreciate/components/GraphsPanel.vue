@@ -20,7 +20,11 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
     :get-item-name="state.getInstrumentName"
     :initial-item-id="constants.TOTALS"
     :initial-graph-id="constants.GRAPH_BALANCES_OVER_TIME"
+    pivot-label="Instrument"
   >
+    <template #extraPivot>
+      <slot name="extraPivot" />
+    </template>
     <template
       v-for="id in extraViewIds"
       :key="id"

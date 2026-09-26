@@ -30,8 +30,12 @@ const initialItemId = computed(() => state.selectedLoanId || constants.TOTALS);
     :get-item-name="getScenarioNameLocal"
     :initial-item-id="initialItemId"
     :initial-graph-id="constants.GRAPH_BALANCES_OVER_TIME"
+    pivot-label="Loan"
     @update:viewed-item-id="state.setSelectedLoanId"
   >
+    <template #extraPivot>
+      <slot name="extraPivot" />
+    </template>
     <template
       v-for="id in extraViewIds"
       :key="id"

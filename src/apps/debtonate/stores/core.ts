@@ -6,6 +6,7 @@ import { computed, ref, Ref, ComputedRef } from 'vue';
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import { PaymentScenario, UIDebtLoan } from '@/apps/debtonate/types/core';
+import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
 import {
@@ -1405,6 +1406,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       undefined,
       fees ? BigInt(Math.round(fees * 100)) : undefined
     );
+    biLoan.id = generateId();
     const uiLoan = toUILoan(biLoan);
     if (refinancingScenarios.value[parentLoanId]) {
       refinancingScenarios.value[parentLoanId].push(uiLoan);
@@ -1428,7 +1430,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   // Budget
   const createBudget = (proposedBudget: number): string => {
     const budget = <Budget>{
-      id: String(Math.floor(Math.random() * Date.now())),
+      id: generateId(),
       relative: proposedBudget,
     };
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
@@ -1458,6 +1460,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       currentBalance ? BigInt(Math.round(currentBalance * 100)) : undefined,
       fees ? BigInt(Math.round(fees * 100)) : undefined
     );
+    biLoan.id = generateId();
     const uiLoan = toUILoan(biLoan);
     if (currentLoanId.value && currentLoanId.value !== constants.TOTALS) {
       deleteLoan(currentLoanId.value);

@@ -26,17 +26,18 @@ const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
 <template>
   <div :class="['m-4', 'flex-1', 'flex', 'flex-col', 'items-center']">
     <div :class="['w-full', 'max-w-6xl']">
-      <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4']">
+      <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4', 'mb-2']">
         <h2>Retirement Analysis</h2>
-        <div :class="['mr-4']">
+      </div>
+      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_RETIREMENT_SUMMARY]">
+        <template #extraPivot>
           <base-menu
             :text="investmentAnalysisPivotText"
             :buttons="careerBudgetSelectors"
-            :classes="['btn-sm']"
+            :classes="['btn-outline', 'btn-sm']"
+            align="start"
           />
-        </div>
-      </div>
-      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_RETIREMENT_SUMMARY]">
+        </template>
         <template #[`view-${EXTRA_VIEW_RETIREMENT_SUMMARY}`]>
           <InvestigateSummary />
         </template>

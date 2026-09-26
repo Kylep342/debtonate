@@ -7,6 +7,7 @@ import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import sharedKeys from '@/apps/shared/constants/keys';
+import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
 import { UIInstrument } from '@/apps/appreciate/types/core';
@@ -24,6 +25,7 @@ function mockInstrument(
     name,
     BigInt(Math.round(annualLimit * 100))
   );
+  biInst.id = generateId();
   return {
     id: biInst.id,
     name: biInst.name,
@@ -42,9 +44,9 @@ const Instruments = (): UIInstrument[] => [
 ];
 
 const Budgets = (): Budget[] => [
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 1200 },
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 555 },
-  { id: String(Math.floor(Math.random() * Date.now())), relative: 200 },
+  { id: generateId(), relative: 1200 },
+  { id: generateId(), relative: 555 },
+  { id: generateId(), relative: 200 },
 ];
 
 describe('Appreciate Core Store', () => {

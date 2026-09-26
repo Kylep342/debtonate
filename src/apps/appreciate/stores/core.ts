@@ -6,6 +6,7 @@ import { computed, ref, ComputedRef, Ref } from 'vue';
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
 import { ContributionScenario, UIInstrument } from '@/apps/appreciate/types/core';
+import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import {
   Budget,
@@ -1466,7 +1467,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
   const createWithdrawalBudget = (proposedBudget: number): string => {
     const budget = <Budget>{
-      id: String(Math.floor(Math.random() * Date.now())),
+      id: generateId(),
       relative: proposedBudget,
     };
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
@@ -1483,7 +1484,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   // Budget
   const createBudget = (proposedBudget: number): string => {
     const budget = <Budget>{
-      id: String(Math.floor(Math.random() * Date.now())),
+      id: generateId(),
       relative: proposedBudget,
     };
     if (currentBudgetId.value && currentBudgetId.value !== constants.DEFAULT) {
@@ -1509,6 +1510,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       name,
       annualLimit ? BigInt(Math.round(annualLimit * 100)) : undefined
     );
+    biInst.id = generateId();
     const uiInst = toUIInstrument(biInst);
     if (
       currentInstrumentId.value &&

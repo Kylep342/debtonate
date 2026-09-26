@@ -59,13 +59,17 @@ describe('GraphsFrame Component', () => {
         watchedItems: mockWatchedItems,
         getItemName: mockGetItemName,
         initialItemId: 'item1',
-        initialGraphId: 'Graph 1'
+        initialGraphId: 'Graph 1',
+        pivotLabel: 'Loan'
       },
       global: globalConfig
     });
 
     expect(wrapper.find('h2').text()).toBe('Graph 1');
-    expect(wrapper.findComponent(BaseTabs).exists()).toBe(true);
+    const menus = wrapper.findAllComponents(BaseMenu);
+    expect(menus.length).toBe(2);
+    expect(menus[0].props('text')).toBe('Graph: Graph 1');
+    expect(menus[1].props('text')).toBe('Loan: Name item1');
     expect(wrapper.findComponent(BaseGraph).exists()).toBe(true);
   });
 
@@ -83,9 +87,7 @@ describe('GraphsFrame Component', () => {
     });
 
     // Find the menu and trigger the "Graph 2" click
-    // Note: BaseMenu renders <li> for buttons
     const menuItems = wrapper.findAll('li');
-    // Find the one with "Graph 2"
     const graph2Btn = menuItems.find(li => li.text() === 'Graph 2');
     await graph2Btn?.trigger('click');
 
@@ -105,14 +107,14 @@ describe('GraphsFrame Component', () => {
       global: globalConfig
     });
 
-    const menu = wrapper.findComponent(BaseMenu);
-    expect(menu.props('text')).toBe('Graph 1');
+    const menus = wrapper.findAllComponents(BaseMenu);
+    expect(menus[0].props('text')).toBe('Graph: Graph 1');
 
     const menuItems = wrapper.findAll('li');
     const graph2Btn = menuItems.find(li => li.text() === 'Graph 2');
     await graph2Btn?.trigger('click');
 
-    expect(menu.props('text')).toBe('Graph 2');
+    expect(menus[0].props('text')).toBe('Graph: Graph 2');
     expect(wrapper.find('h2').text()).toBe('Graph 2');
   });
 
@@ -140,10 +142,13 @@ describe('GraphsFrame Component', () => {
 
     expect(wrapper.find('h2').text()).toBe('Extra View');
     expect(wrapper.find('.extra').exists()).toBe(true);
-    expect(wrapper.findComponent(BaseTabs).exists()).toBe(false);
+    // Entity pivot menu is hidden on extra views
+    const menus = wrapper.findAllComponents(BaseMenu);
+    expect(menus.length).toBe(1);
+    expect(menus[0].props('text')).toBe('Graph: Extra View');
   });
 
-  it('emits update:viewed-item-id when a tab is clicked', async () => {
+  it('emits update:viewed-item-id when an item is selected from the pivot menu', async () => {
     const wrapper = mount(GraphsFrame, {
       props: {
         graphs: mockGraphs,
@@ -151,17 +156,22 @@ describe('GraphsFrame Component', () => {
         watchedItems: mockWatchedItems,
         getItemName: mockGetItemName,
         initialItemId: 'item1',
-        initialGraphId: 'Graph 1'
+        initialGraphId: 'Graph 1',
+        pivotLabel: 'Loan'
       },
       global: globalConfig
     });
 
-    const tabs = wrapper.findComponent(BaseTabs);
-    const buttons = tabs.findAll('button');
-    // Click the second tab (item2)
-    await buttons[1].trigger('click');
+    const menus = wrapper.findAllComponents(BaseMenu);
+    expect(menus[1].props('text')).toBe('Loan: Name item1');
+
+    // Click the item2 option in the pivot menu
+    const menuItems = wrapper.findAll('li');
+    const item2Btn = menuItems.find(li => li.text() === 'Name item2');
+    await item2Btn?.trigger('click');
 
     expect(wrapper.emitted('update:viewed-item-id')).toBeTruthy();
     expect(wrapper.emitted('update:viewed-item-id')![0]).toEqual(['item2']);
+    expect(menus[1].props('text')).toBe('Loan: Name item2');
   });
 });
