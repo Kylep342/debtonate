@@ -1499,7 +1499,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const amortizationTableHeaders: ComputedRef<
     Record<string, string | ComputedRef<string>>[]
   > = computed(() => [
-    { key: constants.TK_PERIOD, label: periodLabel },
+    { key: constants.TK_PERIOD, label: periodLabel.value },
     { key: constants.TK_AMOUNT_PAID, label: 'Total Payment' },
     { key: constants.TK_PRINCIPAL_PAID, label: 'Principal' },
     { key: constants.TK_INTEREST_PAID, label: 'Interest' },

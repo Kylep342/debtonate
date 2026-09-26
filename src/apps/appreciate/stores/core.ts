@@ -703,9 +703,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   };
 
   // ease-of-use getters over computed values
-  const periodLabel: ComputedRef<string> = computed(() =>
-    globalOptions.periodsAsDates ? 'Contribution Date' : 'Contribution Number'
-  );
+  const periodLabel: ComputedRef<string> = computed(() => {
+    if (viewPhase.value === constants.PHASE_CAREER) {
+      return globalOptions.periodsAsDates ? 'Contribution Date' : 'Contribution Number';
+    }
+    return globalOptions.periodsAsDates ? 'Withdrawal Date' : 'Withdrawal Number';
+  });
 
   // Graphing
   const graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>> = computed(() =>
@@ -1580,7 +1583,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     Record<string, string | ComputedRef<string>>[]
   > = computed(() => {
     const baseHeaders = [
-      { key: constants.TK_PERIOD, label: periodLabel },
+      { key: constants.TK_PERIOD, label: periodLabel.value },
       { key: constants.TK_TOTAL_GROWTH, label: 'Growth' },
     ];
 

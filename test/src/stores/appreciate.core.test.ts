@@ -446,6 +446,15 @@ describe('Appreciate Core Store', () => {
     expect(rows[0]).toHaveProperty('netAmount');
     expect(totals).toHaveProperty('withdrawal');
     expect(totals).toHaveProperty('netAmount');
+
+    // Headers in retirement phase
+    const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+    const periodHeader = headers.find(h => h.key === constants.TK_PERIOD);
+    expect(periodHeader?.label).toBe('Withdrawal Number');
+
+    globalOptions.togglePeriodsAsDates();
+    expect(state.amortizationTableHeaders.find(h => h.key === constants.TK_PERIOD)?.label).toBe('Withdrawal Date');
+    globalOptions.togglePeriodsAsDates();
   });
 
   it('computes withdrawal scenarios with custom withdrawal budgets', async () => {

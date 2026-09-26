@@ -23,7 +23,14 @@ export function generateCsvString(
   rows: Record<string, any>[],
   totals?: Record<string, any>
 ): string {
-  const headerLine = headers.map(h => escapeCsvCell(h.label)).join(',');
+  const headerLine = headers
+    .map(h => {
+      const label = typeof h.label === 'object' && h.label && 'value' in h.label
+        ? (h.label as any).value
+        : h.label;
+      return escapeCsvCell(label);
+    })
+    .join(',');
   const rowLines = rows.map(row => headers.map(h => escapeCsvCell(row[h.key] ?? '')).join(','));
 
   const lines = [headerLine, ...rowLines];
