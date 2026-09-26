@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import GlossaryModal from '@/apps/shared/components/GlossaryModal.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
+import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
 import BaseModal from '@/apps/shared/components/ui/BaseModal.vue';
 import elementIds from '@/apps/shared/constants/elementIds';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
@@ -17,6 +18,7 @@ describe('GlossaryModal Component', () => {
       BaseModal,
       BaseCard,
       BaseButton,
+      BaseMenu,
     },
   };
 
@@ -51,18 +53,22 @@ describe('GlossaryModal Component', () => {
     expect(wrapper.text()).not.toContain('Snowball Method');
   });
 
-  it('filters entries by category tabs', async () => {
+  it('filters entries by category dropdown', async () => {
     const wrapper = mount(GlossaryModal, {
       props: { id: 'glossaryModal' },
       global: globalConfig,
     });
 
-    // Find and click Investing button
-    const buttons = wrapper.findAll('button');
-    const investingBtn = buttons.find((b) => b.text().includes('Investing'));
-    expect(investingBtn?.exists()).toBe(true);
+    const menu = wrapper.findComponent(BaseMenu);
+    expect(menu.props('text')).toBe('All Terms');
 
-    await investingBtn?.trigger('click');
+    // Find and click Investing menu item
+    const menuItems = wrapper.findAll('li');
+    const investingItem = menuItems.find((li) => li.text().includes('Investing'));
+    expect(investingItem?.exists()).toBe(true);
+
+    await investingItem?.trigger('click');
+    expect(menu.props('text')).toBe('Appreciate (Investing)');
     expect(wrapper.text()).toContain('Annual Contribution Limit');
     expect(wrapper.text()).not.toContain('Snowball Method');
   });

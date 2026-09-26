@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import GraphsPanel from '@/apps/appreciate/components/GraphsPanel.vue';
-import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import InvestigateSummary from '@/apps/appreciate/investigate/components/InvestigateSummary.vue';
 import { useAppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import constants from '@/apps/appreciate/constants/constants';
@@ -21,7 +20,6 @@ const careerBudgetSelectors = computed<Button[]>(
   })))
 );
 
-const EXTRA_VIEW_COMPARATIVE_ANALYSIS = 'Comparative Analysis';
 const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
 </script>
 
@@ -38,15 +36,7 @@ const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
           />
         </div>
       </div>
-      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_COMPARATIVE_ANALYSIS, EXTRA_VIEW_RETIREMENT_SUMMARY]">
-        <template #[`view-${EXTRA_VIEW_COMPARATIVE_ANALYSIS}`]>
-          <TabularAnalysis
-            title="Retirement Comparative Analysis"
-            :analysis="state.retirementTabularAnalysis"
-            :items="state.monthlyWithdrawalBudgets"
-            :get-item-name="state.getWithdrawalBudgetName"
-          />
-        </template>
+      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_RETIREMENT_SUMMARY]">
         <template #[`view-${EXTRA_VIEW_RETIREMENT_SUMMARY}`]>
           <InvestigateSummary />
         </template>

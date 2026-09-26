@@ -45,11 +45,11 @@ const handleExportJson = (): void => {
   <div>
     <header class="mb-2">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 gap-2">
-        <div class="flex-1 text-center sm:text-left">
-          <h3 class="text-center sm:text-left">
+        <div class="flex-1 text-center sm:text-left min-w-0">
+          <h3 class="text-center sm:text-left break-words">
             {{ title }}
           </h3>
-          <h5 class="text-center sm:text-left text-xs opacity-75">
+          <h5 class="text-center sm:text-left text-xs opacity-75 break-words leading-relaxed mt-0.5">
             {{ subtitle }}
           </h5>
         </div>

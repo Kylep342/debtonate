@@ -100,6 +100,14 @@ export interface AppreciateCoreActions {
   ) => string;
   buildInstrumentSubtitle: (instrument: UIInstrument) => string;
   clearState: () => void;
+  getBudgetComparativeAnalysis: (
+    budgetId: string,
+    isCareer?: boolean
+  ) => Record<string, Record<string, any>>;
+  getInstrumentComparativeAnalysis: (
+    instrumentId: string,
+    isCareer?: boolean
+  ) => Record<string, Record<string, any>>;
   createBudget: (proposedBudget: number) => string;
   createWithdrawalBudget: (proposedBudget: number) => string;
   createInstrument: (
@@ -552,6 +560,147 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
     return analysis;
   });
+
+  const getInstrumentComparativeAnalysis = (
+    instrumentId: string,
+    isCareer: boolean = true,
+  ): Record<string, Record<string, any>> => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const isTotals = instrumentId === constants.TOTALS;
+    const inst = isTotals ? null : getInstrument(instrumentId);
+    if (!isTotals && !inst) return analysis;
+
+    if (isCareer) {
+      const metrics = [
+        'Starting Balance',
+        'Expected Return',
+        'Principal Contributed',
+        'Interest Growth',
+        'Final Balance',
+        'Interest/principal ratio',
+        'Growth factor from present',
+      ];
+      metrics.forEach(m => { analysis[m] = {}; });
+
+      const startBal = isTotals ? totalCurrentBalance.value : (inst?.currentBalance || 0);
+      const rateStr = isTotals ? '-' : globalOptions.Percent(Number(inst?.annualRate || 0) * 100);
+
+      monthlyBudgets.value.forEach(budget => {
+        const schedule = getContributionSchedule(instrumentId, budget.id);
+        const principal = Number(schedule.lifetimeContribution);
+        const growth = Number(schedule.lifetimeGrowth);
+        const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+
+        analysis['Starting Balance'][budget.id] = globalOptions.Money(startBal);
+        analysis['Expected Return'][budget.id] = rateStr;
+        analysis['Principal Contributed'][budget.id] = globalOptions.Money(principal);
+        analysis['Interest Growth'][budget.id] = globalOptions.Money(growth);
+        analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
+        analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (growth / principal).toFixed(4) : '0.0000';
+        analysis['Growth factor from present'][budget.id] = principal > 0 ? (finalBal / principal).toFixed(4) : '0.0000';
+      });
+    } else {
+      const metrics = [
+        'Initial Balance',
+        'Expected Return',
+        'Growth in Retirement',
+        'Final Balance',
+        'Growth/initial ratio',
+        'Growth factor from retirement start',
+      ];
+      metrics.forEach(m => { analysis[m] = {}; });
+
+      const rateStr = isTotals ? '-' : globalOptions.Percent(Number(inst?.annualRate || 0) * 100);
+
+      monthlyWithdrawalBudgets.value.forEach(budget => {
+        const schedule = getWithdrawalSchedule(instrumentId, budget.id);
+        const initialBal = Number(getContributionSchedule(instrumentId, selectedCareerBudgetId.value || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+        const growth = Number(schedule.lifetimeGrowth);
+        const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+
+        analysis['Initial Balance'][budget.id] = globalOptions.Money(initialBal);
+        analysis['Expected Return'][budget.id] = rateStr;
+        analysis['Growth in Retirement'][budget.id] = globalOptions.Money(growth);
+        analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
+        analysis['Growth/initial ratio'][budget.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth factor from retirement start'][budget.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+      });
+    }
+
+    return analysis;
+  };
+
+  const getBudgetComparativeAnalysis = (
+    budgetId: string,
+    isCareer: boolean = true,
+  ): Record<string, Record<string, any>> => {
+    const analysis: Record<string, Record<string, any>> = {};
+
+    if (isCareer) {
+      const budget = getBudget(budgetId);
+      if (!budget) return analysis;
+
+      const metrics = [
+        'Starting Balance',
+        'Expected Return',
+        'Principal Contributed',
+        'Interest Growth',
+        'Final Balance',
+        'Interest/principal ratio',
+        'Growth factor from present',
+      ];
+      metrics.forEach(m => { analysis[m] = {}; });
+
+      instrumentsWithTotals.value.forEach(instItem => {
+        const schedule = getContributionSchedule(instItem.id, budgetId);
+        const isTotals = instItem.id === constants.TOTALS;
+        const startBal = isTotals ? totalCurrentBalance.value : instItem.currentBalance;
+        const rateStr = isTotals ? '-' : globalOptions.Percent(Number(instItem.annualRate) * 100);
+        const principal = Number(schedule.lifetimeContribution);
+        const growth = Number(schedule.lifetimeGrowth);
+        const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+
+        analysis['Starting Balance'][instItem.id] = globalOptions.Money(startBal);
+        analysis['Expected Return'][instItem.id] = rateStr;
+        analysis['Principal Contributed'][instItem.id] = globalOptions.Money(principal);
+        analysis['Interest Growth'][instItem.id] = globalOptions.Money(growth);
+        analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
+        analysis['Interest/principal ratio'][instItem.id] = principal > 0 ? (growth / principal).toFixed(4) : '0.0000';
+        analysis['Growth factor from present'][instItem.id] = principal > 0 ? (finalBal / principal).toFixed(4) : '0.0000';
+      });
+    } else {
+      const budget = getWithdrawalBudget(budgetId);
+      if (!budget) return analysis;
+
+      const metrics = [
+        'Initial Balance',
+        'Expected Return',
+        'Growth in Retirement',
+        'Final Balance',
+        'Growth/initial ratio',
+        'Growth factor from retirement start',
+      ];
+      metrics.forEach(m => { analysis[m] = {}; });
+
+      instrumentsWithTotals.value.forEach(instItem => {
+        const schedule = getWithdrawalSchedule(instItem.id, budgetId);
+        const isTotals = instItem.id === constants.TOTALS;
+        const initialBal = Number(getContributionSchedule(instItem.id, selectedCareerBudgetId.value || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+        const rateStr = isTotals ? '-' : globalOptions.Percent(Number(instItem.annualRate) * 100);
+        const growth = Number(schedule.lifetimeGrowth);
+        const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
+
+        analysis['Initial Balance'][instItem.id] = globalOptions.Money(initialBal);
+        analysis['Expected Return'][instItem.id] = rateStr;
+        analysis['Growth in Retirement'][instItem.id] = globalOptions.Money(growth);
+        analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
+        analysis['Growth/initial ratio'][instItem.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth factor from retirement start'][instItem.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+      });
+    }
+
+    return analysis;
+  };
 
   // ease-of-use getters over computed values
   const periodLabel: ComputedRef<string> = computed(() =>
@@ -1611,10 +1760,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     exitOptionsForm,
     exportState,
     getBudget,
-    getWithdrawalBudget,
     getBudgetColor,
+    getBudgetComparativeAnalysis,
     getBudgetIndex,
     getBudgetName,
+    getInstrumentComparativeAnalysis,
+    getWithdrawalBudget,
     getWithdrawalBudgetName,
     getContributionSchedule,
     getWithdrawalSchedule,

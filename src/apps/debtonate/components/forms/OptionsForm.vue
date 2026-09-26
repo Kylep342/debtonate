@@ -9,7 +9,15 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const activeTab = ref<'strategy' | 'display' | 'storage'>('strategy');
+const tabs = [
+  { key: 'all', label: 'All' },
+  { key: 'strategy', label: 'Strategy' },
+  { key: 'display', label: 'Display' },
+  { key: 'storage', label: 'Data' },
+] as const;
+
+type TabKey = typeof tabs[number]['key'];
+const activeTab = ref<TabKey>('all');
 
 const isCopied = ref<boolean>(false);
 const copyTimeout = ref<any>(null);
@@ -71,41 +79,33 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
         x
       </base-button>
     </template>
+    <template #subHeader>
+      <div class="flex gap-1 p-1 bg-base-300/40 rounded-xl w-full">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          type="button"
+          class="btn btn-xs sm:btn-sm flex-1 text-center text-xs sm:text-sm font-medium px-1.5 sm:px-4 transition-all"
+          :class="activeTab === tab.key ? 'btn-primary' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+          @click="activeTab = tab.key"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+    </template>
     <template #body>
       <div class="p-3 sm:p-4 flex flex-col gap-4 min-h-[480px] sm:min-h-[575px]">
-        <!-- Segmented Navigation Tabs -->
-        <div class="flex flex-wrap sm:flex-nowrap gap-1.5 p-1 bg-base-300/40 rounded-xl">
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
-            :class="activeTab === 'strategy' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'strategy'"
-          >
-            Strategy
-          </button>
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
-            :class="activeTab === 'display' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'display'"
-          >
-            Display
-          </button>
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm flex-1 min-w-[75px] text-center text-xs sm:text-sm font-medium px-2 sm:px-4"
-            :class="activeTab === 'storage' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'storage'"
-          >
-            Data
-          </button>
-        </div>
-
         <!-- Tab 1: Strategy & Priority -->
         <div
-          v-if="activeTab === 'strategy'"
+          v-if="activeTab === 'all' || activeTab === 'strategy'"
           class="flex flex-col gap-3 flex-1"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-1"
+          >
+            Strategy & Priority
+          </div>
           <!-- Repayment Priority -->
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -230,17 +230,29 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
 
         <!-- Tab 2: Display & Regional -->
         <div
-          v-if="activeTab === 'display'"
+          v-if="activeTab === 'all' || activeTab === 'display'"
           class="flex flex-col gap-3 flex-1"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-3 border-t border-base-content/10"
+          >
+            Display & Regional
+          </div>
           <global-options-formlet />
         </div>
 
         <!-- Tab 3: Data & Storage -->
         <div
-          v-if="activeTab === 'storage'"
+          v-if="activeTab === 'all' || activeTab === 'storage'"
           class="flex flex-col gap-3 flex-1"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-3 border-t border-base-content/10"
+          >
+            Data & Storage
+          </div>
           <!-- Privacy & Data Ownership Disclaimer -->
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-1.5">
             <div class="flex items-center gap-2">

@@ -4,18 +4,22 @@ import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
 import RefinancingTable from '@/apps/debtonate/components/RefinancingTable.vue';
+import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
+import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { UIDebtLoan } from '@/apps/debtonate/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+const { isMobile } = useBreakpoint();
 
 const currentLoan: Ref<loan.ILoan | UIDebtLoan | null> = ref(null);
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
+const { viewedItemId, setViewedItemId } = usePivot(constants.DEFAULT);
 
 const currentBudget: ComputedRef<MonthlyBudget|null> = computed(() => {
   if (!viewedItemId.value) return null;
@@ -53,12 +57,41 @@ const tableFooter: ComputedRef<{}> = computed(() => {
   return state.amortizationTableTotals(paymentSchedule.value);
 });
 
-const buildLoanDetailsTitle = (loanItem: loan.ILoan | UIDebtLoan): string => loanItem
-  ? `Loan Details - ${state.getLoanName(loanItem.id)} | `
-  + `${state.buildLoanSubtitle(loanItem)}`
-  : constants.LOAN_DETAILS;
+const panelTitle = computed(() => (
+  currentLoan.value
+    ? `Loan Details - ${state.getLoanName(currentLoan.value.id)}`
+    : constants.LOAN_DETAILS
+));
 
-const title: ComputedRef<string> = computed(() => currentLoan.value ? buildLoanDetailsTitle(currentLoan.value) : constants.LOAN_DETAILS);
+const panelSubtitle = computed(() => (
+  currentLoan.value ? state.buildLoanSubtitle(currentLoan.value) : ''
+));
+
+const activeView = ref<'amortization' | 'comparative'>('amortization');
+
+const scheduleTabLabel = computed(() => (
+  isMobile.value ? 'Schedule' : 'Amortization Schedule'
+));
+
+const comparativeTabLabel = computed(() => (
+  isMobile.value ? 'Comparison' : 'Comparative Analysis'
+));
+
+const budgetDropdownLabel = computed(() => (
+  viewedItemId.value ? state.getBudgetName(viewedItemId.value) : 'Select Budget'
+));
+
+const budgetDropdownButtons = computed<Button[]>(() =>
+  state.monthlyBudgets.map((budget) => ({
+    text: state.getBudgetName(budget.id),
+    onClick: () => setViewedItemId(budget.id),
+  }))
+);
+
+const loanComparativeAnalysis = computed(() => {
+  if (!currentLoan.value) return {};
+  return state.getLoanComparativeAnalysis(currentLoan.value.id);
+});
 
 watch(
   () => state.currentLoanId,
@@ -78,10 +111,16 @@ watch(
     @exit="state.unviewLoan"
   >
     <template #header>
-      <div class="flex items-center gap-2 pl-2">
-        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
-          {{ title }}
+      <div class="flex flex-col min-w-0 pr-2">
+        <h2 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-base-content truncate">
+          {{ panelTitle }}
         </h2>
+        <p
+          v-if="panelSubtitle"
+          class="hidden sm:block text-xs text-base-content/60 font-mono truncate mt-0.5"
+        >
+          {{ panelSubtitle }}
+        </p>
       </div>
     </template>
     <template #headerActions>
@@ -133,24 +172,66 @@ watch(
           :schedules="state.refinancingSchedules[currentLoan.id]"
         />
 
-        <!-- Amortization Schedules Pivot -->
-        <div class="tabframe w-auto">
-          <base-tabs
+        <!-- Paired Navigation Tabs & Budget Dropdown -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-2">
+          <div class="tabs tabs-boxed bg-base-300/40 p-1 rounded-xl grid grid-cols-2 w-full sm:w-auto sm:flex">
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'amortization' }"
+              @click="activeView = 'amortization'"
+            >
+              {{ scheduleTabLabel }}
+            </button>
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'comparative' }"
+              @click="activeView = 'comparative'"
+            >
+              {{ comparativeTabLabel }}
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-2">
+            <span class="text-xs text-base-content/60 font-medium">Budget:</span>
+            <base-menu
+              :text="budgetDropdownLabel"
+              :buttons="budgetDropdownButtons"
+              :classes="['btn-sm', 'btn-outline']"
+              align="end"
+            />
+          </div>
+        </div>
+
+        <!-- Tab 1: Amortization Schedule (Direct Table, No Pivot Tabs) -->
+        <div
+          v-if="activeView === 'amortization'"
+          class="w-auto"
+        >
+          <data-table
+            :title="amortizationTitle"
+            :subtitle="amortizationSubtitle"
+            :headers="state.amortizationTableHeaders"
+            :rows="tableRows"
+            :totals="tableFooter"
+          />
+        </div>
+
+        <!-- Tab 2: Dynamic Crosstab Comparative Analysis -->
+        <div
+          v-else-if="activeView === 'comparative'"
+          class="w-auto"
+        >
+          <TabularAnalysis
+            :title="`${state.getLoanName(currentLoan.id)} - Budget Comparison`"
+            subtitle="Comparing how this loan performs across all repayment budgets"
+            :analysis="loanComparativeAnalysis"
+            :items="state.monthlyBudgets"
             :get-item-name="state.getBudgetName"
-            :pivot="state.monthlyBudgets"
-            :is-viewed-item-id="isViewedItemId"
-            :set-viewed-item-id="setViewedItemId"
-          >
-            <template #tabContent>
-              <data-table
-                :title="amortizationTitle"
-                :subtitle="amortizationSubtitle"
-                :headers="state.amortizationTableHeaders"
-                :rows="tableRows"
-                :totals="tableFooter"
-              />
-            </template>
-          </base-tabs>
+            :baseline-id="viewedItemId"
+            @select-baseline="setViewedItemId"
+          />
         </div>
       </div>
     </template>

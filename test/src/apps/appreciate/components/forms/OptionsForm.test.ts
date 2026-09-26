@@ -7,6 +7,7 @@ import OptionsForm from '@/apps/appreciate/components/forms/OptionsForm.vue';
 import BaseModal from '@/apps/shared/components/ui/BaseModal.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
+import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
 
 describe('Appreciate OptionsForm Component', () => {
   beforeEach(() => {
@@ -19,27 +20,48 @@ describe('Appreciate OptionsForm Component', () => {
       BaseModal,
       BaseButton,
       BaseCard,
+      BaseMenu,
     },
     stubs: {
       GlobalOptionsFormlet: true,
     },
   };
 
-  it('renders privacy disclaimer when navigating to the Data tab', async () => {
+  it('renders all sections by default when on the All tab', () => {
     const wrapper = mount(OptionsForm, {
       global: globalConfig,
     });
 
     expect(wrapper.text()).toContain('Appreciate Options');
+    const tabButtons = wrapper.findAll('.bg-base-300\\/40 button');
+    expect(tabButtons.length).toBe(5);
+    expect(tabButtons[0].text()).toBe('All');
+    expect(tabButtons[0].classes()).toContain('btn-primary');
 
-    // Click on the 'Data' tab button
-    const dataTabButton = wrapper.findAll('button').find(btn => btn.text() === 'Data');
-    expect(dataTabButton).toBeDefined();
-    await dataTabButton!.trigger('click');
+    // All sections are visible
+    expect(wrapper.text()).toContain('Growth & Inflation');
+    expect(wrapper.text()).toContain('Retirement Horizon');
+    expect(wrapper.text()).toContain('Display & Regional');
+    expect(wrapper.text()).toContain('Data & Storage');
+    expect(wrapper.text()).toContain('Privacy & Data Ownership');
+  });
 
-    // Verify privacy disclaimer is rendered
+  it('filters to the Data tab when tab button is clicked', async () => {
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    // Click on 'Data' tab button
+    const tabButtons = wrapper.findAll('.bg-base-300\\/40 button');
+    const dataTab = tabButtons.find(b => b.text() === 'Data');
+    expect(dataTab).toBeDefined();
+    await dataTab!.trigger('click');
+
+    expect(dataTab!.classes()).toContain('btn-primary');
+    // Verify privacy disclaimer is rendered and growth is hidden
     expect(wrapper.text()).toContain('Privacy & Data Ownership');
     expect(wrapper.text()).toContain('All data and calculation activity remain strictly within your browser');
     expect(wrapper.text()).toContain('Saving, exporting, sharing, or deleting your plan is completely at your discretion');
+    expect(wrapper.text()).not.toContain('Accrue Before Contribution');
   });
 });

@@ -3,18 +3,22 @@ import { loan, paymentTypes } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
+import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { UIDebtLoan } from '@/apps/debtonate/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+const { isMobile } = useBreakpoint();
 
 const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+const { viewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
 const currentLoan: ComputedRef<loan.ILoan | UIDebtLoan | null> = computed(() => {
   if (!viewedItemId.value) return null;
@@ -52,13 +56,42 @@ const tableFooter: ComputedRef<{}> = computed(() => {
   return state.amortizationTableTotals(paymentSchedule.value);
 })
 
-const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget): string => monthlyBudget
-  ? `Budget Details - ${state.getBudgetName(monthlyBudget.id)} | `
-  + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-  + `(+${globalOptions.Money(monthlyBudget.relative)} over minimum)`
-  : constants.BUDGET_DETAILS;
+const panelTitle = computed(() => (
+  currentBudget.value
+    ? `Budget Details - ${state.getBudgetName(currentBudget.value.id)}`
+    : constants.BUDGET_DETAILS
+));
 
-const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value!)))
+const panelSubtitle = computed(() => {
+  if (!currentBudget.value) return '';
+  return `${globalOptions.Money(currentBudget.value.absolute)}/month (+${globalOptions.Money(currentBudget.value.relative)} over minimum)`;
+});
+
+const activeView = ref<'amortization' | 'comparative'>('amortization');
+
+const scheduleTabLabel = computed(() => (
+  isMobile.value ? 'Schedule' : 'Amortization Schedule'
+));
+
+const comparativeTabLabel = computed(() => (
+  isMobile.value ? 'Comparison' : 'Comparative Analysis'
+));
+
+const loanDropdownLabel = computed(() => (
+  viewedItemId.value ? state.getLoanName(viewedItemId.value) : 'Select Loan'
+));
+
+const loanDropdownButtons = computed<Button[]>(() =>
+  state.loansWithTotals.map((loanItem) => ({
+    text: state.getLoanName(loanItem.id),
+    onClick: () => setViewedItemId(loanItem.id),
+  }))
+);
+
+const loanComparativeAnalysis = computed(() => {
+  if (!viewedItemId.value) return {};
+  return state.getLoanComparativeAnalysis(viewedItemId.value);
+});
 
 watch(
   () => state.currentBudgetId,
@@ -78,10 +111,16 @@ watch(
     @exit="state.unviewBudget"
   >
     <template #header>
-      <div class="flex items-center gap-2 pl-2">
-        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
-          {{ title }}
+      <div class="flex flex-col min-w-0 pr-2">
+        <h2 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-base-content truncate">
+          {{ panelTitle }}
         </h2>
+        <p
+          v-if="panelSubtitle"
+          class="hidden sm:block text-xs text-base-content/60 font-mono truncate mt-0.5"
+        >
+          {{ panelSubtitle }}
+        </p>
       </div>
     </template>
     <template #headerActions>
@@ -111,32 +150,73 @@ watch(
               +{{ globalOptions.Money(currentBudget.relative) }}/mo
             </span>
           </div>
-          <div>
-            <span class="text-base-content/60 text-[11px] block">Baseline Minimum</span>
+          <div class="col-span-2 sm:col-span-1 flex items-center justify-between sm:block border-t border-base-content/10 pt-2.5 sm:border-t-0 sm:pt-0">
+            <span class="text-base-content/60 text-[11px] block whitespace-nowrap">Baseline Minimum</span>
             <span class="font-mono font-bold text-sm sm:text-base text-base-content">
               {{ globalOptions.Money(state.totalMinPayment) }}/mo
             </span>
           </div>
         </div>
 
-        <!-- Amortization Schedules Pivot -->
-        <div class="tabframe w-auto">
-          <base-tabs
-            :get-item-name="state.getLoanName"
-            :pivot="state.loansWithTotals"
-            :is-viewed-item-id="isViewedItemId"
-            :set-viewed-item-id="setViewedItemId"
-          >
-            <template #tabContent>
-              <data-table
-                :title="amortizationTitle"
-                :subtitle="amortizationSubtitle"
-                :headers="state.amortizationTableHeaders"
-                :rows="tableRows"
-                :totals="tableFooter"
-              />
-            </template>
-          </base-tabs>
+        <!-- Paired Navigation Tabs & Focused Vehicle Dropdown -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-2">
+          <div class="tabs tabs-boxed bg-base-300/40 p-1 rounded-xl grid grid-cols-2 w-full sm:w-auto sm:flex">
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'amortization' }"
+              @click="activeView = 'amortization'"
+            >
+              {{ scheduleTabLabel }}
+            </button>
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'comparative' }"
+              @click="activeView = 'comparative'"
+            >
+              {{ comparativeTabLabel }}
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-2">
+            <span class="text-xs text-base-content/60 font-medium">Vehicle:</span>
+            <base-menu
+              :text="loanDropdownLabel"
+              :buttons="loanDropdownButtons"
+              :classes="['btn-sm', 'btn-outline']"
+              align="end"
+            />
+          </div>
+        </div>
+
+        <!-- Tab 1: Amortization Schedule (Direct Table, No Pivot Tabs) -->
+        <div
+          v-if="activeView === 'amortization'"
+          class="w-auto"
+        >
+          <data-table
+            :title="amortizationTitle"
+            :subtitle="amortizationSubtitle"
+            :headers="state.amortizationTableHeaders"
+            :rows="tableRows"
+            :totals="tableFooter"
+          />
+        </div>
+
+        <!-- Tab 2: Dynamic Crosstab Comparative Analysis (Budgets compared for selected vehicle) -->
+        <div
+          v-else-if="activeView === 'comparative'"
+          class="w-auto"
+        >
+          <TabularAnalysis
+            :title="`${state.getLoanName(viewedItemId || constants.TOTALS)} - Budget Comparison`"
+            :subtitle="`Comparing all payment budgets for ${state.getLoanName(viewedItemId || constants.TOTALS)}`"
+            :analysis="loanComparativeAnalysis"
+            :items="state.monthlyBudgets"
+            :get-item-name="state.getBudgetName"
+            :baseline-id="currentBudget.id"
+          />
         </div>
       </div>
     </template>

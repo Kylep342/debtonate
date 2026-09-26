@@ -4,6 +4,7 @@ import { computed, ref, ComputedRef } from 'vue';
 import elementIds from '@/apps/shared/constants/elementIds';
 import { GLOSSARY_ENTRIES, filterGlossary, GlossaryEntry } from '@/apps/shared/constants/glossary';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
 
 defineProps<{
   id: string;
@@ -46,6 +47,20 @@ const categories = [
   { key: 'investing', label: 'Appreciate (Investing)' },
   { key: 'shared', label: 'Shared' },
 ] as const;
+
+const currentCategoryLabel = computed<string>(() => {
+  const current = categories.find((cat) => cat.key === selectedCategory.value);
+  return current ? current.label : 'All Terms';
+});
+
+const categoryButtons = computed<Button[]>(() =>
+  categories.map((cat) => ({
+    text: cat.label,
+    onClick: () => {
+      selectedCategory.value = cat.key;
+    },
+  }))
+);
 </script>
 
 <template>
@@ -83,18 +98,15 @@ const categories = [
           >
         </div>
 
-        <!-- Category Filter Tabs -->
-        <div class="flex flex-wrap gap-1">
-          <button
-            v-for="cat in categories"
-            :key="cat.key"
-            type="button"
-            class="btn btn-xs"
-            :class="selectedCategory === cat.key ? 'btn-primary' : 'btn-ghost'"
-            @click="selectedCategory = cat.key"
-          >
-            {{ cat.label }}
-          </button>
+        <!-- Category Filter Dropdown -->
+        <div class="flex items-center gap-2">
+          <base-menu
+            :text="currentCategoryLabel"
+            :buttons="categoryButtons"
+            :classes="['btn-secondary', 'btn-sm']"
+            align="start"
+            style="filter: brightness(0.9);"
+          />
         </div>
 
         <!-- Entries List -->

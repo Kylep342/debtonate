@@ -98,6 +98,12 @@ export interface DebtonateCoreActions {
   ) => string;
   buildLoanSubtitle: (loan: loan.ILoan | UIDebtLoan) => string;
   clearState: () => void;
+  getBudgetComparativeAnalysis: (
+    budgetId: string
+  ) => Record<string, Record<string, any>>;
+  getLoanComparativeAnalysis: (
+    loanId: string
+  ) => Record<string, Record<string, any>>;
   createBudget: (proposedBudget: number) => string;
   createLoan: (
     principal: number,
@@ -411,15 +417,19 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     return analysis;
   });
 
-  const debtonateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+  const getLoanComparativeAnalysis = (loanId: string): Record<string, Record<string, any>> => {
     const analysis: Record<string, Record<string, any>> = {};
+    const isTotals = loanId === constants.TOTALS;
+    const loan = isTotals ? null : getLoan(loanId);
+    if (!isTotals && !loan) return analysis;
+
     const metrics = [
-      'Total Principal',
+      isTotals ? 'Total Principal' : 'Current Balance',
+      'Interest Rate',
       'Total Interest',
       'Total Fees',
       'Total Cost',
       'Interest/Principal Ratio',
-      'Avg Monthly Payment',
       'Periods to Payoff',
     ];
 
@@ -427,23 +437,69 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       analysis[metric] = {};
     });
 
+    const principal = isTotals ? totalCurrentBalance.value : (loan?.currentBalance || 0);
+    const rateStr = isTotals ? '-' : globalOptions.Percent(Number(loan?.annualRate || 0) * 100);
+    const fees = isTotals ? totalFees.value : (loan?.fees || 0);
+
     monthlyBudgets.value.forEach(budget => {
-      const schedule = getPaymentSchedule(constants.TOTALS, budget.id);
-      const principal = totalCurrentBalance.value;
+      const schedule = getPaymentSchedule(loanId, budget.id);
       const interest = Number(schedule.lifetimeInterest);
-      const fees = totalFees.value;
       const total = principal + interest + fees;
 
-      analysis['Total Principal'][budget.id] = globalOptions.Money(principal);
+      analysis[isTotals ? 'Total Principal' : 'Current Balance'][budget.id] = globalOptions.Money(principal);
+      analysis['Interest Rate'][budget.id] = rateStr;
       analysis['Total Interest'][budget.id] = globalOptions.Money(interest);
       analysis['Total Fees'][budget.id] = globalOptions.Money(fees);
       analysis['Total Cost'][budget.id] = globalOptions.Money(total);
       analysis['Interest/Principal Ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
-      analysis['Avg Monthly Payment'][budget.id] = globalOptions.Money(budget.absolute);
       analysis['Periods to Payoff'][budget.id] = schedule.amortizationSchedule.length;
     });
 
     return analysis;
+  };
+
+  const getBudgetComparativeAnalysis = (budgetId: string): Record<string, Record<string, any>> => {
+    const analysis: Record<string, Record<string, any>> = {};
+    const budget = getBudget(budgetId);
+    if (!budget) return analysis;
+
+    const metrics = [
+      'Current Balance',
+      'Interest Rate',
+      'Total Interest',
+      'Total Fees',
+      'Total Cost',
+      'Interest/Principal Ratio',
+      'Periods to Payoff',
+    ];
+
+    metrics.forEach(metric => {
+      analysis[metric] = {};
+    });
+
+    loansWithTotals.value.forEach(loanItem => {
+      const schedule = getPaymentSchedule(loanItem.id, budgetId);
+      const isTotals = loanItem.id === constants.TOTALS;
+      const principal = isTotals ? totalCurrentBalance.value : loanItem.currentBalance;
+      const rateStr = isTotals ? '-' : globalOptions.Percent(Number(loanItem.annualRate) * 100);
+      const fees = isTotals ? totalFees.value : (loanItem.fees || 0);
+      const interest = Number(schedule.lifetimeInterest);
+      const total = principal + interest + fees;
+
+      analysis['Current Balance'][loanItem.id] = globalOptions.Money(principal);
+      analysis['Interest Rate'][loanItem.id] = rateStr;
+      analysis['Total Interest'][loanItem.id] = globalOptions.Money(interest);
+      analysis['Total Fees'][loanItem.id] = globalOptions.Money(fees);
+      analysis['Total Cost'][loanItem.id] = globalOptions.Money(total);
+      analysis['Interest/Principal Ratio'][loanItem.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Periods to Payoff'][loanItem.id] = schedule.amortizationSchedule.length;
+    });
+
+    return analysis;
+  };
+
+  const debtonateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    return getLoanComparativeAnalysis(selectedLoanId.value || constants.TOTALS);
   });
 
   // String builders
@@ -1577,8 +1633,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     exportState,
     getBudget,
     getBudgetColor,
+    getBudgetComparativeAnalysis,
     getBudgetIndex,
     getBudgetName,
+    getLoanComparativeAnalysis,
     getInterestUpToPeriod,
     getLifetimeInterest,
     getLoan,

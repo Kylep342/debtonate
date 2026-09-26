@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
-import constants from '@/apps/shared/constants/constants';
 import { Button } from '@/apps/shared/types/app';
 import { GraphConfig, LineGraphContent } from '@/apps/shared/types/graph';
 import { usePivot } from '@/apps/shared/composables/usePivot';
@@ -62,38 +61,17 @@ watch(() => props.watchedItems, (newItems) => {
 <template>
   <div>
     <div class="card-actions p-2 sm:p-4 border-b border-base-content/10">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 w-full">
-        <div class="flex items-center justify-between w-full md:w-auto">
-          <h2 class="cardHeaderTitle font-bold text-base sm:text-lg tracking-tight">
-            {{ viewedGraphId }}
-          </h2>
-          <!-- Mobile Dropdown Menu -->
-          <div class="md:hidden">
-            <base-menu
-              :text="constants.BTN_SELECT"
-              :buttons="buttons"
-              :classes="['btn-sm']"
-            />
-          </div>
-        </div>
-
-        <!-- Desktop / Tablet Segmented Pill Controls -->
-        <div class="hidden md:flex flex-wrap items-center gap-1.5">
-          <button
-            v-for="btn in buttons"
-            :key="btn.text"
-            type="button"
-            class="btn btn-xs sm:btn-sm transition-all rounded-full font-medium"
-            :class="[
-              viewedGraphId === btn.text
-                ? 'btn-primary shadow-sm'
-                : 'btn-ghost hover:bg-base-200 text-base-content/80'
-            ]"
-            @click="() => btn.onClick()"
-          >
-            {{ btn.text }}
-          </button>
-        </div>
+      <div class="flex items-center justify-between w-full min-w-0">
+        <h2 class="cardHeaderTitle font-bold text-base sm:text-lg tracking-tight sr-only">
+          {{ viewedGraphId }}
+        </h2>
+        <base-menu
+          :text="viewedGraphId"
+          :buttons="buttons"
+          :classes="['btn-secondary', 'btn-sm']"
+          align="start"
+          style="filter: brightness(0.9);"
+        />
       </div>
     </div>
     <div :class="['tabframe', 'w-full']">

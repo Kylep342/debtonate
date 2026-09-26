@@ -512,9 +512,9 @@ describe('Appreciate Core Store', () => {
     state.instruments = Instruments();
 
     expect(
-      Object.keys(state.withdrawalScenarios)
+      Object.keys(state.withdrawalScenarios).sort()
     ).toStrictEqual(
-      state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id)
+      state.monthlyBudgets.map((budget: MonthlyBudget) => budget.id).sort()
     );
 
     state.monthlyBudgets.forEach((budget: MonthlyBudget) => {

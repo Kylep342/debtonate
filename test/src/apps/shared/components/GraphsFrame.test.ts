@@ -92,7 +92,7 @@ describe('GraphsFrame Component', () => {
     expect(wrapper.find('h2').text()).toBe('Graph 2');
   });
 
-  it('switches between graphs via pill buttons', async () => {
+  it('updates the dropdown button label when graph switches', async () => {
     const wrapper = mount(GraphsFrame, {
       props: {
         graphs: mockGraphs,
@@ -105,10 +105,14 @@ describe('GraphsFrame Component', () => {
       global: globalConfig
     });
 
-    const buttons = wrapper.findAll('button');
-    const graph2Btn = buttons.find(btn => btn.text() === 'Graph 2');
+    const menu = wrapper.findComponent(BaseMenu);
+    expect(menu.props('text')).toBe('Graph 1');
+
+    const menuItems = wrapper.findAll('li');
+    const graph2Btn = menuItems.find(li => li.text() === 'Graph 2');
     await graph2Btn?.trigger('click');
 
+    expect(menu.props('text')).toBe('Graph 2');
     expect(wrapper.find('h2').text()).toBe('Graph 2');
   });
 

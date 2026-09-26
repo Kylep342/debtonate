@@ -9,7 +9,16 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
-const activeTab = ref<'growth' | 'retirement' | 'display' | 'storage'>('growth');
+const tabs = [
+  { key: 'all', label: 'All' },
+  { key: 'growth', label: 'Growth' },
+  { key: 'retirement', label: 'Retirement' },
+  { key: 'display', label: 'Display' },
+  { key: 'storage', label: 'Data' },
+] as const;
+
+type TabKey = typeof tabs[number]['key'];
+const activeTab = ref<TabKey>('all');
 
 const isCopied = ref<boolean>(false);
 const copyTimeout = ref<any>(null);
@@ -56,49 +65,33 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
         x
       </base-button>
     </template>
+    <template #subHeader>
+      <div class="flex gap-1 p-1 bg-base-300/40 rounded-xl w-full">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          type="button"
+          class="btn btn-xs sm:btn-sm flex-1 text-center text-xs sm:text-sm font-medium px-1 sm:px-3 transition-all"
+          :class="activeTab === tab.key ? 'btn-primary' : 'btn-ghost text-base-content/70 hover:text-base-content'"
+          @click="activeTab = tab.key"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+    </template>
     <template #body>
       <div class="p-3 sm:p-4 flex flex-col gap-4 min-h-[480px] sm:min-h-[520px]">
-        <!-- Segmented Navigation Tabs -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-base-300/40 rounded-xl">
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm text-center text-xs sm:text-sm font-medium px-2 sm:px-3"
-            :class="activeTab === 'growth' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'growth'"
-          >
-            Growth
-          </button>
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm text-center text-xs sm:text-sm font-medium px-2 sm:px-3"
-            :class="activeTab === 'retirement' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'retirement'"
-          >
-            Retirement
-          </button>
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm text-center text-xs sm:text-sm font-medium px-2 sm:px-3"
-            :class="activeTab === 'display' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'display'"
-          >
-            Display
-          </button>
-          <button
-            type="button"
-            class="btn btn-xs sm:btn-sm text-center text-xs sm:text-sm font-medium px-2 sm:px-3"
-            :class="activeTab === 'storage' ? 'btn-primary' : 'btn-ghost'"
-            @click="activeTab = 'storage'"
-          >
-            Data
-          </button>
-        </div>
-
         <!-- Tab 1: Growth & Inflation -->
         <div
-          v-if="activeTab === 'growth'"
+          v-if="activeTab === 'all' || activeTab === 'growth'"
           class="flex flex-col gap-3 flex-1"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-1"
+          >
+            Growth & Inflation
+          </div>
           <!-- Accrue Before Contribution -->
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
             <div class="flex items-center justify-between gap-2">
@@ -156,9 +149,15 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
 
         <!-- Tab 2: Retirement Horizon -->
         <div
-          v-if="activeTab === 'retirement'"
+          v-if="activeTab === 'all' || activeTab === 'retirement'"
           class="flex flex-col gap-3"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-3 border-t border-base-content/10"
+          >
+            Retirement Horizon
+          </div>
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-3">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <!-- Years to Contribute -->
@@ -261,17 +260,29 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
 
         <!-- Tab 3: Display & Regional -->
         <div
-          v-if="activeTab === 'display'"
+          v-if="activeTab === 'all' || activeTab === 'display'"
           class="flex flex-col gap-3"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-3 border-t border-base-content/10"
+          >
+            Display & Regional
+          </div>
           <global-options-formlet />
         </div>
 
         <!-- Tab 4: Data & Storage -->
         <div
-          v-if="activeTab === 'storage'"
+          v-if="activeTab === 'all' || activeTab === 'storage'"
           class="flex flex-col gap-3"
         >
+          <div
+            v-if="activeTab === 'all'"
+            class="text-xs uppercase tracking-wider font-bold opacity-60 px-1 pt-3 border-t border-base-content/10"
+          >
+            Data & Storage
+          </div>
           <!-- Privacy & Data Ownership Disclaimer -->
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-1.5">
             <div class="flex items-center gap-2">

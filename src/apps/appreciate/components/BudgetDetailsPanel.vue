@@ -3,18 +3,22 @@ import { contributionTypes, withdrawalTypes } from 'moneyfunx';
 import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
+import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { usePivot } from '@/apps/shared/composables/usePivot';
+import { useBreakpoint } from '@/apps/shared/functions/viewport';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { Button } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { UIInstrument } from '@/apps/appreciate/types/core';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
+const { isMobile } = useBreakpoint();
 
 const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
-const { viewedItemId, isViewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
+const { viewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
 const currentInstrument: ComputedRef<UIInstrument | null> = computed(() => {
   if (!viewedItemId.value) return null;
@@ -56,30 +60,57 @@ const tableFooter: ComputedRef<{}> = computed(() => {
   return state.amortizationTableTotals(schedule.value);
 });
 
-const buildBudgetDetailsTitle = (monthlyBudget: MonthlyBudget | null): string => {
-  if (!monthlyBudget) return constants.BUDGET_DETAILS;
-
+const panelTitle = computed(() => {
+  if (!currentBudget.value) return constants.BUDGET_DETAILS;
   const budgetName = isCareerPhase.value
-    ? state.getBudgetName(monthlyBudget.id)
-    : state.getWithdrawalBudgetName(monthlyBudget.id);
+    ? state.getBudgetName(currentBudget.value.id)
+    : state.getWithdrawalBudgetName(currentBudget.value.id);
+  return isCareerPhase.value
+    ? `Budget Details - ${budgetName}`
+    : `Withdrawal Details - ${budgetName}`;
+});
 
+const panelSubtitle = computed(() => {
+  if (!currentBudget.value) return '';
   if (isCareerPhase.value) {
-    return `Budget Details - ${budgetName} | `
-      + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-      + `(+${globalOptions.Money(monthlyBudget.relative)}/month)`;
+    return `${globalOptions.Money(currentBudget.value.absolute)}/month (+${globalOptions.Money(currentBudget.value.relative)}/month)`;
   }
-  const diff = monthlyBudget.relative - state.desiredNetIncome;
+  const diff = currentBudget.value.relative - state.desiredNetIncome;
   const diffStr = diff > 0
     ? `(+${globalOptions.Money(diff)}/mo vs target)`
     : diff < 0
       ? `(-${globalOptions.Money(Math.abs(diff))}/mo vs target)`
       : '(matches target)';
-  return `Withdrawal Details - ${budgetName} | `
-    + `${globalOptions.Money(monthlyBudget.absolute)}/month `
-    + diffStr;
-};
+  return `${globalOptions.Money(currentBudget.value.absolute)}/month ${diffStr}`;
+});
 
-const title: ComputedRef<string> = computed(() => (buildBudgetDetailsTitle(currentBudget.value)))
+const activeView = ref<'amortization' | 'comparative'>('amortization');
+
+const scheduleTabLabel = computed(() => (
+  isMobile.value ? 'Schedule' : 'Amortization Schedule'
+));
+
+const comparativeTabLabel = computed(() => (
+  isMobile.value ? 'Comparison' : 'Comparative Analysis'
+));
+
+const instrumentDropdownLabel = computed(() => (
+  viewedItemId.value ? state.getInstrumentName(viewedItemId.value) : 'Select Instrument'
+));
+
+const instrumentDropdownButtons = computed<Button[]>(() =>
+  state.instrumentsWithTotals.map((inst) => ({
+    text: state.getInstrumentName(inst.id),
+    onClick: () => setViewedItemId(inst.id),
+  }))
+);
+
+const instrumentComparativeAnalysis = computed(() => {
+  return state.getInstrumentComparativeAnalysis(
+    viewedItemId.value || constants.TOTALS,
+    isCareerPhase.value
+  );
+});
 
 watch(
   () => state.currentBudgetId,
@@ -101,10 +132,16 @@ watch(
     @exit="state.unviewBudget"
   >
     <template #header>
-      <div class="flex items-center gap-2 pl-2">
-        <h2 class="text-lg md:text-xl font-bold tracking-tight text-base-content">
-          {{ title }}
+      <div class="flex flex-col min-w-0 pr-2">
+        <h2 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-base-content truncate">
+          {{ panelTitle }}
         </h2>
+        <p
+          v-if="panelSubtitle"
+          class="hidden sm:block text-xs text-base-content/60 font-mono truncate mt-0.5"
+        >
+          {{ panelSubtitle }}
+        </p>
       </div>
     </template>
     <template #headerActions>
@@ -141,32 +178,73 @@ watch(
               {{ isCareerPhase ? `+${globalOptions.Money(currentBudget.relative)}/mo` : `${globalOptions.Money(state.desiredNetIncome)}/mo` }}
             </span>
           </div>
-          <div>
-            <span class="text-base-content/60 text-[11px] block">Target Planning Phase</span>
-            <span class="badge badge-sm badge-primary uppercase text-[10px] mt-0.5">
+          <div class="col-span-2 sm:col-span-1 flex items-center justify-between sm:block border-t border-base-content/10 pt-2.5 sm:border-t-0 sm:pt-0">
+            <span class="text-base-content/60 text-[11px] block whitespace-nowrap">Planning Phase</span>
+            <span class="badge badge-sm badge-primary uppercase text-[10px] mt-0 sm:mt-0.5 whitespace-nowrap tracking-wider font-semibold">
               {{ isCareerPhase ? 'Career Accumulation' : 'Retirement Drawdown' }}
             </span>
           </div>
         </div>
 
-        <!-- Amortization Schedules Pivot -->
-        <div class="tabframe w-auto">
-          <base-tabs
-            :get-item-name="state.getInstrumentName"
-            :pivot="state.instrumentsWithTotals"
-            :is-viewed-item-id="isViewedItemId"
-            :set-viewed-item-id="setViewedItemId"
-          >
-            <template #tabContent>
-              <data-table
-                :title="amortizationTitle"
-                :subtitle="amortizationSubtitle"
-                :headers="state.amortizationTableHeaders"
-                :rows="tableRows"
-                :totals="tableFooter"
-              />
-            </template>
-          </base-tabs>
+        <!-- Paired Navigation Tabs & Instrument Dropdown -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-2">
+          <div class="tabs tabs-boxed bg-base-300/40 p-1 rounded-xl grid grid-cols-2 w-full sm:w-auto sm:flex">
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'amortization' }"
+              @click="activeView = 'amortization'"
+            >
+              {{ scheduleTabLabel }}
+            </button>
+            <button
+              type="button"
+              class="tab tab-sm font-medium transition-all whitespace-nowrap flex-1 text-center"
+              :class="{ 'tab-active font-bold': activeView === 'comparative' }"
+              @click="activeView = 'comparative'"
+            >
+              {{ comparativeTabLabel }}
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-2">
+            <span class="text-xs text-base-content/60 font-medium">Instrument:</span>
+            <base-menu
+              :text="instrumentDropdownLabel"
+              :buttons="instrumentDropdownButtons"
+              :classes="['btn-sm', 'btn-outline']"
+              align="end"
+            />
+          </div>
+        </div>
+
+        <!-- Tab 1: Amortization Schedule (Direct Table, No Pivot Tabs) -->
+        <div
+          v-if="activeView === 'amortization'"
+          class="w-auto"
+        >
+          <data-table
+            :title="amortizationTitle"
+            :subtitle="amortizationSubtitle"
+            :headers="state.amortizationTableHeaders"
+            :rows="tableRows"
+            :totals="tableFooter"
+          />
+        </div>
+
+        <!-- Tab 2: Dynamic Crosstab Comparative Analysis -->
+        <div
+          v-else-if="activeView === 'comparative'"
+          class="w-auto"
+        >
+          <TabularAnalysis
+            :title="`${state.getInstrumentName(viewedItemId || constants.TOTALS)} - Budget Comparison`"
+            :subtitle="`Comparing all ${isCareerPhase ? 'career budgets' : 'withdrawal budgets'} for ${state.getInstrumentName(viewedItemId || constants.TOTALS)}`"
+            :analysis="instrumentComparativeAnalysis"
+            :items="isCareerPhase ? state.monthlyBudgets : state.monthlyWithdrawalBudgets"
+            :get-item-name="isCareerPhase ? state.getBudgetName : state.getWithdrawalBudgetName"
+            :baseline-id="currentBudget.id"
+          />
         </div>
       </div>
     </template>

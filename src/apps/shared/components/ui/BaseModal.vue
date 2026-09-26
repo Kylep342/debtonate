@@ -66,6 +66,7 @@ const maxWidthClass = computed(() => {
         'border-base-content/10',
         'shadow-2xl',
         'bg-base-100',
+        'translate-y-0',
       ]"
     >
       <base-card
@@ -74,7 +75,7 @@ const maxWidthClass = computed(() => {
         style="-webkit-overflow-scrolling: touch;"
       >
         <template #cardTitle>
-          <header class="navbar bg-secondary px-4 py-2 border-b border-base-content/10 min-h-0">
+          <header class="navbar bg-secondary px-4 sm:px-6 py-3.5 sm:py-4 border-b border-base-content/10 min-h-0 shrink-0">
             <div class="flex-1 min-w-0">
               <slot name="header" />
             </div>
@@ -84,6 +85,12 @@ const maxWidthClass = computed(() => {
               </menu>
             </div>
           </header>
+          <div
+            v-if="$slots.subHeader"
+            class="px-3 sm:px-6 py-2 bg-base-100 border-b border-base-content/10 shrink-0"
+          >
+            <slot name="subHeader" />
+          </div>
         </template>
         <template #cardBody>
           <slot name="body" />
@@ -91,7 +98,7 @@ const maxWidthClass = computed(() => {
         <template #cardActions>
           <div
             v-if="$slots.actions"
-            class="card-actions justify-end px-4 py-3 bg-base-200/30 border-t border-base-content/10"
+            class="card-actions justify-end px-4 sm:px-6 py-3 bg-base-200/30 border-t border-base-content/10 shrink-0"
           >
             <menu class="flex items-center gap-2 m-0 p-0">
               <slot name="actions" />
