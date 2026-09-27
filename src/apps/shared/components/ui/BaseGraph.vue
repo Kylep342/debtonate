@@ -57,6 +57,12 @@ const activeTooltipConfig = computed<TooltipConfig | null>(() => {
     color: (chart.color as any) || (() => '#ffffff'),
     lineName: (chart.lineName as any) || ((id: string) => id),
     yFormat: (chart.yFormat as any) || ((y: any) => `${y}`),
+    seriesLabel: typeof chart.seriesLabel === 'function'
+      ? chart.seriesLabel()
+      : (chart.seriesLabel || 'Budget'),
+    valueLabel: typeof chart.valueLabel === 'function'
+      ? chart.valueLabel()
+      : (typeof chart.yLabel === 'function' ? chart.yLabel() : 'Amount'),
   };
 });
 

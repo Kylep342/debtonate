@@ -9,7 +9,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div :class="['navbar', 'min-h-0', 'py-2', 'px-3', 'w-full', 'max-w-full', 'overflow-hidden']">
+  <div :class="['navbar', 'min-h-0', 'py-2', 'px-3', 'w-full', 'max-w-full', 'overflow-visible', 'relative', 'z-20']">
     <div :class="['flex-1', 'min-w-0', 'overflow-hidden']">
       <h2 class="truncate font-semibold text-lg">
         {{ props.title }}

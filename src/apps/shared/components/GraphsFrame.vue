@@ -75,7 +75,7 @@ watch(() => props.watchedItems, (newItems) => {
 
 <template>
   <div>
-    <div class="card-actions p-2 sm:p-4 border-b border-base-content/10">
+    <div class="card-actions p-2 sm:p-4 border-b border-base-content/10 relative z-20">
       <div class="flex flex-wrap items-center justify-between w-full min-w-0 gap-2">
         <!-- Controls Group: Graph selector, Entity pivot selector, Extra pivots -->
         <div class="flex flex-wrap items-center gap-2 min-w-0">

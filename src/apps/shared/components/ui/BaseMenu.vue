@@ -67,7 +67,7 @@ onUnmounted(() => {
       'dropdown',
       'dropdown-bottom',
       align === 'end' ? 'dropdown-end' : '',
-      { 'dropdown-open': isOpen, 'z-30': isOpen }
+      { 'dropdown-open': isOpen, 'z-50': isOpen }
     ]"
   >
     <base-button
@@ -83,7 +83,7 @@ onUnmounted(() => {
         'menu',
         'bg-base-100',
         'rounded-box',
-        'z-[50]',
+        'z-[60]',
         'w-max',
         'min-w-[120px]',
         'p-2',

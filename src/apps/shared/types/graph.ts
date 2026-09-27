@@ -56,6 +56,8 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   subheader: (id: string) => string;
   xLabel: () => string;
   yLabel: () => string;
+  seriesLabel?: () => string;
+  valueLabel?: () => string;
   x: (value: any) => any;
   y: (value: any) => any;
   xFormat: (value: number | Date) => string | number | Date;
@@ -72,6 +74,8 @@ export type TooltipConfig = {
   color: (id: string) => string;
   lineName: (id: string) => string;
   yFormat: (value: number) => string;
+  seriesLabel?: string;
+  valueLabel?: string;
 };
 
 export type TooltipPosition = { left: number, top: number };

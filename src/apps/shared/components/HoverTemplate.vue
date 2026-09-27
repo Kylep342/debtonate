@@ -38,6 +38,17 @@ onUpdated(reportSize);
       <span class="badge badge-xs badge-primary font-mono font-bold">{{ tooltipConfig.xFormat(index) }}</span>
     </div>
     <table class="table table-xs w-full">
+      <thead>
+        <tr class="border-b border-base-content/10 text-[10px] uppercase font-bold text-base-content/60 tracking-wider">
+          <th class="p-1 w-4" />
+          <th class="p-1 text-left font-bold text-base-content/70">
+            {{ tooltipConfig.seriesLabel || 'Budget' }}
+          </th>
+          <th class="p-1 text-right font-bold text-base-content/70">
+            {{ tooltipConfig.valueLabel || 'Balance' }}
+          </th>
+        </tr>
+      </thead>
       <tbody>
         <tr
           v-for="(line, id) in tooltipConfig.lines"

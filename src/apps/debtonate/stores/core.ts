@@ -606,6 +606,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         header: (loanId: string) =>
           `Balances over Time by Budget - ${getLoanName(loanId)}`,
         lineName: getBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
@@ -719,6 +720,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         header: (loanId: string) =>
           `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
         lineName: getBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
@@ -770,13 +772,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           loanId
         )}`,
       lineName: getBudgetAbsoluteRate,
+      seriesLabel: () => 'Budget',
+      valueLabel: () => 'Principal %',
       subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
       x: globalOptions.Period,
       xFormat: (x: number | Date) => globalOptions.Period(x, true),
       xLabel: () => globalOptions.Time,
       xScale: graphXScale.value,
       y: (y: number) => y,
-      yLabel: () => 'Percent of Payemnt to Principal',
+      yLabel: () => 'Percent of Payment to Principal',
       yFormat: globalOptions.Percent,
       yScale: d3.scaleLinear,
     };
@@ -872,6 +876,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         graphs: graphs,
         header: (loanId: string) => `Balance Comparison - ${getLoanName(loanId)}`,
         lineName: getScenarioNameLocal,
+        seriesLabel: () => 'Scenario',
         subheader: (loanId: string) => {
           const loan = getLoan(loanId);
           return loan ? buildLoanSubtitle(loan) : '';
@@ -984,6 +989,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       header: (loanId: string) =>
         `Interest Paid Comparison - ${getLoanName(loanId)}`,
       lineName: getScenarioNameLocal,
+      seriesLabel: () => 'Scenario',
       subheader: (loanId: string) => {
         const loan = getLoan(loanId);
         return loan ? buildLoanSubtitle(loan) : '';

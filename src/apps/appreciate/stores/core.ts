@@ -759,6 +759,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         header: (instrumentId: string) =>
           `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: (instrumentId: string) =>
           buildInstrumentSubtitle(getInstrument(instrumentId)!),
         x: globalOptions.Period,
@@ -893,6 +894,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
             instrumentId
           )}`,
         lineName: getBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: (instrumentId: string) =>
           buildInstrumentSubtitle(getInstrument(instrumentId)!),
         x: globalOptions.Period,
@@ -956,6 +958,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         header: (instrumentId: string) =>
           `Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getWithdrawalBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: () =>
           `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
         x: globalOptions.Period,
@@ -1026,6 +1029,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         header: (instrumentId: string) =>
           `Purchasing Power Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getWithdrawalBudgetAbsoluteRate,
+        seriesLabel: () => 'Budget',
         subheader: () =>
           `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
         x: globalOptions.Period,
@@ -1034,7 +1038,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         xScale: graphXScale.value,
         y: (y: number) => y,
         yFormat: globalOptions.Money,
-        yLabel: () => 'Balance',
+        yLabel: () => 'Purchasing Power',
         yScale: d3.scaleLinear,
       };
     }
