@@ -6,6 +6,7 @@ import { setActivePinia } from 'pinia';
 import BudgetCard from '@/apps/appreciate/components/BudgetCard.vue';
 import constants from '@/apps/appreciate/constants/constants';
 import { useAppreciateCoreStore } from '@/apps/appreciate/stores/core';
+import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
@@ -152,5 +153,69 @@ describe('BudgetCard Component (Appreciate)', () => {
     expect(wrapper.find('h2').text()).toBe('Withdrawal Budget 1');
     expect(wrapper.text()).toContain('Ending Balance');
     expect(wrapper.text()).toContain('Withdrawals');
+  });
+
+  it('renders Deplete on: never when plan gains more than user spends', async () => {
+    const store = useAppreciateCoreStore();
+    store.viewPhase = constants.PHASE_RETIREMENT;
+    store.instruments = [{ id: 'inst1' }] as any;
+
+    vi.mocked(store.getWithdrawalBudgetName).mockReturnValue('Perpetual Plan');
+    vi.mocked(store.getWithdrawalSchedule).mockReturnValue({
+      lifetimeGrowth: 8000,
+      lifetimeWithdrawal: 3000,
+      amortizationSchedule: [
+        { currentBalance: 100000, growth: 500, withdrawal: 200, period: 1 },
+        { currentBalance: 105000, growth: 520, withdrawal: 200, period: 2 }
+      ]
+    } as any);
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.find('h2').text()).toBe('Perpetual Plan');
+    expect(wrapper.text()).toContain('Deplete on');
+    expect(wrapper.text()).toContain('never');
+  });
+
+  it('renders steady-state monthly withdrawal for career savings budgets', async () => {
+    const store = useAppreciateCoreStore();
+    store.viewPhase = constants.PHASE_CAREER;
+    store.instruments = [{ id: 'inst1' }] as any;
+
+    vi.mocked(store.getBudgetName).mockReturnValue('Retirement Savings');
+    vi.mocked(store.getContributionSchedule).mockReturnValue({
+      lifetimeContribution: 50000,
+      lifetimeGrowth: 30000,
+      amortizationSchedule: [{ currentBalance: 80000 }]
+    } as any);
+    vi.mocked(store.getSteadyStateMonthlyWithdrawal).mockReturnValue(3200);
+
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {
+      [mockInstrumentId]: {
+        [mockBudget.id]: []
+      }
+    };
+
+    const globalOptions = useGlobalOptionsStore();
+    vi.mocked(globalOptions.Money).mockImplementation((val: any) => `$${val}`);
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Steady-State Withdrawal');
+    expect(wrapper.text()).toContain('$3200/mo');
   });
 });

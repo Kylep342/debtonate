@@ -12,6 +12,7 @@ import {
 
 import HoverTemplate from '@/apps/shared/components/HoverTemplate.vue';
 import { smartTransform, useBreakpoint } from '@/apps/shared/functions/viewport';
+import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { GraphConfig, Point, TooltipConfig, TooltipPosition, TooltipSize } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
@@ -19,6 +20,7 @@ const props = defineProps<{
   anchorId: string;
 }>();
 
+const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const chart = shallowReactive<Record<string, any>>({});
 const tooltipPosition: Ref<TooltipPosition> = ref({ left: 0, top: 0 });
 const tooltipTransform: Ref<string> = ref('translateX(0%) translateY(0%)');
@@ -49,6 +51,9 @@ watch([tooltipSize, tooltipPosition], ([newSize, newPos]) => {
 const activeTooltipConfig = computed<TooltipConfig | null>(() => {
   const g = chart.graphs?.[props.anchorId];
   if (!g) return null;
+  // React to currency and language changes
+  const _curr = globalOptions.currency;
+  const _lang = globalOptions.language;
   return {
     xLabel: typeof chart.xLabel === 'function' ? chart.xLabel() : 'Period',
     xFormat: (chart.xFormat as any) || ((x: any) => `${x}`),
@@ -296,6 +301,16 @@ watch(
     }
   },
   { immediate: true },
+);
+
+watch(
+  [() => globalOptions.currency, () => globalOptions.language],
+  () => {
+    if (props.graph) {
+      Object.assign(chart, props.graph);
+      initializeChart();
+    }
+  },
 );
 </script>
 

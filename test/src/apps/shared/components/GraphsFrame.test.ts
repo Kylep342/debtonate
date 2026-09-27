@@ -6,8 +6,11 @@ import BaseTabs from '@/apps/shared/components/ui/BaseTabs.vue';
 import BaseGraph from '@/apps/shared/components/ui/BaseGraph.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 
+import { createPinia, setActivePinia } from 'pinia';
+
 describe('GraphsFrame Component', () => {
   beforeEach(() => {
+    setActivePinia(createPinia());
     (globalThis as any).ResizeObserver = class ResizeObserver {
       observe = vi.fn();
       unobserve = vi.fn();

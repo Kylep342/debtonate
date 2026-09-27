@@ -670,7 +670,68 @@ describe('Appreciate Core Store', () => {
     expect(state.retirementTaxRate).toBe(18);
     expect(state.yearsToContribute).toBe(25);
     expect(state.yearsToSpend).toBe(30);
-    expect(state.accrueBeforeContribution).toBe(true);
     expect(globalOptions.currency).toBe('GBP');
+  });
+
+  it('calculates steady-state monthly withdrawal allowed by retirement settings', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = [
+      {
+        id: 'inst-1',
+        name: 'Investment Account',
+        currentBalance: 100000,
+        annualRate: 0.06,
+        periodsPerYear: 12,
+        annualLimit: 0,
+      } as any
+    ];
+    state.yearsToContribute = 0; // Immediate retirement balance = 100,000
+    state.yearsToSpend = 20;
+    state.retirementTaxRate = 10; // 10% effective tax
+
+    const withdrawal = state.getSteadyStateMonthlyWithdrawal('inst-1', constants.DEFAULT);
+    expect(withdrawal).toBeGreaterThan(600);
+    expect(withdrawal).toBeLessThan(700);
+
+    const totalWithdrawal = state.getSteadyStateMonthlyWithdrawal(constants.TOTALS, constants.DEFAULT);
+    expect(totalWithdrawal).toBe(withdrawal);
+  });
+
+  it('normalizes career accumulation stats for current balance as principal', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = [
+      {
+        id: 'inst-1',
+        name: 'Index Fund',
+        currentBalance: 10000,
+        annualRate: 0.08,
+        periodsPerYear: 12,
+        annualLimit: 0,
+      } as any
+    ];
+    state.budgets = [
+      { id: 'b1', relative: 500 } as any
+    ];
+    state.yearsToContribute = 10;
+
+    // In investmentTabularAnalysis, minimumBudget (DEFAULT, relative: 0) is evaluated alongside b1
+    const analysis = state.investmentTabularAnalysis;
+    const defaultRatio = analysis['Interest/principal ratio'][constants.DEFAULT];
+    expect(defaultRatio).not.toBe('0.0000');
+    expect(defaultRatio).not.toBe('-');
+    expect(Number(defaultRatio)).toBeGreaterThan(0);
+    // Principal for DEFAULT should equal starting balance of 10000
+    const globalOptions = useGlobalOptionsStore();
+    expect(analysis['Principal'][constants.DEFAULT]).toBe(globalOptions.Money(10000));
+
+    // getInstrumentComparativeAnalysis should also normalize starting balance as principal
+    const instAnalysis = state.getInstrumentComparativeAnalysis('inst-1', true);
+    expect(instAnalysis['Interest/principal ratio'][constants.DEFAULT]).toBe(defaultRatio);
+    expect(instAnalysis['Starting Balance'][constants.DEFAULT]).toBe(globalOptions.Money(10000));
+    expect(instAnalysis['Principal Contributed'][constants.DEFAULT]).toBe(globalOptions.Money(0));
+
+    // getBudgetComparativeAnalysis should also normalize starting balance as principal
+    const budgetAnalysis = state.getBudgetComparativeAnalysis(constants.DEFAULT, true);
+    expect(budgetAnalysis['Interest/principal ratio']['inst-1']).toBe(defaultRatio);
   });
 });

@@ -51,6 +51,9 @@ const summaryRows: ComputedRef<SummaryRow[]> = computed(() => {
     label: 'Money Lasts',
     values: careerBudgets.value.map(budget => {
       const withdrawalSchedule = state.careerRetirementComparison[budget.id][constants.TOTALS];
+      if (Number(withdrawalSchedule.lifetimeGrowth) >= Number(withdrawalSchedule.lifetimeWithdrawal)) {
+        return 'Never';
+      }
       const periods = withdrawalSchedule.amortizationSchedule.filter(r => r.currentBalance > 0.01).length;
       return `${Math.floor(periods / 12)} years ${periods % 12} months`;
     })

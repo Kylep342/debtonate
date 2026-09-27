@@ -142,6 +142,10 @@ export interface AppreciateCoreActions {
     instrumentId: string,
     budgetId: string
   ) => withdrawalTypes.WithdrawalSchedule;
+  getSteadyStateMonthlyWithdrawal: (
+    instrumentId: string,
+    budgetId: string
+  ) => number;
   getInstrument: (id: string) => UIInstrument | undefined;
   getInstrumentIndex: (id: string) => number;
   getInstrumentName: (id: string) => string;
@@ -508,16 +512,18 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
     monthlyBudgets.value.forEach(budget => {
       const schedule = getContributionSchedule(constants.TOTALS, budget.id);
-      const principal = Number(schedule.lifetimeContribution);
+      const startingPrincipal = totalCurrentBalance.value;
+      const contributedPrincipal = Number(schedule.lifetimeContribution);
+      const principal = startingPrincipal + contributedPrincipal;
       const interest = Number(schedule.lifetimeGrowth);
       const total = principal + interest;
 
       analysis['Principal'][budget.id] = globalOptions.Money(principal);
       analysis['Interest'][budget.id] = globalOptions.Money(interest);
-      analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
+      analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '-';
       analysis['Share of balance at retirement as principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
-      analysis['Effective avg saved/yr of work'][budget.id] = globalOptions.Money(principal / yearsToContribute.value);
-      analysis['Growth factor from present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '0.0000';
+      analysis['Effective avg saved/yr of work'][budget.id] = globalOptions.Money(contributedPrincipal / yearsToContribute.value);
+      analysis['Growth factor from present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '-';
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => Number(r.currentBalance) >= 1000000)?.period;
       analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
@@ -588,17 +594,18 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
       monthlyBudgets.value.forEach(budget => {
         const schedule = getContributionSchedule(instrumentId, budget.id);
-        const principal = Number(schedule.lifetimeContribution);
+        const contributed = Number(schedule.lifetimeContribution);
+        const totalPrincipal = startBal + contributed;
         const growth = Number(schedule.lifetimeGrowth);
         const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
 
         analysis['Starting Balance'][budget.id] = globalOptions.Money(startBal);
         analysis['Expected Return'][budget.id] = rateStr;
-        analysis['Principal Contributed'][budget.id] = globalOptions.Money(principal);
+        analysis['Principal Contributed'][budget.id] = globalOptions.Money(contributed);
         analysis['Interest Growth'][budget.id] = globalOptions.Money(growth);
         analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
-        analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (growth / principal).toFixed(4) : '0.0000';
-        analysis['Growth factor from present'][budget.id] = principal > 0 ? (finalBal / principal).toFixed(4) : '0.0000';
+        analysis['Interest/principal ratio'][budget.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
+        analysis['Growth factor from present'][budget.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
       });
     } else {
       const metrics = [
@@ -657,17 +664,18 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         const isTotals = instItem.id === constants.TOTALS;
         const startBal = isTotals ? totalCurrentBalance.value : instItem.currentBalance;
         const rateStr = isTotals ? '-' : globalOptions.Percent(Number(instItem.annualRate) * 100);
-        const principal = Number(schedule.lifetimeContribution);
+        const contributed = Number(schedule.lifetimeContribution);
+        const totalPrincipal = startBal + contributed;
         const growth = Number(schedule.lifetimeGrowth);
         const finalBal = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
 
         analysis['Starting Balance'][instItem.id] = globalOptions.Money(startBal);
         analysis['Expected Return'][instItem.id] = rateStr;
-        analysis['Principal Contributed'][instItem.id] = globalOptions.Money(principal);
+        analysis['Principal Contributed'][instItem.id] = globalOptions.Money(contributed);
         analysis['Interest Growth'][instItem.id] = globalOptions.Money(growth);
         analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
-        analysis['Interest/principal ratio'][instItem.id] = principal > 0 ? (growth / principal).toFixed(4) : '0.0000';
-        analysis['Growth factor from present'][instItem.id] = principal > 0 ? (finalBal / principal).toFixed(4) : '0.0000';
+        analysis['Interest/principal ratio'][instItem.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
+        analysis['Growth factor from present'][instItem.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
       });
     } else {
       const budget = getWithdrawalBudget(budgetId);
@@ -1553,6 +1561,50 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     } as unknown as withdrawalTypes.WithdrawalSchedule);
   };
 
+  const getSteadyStateMonthlyWithdrawal = (
+    instrumentId: string,
+    budgetId: string
+  ): number => {
+    const isTotals = instrumentId === constants.TOTALS;
+    const targetInstruments = isTotals
+      ? instruments.value
+      : instruments.value.filter(i => i.id === instrumentId);
+
+    if (targetInstruments.length === 0) return 0;
+
+    const N = yearsToSpend.value * constants.PERIODS_PER_YEAR;
+    if (N <= 0) return 0;
+
+    let totalNet = 0;
+    targetInstruments.forEach(inst => {
+      const sched = getContributionSchedule(inst.id, budgetId);
+      const finalBal = sched.amortizationSchedule.length > 0
+        ? Number(sched.amortizationSchedule.slice(-1)[0].currentBalance)
+        : Number(inst.currentBalance || 0);
+
+      if (!finalBal || finalBal <= 0 || Number.isNaN(finalBal)) return;
+
+      const rate = Number(inst.annualRate || 0);
+      const r = rate / constants.PERIODS_PER_YEAR;
+      let pGross = 0;
+      if (r <= 0 || Number.isNaN(r)) {
+        pGross = finalBal / N;
+      } else {
+        const factor = Math.pow(1 + r, N);
+        pGross = factor > 1 ? finalBal * (r * factor) / (factor - 1) : finalBal / N;
+      }
+      const taxRate = Number(retirementTaxRateEffective.value || 0);
+      const pNet = pGross * (1 - taxRate);
+      if (!Number.isNaN(pNet)) {
+        totalNet += pNet;
+      }
+    });
+
+    return deflateAllMoney.value
+      ? deflate(totalNet, getNumContributions(constants.TOTALS, budgetId))
+      : totalNet;
+  };
+
   const getNumContributions = (
     instrumentId: string,
     budgetId: string
@@ -1778,6 +1830,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     getWithdrawalBudgetName,
     getContributionSchedule,
     getWithdrawalSchedule,
+    getSteadyStateMonthlyWithdrawal,
     getInstrument,
     getInstrumentIndex,
     getInstrumentName,

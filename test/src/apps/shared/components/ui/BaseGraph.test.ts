@@ -3,10 +3,15 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import BaseGraph from '@/apps/shared/components/ui/BaseGraph.vue';
 import * as d3 from 'd3';
 
+import { createPinia, setActivePinia } from 'pinia';
+import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+
 describe('BaseGraph Component', () => {
   let resizeCallback: (entries: any[], observer: any) => void;
 
   beforeEach(() => {
+    setActivePinia(createPinia());
+
     // Mock getBBox for JSDOM
     if (!(SVGElement.prototype as any).getBBox) {
       (SVGElement.prototype as any).getBBox = vi.fn().mockReturnValue({
@@ -92,4 +97,38 @@ describe('BaseGraph Component', () => {
 
     wrapper.unmount();
   });
+
+  it('re-renders chart when currency changes', async () => {
+    const globalOptions = useGlobalOptionsStore();
+    const wrapper = mount(BaseGraph, {
+      props: {
+        graph: mockGraphConfig,
+        anchorId: 'test-anchor'
+      },
+      attachTo: document.body
+    });
+
+    if (resizeCallback) {
+      resizeCallback([
+        {
+          contentRect: { width: 800, height: 500 }
+        } as ResizeObserverEntry
+      ], {} as ResizeObserver);
+    }
+    await wrapper.vm.$nextTick();
+
+    const svg = wrapper.find('svg');
+    expect(svg.findAll('g').length).toBeGreaterThan(0);
+
+    // Change currency
+    globalOptions.currency = 'EUR';
+    await wrapper.vm.$nextTick();
+
+    // Verify SVG still contains rendered chart elements
+    expect(svg.findAll('g').length).toBeGreaterThan(0);
+    expect(svg.findAll('path').length).toBeGreaterThan(0);
+
+    wrapper.unmount();
+  });
 });
+

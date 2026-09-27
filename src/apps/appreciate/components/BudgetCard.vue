@@ -32,13 +32,16 @@ const viewedWithdrawalSummary: ComputedRef<withdrawalTypes.WithdrawalSchedule | 
 
 const netWorth: ComputedRef<number> = computed(() => {
   if (isCareerPhase.value && viewedContributionSummary.value) {
-    const total = Number(viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth);
+    const schedule = viewedContributionSummary.value.amortizationSchedule;
+    const finalBalance = schedule.length > 0
+      ? Number(schedule.slice(-1)[0].currentBalance)
+      : (state.getInstrument(props.viewedInstrumentId)?.currentBalance || (props.viewedInstrumentId === constants.TOTALS ? state.totalCurrentBalance : 0));
     return state.deflateAllMoney
       ? state.deflate(
-        total,
+        finalBalance,
         state.getNumContributions(constants.TOTALS, props.budget.id)
       )
-      : total;
+      : finalBalance;
   } else if (viewedWithdrawalSummary.value) {
     // In retirement, show ending balance
     const schedule = viewedWithdrawalSummary.value.amortizationSchedule;
@@ -59,10 +62,19 @@ const budgetAmount: ComputedRef<string> = computed(() =>
   `${globalOptions.Money(props.budget.absolute)}/month`
 );
 
+const gainsMoreThanSpends: ComputedRef<boolean> = computed(() => {
+  if (isCareerPhase.value || !viewedWithdrawalSummary.value) return false;
+  const summary = viewedWithdrawalSummary.value;
+  return Number(summary.lifetimeGrowth) >= Number(summary.lifetimeWithdrawal);
+});
+
 const periodLabel: ComputedRef<string> = computed(() => {
   if (isCareerPhase.value) {
     return globalOptions.periodsAsDates ? 'Retire on' : 'Contributions';
   } else {
+    if (gainsMoreThanSpends.value) {
+      return 'Deplete on';
+    }
     return globalOptions.periodsAsDates ? 'Deplete on' : 'Withdrawals';
   }
 });
@@ -71,10 +83,31 @@ const budgetPeriodCount: ComputedRef<string | number | Date> = computed(() => {
   if (isCareerPhase.value && viewedContributionSummary.value) {
     return globalOptions.Period(viewedContributionSummary.value.amortizationSchedule.length, true);
   } else if (viewedWithdrawalSummary.value) {
-    return globalOptions.Period(viewedWithdrawalSummary.value.amortizationSchedule.length, true);
+    if (gainsMoreThanSpends.value) {
+      return 'never';
+    }
+    const schedule = viewedWithdrawalSummary.value.amortizationSchedule;
+    const depletionRecord = schedule.find(r => Number(r.currentBalance) <= 0.01);
+    if (depletionRecord) {
+      return globalOptions.Period(depletionRecord.period, true);
+    }
+    return globalOptions.Period(schedule.length, true);
   }
   return 0;
 });
+
+const steadyStateWithdrawal: ComputedRef<number> = computed(() => {
+  if (!isCareerPhase.value) return 0;
+  return state.getSteadyStateMonthlyWithdrawal(props.viewedInstrumentId, props.budget.id);
+});
+
+const steadyStateWithdrawalFormatted: ComputedRef<string> = computed(() =>
+  `${globalOptions.Money(steadyStateWithdrawal.value)}/mo`
+);
+
+const steadyStateLabel: ComputedRef<string> = computed(() =>
+  state.deflateAllMoney ? 'Steady-State Withdrawal (CYM)' : 'Steady-State Withdrawal'
+);
 
 const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
@@ -114,11 +147,17 @@ const appreciationDelta = computed(() => {
   if (!isCareerPhase.value || props.budget.id === constants.DEFAULT || !defaultContributionSummary.value || !viewedContributionSummary.value) {
     return null;
   }
-  const defaultTotal = Number(defaultContributionSummary.value.lifetimeContribution + defaultContributionSummary.value.lifetimeGrowth);
-  const currentTotal = Number(viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth);
+  const defaultSched = defaultContributionSummary.value.amortizationSchedule;
+  const currentSched = viewedContributionSummary.value.amortizationSchedule;
+  const defaultTotal = defaultSched.length > 0
+    ? Number(defaultSched.slice(-1)[0].currentBalance)
+    : Number(defaultContributionSummary.value.lifetimeContribution + defaultContributionSummary.value.lifetimeGrowth);
+  const currentTotal = currentSched.length > 0
+    ? Number(currentSched.slice(-1)[0].currentBalance)
+    : Number(viewedContributionSummary.value.lifetimeContribution + viewedContributionSummary.value.lifetimeGrowth);
   const extraTotal = currentTotal - defaultTotal;
 
-  if (extraTotal <= 0) return null;
+  if (!extraTotal || extraTotal <= 0 || Number.isNaN(extraTotal)) return null;
   return {
     extraTotal,
     extraTotalText: `+${globalOptions.Money(extraTotal)}`,
@@ -269,6 +308,17 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ budgetNetWorth }}</b>
+              </td>
+            </tr>
+            <tr v-if="isCareerPhase && state.instruments.length">
+              <td
+                class="truncate max-w-[110px]"
+                :title="steadyStateLabel"
+              >
+                {{ steadyStateLabel }}
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ steadyStateWithdrawalFormatted }}</b>
               </td>
             </tr>
           </tbody>
