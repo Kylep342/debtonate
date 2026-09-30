@@ -40,8 +40,8 @@ describe('LoanForm Component (Debtonate)', () => {
 
     const wrapper = mount(LoanForm, {
       global: {
-        components: {
-          BaseEntityForm
+        stubs: {
+          BaseEntityForm: true
         }
       }
     });

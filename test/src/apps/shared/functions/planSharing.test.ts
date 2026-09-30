@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   compressPlanState,
   decompressPlanState,
@@ -66,9 +66,11 @@ describe('planSharing utilities', () => {
   });
 
   it('returns null for empty or invalid hash', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(await parseShareUrlHash('')).toBeNull();
     expect(await parseShareUrlHash('#other-hash=123')).toBeNull();
     expect(await parseShareUrlHash('#plan=invalid!payload')).toBeNull();
+    errorSpy.mockRestore();
   });
 
   it('handles raw base64 and url-encoded fallback payloads', async () => {

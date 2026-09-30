@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, ComputedRef, Ref } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref, getCurrentInstance } from 'vue';
 import { getActivePinia } from 'pinia';
 
 import constants from '@/apps/debtonate/constants/constants';
@@ -7,7 +7,14 @@ import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stor
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
-const globalOptions = getActivePinia() ? useGlobalOptionsStore() : null;
+const getGlobalOptions = () => {
+  const vm = getCurrentInstance();
+  if (vm && !vm.appContext.config.globalProperties.$pinia) {
+    return null;
+  }
+  return getActivePinia() ? useGlobalOptionsStore() : null;
+};
+const globalOptions = getGlobalOptions();
 const currencySymbol = computed(() =>
   globalOptions ? globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.language) : '$'
 );

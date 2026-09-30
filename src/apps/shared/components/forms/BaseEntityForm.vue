@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, ComputedRef } from 'vue';
+import { computed, ref, watch, ComputedRef, getCurrentInstance } from 'vue';
 import { getActivePinia } from 'pinia';
 import { FormField } from '@/apps/shared/types/app';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
@@ -15,7 +15,15 @@ const props = defineProps<{
   onSubmit: (values: Record<string, any>) => void;
 }>();
 
-const globalOptions = getActivePinia() ? useGlobalOptionsStore() : null;
+const getGlobalOptions = () => {
+  const vm = getCurrentInstance();
+  if (vm && !vm.appContext.config.globalProperties.$pinia) {
+    return null;
+  }
+  return getActivePinia() ? useGlobalOptionsStore() : null;
+};
+
+const globalOptions = getGlobalOptions();
 const currencySymbol = computed(() => {
   return globalOptions ? globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.language) : '$';
 });

@@ -43,8 +43,8 @@ describe('InstrumentForm Component (Appreciate)', () => {
 
     const wrapper = mount(InstrumentForm, {
       global: {
-        components: {
-          BaseEntityForm
+        stubs: {
+          BaseEntityForm: true
         }
       }
     });

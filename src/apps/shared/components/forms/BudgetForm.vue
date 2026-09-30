@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, ComputedRef, Ref } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref, getCurrentInstance } from 'vue';
 import { getActivePinia } from 'pinia';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
@@ -18,7 +18,15 @@ const props = defineProps<{
   helperText?: string;
 }>();
 
-const globalOptions = getActivePinia() ? useGlobalOptionsStore() : null;
+const getGlobalOptions = () => {
+  const vm = getCurrentInstance();
+  if (vm && !vm.appContext.config.globalProperties.$pinia) {
+    return null;
+  }
+  return getActivePinia() ? useGlobalOptionsStore() : null;
+};
+
+const globalOptions = getGlobalOptions();
 const currencySymbol = computed(() =>
   globalOptions ? globalOptions.CurrencySymbol(globalOptions.currency, globalOptions.language) : '$'
 );
