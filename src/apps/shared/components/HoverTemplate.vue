@@ -19,6 +19,9 @@ const reportSize = () => {
 
 const getPointVal = (line: any[]) => {
   if (!line || line.length === 0) return 0;
+  const match = line.find((p: any) => p.x === props.index);
+  if (match !== undefined) return match.y;
+  if (line.length === 2 && line[0].y === line[1].y) return line[0].y;
   const minX = props.tooltipConfig.minX || 0;
   const idx = Math.max(0, Math.min(props.index - minX, line.length - 1));
   return line[idx]?.y ?? 0;

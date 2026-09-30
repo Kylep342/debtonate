@@ -110,6 +110,13 @@ export const GLOSSARY_ENTRIES: GlossaryEntry[] = [
     category: 'debt',
     definition: 'The projected calendar month or period number when all outstanding loan balances reach exactly zero.',
   },
+  {
+    id: 'cumulativeInterest',
+    title: 'Cumulative Interest vs. Principal',
+    category: 'debt',
+    definition: 'Tracking total interest paid period-by-period alongside original loan balance to pinpoint the threshold where borrowing costs exceed the principal amount borrowed.',
+    strategyTip: 'On long-term loans with high APR, cumulative interest paid can easily exceed 100% of the original principal if only minimum payments are made.',
+  },
 
   // Appreciate (Investing)
   {
@@ -189,6 +196,60 @@ export const GLOSSARY_ENTRIES: GlossaryEntry[] = [
     title: 'Accrue Before Contribution',
     category: 'investing',
     definition: 'Calculation timing option: when enabled, portfolio growth is calculated for the month before that period\'s contribution is added.',
+  },
+  {
+    id: 'crossoverPoint',
+    title: 'Crossover Point',
+    category: 'investing',
+    definition: 'The milestone in portfolio accumulation where monthly compounding investment gains equal or exceed your monthly out-of-pocket savings contributions.',
+    formula: 'Monthly Investment Growth >= Monthly Contribution',
+    strategyTip: 'Before the crossover point, savings rate drives accumulation; after it, compound growth takes over as the primary wealth engine.',
+  },
+  {
+    id: 'safeWithdrawalRate',
+    title: 'Safe Withdrawal Rate (SWR) / 4% Rule',
+    category: 'investing',
+    definition: 'The initial annual percentage withdrawn from retirement savings (subsequently adjusted for inflation) that historically ensures high confidence against running out of money over 30+ years.',
+    formula: 'SWR (%) = (Annual Gross Withdrawal ÷ Initial Retirement Nest Egg) * 100',
+    strategyTip: 'Rates <= 3.5% are conservative/safe, 4.0% is the standard Trinity Study benchmark, 4.5% - 5.5% warrant caution, and > 5.5% carry high depletion risk.',
+  },
+  {
+    id: 'steadyStateWithdrawal',
+    title: 'Steady-State Withdrawal',
+    category: 'investing',
+    definition: 'The constant, annuitized monthly spend amount that fully and smoothly exhausts the retirement portfolio balance across the chosen retirement horizon.',
+    formula: 'Monthly PMT = Present Value * [r(1 + r)^N ÷ ((1 + r)^N - 1)]',
+    strategyTip: 'Unlike a fixed percentage SWR, steady-state withdrawal plans for intentional capital decumulation down to zero at your planned horizon.',
+  },
+  {
+    id: 'escapeVelocity',
+    title: 'Escape Velocity',
+    category: 'investing',
+    definition: 'The inflection dynamic where periodic investment growth outpaces periodic deposits, establishing self-sustaining wealth expansion.',
+    strategyTip: 'Tracking monthly return versus monthly deposit reveals the exact timeframe when portfolio yield dwarfs manual paycheck savings.',
+  },
+  {
+    id: 'longevityEnvelope',
+    title: 'Longevity Envelope (Market Sensitivity)',
+    category: 'investing',
+    definition: 'A stress-testing projection model evaluating portfolio survival across Bull (+2%), Base (expected), and Bear (-2%) market return environments.',
+    strategyTip: 'Testing your spending strategy against bear market trajectories helps prevent sequence-of-returns risk from exhausting capital early in retirement.',
+  },
+  {
+    id: 'yieldVsDrawdown',
+    title: 'Periodic Yield vs. Drawdown',
+    category: 'investing',
+    definition: 'A cash-flow comparison of periodic investment returns against gross periodic withdrawal amounts during retirement.',
+    formula: 'Net Cash Flow = Monthly Yield - Gross Monthly Withdrawal',
+    strategyTip: 'When periodic yield exceeds withdrawal, portfolio capital is preserved or growing; when withdrawal exceeds yield, principal is actively drawn down.',
+  },
+  {
+    id: 'passiveIncome',
+    title: 'Passive Monthly Income (FI Metric)',
+    category: 'investing',
+    definition: 'The net monthly cash flow your accumulated portfolio could sustainably generate under a 4% rule (net of retirement taxes), measured against your target monthly income goal.',
+    formula: 'Passive Income = (Portfolio Balance * 4% ÷ 12) * (1 - Tax Rate)',
+    strategyTip: 'Reaching the threshold where passive monthly income equals or exceeds your desired retirement income marks Financial Independence (FI).',
   },
 
   // Shared

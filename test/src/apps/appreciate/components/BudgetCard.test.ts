@@ -218,4 +218,76 @@ describe('BudgetCard Component (Appreciate)', () => {
     expect(wrapper.text()).toContain('Steady-State Withdrawal');
     expect(wrapper.text()).toContain('$3200/mo');
   });
+
+  it('renders crossover point row during career phase', async () => {
+    const store = useAppreciateCoreStore();
+    store.viewPhase = constants.PHASE_CAREER;
+    store.instruments = [{ id: 'inst1' }] as any;
+
+    vi.mocked(store.getBudgetName).mockReturnValue('Career Budget 1');
+    vi.mocked(store.getContributionSchedule).mockReturnValue({
+      lifetimeContribution: 50000,
+      lifetimeGrowth: 30000,
+      amortizationSchedule: [{ currentBalance: 80000 }]
+    } as any);
+    vi.mocked(store.getCrossoverPoint).mockReturnValue({
+      period: 142,
+      formatted: 'Period 142',
+      reached: true
+    });
+
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {
+      [mockInstrumentId]: {
+        [mockBudget.id]: []
+      }
+    };
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Crossover Point');
+    expect(wrapper.text()).toContain('Period 142');
+  });
+
+  it('renders safe withdrawal rate with tier badge during retirement phase', async () => {
+    const store = useAppreciateCoreStore();
+    store.viewPhase = constants.PHASE_RETIREMENT;
+    store.instruments = [{ id: 'inst1' }] as any;
+
+    vi.mocked(store.getWithdrawalBudgetName).mockReturnValue('Withdrawal Budget 1');
+    vi.mocked(store.getWithdrawalSchedule).mockReturnValue({
+      lifetimeGrowth: 50000,
+      lifetimeWithdrawal: 40000,
+      amortizationSchedule: [{ currentBalance: 500000 }]
+    } as any);
+    vi.mocked(store.getSafeWithdrawalRate).mockReturnValue({
+      rate: 3.8,
+      formatted: '3.80%',
+      tier: 'benchmark',
+      label: '4% Rule',
+      badgeClass: 'badge-info'
+    });
+
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+
+    const wrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    expect(wrapper.text()).toContain('Withdrawal Rate');
+    expect(wrapper.text()).toContain('3.80%');
+    expect(wrapper.text()).toContain('4% Rule');
+    const badge = wrapper.find('.badge-info');
+    expect(badge.exists()).toBe(true);
+  });
 });

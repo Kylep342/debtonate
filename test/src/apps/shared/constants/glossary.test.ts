@@ -52,4 +52,33 @@ describe('Financial Glossary & Filter Utility', () => {
     const results = filterGlossary(GLOSSARY_ENTRIES, 'xyz_random_nonexistent_term_123');
     expect(results).toStrictEqual([]);
   });
+
+  it('includes newly added advanced metrics and graph concepts', () => {
+    const expectedIds = [
+      'crossoverPoint',
+      'safeWithdrawalRate',
+      'steadyStateWithdrawal',
+      'escapeVelocity',
+      'longevityEnvelope',
+      'yieldVsDrawdown',
+      'passiveIncome',
+      'cumulativeInterest',
+    ];
+
+    expectedIds.forEach((id) => {
+      const match = GLOSSARY_ENTRIES.find((entry) => entry.id === id);
+      expect(match, `Missing glossary entry for ${id}`).toBeDefined();
+      expect(match?.definition).toBeTruthy();
+    });
+
+    // Check specific searches
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'crossover').some(e => e.id === 'crossoverPoint')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'Trinity Study').some(e => e.id === 'safeWithdrawalRate')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'escape velocity').some(e => e.id === 'escapeVelocity')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'bear market').some(e => e.id === 'longevityEnvelope')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'steady-state').some(e => e.id === 'steadyStateWithdrawal')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'yield').some(e => e.id === 'yieldVsDrawdown')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'Financial Independence').some(e => e.id === 'passiveIncome')).toBe(true);
+    expect(filterGlossary(GLOSSARY_ENTRIES, 'cumulative interest').some(e => e.id === 'cumulativeInterest')).toBe(true);
+  });
 });

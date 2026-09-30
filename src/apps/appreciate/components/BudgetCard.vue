@@ -109,6 +109,28 @@ const steadyStateLabel: ComputedRef<string> = computed(() =>
   state.deflateAllMoney ? 'Steady-State Withdrawal (CYM)' : 'Steady-State Withdrawal'
 );
 
+const crossoverPoint = computed(() => {
+  if (!isCareerPhase.value) return null;
+  return state.getCrossoverPoint?.(props.viewedInstrumentId, props.budget.id) || null;
+});
+
+const crossoverFormatted = computed(() => {
+  return crossoverPoint.value?.formatted || '-';
+});
+
+const safeWithdrawalResult = computed(() => {
+  if (isCareerPhase.value) {
+    return { rate: 0, formatted: '-', tier: 'na' as const, label: '', badgeClass: '' };
+  }
+  return state.getSafeWithdrawalRate?.(props.viewedInstrumentId, props.budget.id) || {
+    rate: 0,
+    formatted: '-',
+    tier: 'na' as const,
+    label: '',
+    badgeClass: '',
+  };
+});
+
 const budgetNetWorth: ComputedRef<string> = computed(() => `${globalOptions.Money(netWorth.value)}`);
 
 const budgetName: ComputedRef<string> = computed(() => isCareerPhase.value
@@ -300,6 +322,34 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ budgetPeriodCount }}</b>
+              </td>
+            </tr>
+            <tr v-if="isCareerPhase && state.instruments.length">
+              <td
+                class="truncate max-w-[110px]"
+                title="Crossover Point (Growth >= Contribution)"
+              >
+                Crossover Point
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap']">
+                <b>{{ crossoverFormatted }}</b>
+              </td>
+            </tr>
+            <tr v-if="!isCareerPhase && state.instruments.length">
+              <td
+                class="truncate max-w-[110px]"
+                title="Safe Withdrawal Rate (SWR)"
+              >
+                Withdrawal Rate
+              </td>
+              <td :class="['text-right', 'whitespace-nowrap', 'flex', 'items-center', 'justify-end', 'gap-1']">
+                <b>{{ safeWithdrawalResult.formatted }}</b>
+                <span
+                  v-if="safeWithdrawalResult.tier !== 'na'"
+                  :class="['badge', 'badge-xs', safeWithdrawalResult.badgeClass, 'font-semibold', 'text-[10px]']"
+                >
+                  {{ safeWithdrawalResult.label }}
+                </span>
               </td>
             </tr>
             <tr>

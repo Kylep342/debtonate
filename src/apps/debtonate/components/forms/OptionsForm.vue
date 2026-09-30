@@ -329,6 +329,23 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
               </base-button>
             </div>
           </div>
+
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="font-bold text-sm text-base-content">Financial Glossary & Guide</span>
+                <p class="text-xs text-base-content/70 mt-1">
+                  Browse definitions, calculation formulas, and strategies for all debt and repayment metrics.
+                </p>
+              </div>
+              <base-button
+                class="btn-xs sm:btn-sm btn-primary"
+                @click="globalOptions.openGlossary"
+              >
+                {{ constants.BTN_VIEW }}
+              </base-button>
+            </div>
+          </div>
         </div>
       </div>
     </template>

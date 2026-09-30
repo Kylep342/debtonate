@@ -8,6 +8,7 @@ import BaseModal from '@/apps/shared/components/ui/BaseModal.vue';
 import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
+import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 
 describe('Debtonate OptionsForm Component', () => {
   beforeEach(() => {
@@ -62,5 +63,23 @@ describe('Debtonate OptionsForm Component', () => {
     expect(wrapper.text()).toContain('All data and calculation activity remain strictly within your browser');
     expect(wrapper.text()).toContain('Saving, exporting, sharing, or deleting your plan is completely at your discretion');
     expect(wrapper.text()).not.toContain('Repayment Priority Method');
+  });
+
+  it('renders glossary section in Data tab and opens glossary on View click', async () => {
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const globalOptions = useGlobalOptionsStore();
+
+    expect(wrapper.text()).toContain('Financial Glossary & Guide');
+    expect(wrapper.text()).toContain('Browse definitions, calculation formulas, and strategies for all debt and repayment metrics.');
+
+    const buttons = wrapper.findAllComponents(BaseButton);
+    const viewButton = buttons.find((btn) => btn.text() === 'View');
+    expect(viewButton).toBeDefined();
+
+    await viewButton!.trigger('click');
+    expect(globalOptions.openGlossary).toHaveBeenCalled();
   });
 });

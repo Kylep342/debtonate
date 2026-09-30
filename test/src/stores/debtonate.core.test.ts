@@ -601,6 +601,7 @@ describe('Debtonate Core Store', () => {
         Object.keys(state.graphs)
       ).toStrictEqual([
         constants.GRAPH_BALANCES_OVER_TIME,
+        constants.GRAPH_INTEREST_PAID_OVER_TIME,
         constants.GRAPH_INTEREST_SAVED_OVER_TIME,
         constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL,
       ]);
@@ -651,6 +652,18 @@ describe('Debtonate Core Store', () => {
 
       expect(
         Object.keys(state.graphs[constants.GRAPH_BALANCES_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
+      );
+    });
+
+    it('computes interest paid over time graph content', async () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      state.budgets = Budgets();
+      state.loans = Loans();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_INTEREST_PAID_OVER_TIME].graphs || {}).sort()
       ).toStrictEqual(
         state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
       );

@@ -87,7 +87,7 @@ const initializeChart = () => {
 
   // Create temporary Y scale to measure label width
   const tempY = chart.yScale()
-    .domain([chart.y(graph.config.minY || 0), chart.y(graph.config.maxY * 1.1)])
+    .domain([chart.y(graph.config.minY !== undefined ? graph.config.minY : 0), chart.y(graph.config.maxY * 1.1)])
     .range([totalHeight - margin.top - margin.bottom, 0]);
 
   const tempAxis = svg.append('g')
@@ -115,7 +115,7 @@ const initializeChart = () => {
     .range([0, innerWidth]);
 
   const y = chart.yScale()
-    .domain([chart.y(0), chart.y(graph.config.maxY * 1.1)])
+    .domain([chart.y(graph.config.minY !== undefined ? graph.config.minY : 0), chart.y(graph.config.maxY * 1.1)])
     .range([innerHeight, 0]);
 
   const draw: any = d3.line<Point>()
@@ -137,12 +137,19 @@ const initializeChart = () => {
 
   // Line paths
   Object.entries(graph.lines).forEach(([id, line]: [string, any]) => {
-    g.append('path')
+    const path = g.append('path')
       .datum(line)
       .attr('fill', 'none')
       .attr('stroke', chart.color(id))
-      .attr('stroke-width', 2)
+      .attr('stroke-width', typeof chart.strokeWidth === 'function' ? chart.strokeWidth(id) : 2)
       .attr('d', draw);
+
+    if (typeof chart.strokeDasharray === 'function') {
+      const dash = chart.strokeDasharray(id);
+      if (dash) {
+        path.attr('stroke-dasharray', dash);
+      }
+    }
   });
 
   // Collect all unique period values
@@ -328,7 +335,7 @@ watch(
       </h2>
       <h3
         v-if="chart.subheader"
-        class="text-xs text-base-content/60 font-mono mt-0.5"
+        class="text-xs text-base-content/70 mt-1 max-w-2xl mx-auto leading-relaxed"
       >
         {{ chart.subheader(anchorId) }}
       </h3>

@@ -50,6 +50,8 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   type: GraphType;
   drawer?: DrawerFunction<TGraphContent>;
   color: (id: string) => string;
+  strokeDasharray?: (id: string) => string | undefined;
+  strokeWidth?: (id: string) => number;
   graphs?: Graphs<TGraphContent>;
   header: (id: string) => string;
   lineName: (id: string) => string;

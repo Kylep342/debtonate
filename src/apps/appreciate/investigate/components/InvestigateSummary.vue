@@ -27,6 +27,25 @@ const summaryRows: ComputedRef<SummaryRow[]> = computed(() => {
     })
   });
 
+  // Crossover Point Row
+  rows.push({
+    label: 'Crossover Point',
+    values: careerBudgets.value.map(budget => {
+      const crossover = state.getCrossoverPoint?.(constants.TOTALS, budget.id);
+      return crossover?.formatted || '-';
+    })
+  });
+
+  // Initial Withdrawal Rate (SWR) Row
+  rows.push({
+    label: 'Initial Withdrawal Rate (SWR)',
+    values: careerBudgets.value.map(budget => {
+      const swr = state.getSafeWithdrawalRateForCareerBudget?.(budget.id, constants.TOTALS);
+      if (!swr) return '-';
+      return swr.tier !== 'na' ? `${swr.formatted} (${swr.label})` : swr.formatted;
+    })
+  });
+
   // Growth during Retirement Row
   rows.push({
     label: 'Growth in Retirement',

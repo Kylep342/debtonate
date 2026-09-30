@@ -28,6 +28,7 @@ const BTN_REFINANCE = 'Refinancing';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BTN_SHARE_EXPORT = 'Share & Export';
+const BTN_VIEW = 'View';
 
 // Budgets
 const BUDGET = 'Budget';
@@ -159,6 +160,7 @@ export default Object.freeze({
   BTN_SAVE,
   BTN_SELECT,
   BTN_SHARE_EXPORT,
+  BTN_VIEW,
   BUDGET,
   BUDGET_DETAILS,
   BUDGET_FORM_ID,

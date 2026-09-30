@@ -52,6 +52,7 @@ export interface DebtonateCoreGetters {
   debtonateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>>;
   graphs: ComputedRef<Record<string, GraphConfig>>;
   graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>>;
+  interestPaidGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   loanCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   loanFormTitle: ComputedRef<string>;
@@ -607,7 +608,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           `Balances over Time by Budget - ${getLoanName(loanId)}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
-        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+        subheader: () =>
+          'Compare accelerated debt elimination timelines and debt-free milestones across payment plans',
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -721,7 +723,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
-        subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+        subheader: () =>
+          'Calculate cumulative dollars saved and interest expense eliminated compared to minimum payments',
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -732,6 +735,83 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         yScale: d3.scaleLinear,
       };
     });
+
+  const interestPaidGraphs: ComputedRef<
+    GraphConfig<LineGraphContent>
+  > = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    loansWithTotals.value.forEach((loan: UIDebtLoan) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = loan.currentBalance;
+
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+        const schedule = getPaymentSchedule(loan.id, budget.id);
+        let cumInterest = 0;
+        const line: Point[] = [];
+        schedule.amortizationSchedule.forEach((record: paymentTypes.PaymentRecord) => {
+          cumInterest += Number(record.interest);
+          line.push({
+            x: record.period,
+            y: cumInterest,
+          });
+        });
+        lines[budget.id] = line;
+        const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, cumInterest);
+      });
+
+      // Benchmark reference line for loan principal
+      const principalLine: Point[] = [];
+      for (let p = 1; p <= overallMaxX; p++) {
+        principalLine.push({ x: p, y: loan.currentBalance });
+      }
+      lines['principal_ref'] = principalLine;
+
+      graphs[loan.id] = <LineGraphContent>{
+        config: {
+          minX: 1,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'InterestPaid',
+      type: 'line',
+      color: (id: string) => (id === 'principal_ref' ? '#a855f7' : getBudgetColor(id)),
+      strokeDasharray: (id: string) => (id === 'principal_ref' ? '5,5' : undefined),
+      strokeWidth: (id: string) => (id === 'principal_ref' ? 2.5 : 2),
+      graphs,
+      header: (loanId: string) =>
+        `Cumulative Interest Paid over Time by Budget - ${getLoanName(loanId)}`,
+      lineName: (id: string) => {
+        if (id === 'principal_ref') {
+          const parentId = selectedLoanId.value || constants.TOTALS;
+          const parentLoan = getLoan(parentId);
+          const bal = parentLoan?.currentBalance || 0;
+          return `Loan Principal (${globalOptions.Money(bal)})`;
+        }
+        return getBudgetAbsoluteRate(id);
+      },
+      seriesLabel: () => 'Budget / Metric',
+      subheader: () =>
+        'Quantify total lifetime borrowing costs and track how extra payments prevent interest from exceeding principal',
+      x: globalOptions.Period,
+      xFormat: (x: number) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Cumulative Interest Paid',
+      yScale: d3.scaleLinear,
+    };
+  });
 
   const percentOfPaymentAsPrincipalGraphs: ComputedRef<
     GraphConfig<LineGraphContent>
@@ -774,7 +854,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       lineName: getBudgetAbsoluteRate,
       seriesLabel: () => 'Budget',
       valueLabel: () => 'Principal %',
-      subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+      subheader: () =>
+        'Track payment efficiency as amortization shifts monthly dollars from lender interest to loan principal',
       x: globalOptions.Period,
       xFormat: (x: number | Date) => globalOptions.Period(x, true),
       xLabel: () => globalOptions.Time,
@@ -877,10 +958,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         header: (loanId: string) => `Balance Comparison - ${getLoanName(loanId)}`,
         lineName: getScenarioNameLocal,
         seriesLabel: () => 'Scenario',
-        subheader: (loanId: string) => {
-          const loan = getLoan(loanId);
-          return loan ? buildLoanSubtitle(loan) : '';
-        },
+        subheader: () =>
+          'Compare payoff trajectory and debt elimination speed between current terms and refinancing offers',
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -990,10 +1069,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         `Interest Paid Comparison - ${getLoanName(loanId)}`,
       lineName: getScenarioNameLocal,
       seriesLabel: () => 'Scenario',
-      subheader: (loanId: string) => {
-        const loan = getLoan(loanId);
-        return loan ? buildLoanSubtitle(loan) : '';
-      },
+      subheader: () =>
+        'Compare total lifetime interest expense between your current loan and new refinancing proposals',
       x: globalOptions.Period,
       xFormat: (x: number | Date) => globalOptions.Period(x, true),
       xLabel: () => globalOptions.Time,
@@ -1017,6 +1094,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     }
     return {
       [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
+      [constants.GRAPH_INTEREST_PAID_OVER_TIME]: interestPaidGraphs.value,
       [constants.GRAPH_INTEREST_SAVED_OVER_TIME]: interestSavedGraphs.value,
       [constants.GRAPH_PERCENT_OF_PAYMENT_AS_PRINCIPAL]:
         percentOfPaymentAsPrincipalGraphs.value,
@@ -1052,12 +1130,14 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const importState = (data: Record<string, any>): void => {
     globalOptions.importState(data);
 
-    if (data[keys.LS_BUDGETS]) {
-      budgets.value = data[keys.LS_BUDGETS];
+    const rawBudgets = data[keys.LS_BUDGETS] || data.budgets;
+    if (rawBudgets) {
+      budgets.value = rawBudgets;
     }
 
-    if (data[keys.LS_LOANS]) {
-      loans.value = data[keys.LS_LOANS].map((storedLoan: any) => {
+    const rawLoans = data[keys.LS_LOANS] || data.loans;
+    if (rawLoans) {
+      loans.value = rawLoans.map((storedLoan: any) => {
         const biLoan = new loan.Loan(
           BigInt(Math.round(storedLoan.principal * 100)),
           BigInt(Math.round(storedLoan.annualRate * 1_000_000)),
@@ -1595,6 +1675,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     debtonateTabularAnalysis,
     graphs,
     graphXScale,
+    interestPaidGraphs,
     interestSavedGraphs,
     loanCardGraphConfig,
     loanFormTitle,

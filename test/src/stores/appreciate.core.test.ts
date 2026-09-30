@@ -575,7 +575,21 @@ describe('Appreciate Core Store', () => {
       ).toStrictEqual([
         constants.GRAPH_BALANCES_OVER_TIME,
         constants.GRAPH_PURCHASING_POWER_OVER_TIME,
+        constants.GRAPH_CONTRIBUTIONS_VS_GROWTH_OVER_TIME,
+        constants.GRAPH_ESCAPE_VELOCITY_OVER_TIME,
+        constants.GRAPH_PASSIVE_INCOME_OVER_TIME,
       ]);
+
+      state.setPhase(constants.PHASE_RETIREMENT);
+      expect(
+        Object.keys(state.graphs)
+      ).toStrictEqual([
+        constants.GRAPH_BALANCES_OVER_TIME,
+        constants.GRAPH_PURCHASING_POWER_OVER_TIME,
+        constants.GRAPH_LONGEVITY_ENVELOPE_OVER_TIME,
+        constants.GRAPH_YIELD_VS_DRAWDOWN_OVER_TIME,
+      ]);
+      state.setPhase(constants.PHASE_CAREER);
 
       globalOptions.togglePeriodsAsDates();
       expect(state.graphXScale).toStrictEqual(d3.scaleTime);
@@ -638,6 +652,63 @@ describe('Appreciate Core Store', () => {
       ).toStrictEqual(
         state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
       );
+    });
+
+    it('computes contributions vs growth graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_CONTRIBUTIONS_VS_GROWTH_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
+      );
+    });
+
+    it('computes escape velocity graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_ESCAPE_VELOCITY_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
+      );
+    });
+
+    it('computes passive income graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_PASSIVE_INCOME_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
+      );
+    });
+
+    it('computes retirement longevity envelope and yield vs drawdown graph content', async () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.budgets = Budgets();
+      state.instruments = Instruments();
+      state.setPhase(constants.PHASE_RETIREMENT);
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_LONGEVITY_ENVELOPE_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
+      );
+
+      expect(
+        Object.keys(state.graphs[constants.GRAPH_YIELD_VS_DRAWDOWN_OVER_TIME].graphs || {}).sort()
+      ).toStrictEqual(
+        state.instrumentsWithTotals.map((instrument: UIInstrument) => instrument.id).sort()
+      );
+
+      state.setPhase(constants.PHASE_CAREER);
     });
   });
 
@@ -733,5 +804,79 @@ describe('Appreciate Core Store', () => {
     // getBudgetComparativeAnalysis should also normalize starting balance as principal
     const budgetAnalysis = state.getBudgetComparativeAnalysis(constants.DEFAULT, true);
     expect(budgetAnalysis['Interest/principal ratio']['inst-1']).toBe(defaultRatio);
+  });
+
+  it('calculates crossover period and crossover point correctly', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = [
+      {
+        id: 'inst-1',
+        name: 'Growth ETF',
+        currentBalance: 0,
+        annualRate: 0.12, // 1% per month
+        periodsPerYear: 12,
+        annualLimit: 20000,
+      } as any
+    ];
+    state.budgets = [
+      { id: 'b1', relative: 1000 } as any
+    ];
+    state.yearsToContribute = 15;
+
+    // Minimum budget has 0 contributions, so crossover is N/A
+    const defaultCrossover = state.getCrossoverPoint(constants.TOTALS, constants.DEFAULT);
+    expect(defaultCrossover.reached).toBe(false);
+    expect(defaultCrossover.formatted).toBe('N/A');
+
+    // Budget 1 contributes $1000/mo at 1%/mo.
+    // When balance reaches $100,000, 1% interest is $1000/mo, matching contribution.
+    const crossoverPeriod = state.getCrossoverPeriod(constants.TOTALS, 'b1');
+    expect(crossoverPeriod).not.toBeNull();
+    expect(typeof crossoverPeriod).toBe('number');
+    expect(crossoverPeriod).toBeGreaterThan(0);
+
+    const crossoverPoint = state.getCrossoverPoint(constants.TOTALS, 'b1');
+    expect(crossoverPoint.reached).toBe(true);
+    expect(crossoverPoint.formatted).toContain('Period');
+  });
+
+  it('calculates safe withdrawal rate with risk tier classifications', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    state.instruments = [
+      {
+        id: 'inst-1',
+        name: 'Portfolio',
+        currentBalance: 1000000,
+        annualRate: 0.06,
+        periodsPerYear: 12,
+        annualLimit: 0,
+      } as any
+    ];
+    state.budgets = [
+      { id: 'b1', relative: 1000 } as any
+    ];
+    state.yearsToContribute = 10;
+    state.yearsToSpend = 30;
+    state.retirementTaxRate = 0;
+
+    // Test career budget SWR comparison
+    state.desiredNetIncome = 3000; // $36,000/yr on > $1M nest egg => < 3.5% (Safe)
+    const swrSafe = state.getSafeWithdrawalRateForCareerBudget('b1', constants.TOTALS);
+    expect(swrSafe.rate).toBeLessThanOrEqual(3.5);
+    expect(swrSafe.tier).toBe('safe');
+    expect(swrSafe.badgeClass).toBe('badge-success');
+
+    state.desiredNetIncome = 6500; // $78,000/yr on $1.82M => ~4.28% (Benchmark)
+    const swrBenchmark = state.getSafeWithdrawalRateForCareerBudget('b1', constants.TOTALS);
+    expect(swrBenchmark.rate).toBeGreaterThan(3.5);
+    expect(swrBenchmark.rate).toBeLessThanOrEqual(4.5);
+    expect(swrBenchmark.tier).toBe('benchmark');
+    expect(swrBenchmark.badgeClass).toBe('badge-info');
+
+    state.desiredNetIncome = 15000; // $180,000/yr => High Risk
+    const swrHighRisk = state.getSafeWithdrawalRateForCareerBudget('b1', constants.TOTALS);
+    expect(swrHighRisk.rate).toBeGreaterThan(5.5);
+    expect(swrHighRisk.tier).toBe('danger');
+    expect(swrHighRisk.badgeClass).toBe('badge-error');
   });
 });

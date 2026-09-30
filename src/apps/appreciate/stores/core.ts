@@ -22,6 +22,20 @@ import {
   Point,
 } from '@/apps/shared/types/graph';
 
+export interface SafeWithdrawalRateResult {
+  rate: number;
+  formatted: string;
+  tier: 'safe' | 'benchmark' | 'warning' | 'danger' | 'na';
+  label: string;
+  badgeClass: string;
+}
+
+export interface CrossoverPointResult {
+  period: number | null;
+  formatted: string;
+  reached: boolean;
+}
+
 export interface AppreciateCoreState {
   accrueBeforeContribution: Ref<boolean>;
   budgetDetailsPanelActive: Ref<boolean>;
@@ -57,12 +71,15 @@ export interface AppreciateCoreGetters {
   contributionSchedules: ComputedRef<
     Record<string, Record<string, contributionTypes.ContributionSchedule>>
   >;
+  contributionsVsGrowthGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
+  escapeVelocityGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   graphs: ComputedRef<Record<string, GraphConfig>>;
   graphXScale: ComputedRef<() => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>>;
   inflationRate: ComputedRef<number>;
   instrumentCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   instrumentFormTitle: ComputedRef<string>;
   instrumentsWithTotals: ComputedRef<UIInstrument[]>;
+  passiveIncomeGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   retirementTaxRateEffective: ComputedRef<number>;
   monthlyBudgets: ComputedRef<MonthlyBudget[]>;
   monthlyWithdrawalBudgets: ComputedRef<MonthlyBudget[]>;
@@ -75,12 +92,16 @@ export interface AppreciateCoreGetters {
   careerRetirementComparison: ComputedRef<
     Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
   >;
+  withdrawalBalancesGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
+  withdrawalLongevityEnvelopeGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
+  withdrawalPurchasingPowerGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   withdrawalScenarios: ComputedRef<
     Record<string, withdrawalTypes.InstrumentsWithdrawalSchedule>
   >;
   withdrawalSchedules: ComputedRef<
     Record<string, Record<string, withdrawalTypes.WithdrawalSchedule>>
   >;
+  withdrawalYieldVsDrawdownGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
 }
 
 export interface AppreciateCoreActions {
@@ -146,6 +167,22 @@ export interface AppreciateCoreActions {
     instrumentId: string,
     budgetId: string
   ) => number;
+  getCrossoverPeriod: (
+    instrumentId: string,
+    budgetId: string
+  ) => number | null;
+  getCrossoverPoint: (
+    instrumentId: string,
+    budgetId: string
+  ) => CrossoverPointResult;
+  getSafeWithdrawalRate: (
+    instrumentId: string,
+    budgetId: string
+  ) => SafeWithdrawalRateResult;
+  getSafeWithdrawalRateForCareerBudget: (
+    careerBudgetId: string,
+    instrumentId?: string
+  ) => SafeWithdrawalRateResult;
   getInstrument: (id: string) => UIInstrument | undefined;
   getInstrumentIndex: (id: string) => number;
   getInstrumentName: (id: string) => string;
@@ -503,6 +540,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       'Share of balance at retirement as principal',
       'Effective avg saved/yr of work',
       'Growth factor from present',
+      'Crossover point',
       'Age of > $1M saved',
     ];
 
@@ -524,6 +562,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       analysis['Share of balance at retirement as principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
       analysis['Effective avg saved/yr of work'][budget.id] = globalOptions.Money(contributedPrincipal / yearsToContribute.value);
       analysis['Growth factor from present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '-';
+      analysis['Crossover point'][budget.id] = getCrossoverPoint(constants.TOTALS, budget.id).formatted;
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => Number(r.currentBalance) >= 1000000)?.period;
       analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
@@ -541,6 +580,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       'Share of value retirement end as growth',
       'Effective avg saved/yr',
       'Growth factor from retirement start',
+      'Safe withdrawal rate',
       'Age of > $1M saved',
     ];
 
@@ -560,6 +600,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       analysis['Share of value retirement end as growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
       analysis['Effective avg saved/yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
       analysis['Growth factor from retirement start'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
+      analysis['Safe withdrawal rate'][budget.id] = getSafeWithdrawalRate(constants.TOTALS, budget.id).formatted;
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => Number(r.currentBalance) >= 1000000)?.period;
       analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming retirement start retirement
@@ -586,6 +627,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Final Balance',
         'Interest/principal ratio',
         'Growth factor from present',
+        'Crossover Point',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
 
@@ -606,6 +648,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
         analysis['Interest/principal ratio'][budget.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
         analysis['Growth factor from present'][budget.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
+        analysis['Crossover Point'][budget.id] = getCrossoverPoint(instrumentId, budget.id).formatted;
       });
     } else {
       const metrics = [
@@ -615,6 +658,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Final Balance',
         'Growth/initial ratio',
         'Growth factor from retirement start',
+        'Safe Withdrawal Rate',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
 
@@ -632,6 +676,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
         analysis['Growth/initial ratio'][budget.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
         analysis['Growth factor from retirement start'][budget.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+        analysis['Safe Withdrawal Rate'][budget.id] = getSafeWithdrawalRate(instrumentId, budget.id).formatted;
       });
     }
 
@@ -656,6 +701,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Final Balance',
         'Interest/principal ratio',
         'Growth factor from present',
+        'Crossover Point',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
 
@@ -676,6 +722,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
         analysis['Interest/principal ratio'][instItem.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
         analysis['Growth factor from present'][instItem.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
+        analysis['Crossover Point'][instItem.id] = getCrossoverPoint(instItem.id, budgetId).formatted;
       });
     } else {
       const budget = getWithdrawalBudget(budgetId);
@@ -688,6 +735,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Final Balance',
         'Growth/initial ratio',
         'Growth factor from retirement start',
+        'Safe Withdrawal Rate',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
 
@@ -705,6 +753,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
         analysis['Growth/initial ratio'][instItem.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
         analysis['Growth factor from retirement start'][instItem.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+        analysis['Safe Withdrawal Rate'][instItem.id] = getSafeWithdrawalRate(instItem.id, budgetId).formatted;
       });
     }
 
@@ -768,8 +817,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
-        subheader: (instrumentId: string) =>
-          buildInstrumentSubtitle(getInstrument(instrumentId)!),
+        subheader: () =>
+          'Project nominal portfolio wealth accumulation across contribution plans over time',
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -903,8 +952,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           )}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
-        subheader: (instrumentId: string) =>
-          buildInstrumentSubtitle(getInstrument(instrumentId)!),
+        subheader: () =>
+          'Forecast true future purchasing power by adjusting projected portfolio growth for inflation',
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -968,7 +1017,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         lineName: getWithdrawalBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
         subheader: () =>
-          `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
+          'Monitor retirement depletion horizons and capital longevity across spending strategies',
         x: globalOptions.Period,
         xFormat: (x: number | Date) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -1039,7 +1088,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         lineName: getWithdrawalBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
         subheader: () =>
-          `Starting from ${getBudgetAbsoluteRate(selectedCareerBudgetId.value || constants.DEFAULT)} outcome`,
+          'Evaluate the real inflation-adjusted purchasing power of your remaining retirement reserves',
         x: globalOptions.Period,
         xFormat: (x: number) => globalOptions.Period(x, true),
         xLabel: () => globalOptions.Time,
@@ -1052,16 +1101,435 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     }
   );
 
-  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(() => {
+  const contributionsVsGrowthGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = 0;
+
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+        const schedule = getContributionSchedule(instrument.id, budget.id);
+        const growthLine: Point[] = [];
+        const contribLine: Point[] = [];
+
+        let cumGrowth = 0;
+        let cumContrib = Number(instrument.currentBalance || 0);
+
+        schedule.amortizationSchedule.forEach((record: contributionTypes.ContributionRecord) => {
+          cumGrowth += Number(record.growth);
+          cumContrib += Number(record.contribution);
+
+          growthLine.push({ x: record.period, y: cumGrowth });
+          contribLine.push({ x: record.period, y: cumContrib });
+        });
+
+        lines[`${budget.id}_growth`] = growthLine;
+        lines[`${budget.id}_contrib`] = contribLine;
+
+        const lineMaxX = growthLine.length > 0 ? growthLine[growthLine.length - 1].x : 0;
+        const lineMaxY = Math.max(
+          growthLine.reduce((max, p) => Math.max(max, p.y), 0),
+          contribLine.reduce((max, p) => Math.max(max, p.y), 0)
+        );
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, lineMaxY);
+      });
+
+      graphs[instrument.id] = <LineGraphContent>{
+        config: {
+          minX: 1,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'ContributionsVsGrowth',
+      type: 'line',
+      color: (id: string) => getBudgetColor(id.replace(/_growth|_contrib/, '')),
+      strokeDasharray: (id: string) => (id.endsWith('_contrib') ? '4,4' : undefined),
+      strokeWidth: (id: string) => (id.endsWith('_growth') ? 2.5 : 2),
+      graphs,
+      header: (instrumentId: string) =>
+        `Cumulative Contributions vs Compound Growth - ${getInstrumentName(instrumentId)}`,
+      lineName: (id: string) => {
+        const baseId = id.replace(/_growth|_contrib/, '');
+        const name = getBudgetAbsoluteRate(baseId);
+        return id.endsWith('_growth') ? `${name} (Growth)` : `${name} (Principal)`;
+      },
+      seriesLabel: () => 'Budget / Component',
+      subheader: () =>
+        'Measure wealth engine efficiency by tracking physical deposits against exponential compound returns',
+      x: globalOptions.Period,
+      xFormat: (x: number | Date) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Cumulative Amount',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const escapeVelocityGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = 0;
+
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+        const schedule = getContributionSchedule(instrument.id, budget.id);
+        const growthLine: Point[] = [];
+        const contribLine: Point[] = [];
+
+        schedule.amortizationSchedule.forEach((record: contributionTypes.ContributionRecord) => {
+          growthLine.push({ x: record.period, y: Number(record.growth) });
+          contribLine.push({ x: record.period, y: Number(record.contribution) });
+        });
+
+        lines[`${budget.id}_growth`] = growthLine;
+        lines[`${budget.id}_contrib`] = contribLine;
+
+        const lineMaxX = growthLine.length > 0 ? growthLine[growthLine.length - 1].x : 0;
+        const lineMaxY = Math.max(
+          growthLine.reduce((max, p) => Math.max(max, p.y), 0),
+          contribLine.reduce((max, p) => Math.max(max, p.y), 0)
+        );
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, lineMaxY);
+      });
+
+      graphs[instrument.id] = <LineGraphContent>{
+        config: {
+          minX: 1,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'EscapeVelocity',
+      type: 'line',
+      color: (id: string) => getBudgetColor(id.replace(/_growth|_contrib/, '')),
+      strokeDasharray: (id: string) => (id.endsWith('_contrib') ? '5,4' : undefined),
+      strokeWidth: (id: string) => (id.endsWith('_growth') ? 2.5 : 2),
+      graphs,
+      header: (instrumentId: string) =>
+        `Escape Velocity (Periodic Return vs Contribution) - ${getInstrumentName(instrumentId)}`,
+      lineName: (id: string) => {
+        const baseId = id.replace(/_growth|_contrib/, '');
+        const name = getBudgetAbsoluteRate(baseId);
+        return id.endsWith('_growth') ? `${name} (Monthly Return)` : `${name} (Monthly Deposit)`;
+      },
+      seriesLabel: () => 'Budget / Stream',
+      subheader: () =>
+        'Pinpoint the crossover milestone where monthly compound returns overtake monthly savings deposits',
+      x: globalOptions.Period,
+      xFormat: (x: number | Date) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Monthly Amount',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const passiveIncomeGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = desiredNetIncome.value;
+
+      monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
+        const line: Point[] = [];
+        const schedule = getContributionSchedule(instrument.id, budget.id);
+        const taxRate = Number(retirementTaxRateEffective.value || 0);
+
+        schedule.amortizationSchedule.forEach((record: contributionTypes.ContributionRecord) => {
+          const balance = Number(record.currentBalance);
+          const annualGross = balance * 0.04;
+          const monthlyGross = annualGross / 12;
+          const monthlyNet = monthlyGross * (1 - taxRate);
+          line.push({ x: record.period, y: monthlyNet });
+        });
+
+        lines[budget.id] = line;
+        const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+        const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, lineMaxY);
+      });
+
+      // Target benchmark line across all periods
+      const targetLine: Point[] = [];
+      for (let p = 1; p <= overallMaxX; p++) {
+        targetLine.push({ x: p, y: desiredNetIncome.value });
+      }
+      lines['target'] = targetLine;
+
+      graphs[instrument.id] = <LineGraphContent>{
+        config: {
+          minX: 1,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'PassiveIncome',
+      type: 'line',
+      color: (id: string) => (id === 'target' ? '#eab308' : getBudgetColor(id)),
+      strokeDasharray: (id: string) => (id === 'target' ? '6,4' : undefined),
+      strokeWidth: (id: string) => (id === 'target' ? 2.5 : 2),
+      graphs,
+      header: (instrumentId: string) =>
+        `Passive Monthly Income over Time - ${getInstrumentName(instrumentId)}`,
+      lineName: (id: string) =>
+        id === 'target'
+          ? `Target Income (${globalOptions.Money(desiredNetIncome.value)}/mo)`
+          : getBudgetAbsoluteRate(id),
+      seriesLabel: () => 'Budget / Goal',
+      subheader: () =>
+        'Track Financial Independence by measuring sustainable monthly passive income (4% SWR) against your target goal',
+      x: globalOptions.Period,
+      xFormat: (x: number | Date) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Net Monthly Income',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const withdrawalLongevityEnvelopeGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+    const baseCareerId = selectedCareerBudgetId.value || constants.DEFAULT;
+    const baseBudget = monthlyWithdrawalBudgets.value[0] || { relative: 0, id: constants.DEFAULT };
+
+    const simulateDrawdown = (rateDelta: number): Record<string, withdrawalTypes.WithdrawalSchedule> => {
+      const retirementInstruments = instruments.value.map((inst) => {
+        const scenario = contributionScenarios.value[baseCareerId];
+        const instContribSched = scenario?.contributionSchedule[inst.id];
+        const finalBalance = instContribSched && instContribSched.amortizationSchedule.length > 0
+          ? instContribSched.amortizationSchedule.slice(-1)[0].currentBalance
+          : inst.currentBalance;
+        const adjustedRate = Math.max(0, inst.annualRate + rateDelta);
+        const retInst = new instrument.Instrument(
+          BigInt(Math.round(Number(finalBalance) * 100)),
+          BigInt(Math.round(adjustedRate * 1_000_000)),
+          inst.periodsPerYear,
+          inst.name,
+          BigInt(Math.round(inst.annualLimit * 100))
+        );
+        retInst.id = inst.id;
+        return retInst;
+      });
+
+      const biSchedule = withdrawals.drawdownInstruments(
+        retirementInstruments,
+        BigInt(Math.round(baseBudget.relative * 100)),
+        yearsToSpend.value * constants.PERIODS_PER_YEAR,
+        retirementTaxRateEffective.value,
+        true
+      );
+      return toFloatWithdrawalSchedule(biSchedule);
+    };
+
+    const bullSchedules = simulateDrawdown(0.02);
+    const bearSchedules = simulateDrawdown(-0.02);
+
+    instrumentsWithTotals.value.forEach((inst: UIInstrument) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = 0;
+
+      const careerSchedule = getContributionSchedule(inst.id, baseCareerId);
+      const initialBalance = careerSchedule.amortizationSchedule.length > 0
+        ? careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance
+        : (getInstrument(inst.id)?.currentBalance || 0);
+
+      const scenarios: Array<{ id: string; schedule: withdrawalTypes.WithdrawalSchedule }> = [
+        { id: 'bull', schedule: bullSchedules[inst.id] },
+        { id: 'base', schedule: getWithdrawalSchedule(inst.id, baseBudget.id) },
+        { id: 'bear', schedule: bearSchedules[inst.id] },
+      ];
+
+      scenarios.forEach(({ id, schedule }) => {
+        const line: Point[] = [
+          { x: careerOffsetPeriods.value, y: Number(initialBalance) }
+        ];
+        schedule?.amortizationSchedule?.forEach((record: withdrawalTypes.WithdrawalRecord) => {
+          line.push({
+            x: careerOffsetPeriods.value + record.period,
+            y: Number(record.currentBalance),
+          });
+        });
+        lines[id] = line;
+
+        const lineMaxX = line.length > 0 ? line[line.length - 1].x : 0;
+        const lineMaxY = line.reduce((max, p) => Math.max(max, p.y), 0);
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, lineMaxY);
+      });
+
+      graphs[inst.id] = <LineGraphContent>{
+        config: {
+          minX: careerOffsetPeriods.value,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'LongevityEnvelope',
+      type: 'line',
+      color: (id: string) => {
+        if (id === 'bull') return '#10b981';
+        if (id === 'base') return '#3b82f6';
+        if (id === 'bear') return '#ef4444';
+        return '#888888';
+      },
+      strokeDasharray: (id: string) => {
+        if (id === 'bull') return '5,3';
+        if (id === 'bear') return '3,3';
+        return undefined;
+      },
+      strokeWidth: (id: string) => (id === 'base' ? 2.5 : 2),
+      graphs,
+      header: (instrumentId: string) =>
+        `Longevity Envelope (Market Sensitivity) - ${getInstrumentName(instrumentId)}`,
+      lineName: (id: string) => {
+        if (id === 'bull') return 'Bull Market (+2% Return)';
+        if (id === 'base') return 'Base Market (Expected Return)';
+        if (id === 'bear') return 'Bear Market (-2% Return)';
+        return id;
+      },
+      seriesLabel: () => 'Market Scenario',
+      subheader: () =>
+        'Stress-test portfolio survival across Bull (+2%), Base (Expected), and Bear (-2%) market returns',
+      x: globalOptions.Period,
+      xFormat: (x: number | Date) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Balance',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const withdrawalYieldVsDrawdownGraphs: ComputedRef<GraphConfig<LineGraphContent>> = computed(() => {
+    const graphs = <Graphs<LineGraphContent>>{};
+
+    instrumentsWithTotals.value.forEach((instrument: UIInstrument) => {
+      const lines = <ChartSeries<Point>>{};
+      let overallMaxX = 0;
+      let overallMaxY = 0;
+
+      monthlyWithdrawalBudgets.value.forEach((budget: MonthlyBudget) => {
+        const yieldLine: Point[] = [];
+        const drawdownLine: Point[] = [];
+        const sched = getWithdrawalSchedule(instrument.id, budget.id);
+
+        sched.amortizationSchedule.forEach((record: withdrawalTypes.WithdrawalRecord) => {
+          const y = Number(record.growth);
+          const w = Number(record.withdrawal);
+          yieldLine.push({ x: careerOffsetPeriods.value + record.period, y });
+          drawdownLine.push({ x: careerOffsetPeriods.value + record.period, y: w });
+        });
+
+        lines[`${budget.id}_yield`] = yieldLine;
+        lines[`${budget.id}_drawdown`] = drawdownLine;
+
+        const lineMaxX = yieldLine.length > 0 ? yieldLine[yieldLine.length - 1].x : 0;
+        const lineMaxY = Math.max(
+          yieldLine.reduce((max, p) => Math.max(max, p.y), 0),
+          drawdownLine.reduce((max, p) => Math.max(max, p.y), 0)
+        );
+        overallMaxX = Math.max(overallMaxX, lineMaxX);
+        overallMaxY = Math.max(overallMaxY, lineMaxY);
+      });
+
+      graphs[instrument.id] = <LineGraphContent>{
+        config: {
+          minX: careerOffsetPeriods.value,
+          minY: 0,
+          maxX: overallMaxX,
+          maxY: overallMaxY * 1.1,
+        },
+        lines,
+      };
+    });
+
+    return <GraphConfig<LineGraphContent>>{
+      id: 'YieldVsDrawdown',
+      type: 'line',
+      color: (id: string) => {
+        const baseId = id.replace(/_yield|_drawdown/, '');
+        if (id.endsWith('_yield')) return '#10b981';
+        if (id.endsWith('_drawdown')) return '#f43f5e';
+        return getBudgetColor(baseId);
+      },
+      strokeDasharray: (id: string) => (id.endsWith('_drawdown') ? '4,4' : undefined),
+      strokeWidth: () => 2,
+      graphs,
+      header: (instrumentId: string) =>
+        `Periodic Yield vs Drawdown - ${getInstrumentName(instrumentId)}`,
+      lineName: (id: string) => {
+        const baseId = id.replace(/_yield|_drawdown/, '');
+        const name = getWithdrawalBudgetAbsoluteRate(baseId);
+        return id.endsWith('_yield') ? `${name} (Yield)` : `${name} (Withdrawal)`;
+      },
+      seriesLabel: () => 'Cash Flow Stream',
+      subheader: () =>
+        'Determine retirement sustainability by comparing monthly investment yield against cash withdrawn',
+      x: globalOptions.Period,
+      xFormat: (x: number | Date) => globalOptions.Period(x, true),
+      xLabel: () => globalOptions.Time,
+      xScale: graphXScale.value,
+      y: (y: number) => y,
+      yFormat: globalOptions.Money,
+      yLabel: () => 'Periodic Amount',
+      yScale: d3.scaleLinear,
+    };
+  });
+
+  const graphs: ComputedRef<Record<string, GraphConfig<LineGraphContent>>> = computed(
+    (): Record<string, GraphConfig<LineGraphContent>> => {
     if (viewPhase.value === constants.PHASE_RETIREMENT) {
       return {
         [constants.GRAPH_BALANCES_OVER_TIME]: withdrawalBalancesGraphs.value,
         [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: withdrawalPurchasingPowerGraphs.value,
+        [constants.GRAPH_LONGEVITY_ENVELOPE_OVER_TIME]: withdrawalLongevityEnvelopeGraphs.value,
+        [constants.GRAPH_YIELD_VS_DRAWDOWN_OVER_TIME]: withdrawalYieldVsDrawdownGraphs.value,
       };
     }
     return {
       [constants.GRAPH_BALANCES_OVER_TIME]: balancesGraphs.value,
       [constants.GRAPH_PURCHASING_POWER_OVER_TIME]: purchasingPowerGraphs.value,
+      [constants.GRAPH_CONTRIBUTIONS_VS_GROWTH_OVER_TIME]: contributionsVsGrowthGraphs.value,
+      [constants.GRAPH_ESCAPE_VELOCITY_OVER_TIME]: escapeVelocityGraphs.value,
+      [constants.GRAPH_PASSIVE_INCOME_OVER_TIME]: passiveIncomeGraphs.value,
     };
   });
 
@@ -1098,23 +1566,25 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     if (data[keys.LS_ACCRUE_BEFORE_CONTRIBUTION] !== undefined) {
       accrueBeforeContribution.value = data[keys.LS_ACCRUE_BEFORE_CONTRIBUTION];
     }
-    if (data[keys.LS_BUDGETS]) {
-      budgets.value = data[keys.LS_BUDGETS];
+    const rawBudgets = data[keys.LS_BUDGETS] || data.budgets;
+    if (rawBudgets) {
+      budgets.value = rawBudgets;
     }
-    if (data[keys.LS_DEFLATE_ALL_MONEY] !== undefined) {
-      deflateAllMoney.value = data[keys.LS_DEFLATE_ALL_MONEY];
+    if (data[keys.LS_DEFLATE_ALL_MONEY] !== undefined || data.deflateAllMoney !== undefined) {
+      deflateAllMoney.value = data[keys.LS_DEFLATE_ALL_MONEY] ?? data.deflateAllMoney;
     }
-    if (data[keys.LS_DESIRED_NET_INCOME] !== undefined) {
-      desiredNetIncome.value = data[keys.LS_DESIRED_NET_INCOME];
+    if (data[keys.LS_DESIRED_NET_INCOME] !== undefined || data.desiredNetIncome !== undefined) {
+      desiredNetIncome.value = data[keys.LS_DESIRED_NET_INCOME] ?? data.desiredNetIncome;
     }
-    if (data[keys.LS_RETIREMENT_TAX_RATE] !== undefined) {
-      retirementTaxRate.value = data[keys.LS_RETIREMENT_TAX_RATE];
+    if (data[keys.LS_RETIREMENT_TAX_RATE] !== undefined || data.retirementTaxRate !== undefined) {
+      retirementTaxRate.value = data[keys.LS_RETIREMENT_TAX_RATE] ?? data.retirementTaxRate;
     }
-    if (data[keys.LS_INFLATION_FACTOR] !== undefined) {
-      inflationFactor.value = data[keys.LS_INFLATION_FACTOR];
+    if (data[keys.LS_INFLATION_FACTOR] !== undefined || data.inflationFactor !== undefined) {
+      inflationFactor.value = data[keys.LS_INFLATION_FACTOR] ?? data.inflationFactor;
     }
-    if (data[keys.LS_INSTRUMENTS]) {
-      instruments.value = data[keys.LS_INSTRUMENTS].map(
+    const rawInstruments = data[keys.LS_INSTRUMENTS] || data.instruments;
+    if (rawInstruments) {
+      instruments.value = rawInstruments.map(
         (storedInstrument: any) => {
           const biInst = new instrument.Instrument(
             BigInt(Math.round(storedInstrument.currentBalance * 100)),
@@ -1129,20 +1599,21 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         }
       );
     }
-    if (data[keys.LS_SELECTED_CAREER_BUDGET_ID] !== undefined) {
-      selectedCareerBudgetId.value = data[keys.LS_SELECTED_CAREER_BUDGET_ID];
+    if (data[keys.LS_SELECTED_CAREER_BUDGET_ID] !== undefined || data.selectedCareerBudgetId !== undefined) {
+      selectedCareerBudgetId.value = data[keys.LS_SELECTED_CAREER_BUDGET_ID] ?? data.selectedCareerBudgetId;
     }
-    if (data[keys.LS_VIEW_PHASE] !== undefined) {
-      viewPhase.value = data[keys.LS_VIEW_PHASE];
+    if (data[keys.LS_VIEW_PHASE] !== undefined || data.viewPhase !== undefined) {
+      viewPhase.value = data[keys.LS_VIEW_PHASE] ?? data.viewPhase;
     }
-    if (data[keys.LS_WITHDRAWAL_BUDGETS]) {
-      withdrawalBudgets.value = data[keys.LS_WITHDRAWAL_BUDGETS];
+    const rawWithdrawalBudgets = data[keys.LS_WITHDRAWAL_BUDGETS] || data.withdrawalBudgets;
+    if (rawWithdrawalBudgets) {
+      withdrawalBudgets.value = rawWithdrawalBudgets;
     }
-    if (data[keys.LS_YEARS_TO_CONTRIBUTE] !== undefined) {
-      yearsToContribute.value = data[keys.LS_YEARS_TO_CONTRIBUTE];
+    if (data[keys.LS_YEARS_TO_CONTRIBUTE] !== undefined || data.yearsToContribute !== undefined) {
+      yearsToContribute.value = data[keys.LS_YEARS_TO_CONTRIBUTE] ?? data.yearsToContribute;
     }
-    if (data[keys.LS_YEARS_TO_SPEND] !== undefined) {
-      yearsToSpend.value = data[keys.LS_YEARS_TO_SPEND];
+    if (data[keys.LS_YEARS_TO_SPEND] !== undefined || data.yearsToSpend !== undefined) {
+      yearsToSpend.value = data[keys.LS_YEARS_TO_SPEND] ?? data.yearsToSpend;
     }
   };
 
@@ -1284,17 +1755,20 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const setDesiredNetIncome = (newIncome: number): void => {
     if (!Number.isNaN(newIncome) && newIncome >= 0) {
       desiredNetIncome.value = newIncome;
+      saveState();
     }
   };
 
   const setRetirementTaxRate = (newRate: number): void => {
     if (!Number.isNaN(newRate) && newRate >= 0 && newRate < 100) {
       retirementTaxRate.value = newRate;
+      saveState();
     }
   };
 
   const setSelectedCareerBudgetId = (id: string): void => {
     selectedCareerBudgetId.value = id;
+    saveState();
   };
 
   const setYearsToContribute = (newYears: number): void => {
@@ -1304,6 +1778,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       )
     ) {
       yearsToContribute.value = newYears;
+      saveState();
     }
   };
 
@@ -1314,6 +1789,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       )
     ) {
       yearsToSpend.value = newYears;
+      saveState();
     }
   };
 
@@ -1605,6 +2081,183 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       : totalNet;
   };
 
+  const getCrossoverPeriod = (
+    instrumentId: string,
+    budgetId: string
+  ): number | null => {
+    const schedule = getContributionSchedule(instrumentId, budgetId);
+    if (!schedule || !schedule.amortizationSchedule || schedule.amortizationSchedule.length === 0) {
+      return null;
+    }
+    if (schedule.lifetimeContribution <= 0) {
+      return null;
+    }
+    const avgContribution = Number(schedule.lifetimeContribution) / schedule.amortizationSchedule.length;
+    for (const record of schedule.amortizationSchedule) {
+      const contrib = Number(record.contribution);
+      const growth = Number(record.growth);
+      const threshold = contrib > 0 ? contrib : avgContribution;
+      if (growth >= threshold) {
+        return record.period;
+      }
+    }
+    return null;
+  };
+
+  const getCrossoverPoint = (
+    instrumentId: string,
+    budgetId: string
+  ): CrossoverPointResult => {
+    const schedule = getContributionSchedule(instrumentId, budgetId);
+    if (!schedule || Number(schedule.lifetimeContribution) <= 0) {
+      return {
+        period: null,
+        formatted: 'N/A',
+        reached: false,
+      };
+    }
+    const period = getCrossoverPeriod(instrumentId, budgetId);
+    if (period === null) {
+      return {
+        period: null,
+        formatted: `> ${yearsToContribute.value} yrs`,
+        reached: false,
+      };
+    }
+    const formatted = globalOptions.periodsAsDates
+      ? (globalOptions.Period(period, true) as string)
+      : `Period ${period}`;
+    return {
+      period,
+      formatted,
+      reached: true,
+    };
+  };
+
+  const classifySafeWithdrawalRate = (rate: number): { tier: SafeWithdrawalRateResult['tier']; label: string; badgeClass: string } => {
+    if (rate <= 3.5) {
+      return {
+        tier: 'safe',
+        label: 'Safe',
+        badgeClass: 'badge-success',
+      };
+    } else if (rate <= 4.5) {
+      return {
+        tier: 'benchmark',
+        label: '4% Rule',
+        badgeClass: 'badge-info',
+      };
+    } else if (rate <= 5.5) {
+      return {
+        tier: 'warning',
+        label: 'Caution',
+        badgeClass: 'badge-warning',
+      };
+    } else {
+      return {
+        tier: 'danger',
+        label: 'High Risk',
+        badgeClass: 'badge-error',
+      };
+    }
+  };
+
+  const getStartingRetirementBalance = (instrumentId: string, careerBudgetId?: string): number => {
+    const baseCareerId = careerBudgetId || selectedCareerBudgetId.value || constants.DEFAULT;
+    const careerSchedule = getContributionSchedule(instrumentId, baseCareerId);
+    return careerSchedule.amortizationSchedule.length > 0
+      ? Number(careerSchedule.amortizationSchedule.slice(-1)[0].currentBalance)
+      : (getInstrument(instrumentId)?.currentBalance || (instrumentId === constants.TOTALS ? totalCurrentBalance.value : 0));
+  };
+
+  const getSafeWithdrawalRate = (
+    instrumentId: string,
+    budgetId: string
+  ): SafeWithdrawalRateResult => {
+    const nestEgg = getStartingRetirementBalance(instrumentId);
+    if (!nestEgg || nestEgg <= 0) {
+      return {
+        rate: 0,
+        formatted: 'N/A',
+        tier: 'na',
+        label: 'N/A',
+        badgeClass: 'badge-ghost',
+      };
+    }
+
+    const schedule = getWithdrawalSchedule(instrumentId, budgetId);
+    let annualWithdrawal = 0;
+    if (schedule.amortizationSchedule.length > 0) {
+      annualWithdrawal = Number(schedule.amortizationSchedule[0].withdrawal) * constants.PERIODS_PER_YEAR;
+    } else {
+      const budget = getWithdrawalBudget(budgetId);
+      const monthlyNet = budget ? budget.relative : desiredNetIncome.value;
+      const taxRate = retirementTaxRateEffective.value || 0;
+      const monthlyGross = taxRate < 1 ? monthlyNet / (1 - taxRate) : monthlyNet;
+      annualWithdrawal = monthlyGross * constants.PERIODS_PER_YEAR;
+    }
+
+    if (annualWithdrawal <= 0) {
+      return {
+        rate: 0,
+        formatted: '0.00%',
+        tier: 'safe',
+        label: 'Safe',
+        badgeClass: 'badge-success',
+      };
+    }
+
+    const rate = (annualWithdrawal / nestEgg) * 100;
+    const formatted = `${rate.toFixed(2)}%`;
+    const classification = classifySafeWithdrawalRate(rate);
+
+    return {
+      rate,
+      formatted,
+      ...classification,
+    };
+  };
+
+  const getSafeWithdrawalRateForCareerBudget = (
+    careerBudgetId: string,
+    instrumentId: string = constants.TOTALS
+  ): SafeWithdrawalRateResult => {
+    const nestEgg = getStartingRetirementBalance(instrumentId, careerBudgetId);
+    if (!nestEgg || nestEgg <= 0) {
+      return {
+        rate: 0,
+        formatted: 'N/A',
+        tier: 'na',
+        label: 'N/A',
+        badgeClass: 'badge-ghost',
+      };
+    }
+
+    const taxRate = retirementTaxRateEffective.value || 0;
+    const monthlyGross = taxRate < 1 ? desiredNetIncome.value / (1 - taxRate) : desiredNetIncome.value;
+    const annualWithdrawal = monthlyGross * constants.PERIODS_PER_YEAR;
+
+    if (annualWithdrawal <= 0) {
+      return {
+        rate: 0,
+        formatted: '0.00%',
+        tier: 'safe',
+        label: 'Safe',
+        badgeClass: 'badge-success',
+      };
+    }
+
+    const rate = (annualWithdrawal / nestEgg) * 100;
+    const formatted = `${rate.toFixed(2)}%`;
+    const classification = classifySafeWithdrawalRate(rate);
+
+    return {
+      rate,
+      formatted,
+      ...classification,
+    };
+  };
+
   const getNumContributions = (
     instrumentId: string,
     budgetId: string
@@ -1777,6 +2430,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     cardGraphs,
     contributionScenarios,
     contributionSchedules,
+    contributionsVsGrowthGraphs,
+    escapeVelocityGraphs,
     graphs,
     graphXScale,
     inflationRate,
@@ -1786,6 +2441,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     instrumentsWithTotals,
     monthlyBudgets,
     monthlyWithdrawalBudgets,
+    passiveIncomeGraphs,
     periodLabel,
     purchasingPowerGraphs,
     totalAnnualLimit,
@@ -1795,8 +2451,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     careerRetirementComparison,
     investmentTabularAnalysis,
     retirementTabularAnalysis,
+    withdrawalBalancesGraphs,
+    withdrawalLongevityEnvelopeGraphs,
+    withdrawalPurchasingPowerGraphs,
     withdrawalScenarios,
     withdrawalSchedules,
+    withdrawalYieldVsDrawdownGraphs,
 
     // ACTIONS
     amortizationTableRows,
@@ -1831,6 +2491,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     getContributionSchedule,
     getWithdrawalSchedule,
     getSteadyStateMonthlyWithdrawal,
+    getCrossoverPeriod,
+    getCrossoverPoint,
+    getSafeWithdrawalRate,
+    getSafeWithdrawalRateForCareerBudget,
     getInstrument,
     getInstrumentIndex,
     getInstrumentName,
