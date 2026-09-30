@@ -30,7 +30,12 @@ src/assets/built.css
 *.sln
 *.sw?
 
+# IAC files
 .terraform
 terraform.tfstate*
 
+# Gemini files
+.gemini/
+
+# Local scratch work
 scratch
