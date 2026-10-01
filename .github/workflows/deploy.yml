@@ -40,8 +40,11 @@ jobs:
         run: npm run css
       - name: Build
         run: npm run build
-      - name: CNAME
-        run: echo 'www.debtonate.app' > ./dist/CNAME
+      - name: Configure GitHub Pages Routing & CNAME
+        run: |
+          mkdir -p ./dist/appreciate && cp ./dist/index.html ./dist/appreciate/index.html
+          cp ./dist/index.html ./dist/404.html
+          echo 'www.debtonate.app' > ./dist/CNAME
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

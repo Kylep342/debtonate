@@ -11,6 +11,7 @@
     "dev": "vite",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx --fix --ignore-path .gitignore && vue-tsc --noEmit",
     "lint:check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx --ignore-path .gitignore && vue-tsc --noEmit",
+    "postbuild": "mkdir -p dist/appreciate && cp dist/index.html dist/appreciate/index.html && cp dist/index.html dist/404.html",
     "predeploy": "vite build",
     "preview": "vite preview --port 4173",
     "test": "vitest",
