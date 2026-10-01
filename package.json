@@ -16,7 +16,8 @@
     "preview": "vite preview --port 4173",
     "test": "vitest",
     "test:run": "vitest run",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
@@ -40,6 +41,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-vue": "^9.32.0",
     "gh-pages": "^6.2.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.17",
