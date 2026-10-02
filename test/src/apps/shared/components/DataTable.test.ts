@@ -40,7 +40,7 @@ describe('DataTable Component', () => {
     });
 
     expect(wrapper.find('h3').text()).toBe('Test Table');
-    expect(wrapper.find('h5').text()).toBe('Test Subtitle');
+    expect(wrapper.find('p').text()).toBe('Test Subtitle');
 
     const headers = wrapper.findAll('th');
     expect(headers.length).toBe(2);
@@ -60,11 +60,11 @@ describe('DataTable Component', () => {
 
     const buttons = wrapper.findAllComponents(BaseButton);
     expect(buttons.length).toBe(2);
-    expect(buttons[0].text()).toBe('Export CSV');
-    expect(buttons[1].text()).toBe('Export JSON');
+    expect(buttons[0].text()).toBe('CSV');
+    expect(buttons[1].text()).toBe('JSON');
   });
 
-  it('triggers exportToCsv and exportToJson when buttons clicked', async () => {
+  it('triggers exportToCsv and exportToJson with stateHash suffix when buttons clicked', async () => {
     const csvSpy = vi.spyOn(exportUtils, 'exportToCsv').mockImplementation(() => {});
     const jsonSpy = vi.spyOn(exportUtils, 'exportToJson').mockImplementation(() => {});
 
@@ -74,7 +74,8 @@ describe('DataTable Component', () => {
         subtitle: '30 Year Fixed',
         headers: mockHeaders,
         rows: mockRows,
-        totals: mockTotals
+        totals: mockTotals,
+        stateHash: 'fedcba98',
       },
       global: {
         components: {
@@ -87,11 +88,35 @@ describe('DataTable Component', () => {
     const csvBtn = wrapper.find(`#${elementIds.BTN_EXPORT_SCHEDULE_CSV}`);
     expect(csvBtn.exists()).toBe(true);
     await csvBtn.trigger('click');
-    expect(csvSpy).toHaveBeenCalledWith('mortgage_schedule', mockHeaders, mockRows, mockTotals);
+    expect(csvSpy).toHaveBeenCalledWith('mortgage_schedule_fedcba98', mockHeaders, mockRows, mockTotals);
 
     const jsonBtn = wrapper.find(`#${elementIds.BTN_EXPORT_SCHEDULE_JSON}`);
     expect(jsonBtn.exists()).toBe(true);
     await jsonBtn.trigger('click');
-    expect(jsonSpy).toHaveBeenCalled();
+    expect(jsonSpy).toHaveBeenCalledWith('mortgage_schedule_fedcba98', expect.any(Object));
+  });
+
+  it('auto-computes stateHash when stateHash prop is omitted', async () => {
+    const csvSpy = vi.spyOn(exportUtils, 'exportToCsv').mockImplementation(() => {});
+
+    const wrapper = mount(DataTable, {
+      props: {
+        title: 'Mortgage Schedule',
+        subtitle: '30 Year Fixed',
+        headers: mockHeaders,
+        rows: mockRows,
+        totals: mockTotals,
+      },
+      global: {
+        components: {
+          BaseButton,
+          BaseTable
+        }
+      }
+    });
+
+    const csvBtn = wrapper.find(`#${elementIds.BTN_EXPORT_SCHEDULE_CSV}`);
+    await csvBtn.trigger('click');
+    expect(csvSpy).toHaveBeenCalledWith('mortgage_schedule_1591837f', mockHeaders, mockRows, mockTotals);
   });
 });

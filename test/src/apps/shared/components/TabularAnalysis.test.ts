@@ -5,6 +5,7 @@ import { nextTick } from 'vue';
 import { setActivePinia } from 'pinia';
 
 import TabularAnalysis from '@/apps/shared/components/TabularAnalysis.vue';
+import * as exportUtils from '@/apps/shared/functions/export';
 
 describe('TabularAnalysis Component', () => {
   const mockAnalysis = {
@@ -81,9 +82,12 @@ describe('TabularAnalysis Component', () => {
     expect(wrapper.text()).toContain('+$100 (+100%)');
   });
 
-  it('renders export buttons and triggers export', async () => {
+  it('renders export buttons and triggers export with stateHash suffix', async () => {
     const pinia = createTestingPinia({ createSpy: vi.fn });
     setActivePinia(pinia);
+
+    const csvSpy = vi.spyOn(exportUtils, 'exportToCsv').mockImplementation(() => {});
+    const jsonSpy = vi.spyOn(exportUtils, 'exportToJson').mockImplementation(() => {});
 
     const wrapper = mount(TabularAnalysis, {
       props: {
@@ -91,6 +95,7 @@ describe('TabularAnalysis Component', () => {
         items: mockItems as any,
         title: 'Test Analysis Table',
         getItemName: mockGetItemName,
+        stateHash: 'c0ffee01',
       },
       global: {
         plugins: [pinia],
@@ -103,6 +108,12 @@ describe('TabularAnalysis Component', () => {
     const jsonBtn = wrapper.findAll('button').find(b => b.text() === 'JSON');
     expect(csvBtn?.exists()).toBe(true);
     expect(jsonBtn?.exists()).toBe(true);
+
+    await csvBtn!.trigger('click');
+    expect(csvSpy).toHaveBeenCalledWith('test_analysis_table_c0ffee01', expect.any(Array), expect.any(Array));
+
+    await jsonBtn!.trigger('click');
+    expect(jsonSpy).toHaveBeenCalledWith('test_analysis_table_c0ffee01', expect.any(Object));
   });
 
   it('sorts baseline item first, shows Baseline badge, enables deltas, and emits selectBaseline on header click', async () => {

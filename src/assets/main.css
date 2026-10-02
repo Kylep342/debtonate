@@ -92,3 +92,32 @@ p {
     width: min(64rem, calc(100vw - 2rem));
   }
 }
+
+/* Multi-view modals: bound by composite minimum/maximum dimensions effective for the viewport */
+dialog.modal .modal-box.modal-composite-details,
+.sm\:modal-middle :where(.modal-box).modal-composite-details,
+.modal-middle :where(.modal-box).modal-composite-details,
+.modal-bottom :where(.modal-box).modal-composite-details,
+dialog.modal .modal-box.modal-details-box,
+.sm\:modal-middle :where(.modal-box).modal-details-box,
+.modal-middle :where(.modal-box).modal-details-box,
+.modal-bottom :where(.modal-box).modal-details-box {
+  min-height: min(85vh, 46rem);
+  max-height: min(90vh, 48rem);
+  height: min(90vh, 48rem);
+}
+
+dialog.modal .modal-box.modal-composite-share,
+.sm\:modal-middle :where(.modal-box).modal-composite-share,
+.modal-middle :where(.modal-box).modal-composite-share,
+.modal-bottom :where(.modal-box).modal-composite-share {
+  min-height: min(75vh, 24rem);
+  max-height: min(90vh, 28rem);
+  height: min(85vh, 26rem);
+}
+
+/* Ensure modal card-body adheres to flex-1 and min-h-0 so actions footer is never pushed out */
+dialog.modal .modal-box .card-body {
+  min-height: 0;
+  flex: 1 1 0%;
+}

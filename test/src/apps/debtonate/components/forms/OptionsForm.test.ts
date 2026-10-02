@@ -82,4 +82,21 @@ describe('Debtonate OptionsForm Component', () => {
     await viewButton!.trigger('click');
     expect(globalOptions.openGlossary).toHaveBeenCalled();
   });
+
+  it('renders auto-load toggle next to state controls and calls toggleAutoLoadState', async () => {
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const globalOptions = useGlobalOptionsStore();
+
+    expect(wrapper.text()).toContain('Browser Local Storage & State');
+    expect(wrapper.text()).toContain('Auto-load state');
+
+    const toggle = wrapper.find('input.toggle');
+    expect(toggle.exists()).toBe(true);
+
+    await toggle.trigger('change');
+    expect(globalOptions.toggleAutoLoadState).toHaveBeenCalled();
+  });
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import AppreciateApplet from '@/apps/appreciate/appreciate/AppreciateApplet.vue';
 import InvestigateApplet from '@/apps/appreciate/investigate/InvestigateApplet.vue';
@@ -29,6 +29,10 @@ const { isDesktop } = useBreakpoint();
 const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
   appType: 'appreciate',
   importState: state.importState,
+});
+
+onMounted(() => {
+  globalOptions.autoLoadIfEnabled('appreciate', state.loadState);
 });
 
 const activeTab = ref('analysis');

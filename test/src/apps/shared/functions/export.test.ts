@@ -5,6 +5,7 @@ import {
   downloadFile,
   exportToCsv,
   exportToJson,
+  computeStateHash,
 } from '@/apps/shared/functions/export';
 
 describe('export utilities', () => {
@@ -110,6 +111,35 @@ describe('export utilities', () => {
       exportToJson('my_plan', { foo: 'bar' });
       expect(createdAnchor?.download).toBe('my_plan.json');
       expect(clickSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('computeStateHash', () => {
+    it('returns an 8-character hexadecimal string', () => {
+      const hash = computeStateHash({ a: 1, b: 'test' });
+      expect(hash).toMatch(/^[0-9a-f]{8}$/);
+    });
+
+    it('produces identical hash regardless of key order', () => {
+      const hash1 = computeStateHash({ a: 1, b: 2, c: { x: 'foo', y: 'bar' } });
+      const hash2 = computeStateHash({ b: 2, c: { y: 'bar', x: 'foo' }, a: 1 });
+      expect(hash1).toBe(hash2);
+    });
+
+    it('produces different hash when values change', () => {
+      const hash1 = computeStateHash({ balance: 1000, rate: 0.05 });
+      const hash2 = computeStateHash({ balance: 1001, rate: 0.05 });
+      expect(hash1).not.toBe(hash2);
+    });
+
+    it('handles arrays, primitives, and nulls properly', () => {
+      const hashNull = computeStateHash(null);
+      const hashStr = computeStateHash('simple');
+      const hashArr = computeStateHash([1, 2, 3]);
+
+      expect(hashNull).toMatch(/^[0-9a-f]{8}$/);
+      expect(hashStr).toMatch(/^[0-9a-f]{8}$/);
+      expect(hashArr).toMatch(/^[0-9a-f]{8}$/);
     });
   });
 });

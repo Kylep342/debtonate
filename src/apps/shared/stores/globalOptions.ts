@@ -10,7 +10,7 @@
  *
  */
 import { defineStore } from 'pinia';
-import { computed, ref, ComputedRef, Ref } from 'vue';
+import { computed, ref, watch, ComputedRef, Ref } from 'vue';
 
 import { useTheme } from '@/apps/shared/composables/useTheme';
 import constants from '@/apps/shared/constants/constants';
@@ -24,6 +24,7 @@ type CurrencyCode = (typeof constants.LOCALES)[number]['currency'];
 type LanguageCode = (typeof constants.LOCALES)[number]['code'];
 
 export interface GlobalOptionsState {
+  autoLoadState: Ref<boolean>;
   baseDate: Ref<number>;
   colorPalette: ComputedRef<string[]>;
   currency: Ref<CurrencyCode>;
@@ -41,11 +42,13 @@ export interface GlobalOptionsGetters {
 }
 
 export interface GlobalOptionsActions {
+  autoLoadIfEnabled: (appType: 'debtonate' | 'appreciate', loadFn: () => void) => boolean;
   clearState: () => void;
   closeGlossary: () => void;
   closeShareExport: () => void;
   CurrencySymbol: (currency: CurrencyCode, localeCode: LanguageCode) => string;
   exportState: () => Record<string, string | boolean>;
+  hasSavedState: (appType: 'debtonate' | 'appreciate') => boolean;
   importState: (data: Record<string, any>) => void;
   loadState: () => void;
   Money: (amount: number | bigint) => string;
@@ -53,9 +56,12 @@ export interface GlobalOptionsActions {
   openShareExport: () => void;
   Percent: (amount: number | bigint) => string;
   Period: (period: number | Date, asStr?: boolean) => string | number | Date;
+  resetAutoLoadTracking: () => void;
   saveState: () => void;
+  setAutoLoadState: (value: boolean) => void;
   setCurrency: (newCurrency: CurrencyCode) => void;
   setLanguage: (newLanguage: LanguageCode) => void;
+  toggleAutoLoadState: () => void;
   toggleGlossary: () => void;
   togglePeriodsAsDates: () => void;
   toggleShareExport: () => void;
@@ -78,6 +84,30 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     || locales[0];
   const currency: Ref<CurrencyCode> = ref(defaultLocale.currency);
   const language: Ref<LanguageCode> = ref(defaultLocale.code);
+
+  const getInitialAutoLoadState = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const stored = localStorage.getItem(keys.LS_AUTO_LOAD_STATE);
+      return stored !== null ? JSON.parse(stored) === true : false;
+    } catch {
+      return false;
+    }
+  };
+
+  const autoLoadState: Ref<boolean> = ref(getInitialAutoLoadState());
+
+  watch(
+    () => autoLoadState.value,
+    (newValue) => {
+      if (typeof window === 'undefined') return;
+      try {
+        localStorage.setItem(keys.LS_AUTO_LOAD_STATE, JSON.stringify(newValue));
+      } catch {
+        // ignore
+      }
+    },
+  );
 
 
   /** COMPOSABLES */
@@ -105,6 +135,9 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     if (data[keys.LS_PERIODS_AS_DATES] !== undefined) {
       periodsAsDates.value = Boolean(data[keys.LS_PERIODS_AS_DATES]);
     }
+    if (data[keys.LS_AUTO_LOAD_STATE] !== undefined) {
+      autoLoadState.value = Boolean(data[keys.LS_AUTO_LOAD_STATE]);
+    }
   };
 
   /**
@@ -116,10 +149,18 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     const storedCurrency = localStorage.getItem(keys.LS_CURRENCY);
     const storedLanguage = localStorage.getItem(keys.LS_LANGUAGE);
     const storedPeriodsAsDates = localStorage.getItem(keys.LS_PERIODS_AS_DATES);
+    const storedAutoLoadState = localStorage.getItem(keys.LS_AUTO_LOAD_STATE);
 
     if (storedCurrency) data[keys.LS_CURRENCY] = JSON.parse(storedCurrency);
     if (storedLanguage) data[keys.LS_LANGUAGE] = JSON.parse(storedLanguage);
     if (storedPeriodsAsDates) data[keys.LS_PERIODS_AS_DATES] = JSON.parse(storedPeriodsAsDates);
+    if (storedAutoLoadState !== null) {
+      try {
+        autoLoadState.value = JSON.parse(storedAutoLoadState) === true;
+      } catch {
+        // ignore
+      }
+    }
 
     importState(data);
   };
@@ -136,6 +177,70 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
       keys.LS_PERIODS_AS_DATES,
       JSON.stringify(periodsAsDates.value),
     );
+    localStorage.setItem(
+      keys.LS_AUTO_LOAD_STATE,
+      JSON.stringify(autoLoadState.value),
+    );
+  };
+
+  const setAutoLoadState = (value: boolean): void => {
+    autoLoadState.value = value;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(keys.LS_AUTO_LOAD_STATE, JSON.stringify(value));
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const toggleAutoLoadState = (): void => {
+    setAutoLoadState(!autoLoadState.value);
+  };
+
+  const hasSavedState = (appType: 'debtonate' | 'appreciate'): boolean => {
+    if (typeof window === 'undefined' || !window.localStorage) return false;
+    try {
+      if (appType === 'debtonate') {
+        return localStorage.getItem('debtonate.loans') !== null
+          || localStorage.getItem('debtonate.budgets') !== null;
+      }
+      if (appType === 'appreciate') {
+        return localStorage.getItem('appreciate.instruments') !== null
+          || localStorage.getItem('appreciate.budgets') !== null;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  };
+
+  const autoLoadedApps = new Set<string>();
+
+  const resetAutoLoadTracking = (): void => {
+    autoLoadedApps.clear();
+  };
+
+  const autoLoadIfEnabled = (
+    appType: 'debtonate' | 'appreciate',
+    loadFn: () => void,
+  ): boolean => {
+    if (autoLoadedApps.has(appType)) return false;
+    autoLoadedApps.add(appType);
+
+    if (
+      typeof window !== 'undefined'
+      && window.location.hash
+      && window.location.hash.includes('plan=')
+    ) {
+      return false;
+    }
+
+    if (autoLoadState.value && hasSavedState(appType)) {
+      loadFn();
+      return true;
+    }
+    return false;
   };
 
   /**
@@ -297,6 +402,8 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
 
 
   return {
+    autoLoadIfEnabled,
+    autoLoadState,
     baseDate,
     clearState,
     closeGlossary,
@@ -306,6 +413,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     CurrencySymbol,
     darkMode,
     exportState,
+    hasSavedState,
     importState,
     isGlossaryActive,
     isShareExportActive,
@@ -318,10 +426,13 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     Percent,
     Period,
     periodsAsDates,
+    resetAutoLoadTracking,
     saveState,
+    setAutoLoadState,
     setCurrency,
     setLanguage,
     Time,
+    toggleAutoLoadState,
     toggleGlossary,
     togglePeriodsAsDates,
     toggleShareExport,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TableHeader } from '@/apps/shared/types/app';
 import elementIds from '@/apps/shared/constants/elementIds';
-import { exportToCsv, exportToJson } from '@/apps/shared/functions/export';
+import { exportToCsv, exportToJson, computeStateHash } from '@/apps/shared/functions/export';
 
 const props = withDefaults(
   defineProps<{
@@ -11,9 +11,11 @@ const props = withDefaults(
     rows: Record<string, string>[];
     totals: Record<string, string>;
     exportable?: boolean;
+    stateHash?: string;
   }>(),
   {
     exportable: true,
+    stateHash: '',
   }
 );
 
@@ -23,13 +25,24 @@ const slugify = (text: string): string =>
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
 
+const getExportFilename = (): string => {
+  const base = slugify(props.title);
+  const hash = props.stateHash || computeStateHash({
+    title: props.title,
+    headers: props.headers,
+    rows: props.rows,
+    totals: props.totals,
+  });
+  return `${base}_${hash}`;
+};
+
 const handleExportCsv = (): void => {
-  const filename = slugify(props.title);
+  const filename = getExportFilename();
   exportToCsv(filename, props.headers, props.rows, props.totals);
 };
 
 const handleExportJson = (): void => {
-  const filename = slugify(props.title);
+  const filename = getExportFilename();
   exportToJson(filename, {
     title: props.title,
     subtitle: props.subtitle,
@@ -42,41 +55,43 @@ const handleExportJson = (): void => {
 </script>
 
 <template>
-  <div>
-    <header class="mb-2">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 gap-2">
-        <div class="flex-1 text-center sm:text-left min-w-0">
-          <h3 class="text-center sm:text-left break-words">
-            {{ title }}
-          </h3>
-          <h5 class="text-center sm:text-left text-xs opacity-75 break-words leading-relaxed mt-0.5">
-            {{ subtitle }}
-          </h5>
-        </div>
-        <div
-          v-if="exportable && rows.length > 0"
-          class="flex justify-center sm:justify-end gap-1 shrink-0"
+  <div class="card bg-base-100 border border-base-content/10 shadow-sm rounded-2xl p-3 sm:p-5 flex flex-col gap-3.5 flex-1 min-h-0">
+    <!-- Header with Title, Subtitle, and Controls -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-3 shrink-0">
+      <div>
+        <h3 class="text-base sm:text-lg font-bold text-base-content tracking-tight">
+          {{ title }}
+        </h3>
+        <p
+          v-if="subtitle"
+          class="text-xs text-base-content/60 mt-0.5"
         >
-          <base-button
-            :id="elementIds.BTN_EXPORT_SCHEDULE_CSV"
-            class="btn-xs btn-outline"
-            title="Download amortization schedule as CSV"
-            @click="handleExportCsv"
-          >
-            Export CSV
-          </base-button>
-          <base-button
-            :id="elementIds.BTN_EXPORT_SCHEDULE_JSON"
-            class="btn-xs btn-outline"
-            title="Download amortization schedule as JSON"
-            @click="handleExportJson"
-          >
-            Export JSON
-          </base-button>
-        </div>
+          {{ subtitle }}
+        </p>
       </div>
-    </header>
-    <div :class="['justifyCenter', 'max-h-90', 'overflow-y-auto', 'overflow-x-auto']">
+      <div
+        v-if="exportable && rows.length > 0"
+        class="flex items-center gap-1 shrink-0"
+      >
+        <base-button
+          :id="elementIds.BTN_EXPORT_SCHEDULE_CSV"
+          class="btn-xs btn-outline"
+          title="Download amortization schedule as CSV"
+          @click="handleExportCsv"
+        >
+          CSV
+        </base-button>
+        <base-button
+          :id="elementIds.BTN_EXPORT_SCHEDULE_JSON"
+          class="btn-xs btn-outline"
+          title="Download amortization schedule as JSON"
+          @click="handleExportJson"
+        >
+          JSON
+        </base-button>
+      </div>
+    </div>
+    <div :class="['justifyCenter', 'flex-1', 'min-h-0', 'overflow-y-auto', 'overflow-x-auto', 'rounded-xl', 'border', 'border-base-content/10']">
       <base-table :class="['table-sm']">
         <template #header>
           <thead>

@@ -5,11 +5,15 @@ const props = withDefaults(
   defineProps<{
     id: string;
     bodyClasses?: string[];
+    boxClasses?: string[];
     maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'fit';
+    compositeSize?: 'auto' | 'details' | 'share';
   }>(),
   {
     bodyClasses: () => [],
+    boxClasses: () => [],
     maxWidth: 'xl',
+    compositeSize: 'auto',
   }
 );
 
@@ -41,6 +45,17 @@ const maxWidthClass = computed(() => {
       return 'max-w-xl';
   }
 });
+
+const compositeSizeClass = computed(() => {
+  switch (props.compositeSize) {
+    case 'details':
+      return 'modal-composite-details';
+    case 'share':
+      return 'modal-composite-share';
+    default:
+      return '';
+  }
+});
 </script>
 
 <template>
@@ -58,6 +73,7 @@ const maxWidthClass = computed(() => {
         'w-11/12',
         'sm:w-full',
         maxWidthClass,
+        compositeSizeClass,
         'max-h-[90vh]',
         'min-w-0',
         'overflow-hidden',
@@ -67,6 +83,7 @@ const maxWidthClass = computed(() => {
         'shadow-2xl',
         'bg-base-100',
         'translate-y-0',
+        ...(boxClasses || []),
       ]"
     >
       <base-card

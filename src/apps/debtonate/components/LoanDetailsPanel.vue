@@ -108,6 +108,7 @@ watch(
   <base-modal
     :id="constants.LOAN_DETAILS_ID"
     :max-width="'4xl'"
+    composite-size="details"
     @exit="state.unviewLoan"
   >
     <template #header>
@@ -134,10 +135,10 @@ watch(
     <template #body>
       <div
         v-if="currentLoan"
-        class="p-3 sm:p-4 flex flex-col gap-4"
+        class="flex flex-col gap-3 sm:gap-4 flex-1 min-h-0 h-full"
       >
         <!-- Top Stat Ribbon -->
-        <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-content/10 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="bg-base-200/50 rounded-xl p-3.5 border border-base-content/10 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs shrink-0">
           <div>
             <span class="text-base-content/60 text-[11px] block">Current Balance</span>
             <span class="font-mono font-bold text-sm sm:text-base text-base-content">
@@ -170,10 +171,11 @@ watch(
           :parent-id="currentLoan.id"
           :scenarios="state.refinancingScenarios[currentLoan.id]"
           :schedules="state.refinancingSchedules[currentLoan.id]"
+          class="shrink-0"
         />
 
         <!-- Paired Navigation Tabs & Budget Dropdown -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-2 shrink-0">
           <div class="tabs tabs-boxed bg-base-300/40 p-1 rounded-xl grid grid-cols-2 w-full sm:w-auto sm:flex">
             <button
               type="button"
@@ -207,7 +209,7 @@ watch(
         <!-- Tab 1: Amortization Schedule (Direct Table, No Pivot Tabs) -->
         <div
           v-if="activeView === 'amortization'"
-          class="w-auto"
+          class="w-full flex-1 min-h-0 flex flex-col"
         >
           <data-table
             :title="amortizationTitle"
@@ -215,13 +217,15 @@ watch(
             :headers="state.amortizationTableHeaders"
             :rows="tableRows"
             :totals="tableFooter"
+            :state-hash="state.stateHash"
+            class="flex-1 min-h-0 flex flex-col"
           />
         </div>
 
         <!-- Tab 2: Dynamic Crosstab Comparative Analysis -->
         <div
           v-else-if="activeView === 'comparative'"
-          class="w-auto"
+          class="w-full flex-1 min-h-0 flex flex-col"
         >
           <TabularAnalysis
             :title="`${state.getLoanName(currentLoan.id)} - Budget Comparison`"
@@ -230,6 +234,8 @@ watch(
             :items="state.monthlyBudgets"
             :get-item-name="state.getBudgetName"
             :baseline-id="viewedItemId"
+            :state-hash="state.stateHash"
+            class="flex-1 min-h-0 flex flex-col"
             @select-baseline="setViewedItemId"
           />
         </div>

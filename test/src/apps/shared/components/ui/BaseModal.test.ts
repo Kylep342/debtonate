@@ -39,6 +39,47 @@ describe('BaseModal Component', () => {
     expect(wrapper.find('button').text()).toBe('Submit');
   });
 
+  it('applies custom boxClasses to modal-box', () => {
+    const wrapper = mount(BaseModal, {
+      props: {
+        id: 'test-modal',
+        boxClasses: ['modal-details-box', 'custom-box-class'],
+      },
+      global: {
+        components: {
+          BaseCard,
+        },
+      },
+    });
+
+    const modalBox = wrapper.find('.modal-box');
+    expect(modalBox.exists()).toBe(true);
+    expect(modalBox.classes()).toContain('modal-details-box');
+    expect(modalBox.classes()).toContain('custom-box-class');
+  });
+
+  it('resizes individually by default (compositeSize="auto") and applies composite classes when specified', () => {
+    const defaultWrapper = mount(BaseModal, {
+      props: { id: 'auto-modal' },
+      global: { components: { BaseCard } },
+    });
+    const defaultBox = defaultWrapper.find('.modal-box');
+    expect(defaultBox.classes()).not.toContain('modal-composite-details');
+    expect(defaultBox.classes()).not.toContain('modal-composite-share');
+
+    const detailsWrapper = mount(BaseModal, {
+      props: { id: 'details-modal', compositeSize: 'details' },
+      global: { components: { BaseCard } },
+    });
+    expect(detailsWrapper.find('.modal-box').classes()).toContain('modal-composite-details');
+
+    const shareWrapper = mount(BaseModal, {
+      props: { id: 'share-modal', compositeSize: 'share' },
+      global: { components: { BaseCard } },
+    });
+    expect(shareWrapper.find('.modal-box').classes()).toContain('modal-composite-share');
+  });
+
   it('emits exit when the dialog is closed', async () => {
     const wrapper = mount(BaseModal, {
       props: {

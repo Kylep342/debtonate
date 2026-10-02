@@ -83,3 +83,29 @@ export function exportToJson(
   const cleanName = filename.endsWith('.json') ? filename : `${filename}.json`;
   downloadFile(cleanName, json, 'application/json');
 }
+
+/**
+ * Computes a deterministic, short 8-character hex hash (FNV-1a 32-bit)
+ * from any serializable state object or data.
+ */
+export function computeStateHash(data: unknown): string {
+  const serialize = (obj: any): string => {
+    if (obj === null || typeof obj !== 'object') {
+      return JSON.stringify(obj);
+    }
+    if (Array.isArray(obj)) {
+      return `[${obj.map(serialize).join(',')}]`;
+    }
+    const sortedKeys = Object.keys(obj).sort();
+    return `{${sortedKeys.map((k) => `${JSON.stringify(k)}:${serialize(obj[k])}`).join(',')}}`;
+  };
+
+  const str = serialize(data);
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+

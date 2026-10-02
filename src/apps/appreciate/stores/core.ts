@@ -6,6 +6,7 @@ import { computed, ref, ComputedRef, Ref } from 'vue';
 import constants from '@/apps/appreciate/constants/constants';
 import keys from '@/apps/appreciate/constants/keys';
 import { ContributionScenario, UIInstrument } from '@/apps/appreciate/types/core';
+import { computeStateHash } from '@/apps/shared/functions/export';
 import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import {
@@ -102,6 +103,7 @@ export interface AppreciateCoreGetters {
     Record<string, Record<string, withdrawalTypes.WithdrawalSchedule>>
   >;
   withdrawalYieldVsDrawdownGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
+  stateHash: ComputedRef<string>;
 }
 
 export interface AppreciateCoreActions {
@@ -1741,6 +1743,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     [keys.LS_YEARS_TO_SPEND]: yearsToSpend.value,
   });
 
+  const stateHash: ComputedRef<string> = computed(() => computeStateHash(exportState()));
+
   // appreciate settings
   const setInflationFactor = (newFactor: number): void => {
     if (
@@ -2516,6 +2520,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     setYearsToContribute,
     setYearsToSpend,
     sortInstruments,
+    stateHash,
     toggleAccrueBeforeContribution,
     toggleDeflateAllMoney,
     togglePhase,

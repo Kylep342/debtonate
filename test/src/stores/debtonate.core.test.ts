@@ -378,9 +378,13 @@ describe('Debtonate Core Store', () => {
       keys.LS_VIEW_PHASE,
     ]);
 
+    expect(state.stateHash).toMatch(/^[0-9a-f]{8}$/);
+    const initialHash = state.stateHash;
+
     state.budgets = Budgets();
     state.loans = Loans();
 
+    expect(state.stateHash).not.toBe(initialHash);
     expect(state.totalMinPayment).toBe(state.rawTotalMinPayment);
 
     state.toggleRounding(200);

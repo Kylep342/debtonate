@@ -267,8 +267,13 @@ describe('Appreciate Core Store', () => {
       keys.LS_YEARS_TO_SPEND,
     ]);
 
+    expect(state.stateHash).toMatch(/^[0-9a-f]{8}$/);
+    const initialHash = state.stateHash;
+
     state.budgets = Budgets();
     state.instruments = Instruments();
+
+    expect(state.stateHash).not.toBe(initialHash);
     state.setInflationFactor(0.05);
     state.setDesiredNetIncome(6000);
     state.setRetirementTaxRate(20);

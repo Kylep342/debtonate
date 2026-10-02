@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import DebtonateApplet from '@/apps/debtonate/debtonate/DebtonateApplet.vue';
 import RepatriateApplet from '@/apps/debtonate/repatriate/RepatriateApplet.vue';
@@ -30,6 +30,10 @@ const { isDesktop } = useBreakpoint();
 const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
   appType: 'debtonate',
   importState: state.importState,
+});
+
+onMounted(() => {
+  globalOptions.autoLoadIfEnabled('debtonate', state.loadState);
 });
 
 const activeTab = ref('analysis');

@@ -6,6 +6,7 @@ import { computed, ref, Ref, ComputedRef } from 'vue';
 import constants from '@/apps/debtonate/constants/constants';
 import keys from '@/apps/debtonate/constants/keys';
 import { PaymentScenario, UIDebtLoan } from '@/apps/debtonate/types/core';
+import { computeStateHash } from '@/apps/shared/functions/export';
 import { generateId } from '@/apps/shared/functions/id';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { Budget, MonthlyBudget } from '@/apps/shared/types/core';
@@ -71,6 +72,7 @@ export interface DebtonateCoreGetters {
     Record<string, Record<string, PaymentScenario>>
   >;
   roundedTotalMinPayment: ComputedRef<number>;
+  stateHash: ComputedRef<string>;
   totalCurrentBalance: ComputedRef<number>;
   totalEffectiveInterestRate: ComputedRef<number>;
   totalFees: ComputedRef<number>;
@@ -1310,6 +1312,8 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     [keys.LS_VIEW_PHASE]: viewPhase.value,
   });
 
+  const stateHash: ComputedRef<string> = computed(() => computeStateHash(exportState()));
+
   // debtonate settings
   const setSelectedLoanId = (id: string | null): void => {
     selectedLoanId.value = id;
@@ -1748,6 +1752,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     setRoundingScale,
     snowball,
     sortLoans,
+    stateHash,
     toggleAvalancheSort,
     toggleReducePayments,
     toggleRefinancingUseHighestPayment,

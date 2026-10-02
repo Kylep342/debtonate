@@ -162,4 +162,90 @@ describe('Global Options Store', () => {
     expect(globalOptions.language).toBe('de-DE');
     expect(globalOptions.periodsAsDates).toBe(true);
   });
+
+  describe('auto-load state persistence and triggers', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      window.location.hash = '';
+    });
+
+    it('defaults autoLoadState to false and toggles correctly', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.resetAutoLoadTracking();
+      globalOptions.setAutoLoadState(false);
+
+      expect(globalOptions.autoLoadState).toBe(false);
+
+      globalOptions.toggleAutoLoadState();
+      expect(globalOptions.autoLoadState).toBe(true);
+      expect(localStorage.getItem(keys.LS_AUTO_LOAD_STATE)).toBe('true');
+
+      globalOptions.toggleAutoLoadState();
+      expect(globalOptions.autoLoadState).toBe(false);
+      expect(localStorage.getItem(keys.LS_AUTO_LOAD_STATE)).toBe('false');
+
+      globalOptions.setAutoLoadState(true);
+      expect(globalOptions.autoLoadState).toBe(true);
+      expect(localStorage.getItem(keys.LS_AUTO_LOAD_STATE)).toBe('true');
+    });
+
+    it('detects whether saved state exists for debtonate and appreciate', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+
+      expect(globalOptions.hasSavedState('debtonate')).toBe(false);
+      expect(globalOptions.hasSavedState('appreciate')).toBe(false);
+
+      localStorage.setItem('debtonate.loans', JSON.stringify([{ id: 'loan-1' }]));
+      expect(globalOptions.hasSavedState('debtonate')).toBe(true);
+      expect(globalOptions.hasSavedState('appreciate')).toBe(false);
+
+      localStorage.removeItem('debtonate.loans');
+      localStorage.setItem('appreciate.instruments', JSON.stringify([{ id: 'inst-1' }]));
+      expect(globalOptions.hasSavedState('debtonate')).toBe(false);
+      expect(globalOptions.hasSavedState('appreciate')).toBe(true);
+    });
+
+    it('autoLoadIfEnabled respects autoLoadState toggle and saved state existence', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.resetAutoLoadTracking();
+      globalOptions.setAutoLoadState(false);
+
+      const loadSpy = vi.fn();
+
+      // Disabled toggle: should not load even if state exists
+      localStorage.setItem('debtonate.loans', JSON.stringify([{ id: 'loan-1' }]));
+      let loaded = globalOptions.autoLoadIfEnabled('debtonate', loadSpy);
+      expect(loaded).toBe(false);
+      expect(loadSpy).not.toHaveBeenCalled();
+
+      // Reset tracking and enable toggle
+      globalOptions.resetAutoLoadTracking();
+      globalOptions.setAutoLoadState(true);
+
+      loaded = globalOptions.autoLoadIfEnabled('debtonate', loadSpy);
+      expect(loaded).toBe(true);
+      expect(loadSpy).toHaveBeenCalledTimes(1);
+
+      // Subsequent call in the same session does not re-trigger
+      loaded = globalOptions.autoLoadIfEnabled('debtonate', loadSpy);
+      expect(loaded).toBe(false);
+      expect(loadSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('autoLoadIfEnabled does not auto-load if plan hash is in the URL', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.resetAutoLoadTracking();
+      globalOptions.setAutoLoadState(true);
+      localStorage.setItem('debtonate.loans', JSON.stringify([{ id: 'loan-1' }]));
+
+      window.location.hash = '#plan=test123';
+      const loadSpy = vi.fn();
+
+      const loaded = globalOptions.autoLoadIfEnabled('debtonate', loadSpy);
+      expect(loaded).toBe(false);
+      expect(loadSpy).not.toHaveBeenCalled();
+
+      window.location.hash = '';
+    });
+  });
 });

@@ -7,7 +7,7 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useAppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { buildShareUrl } from '@/apps/shared/functions/planSharing';
-import { exportToJson } from '@/apps/shared/functions/export';
+import { exportToJson, computeStateHash } from '@/apps/shared/functions/export';
 
 const props = withDefaults(
   defineProps<{
@@ -91,7 +91,8 @@ const handleDownloadPlanJson = (): void => {
   const store = debtonateStore || appreciateStore;
   if (!store) return;
   const stateObj = store.exportState();
-  const filename = `${props.appType}_plan_backup_${new Date().toISOString().slice(0, 10)}`;
+  const hash = computeStateHash(stateObj);
+  const filename = `${props.appType}_plan_backup_${new Date().toISOString().slice(0, 10)}_${hash}`;
   exportToJson(filename, stateObj);
 };
 
@@ -132,6 +133,7 @@ const handleFileUpload = (event: Event): void => {
   <base-modal
     :id="constants.SHARE_EXPORT_MODAL_ID"
     :body-classes="['overflow-y-auto', 'max-w-2xl']"
+    composite-size="share"
     @exit="globalOptions.closeShareExport"
   >
     <template #header>
@@ -153,7 +155,7 @@ const handleFileUpload = (event: Event): void => {
     </template>
 
     <template #body>
-      <div class="p-2 space-y-4">
+      <div class="p-2 space-y-4 min-h-[22rem]">
         <!-- Navigation Tabs -->
         <div class="flex flex-wrap gap-1">
           <button

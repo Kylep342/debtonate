@@ -308,11 +308,26 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
           </div>
 
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-3">
-            <div>
-              <span class="font-bold text-sm text-base-content">Browser Local Storage & State</span>
-              <p class="text-xs text-base-content/70 mt-1">
-                Save your investment plan to this browser, reload saved data, or copy a snapshot to your clipboard.
-              </p>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="font-bold text-sm text-base-content">Browser Local Storage & State</span>
+                <p class="text-xs text-base-content/70 mt-1">
+                  Save your investment plan to this browser, reload saved data, or copy a snapshot to your clipboard.
+                </p>
+              </div>
+              <label
+                :for="`${constants.OPTIONS_FORM_ID}-auto-load`"
+                class="label cursor-pointer flex items-center gap-2 py-0 shrink-0 self-start sm:self-auto"
+              >
+                <span class="label-text text-xs text-base-content/80 font-medium whitespace-nowrap">Auto-load state</span>
+                <input
+                  :id="`${constants.OPTIONS_FORM_ID}-auto-load`"
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  :checked="globalOptions.autoLoadState"
+                  @change="globalOptions.toggleAutoLoadState"
+                >
+              </label>
             </div>
             <div class="flex flex-wrap gap-2 pt-1">
               <base-button

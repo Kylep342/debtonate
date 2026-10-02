@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { exportToCsv, exportToJson, CsvHeader } from '@/apps/shared/functions/export';
+import { exportToCsv, exportToJson, computeStateHash, CsvHeader } from '@/apps/shared/functions/export';
 
 const props = withDefaults(
   defineProps<{
@@ -12,12 +12,14 @@ const props = withDefaults(
     exportable?: boolean;
     baselineId?: string | null;
     showSummaryCards?: boolean;
+    stateHash?: string;
   }>(),
   {
     subtitle: '',
     exportable: true,
     baselineId: null,
     showSummaryCards: true,
+    stateHash: '',
   }
 );
 
@@ -320,8 +322,17 @@ const slugify = (text: string): string =>
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
 
+const getExportFilename = (): string => {
+  const base = slugify(props.title);
+  const hash = props.stateHash || computeStateHash({
+    title: props.title,
+    analysis: props.analysis,
+  });
+  return `${base}_${hash}`;
+};
+
 const handleExportCsv = (): void => {
-  const filename = slugify(props.title);
+  const filename = getExportFilename();
   const headers: CsvHeader[] = [
     { key: 'metric', label: 'Metric' },
     ...displayItems.value.map((item) => ({
@@ -342,7 +353,7 @@ const handleExportCsv = (): void => {
 };
 
 const handleExportJson = (): void => {
-  const filename = slugify(props.title);
+  const filename = getExportFilename();
   const headers: CsvHeader[] = [
     { key: 'metric', label: 'Metric' },
     ...displayItems.value.map((item) => ({
@@ -370,9 +381,9 @@ const handleExportJson = (): void => {
 </script>
 
 <template>
-  <div class="card bg-base-100 border border-base-content/10 shadow-sm rounded-2xl p-3 sm:p-5 flex flex-col gap-3.5">
+  <div class="card bg-base-100 border border-base-content/10 shadow-sm rounded-2xl p-3 sm:p-5 flex flex-col gap-3.5 flex-1 min-h-0">
     <!-- Header with Title, Subtitle, and Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-base-content/10 pb-3 shrink-0">
       <div>
         <h3 class="text-base sm:text-lg font-bold text-base-content tracking-tight">
           {{ title }}
@@ -419,7 +430,7 @@ const handleExportJson = (): void => {
     <!-- Summary Highlight Cards -->
     <div
       v-if="showSummaryCards && summaryHighlights.length > 0"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 shrink-0"
     >
       <div
         v-for="card in summaryHighlights"
@@ -438,7 +449,7 @@ const handleExportJson = (): void => {
     </div>
 
     <!-- Dynamic Crosstab Table -->
-    <div class="overflow-x-auto overflow-y-auto max-h-90 rounded-xl border border-base-content/10">
+    <div class="overflow-x-auto overflow-y-auto flex-1 min-h-0 rounded-xl border border-base-content/10">
       <table class="table table-zebra table-pin-rows w-full text-xs sm:text-sm">
         <thead class="bg-base-200/60">
           <tr>

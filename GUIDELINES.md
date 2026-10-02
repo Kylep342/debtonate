@@ -13,8 +13,12 @@
  - All code should be linted and covered by unit tests
  - Everything Javascript is Typescript
  - Standard verification commands:
+   - `./dev.sh`: Concurrent development runner that installs dependencies, launches the Vite dev server, Tailwind CSS watcher (`npm run cssw`), and Vitest unit test suite with output piped to `logs/*.log`.
    - `npm run lint`: Single-pass pipeline that runs ESLint auto-fix followed by `vue-tsc --noEmit` type checking.
    - `npm run test:run`: Executes all Vitest unit tests non-interactively.
+   - `npm run coverage`: Runs Vitest with full code coverage instrumentation.
+   - `npm run build`: Compiles production assets and runs `postbuild` to generate static routing fallbacks for GitHub Pages (`dist/appreciate/index.html` and `dist/404.html`).
+   - `git commit`: Git hooks automatically run `npm run lint` via Husky before opening the commit message editor.
 
 
 ## Discovered Guidelines
@@ -28,3 +32,7 @@
 - **Explicit Element IDs**: Interactive UI components, modal triggers, tabs, action buttons, and form inputs should define and bind dedicated, typed IDs from `src/apps/shared/constants/elementIds.ts` for clean, reliable DOM querying in tests and automation.
 - **Plan Sharing & Exporting**: Plan states are shared client-side via compressed URL hashes (`#plan=cz:...` using native deflate Web Streams or UTF-8 base64url fallback) or backed up to JSON files. Amortization and distribution schedules export to RFC 4180-compliant CSV and JSON directly from data tables.
 - **Multi-format UX**: The UI should be clear and functional on both desktop and mobile.
+- **GitHub Pages Subpath Routing**: Because GitHub Pages is a static host without server-side rewrite rules, direct navigation or refreshes to sub-routes (e.g. `/appreciate`) require matching directory index files. The `postbuild` script in `package.json` copies `dist/index.html` to `dist/appreciate/index.html` and `dist/404.html`.
+- **Financial Phase Semantics (Drawdown / SWR)**: Amortization and distribution tables must strictly differentiate between accumulation and decumulation phases: use "Contribution" for accumulation portfolios and "Withdrawal" for drawdown portfolios. Advanced retirement metrics (Safe Withdrawal Rate, Crossover Point, Drawdown Amortization) must be registered with definitions in `src/apps/shared/constants/glossary.ts`.
+- **Isolated Component Testing & Store Injection**: Shared formlets and base components (`BaseEntityForm.vue`, `BudgetForm.vue`, `RefinancingForm.vue`) must guard store calls (`getCurrentInstance()?.appContext.config.globalProperties.$pinia`) or provide safe fallbacks so unit tests can mount them in isolation without triggering unhandled Pinia injection warnings.
+- **BigInt Financial Precision**: All financial calculations, amortization schedules, and loan balances must utilize `bigint` arithmetic via `moneyfunx` rather than floating-point `number` operations. Formatting and conversion should only happen at display boundaries via `useGlobalOptionsStore`.
