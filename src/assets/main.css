@@ -121,3 +121,13 @@ dialog.modal .modal-box .card-body {
   min-height: 0;
   flex: 1 1 0%;
 }
+
+/* Ensure open dropdowns and their contents always stack above sibling buttons and controls */
+.dropdown:focus-within,
+.dropdown.dropdown-open {
+  z-index: 50;
+}
+
+.dropdown .dropdown-content {
+  z-index: 60;
+}

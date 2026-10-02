@@ -25,11 +25,18 @@ const isOpen = ref(false);
 const menuRef = ref<HTMLElement | null>(null);
 
 const toggleMenu = () => {
-  isOpen.value = !isOpen.value;
+  if (isOpen.value) {
+    closeMenu();
+  } else {
+    isOpen.value = true;
+  }
 };
 
 const closeMenu = () => {
   isOpen.value = false;
+  if (menuRef.value && menuRef.value.contains(document.activeElement)) {
+    (document.activeElement as HTMLElement)?.blur();
+  }
 };
 
 const handleItemClick = (button: Button) => {
@@ -67,7 +74,8 @@ onUnmounted(() => {
       'dropdown',
       'dropdown-bottom',
       align === 'end' ? 'dropdown-end' : '',
-      { 'dropdown-open': isOpen, 'z-50': isOpen }
+      'focus-within:z-50',
+      { 'dropdown-open z-50': isOpen }
     ]"
   >
     <base-button

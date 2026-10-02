@@ -86,9 +86,8 @@ watch(() => props.watchedItems, (newItems) => {
           <base-menu
             :text="`Graph: ${viewedGraphId}`"
             :buttons="graphButtons"
-            :classes="['btn-secondary', 'btn-sm']"
+            :classes="['btn-secondary', 'btn-sm', 'brightness-90']"
             align="start"
-            style="filter: brightness(0.9);"
           />
           <!-- Pivot Entity Dropdown Button (e.g. Loan / Instrument / Budget) -->
           <base-menu

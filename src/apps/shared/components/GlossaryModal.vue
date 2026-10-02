@@ -103,9 +103,8 @@ const categoryButtons = computed<Button[]>(() =>
           <base-menu
             :text="currentCategoryLabel"
             :buttons="categoryButtons"
-            :classes="['btn-secondary', 'btn-sm']"
+            :classes="['btn-secondary', 'btn-sm', 'brightness-90']"
             align="start"
-            style="filter: brightness(0.9);"
           />
         </div>
 

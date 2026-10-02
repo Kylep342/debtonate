@@ -49,9 +49,8 @@ const phaseButtons: ComputedRef<Button[]> = computed(() => [
         <base-menu
           :text="isMobile ? 'Appreciate' : constants.NAME_APPRECIATE"
           :buttons="appButtons"
-          :classes="['btn-secondary', 'btn-sm', 'px-1']"
+          :classes="['btn-secondary', 'btn-sm', 'px-1', 'brightness-90']"
           align="start"
-          style="filter: brightness(0.9);"
         />
         <span
           v-if="!isMobile"
