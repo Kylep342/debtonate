@@ -21,6 +21,7 @@ import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stor
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { useModal } from '@/apps/shared/composables/useModal';
 import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
+import { useAutoSave } from '@/apps/shared/composables/useAutoSave';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
@@ -30,6 +31,25 @@ const { isDesktop } = useBreakpoint();
 const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
   appType: 'debtonate',
   importState: state.importState,
+});
+
+useAutoSave({
+  saveFn: state.saveState,
+  isPlanLoadedFromUrl,
+  watchedSources: [
+    () => state.budgets,
+    () => state.loans,
+    () => state.reducePayments,
+    () => state.refinancingScenarios,
+    () => state.refinancingUseHighestPayment,
+    () => state.roundingEnabled,
+    () => state.roundingScale,
+    () => state.snowballSort,
+    () => state.viewPhase,
+    () => globalOptions.currency,
+    () => globalOptions.language,
+    () => globalOptions.periodsAsDates,
+  ],
 });
 
 onMounted(() => {

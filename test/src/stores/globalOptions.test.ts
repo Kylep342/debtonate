@@ -248,4 +248,80 @@ describe('Global Options Store', () => {
       window.location.hash = '';
     });
   });
+
+  describe('auto-save state persistence and triggers', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      window.location.hash = '';
+    });
+
+    it('defaults autoSaveState to false and toggles correctly', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.setAutoSaveState(false);
+
+      expect(globalOptions.autoSaveState).toBe(false);
+
+      globalOptions.toggleAutoSaveState();
+      expect(globalOptions.autoSaveState).toBe(true);
+      expect(localStorage.getItem(keys.LS_AUTO_SAVE_STATE)).toBe('true');
+
+      globalOptions.toggleAutoSaveState();
+      expect(globalOptions.autoSaveState).toBe(false);
+      expect(localStorage.getItem(keys.LS_AUTO_SAVE_STATE)).toBe('false');
+
+      globalOptions.setAutoSaveState(true);
+      expect(globalOptions.autoSaveState).toBe(true);
+      expect(localStorage.getItem(keys.LS_AUTO_SAVE_STATE)).toBe('true');
+    });
+
+    it('autoSaveIfEnabled executes callback only when autoSaveState is true', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.setAutoSaveState(false);
+
+      const saveSpy = vi.fn();
+      let result = globalOptions.autoSaveIfEnabled(saveSpy);
+      expect(result).toBe(false);
+      expect(saveSpy).not.toHaveBeenCalled();
+
+      globalOptions.setAutoSaveState(true);
+      result = globalOptions.autoSaveIfEnabled(saveSpy);
+      expect(result).toBe(true);
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('autoSaveIfEnabled does not save when URL contains plan hash', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.setAutoSaveState(true);
+      window.location.hash = '#plan=xyz789';
+
+      const saveSpy = vi.fn();
+      const result = globalOptions.autoSaveIfEnabled(saveSpy);
+      expect(result).toBe(false);
+      expect(saveSpy).not.toHaveBeenCalled();
+
+      window.location.hash = '';
+    });
+
+    it('persists and hydrates autoSaveState through saveState, loadState, and importState', () => {
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
+      globalOptions.setAutoSaveState(true);
+      globalOptions.saveState();
+
+      expect(localStorage.getItem(keys.LS_AUTO_SAVE_STATE)).toBe('true');
+
+      localStorage.setItem(keys.LS_AUTO_SAVE_STATE, 'false');
+      globalOptions.loadState();
+      expect(globalOptions.autoSaveState).toBe(false);
+
+      localStorage.setItem(keys.LS_AUTO_SAVE_STATE, 'true');
+      globalOptions.loadState();
+      expect(globalOptions.autoSaveState).toBe(true);
+
+      globalOptions.importState({ [keys.LS_AUTO_SAVE_STATE]: false });
+      expect(globalOptions.autoSaveState).toBe(false);
+
+      globalOptions.importState({ [keys.LS_AUTO_SAVE_STATE]: true });
+      expect(globalOptions.autoSaveState).toBe(true);
+    });
+  });
 });

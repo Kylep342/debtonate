@@ -25,6 +25,7 @@ type LanguageCode = (typeof constants.LOCALES)[number]['code'];
 
 export interface GlobalOptionsState {
   autoLoadState: Ref<boolean>;
+  autoSaveState: Ref<boolean>;
   baseDate: Ref<number>;
   colorPalette: ComputedRef<string[]>;
   currency: Ref<CurrencyCode>;
@@ -43,6 +44,7 @@ export interface GlobalOptionsGetters {
 
 export interface GlobalOptionsActions {
   autoLoadIfEnabled: (appType: 'debtonate' | 'appreciate', loadFn: () => void) => boolean;
+  autoSaveIfEnabled: (saveFn: () => void) => boolean;
   clearState: () => void;
   closeGlossary: () => void;
   closeShareExport: () => void;
@@ -59,9 +61,11 @@ export interface GlobalOptionsActions {
   resetAutoLoadTracking: () => void;
   saveState: () => void;
   setAutoLoadState: (value: boolean) => void;
+  setAutoSaveState: (value: boolean) => void;
   setCurrency: (newCurrency: CurrencyCode) => void;
   setLanguage: (newLanguage: LanguageCode) => void;
   toggleAutoLoadState: () => void;
+  toggleAutoSaveState: () => void;
   toggleGlossary: () => void;
   togglePeriodsAsDates: () => void;
   toggleShareExport: () => void;
@@ -109,6 +113,30 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     },
   );
 
+  const getInitialAutoSaveState = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const stored = localStorage.getItem(keys.LS_AUTO_SAVE_STATE);
+      return stored !== null ? JSON.parse(stored) === true : false;
+    } catch {
+      return false;
+    }
+  };
+
+  const autoSaveState: Ref<boolean> = ref(getInitialAutoSaveState());
+
+  watch(
+    () => autoSaveState.value,
+    (newValue) => {
+      if (typeof window === 'undefined') return;
+      try {
+        localStorage.setItem(keys.LS_AUTO_SAVE_STATE, JSON.stringify(newValue));
+      } catch {
+        // ignore
+      }
+    },
+  );
+
 
   /** COMPOSABLES */
 
@@ -138,6 +166,9 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     if (data[keys.LS_AUTO_LOAD_STATE] !== undefined) {
       autoLoadState.value = Boolean(data[keys.LS_AUTO_LOAD_STATE]);
     }
+    if (data[keys.LS_AUTO_SAVE_STATE] !== undefined) {
+      autoSaveState.value = Boolean(data[keys.LS_AUTO_SAVE_STATE]);
+    }
   };
 
   /**
@@ -150,6 +181,7 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     const storedLanguage = localStorage.getItem(keys.LS_LANGUAGE);
     const storedPeriodsAsDates = localStorage.getItem(keys.LS_PERIODS_AS_DATES);
     const storedAutoLoadState = localStorage.getItem(keys.LS_AUTO_LOAD_STATE);
+    const storedAutoSaveState = localStorage.getItem(keys.LS_AUTO_SAVE_STATE);
 
     if (storedCurrency) data[keys.LS_CURRENCY] = JSON.parse(storedCurrency);
     if (storedLanguage) data[keys.LS_LANGUAGE] = JSON.parse(storedLanguage);
@@ -157,6 +189,13 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     if (storedAutoLoadState !== null) {
       try {
         autoLoadState.value = JSON.parse(storedAutoLoadState) === true;
+      } catch {
+        // ignore
+      }
+    }
+    if (storedAutoSaveState !== null) {
+      try {
+        autoSaveState.value = JSON.parse(storedAutoSaveState) === true;
       } catch {
         // ignore
       }
@@ -181,6 +220,10 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
       keys.LS_AUTO_LOAD_STATE,
       JSON.stringify(autoLoadState.value),
     );
+    localStorage.setItem(
+      keys.LS_AUTO_SAVE_STATE,
+      JSON.stringify(autoSaveState.value),
+    );
   };
 
   const setAutoLoadState = (value: boolean): void => {
@@ -196,6 +239,37 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
 
   const toggleAutoLoadState = (): void => {
     setAutoLoadState(!autoLoadState.value);
+  };
+
+  const setAutoSaveState = (value: boolean): void => {
+    autoSaveState.value = value;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(keys.LS_AUTO_SAVE_STATE, JSON.stringify(value));
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const toggleAutoSaveState = (): void => {
+    setAutoSaveState(!autoSaveState.value);
+  };
+
+  const autoSaveIfEnabled = (saveFn: () => void): boolean => {
+    if (
+      typeof window !== 'undefined'
+      && window.location.hash
+      && window.location.hash.includes('plan=')
+    ) {
+      return false;
+    }
+
+    if (autoSaveState.value) {
+      saveFn();
+      return true;
+    }
+    return false;
   };
 
   const hasSavedState = (appType: 'debtonate' | 'appreciate'): boolean => {
@@ -404,6 +478,8 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
   return {
     autoLoadIfEnabled,
     autoLoadState,
+    autoSaveIfEnabled,
+    autoSaveState,
     baseDate,
     clearState,
     closeGlossary,
@@ -429,10 +505,12 @@ export const useGlobalOptionsStore = defineStore('globalOptions', () => {
     resetAutoLoadTracking,
     saveState,
     setAutoLoadState,
+    setAutoSaveState,
     setCurrency,
     setLanguage,
     Time,
     toggleAutoLoadState,
+    toggleAutoSaveState,
     toggleGlossary,
     togglePeriodsAsDates,
     toggleShareExport,

@@ -94,10 +94,26 @@ describe('Appreciate OptionsForm Component', () => {
     expect(wrapper.text()).toContain('Browser Local Storage & State');
     expect(wrapper.text()).toContain('Auto-load state');
 
-    const toggle = wrapper.find('input.toggle');
+    const toggle = wrapper.find('#optionsForm-auto-load');
     expect(toggle.exists()).toBe(true);
 
     await toggle.trigger('change');
     expect(globalOptions.toggleAutoLoadState).toHaveBeenCalled();
+  });
+
+  it('renders auto-save toggle next to state controls and calls toggleAutoSaveState', async () => {
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const globalOptions = useGlobalOptionsStore();
+
+    expect(wrapper.text()).toContain('Auto-save state');
+
+    const toggle = wrapper.find('#optionsForm-auto-save');
+    expect(toggle.exists()).toBe(true);
+
+    await toggle.trigger('change');
+    expect(globalOptions.toggleAutoSaveState).toHaveBeenCalled();
   });
 });

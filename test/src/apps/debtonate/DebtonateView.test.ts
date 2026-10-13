@@ -108,4 +108,20 @@ describe('DebtonateView Component', () => {
 
     expect(spy).toHaveBeenCalledWith('debtonate', expect.any(Function));
   });
+
+  it('triggers debounced state.saveState when autoSaveState is enabled and loans change', async () => {
+    vi.useFakeTimers();
+    const store = useDebtonateCoreStore();
+    const globalOptions = useGlobalOptionsStore();
+    globalOptions.setAutoSaveState(true);
+    const saveSpy = vi.spyOn(store, 'saveState');
+
+    mount(DebtonateView, { global: globalConfig });
+
+    store.createLoan(5000, 4, 2, 'Auto Loan', 5000, 0);
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(saveSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

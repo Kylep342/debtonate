@@ -20,6 +20,7 @@ import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/s
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
 import { useModal } from '@/apps/shared/composables/useModal';
 import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
+import { useAutoSave } from '@/apps/shared/composables/useAutoSave';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
@@ -29,6 +30,28 @@ const { isDesktop } = useBreakpoint();
 const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanSharing({
   appType: 'appreciate',
   importState: state.importState,
+});
+
+useAutoSave({
+  saveFn: state.saveState,
+  isPlanLoadedFromUrl,
+  watchedSources: [
+    () => state.accrueBeforeContribution,
+    () => state.budgets,
+    () => state.deflateAllMoney,
+    () => state.desiredNetIncome,
+    () => state.inflationFactor,
+    () => state.instruments,
+    () => state.retirementTaxRate,
+    () => state.selectedCareerBudgetId,
+    () => state.viewPhase,
+    () => state.withdrawalBudgets,
+    () => state.yearsToContribute,
+    () => state.yearsToSpend,
+    () => globalOptions.currency,
+    () => globalOptions.language,
+    () => globalOptions.periodsAsDates,
+  ],
 });
 
 onMounted(() => {

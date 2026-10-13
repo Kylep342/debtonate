@@ -126,4 +126,20 @@ describe('AppreciateView Component', () => {
 
     expect(spy).toHaveBeenCalledWith('appreciate', expect.any(Function));
   });
+
+  it('triggers debounced state.saveState when autoSaveState is enabled and instruments change', async () => {
+    vi.useFakeTimers();
+    const store = useAppreciateCoreStore();
+    const globalOptions = useGlobalOptionsStore();
+    globalOptions.setAutoSaveState(true);
+    const saveSpy = vi.spyOn(store, 'saveState');
+
+    mount(AppreciateView, { global: globalConfig });
+
+    store.createInstrument(10000, 7, 'Test Equity', 0);
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(saveSpy).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
 });

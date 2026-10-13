@@ -285,19 +285,34 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
                   Save your current loan portfolio to this browser, reload saved data, or copy a snapshot to your clipboard.
                 </p>
               </div>
-              <label
-                :for="`${constants.OPTIONS_FORM_ID}-auto-load`"
-                class="label cursor-pointer flex items-center gap-2 py-0 shrink-0 self-start sm:self-auto"
-              >
-                <span class="label-text text-xs text-base-content/80 font-medium whitespace-nowrap">Auto-load state</span>
-                <input
-                  :id="`${constants.OPTIONS_FORM_ID}-auto-load`"
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  :checked="globalOptions.autoLoadState"
-                  @change="globalOptions.toggleAutoLoadState"
+              <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 self-start sm:self-auto">
+                <label
+                  :for="`${constants.OPTIONS_FORM_ID}-auto-load`"
+                  class="label cursor-pointer flex items-center gap-2 py-0 shrink-0"
                 >
-              </label>
+                  <span class="label-text text-xs text-base-content/80 font-medium whitespace-nowrap">Auto-load state</span>
+                  <input
+                    :id="`${constants.OPTIONS_FORM_ID}-auto-load`"
+                    type="checkbox"
+                    class="toggle toggle-primary toggle-sm"
+                    :checked="globalOptions.autoLoadState"
+                    @change="globalOptions.toggleAutoLoadState"
+                  >
+                </label>
+                <label
+                  :for="`${constants.OPTIONS_FORM_ID}-auto-save`"
+                  class="label cursor-pointer flex items-center gap-2 py-0 shrink-0"
+                >
+                  <span class="label-text text-xs text-base-content/80 font-medium whitespace-nowrap">Auto-save state</span>
+                  <input
+                    :id="`${constants.OPTIONS_FORM_ID}-auto-save`"
+                    type="checkbox"
+                    class="toggle toggle-primary toggle-sm"
+                    :checked="globalOptions.autoSaveState"
+                    @change="globalOptions.toggleAutoSaveState"
+                  >
+                </label>
+              </div>
             </div>
             <div class="flex flex-wrap gap-2 pt-1">
               <base-button
