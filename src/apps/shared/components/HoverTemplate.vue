@@ -34,7 +34,7 @@ onUpdated(reportSize);
 <template>
   <div
     ref="templateRef"
-    class="bg-base-200/95 backdrop-blur-md border border-base-content/15 shadow-2xl rounded-xl p-3 text-xs text-base-content min-w-48 max-w-xs pointer-events-none"
+    class="bg-base-200/95 backdrop-blur-md border border-base-content/15 shadow-2xl rounded-xl p-3 text-xs text-base-content min-w-48 max-w-sm pointer-events-none"
   >
     <div class="flex items-center justify-between border-b border-base-content/10 pb-1.5 mb-2">
       <span class="font-semibold text-[11px] text-base-content/70">{{ tooltipConfig.xLabel }}</span>
@@ -67,8 +67,8 @@ onUpdated(reportSize);
           <td class="p-1 font-medium truncate max-w-[120px]">
             {{ tooltipConfig.lineName(id) }}
           </td>
-          <td class="p-1 text-right font-mono font-bold">
-            {{ tooltipConfig.yFormat(getPointVal(line)) }}
+          <td class="p-1 text-right font-mono font-bold whitespace-nowrap">
+            {{ tooltipConfig.yFormat(getPointVal(line), id as string, index) }}
           </td>
         </tr>
       </tbody>

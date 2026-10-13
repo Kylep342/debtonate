@@ -63,7 +63,7 @@ export type GraphConfig<TGraphContent extends GraphContent = GraphContent> = {
   x: (value: any) => any;
   y: (value: any) => any;
   xFormat: (value: number | Date) => string | number | Date;
-  yFormat: (value: number) => string;
+  yFormat: (value: number, id?: string, period?: number) => string;
   xScale: () => d3.ScaleTime<number, number, any> | d3.ScaleLinear<number, number, any>;
   yScale: () => d3.ScaleLinear<number, number, any>;
 };
@@ -75,7 +75,7 @@ export type TooltipConfig = {
   lines: Record<string, Point[]>;
   color: (id: string) => string;
   lineName: (id: string) => string;
-  yFormat: (value: number) => string;
+  yFormat: (value: number, id?: string, period?: number) => string;
   seriesLabel?: string;
   valueLabel?: string;
 };

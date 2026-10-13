@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import GraphsPanel from '@/apps/appreciate/components/GraphsPanel.vue';
-import InvestigateSummary from '@/apps/appreciate/investigate/components/InvestigateSummary.vue';
 import { useAppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import constants from '@/apps/appreciate/constants/constants';
 import { Button } from '@/apps/shared/types/app';
@@ -19,17 +18,15 @@ const careerBudgetSelectors = computed<Button[]>(
     onClick: () => state.setSelectedCareerBudgetId(budget.id),
   })))
 );
-
-const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
 </script>
 
 <template>
   <div :class="['m-4', 'flex-1', 'flex', 'flex-col', 'items-center']">
     <div :class="['w-full', 'max-w-6xl']">
-      <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4', 'mb-2']">
+      <div :class="['header', 'flex', 'justify-between', 'items-center', 'pr-4']">
         <h2>Retirement Analysis</h2>
       </div>
-      <GraphsPanel :extra-view-ids="[EXTRA_VIEW_RETIREMENT_SUMMARY]">
+      <GraphsPanel>
         <template #extraPivot>
           <base-menu
             :text="investmentAnalysisPivotText"
@@ -37,9 +34,6 @@ const EXTRA_VIEW_RETIREMENT_SUMMARY = 'Retirement Summary';
             :classes="['btn-outline', 'btn-sm']"
             align="start"
           />
-        </template>
-        <template #[`view-${EXTRA_VIEW_RETIREMENT_SUMMARY}`]>
-          <InvestigateSummary />
         </template>
       </GraphsPanel>
     </div>

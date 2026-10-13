@@ -675,13 +675,47 @@ describe('Debtonate Core Store', () => {
 
     it('computes interest saved over time graph content', async () => {
       const state: DebtonateCoreStore = useDebtonateCoreStore();
+      const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
       state.budgets = Budgets();
       state.loans = Loans();
 
+      const config = state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME];
       expect(
-        Object.keys(state.graphs[constants.GRAPH_INTEREST_SAVED_OVER_TIME].graphs || {}).sort()
+        Object.keys(config.graphs || {}).sort()
       ).toStrictEqual(
         state.loansWithTotals.map((loan: UIDebtLoan) => loan.id).sort()
+      );
+
+      // Verify benchmark reference line for default payment interest
+      const totalLoanId = constants.TOTALS;
+      const totalGraph = config.graphs?.[totalLoanId];
+      expect(totalGraph?.lines[constants.DEFAULT]).toBeUndefined();
+      expect(totalGraph?.lines['default_interest_ref']).toBeDefined();
+
+      const expectedDefaultInterest = state.getLifetimeInterest(totalLoanId, constants.DEFAULT);
+      const benchmarkPoints = totalGraph?.lines['default_interest_ref'] || [];
+      expect(benchmarkPoints.length).toBe(state.getNumPayments(totalLoanId, constants.DEFAULT));
+      benchmarkPoints.forEach((pt) => {
+        expect(pt.y).toBe(expectedDefaultInterest);
+      });
+
+      // Verify benchmark styling and metadata
+      expect(config.strokeDasharray?.('default_interest_ref')).toBe('5,5');
+      expect(config.strokeWidth?.('default_interest_ref')).toBe(2.5);
+      expect(config.color('default_interest_ref')).toBe('#a855f7');
+      expect(config.seriesLabel?.()).toBe('Budget / Metric');
+      expect(config.lineName('default_interest_ref')).toBe(
+        'Default Payment (Saved | Paid)'
+      );
+      expect(config.valueLabel?.()).toBe('Saved | Paid');
+      expect(config.yFormat(expectedDefaultInterest, 'default_interest_ref')).toBe(
+        `${globalOptions.Money(0)} | ${globalOptions.Money(expectedDefaultInterest)}`
+      );
+      const testBudgetId = state.budgets[0].id;
+      const testPeriod = 10;
+      const expectedPaid = state.getInterestUpToPeriod(totalLoanId, testBudgetId, testPeriod);
+      expect(config.yFormat(500, testBudgetId, testPeriod)).toBe(
+        `${globalOptions.Money(500)} | ${globalOptions.Money(expectedPaid)}`
       );
     });
 

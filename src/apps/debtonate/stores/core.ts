@@ -692,39 +692,64 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       const graphs = <Graphs<LineGraphContent>>{};
 
       loansWithTotals.value.forEach((loan: UIDebtLoan) => {
+        const lines = <ChartSeries<Point>>{};
+        const maxX = getNumPayments(loan.id, constants.DEFAULT);
+        const defaultInterest = getLifetimeInterest(loan.id, constants.DEFAULT);
+
+        monthlyBudgets.value
+          .filter((budget: MonthlyBudget) => budget.id !== constants.DEFAULT)
+          .forEach((budget: MonthlyBudget) => {
+            const line: Point[] = [];
+            getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach(
+              (record: paymentTypes.PaymentRecord, index: number) => {
+                line.push({
+                  x: record.period,
+                  y:
+                    getInterestUpToPeriod(loan.id, constants.DEFAULT, index) -
+                    getInterestUpToPeriod(loan.id, budget.id, index),
+                });
+              }
+            );
+            lines[budget.id] = line;
+          });
+
+        // Benchmark reference line for interest paid on default payment (max ceiling line)
+        const defaultInterestLine: Point[] = [];
+        for (let p = 1; p <= maxX; p++) {
+          defaultInterestLine.push({ x: p, y: defaultInterest });
+        }
+        lines['default_interest_ref'] = defaultInterestLine;
+
         graphs[loan.id] = <LineGraphContent>{
           config: {
             minX: 1,
             minY: 0,
-            maxX: getNumPayments(loan.id, constants.DEFAULT),
-            maxY: getLifetimeInterest(loan.id, constants.DEFAULT),
+            maxX,
+            maxY: defaultInterest,
           },
-          lines: <ChartSeries<Point>>{},
+          lines,
         };
-        monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
-          const line: Point[] = [];
-          getPaymentSchedule(loan.id, constants.DEFAULT).amortizationSchedule.forEach(
-            (record: paymentTypes.PaymentRecord, index: number) => {
-              line.push({
-                x: record.period,
-                y:
-                  getInterestUpToPeriod(loan.id, constants.DEFAULT, index) -
-                  getInterestUpToPeriod(loan.id, budget.id, index),
-              });
-            }
-          );
-          graphs[loan.id].lines[budget.id] = line;
-        });
       });
       return <GraphConfig<LineGraphContent>>{
         id: 'InterestSaved',
         type: 'line',
-        color: getBudgetColor,
+        color: (id: string) =>
+          id === 'default_interest_ref' ? '#a855f7' : getBudgetColor(id),
+        strokeDasharray: (id: string) =>
+          id === 'default_interest_ref' ? '5,5' : undefined,
+        strokeWidth: (id: string) =>
+          id === 'default_interest_ref' ? 2.5 : 2,
         graphs: graphs,
         header: (loanId: string) =>
           `Interest Saved over Time by Budget - ${getLoanName(loanId)}`,
-        lineName: getBudgetAbsoluteRate,
-        seriesLabel: () => 'Budget',
+        lineName: (id: string) => {
+          if (id === 'default_interest_ref') {
+            return 'Default Payment (Saved | Paid)';
+          }
+          return getBudgetAbsoluteRate(id);
+        },
+        seriesLabel: () => 'Budget / Metric',
+        valueLabel: () => 'Saved | Paid',
         subheader: () =>
           'Calculate cumulative dollars saved and interest expense eliminated compared to minimum payments',
         x: globalOptions.Period,
@@ -732,7 +757,18 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         xLabel: () => globalOptions.Time,
         xScale: graphXScale.value,
         y: (y: number) => y,
-        yFormat: globalOptions.Money,
+        yFormat: (y: number, id?: string, period?: number) => {
+          if (!id || typeof id !== 'string') {
+            return globalOptions.Money(y);
+          }
+          if (id === 'default_interest_ref') {
+            return `${globalOptions.Money(0)} | ${globalOptions.Money(y)}`;
+          }
+          const parentId = selectedLoanId.value || constants.TOTALS;
+          const p = period !== undefined ? period : 0;
+          const paid = getInterestUpToPeriod(parentId, id, p);
+          return `${globalOptions.Money(y)} | ${globalOptions.Money(paid)}`;
+        },
         yLabel: () => 'Interest Saved',
         yScale: d3.scaleLinear,
       };
