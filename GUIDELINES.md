@@ -10,7 +10,9 @@
  - Assume in our back and forth changes I give you are intentional and incorporate them. If you think I make a mistake, ask a clarifying question before changing my changes
 
 ## Development
- - All code should be linted and covered by unit tests
+ - All code should be linted and covered by unit tests conforming to the high test coverage standard: Statements (>80%), Branches (>65%), Functions (>75%), Lines (>80%).
+ - In all future work, opportunistically look for ways to effectively continue increasing test coverage across components, views, applets, formlets, composables, and stores.
+ - Follow the AFWAP principle (*As Far / Faithful / Full As Practicable*): prioritize testing real reactive state transitions, user interactions, event emissions, slot pass-throughs, and computed metrics over artificial or shallow mocking.
  - Everything Javascript is Typescript
  - Standard verification commands:
    - `./dev.sh`: Concurrent development runner that installs dependencies, launches the Vite dev server, Tailwind CSS watcher (`npm run cssw`), and Vitest unit test suite with output piped to `logs/*.log`.
@@ -22,6 +24,8 @@
 
 
 ## Discovered Guidelines
+- **High-Coverage Standard & Opportunistic Expansion**: Maintain and continuously elevate the test coverage bar (baseline: Statements >82%, Branches >66%, Functions >76%, Lines >83%). In any feature, fix, or refactor, opportunistically identify zero-coverage or low-coverage components, views, formlets, composables, or store actions and add thorough unit tests.
+- **AFWAP Testing Philosophy (*As Far / Faithful / Full As Practicable*)**: Write tests that exercise real component behavior, lifecycle hooks, viewport breakpoint switching (desktop vs mobile), template slot forwarding, and Pinia store actions with real mathematical state transitions. Stub only heavy external boundaries (e.g., Plotly canvas frames or native `<dialog>` APIs).
 - **Unused Parameters & Code Cleanliness**: Omit unused callback parameters completely (e.g. `() => ...`) rather than keeping unused identifiers or underscore prefixes.
 - **Global Formatting**: Always use `useGlobalOptionsStore` methods (`Money`, `Percent`, `Period`, `CurrencySymbol`) for currency and date formatting to ensure internationalization consistency across Debtonate and Appreciate.
 - **Pinia Store Architecture**: Stores use the Setup syntax (`defineStore('name', () => { ... })`) with explicit TypeScript interfaces for State, Getters, and Actions.

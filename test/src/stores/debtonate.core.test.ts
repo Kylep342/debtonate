@@ -764,4 +764,193 @@ describe('Debtonate Core Store', () => {
     expect(state.roundingScale).toBe(25);
     expect(globalOptions.currency).toBe('EUR');
   });
+
+  describe('Debtonate Store Actions', () => {
+    it('handles loan CRUD, selection, and viewing', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      const loanId = state.createLoan(10000, 0.05, 5, 'Car Loan', 8000, 100);
+
+      expect(state.loans.length).toBe(1);
+      expect(state.getLoan(loanId)?.name).toBe('Car Loan');
+      expect(state.getLoanName(loanId)).toBe('Car Loan');
+      expect(state.getLoanIndex(loanId)).toBeGreaterThanOrEqual(0);
+
+      state.viewLoan(loanId);
+      expect(state.loanDetailsPanelActive).toBe(true);
+      expect(state.currentLoanId).toBe(loanId);
+
+      state.unviewLoan();
+      expect(state.loanDetailsPanelActive).toBe(false);
+      expect(state.currentLoanId).toBeNull();
+
+      state.openLoanForm();
+      expect(state.loanFormActive).toBe(true);
+      state.exitLoanForm();
+      expect(state.loanFormActive).toBe(false);
+
+      state.editLoan(loanId);
+      expect(state.currentLoanId).toBe(loanId);
+      expect(state.loanFormActive).toBe(true);
+
+      state.deleteLoan(loanId);
+      expect(state.loans.length).toBe(0);
+    });
+
+    it('handles budget CRUD, selection, and viewing', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      const budgetId = state.createBudget(300);
+
+      expect(state.budgets.length).toBe(1);
+      expect(state.getBudget(budgetId)?.relative).toBe(300);
+      expect(state.getBudgetName(budgetId)).toBe('Budget 1');
+      expect(state.getBudgetName(constants.DEFAULT)).toBe(constants.NAME_MIN_BUDGET);
+      expect(state.getBudgetIndex(budgetId)).toBeGreaterThanOrEqual(1);
+      expect(state.getBudgetColor(budgetId)).toBeDefined();
+
+      state.viewBudget(budgetId);
+      expect(state.budgetDetailsPanelActive).toBe(true);
+      expect(state.currentBudgetId).toBe(budgetId);
+
+      state.unviewBudget();
+      expect(state.budgetDetailsPanelActive).toBe(false);
+      expect(state.currentBudgetId).toBeNull();
+
+      state.openBudgetForm();
+      expect(state.budgetFormActive).toBe(true);
+      state.exitBudgetForm();
+      expect(state.budgetFormActive).toBe(false);
+
+      state.editBudget(budgetId);
+      expect(state.currentBudgetId).toBe(budgetId);
+      expect(state.budgetFormActive).toBe(true);
+
+      state.deleteBudget(budgetId);
+      expect(state.budgets.length).toBe(0);
+    });
+
+    it('handles refinancing scenarios and options', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      const loanId = state.createLoan(10000, 0.05, 5, 'Mortgage', 10000, 0);
+
+      state.refinanceLoan(loanId);
+      expect(state.refinancingFormActive).toBe(true);
+      expect(state.currentLoanId).toBe(loanId);
+      state.exitRefinancingForm();
+      expect(state.refinancingFormActive).toBe(false);
+      expect(state.currentLoanId).toBeNull();
+
+      const scenarioId = state.createRefinanceScenario(loanId, 10000, 0.04, 4, 'Better Rate', 50);
+      expect(state.refinancingScenarios[loanId]?.length).toBe(1);
+
+      const parentLoan = state.getLoan(loanId)!;
+      const scenarioLoan = state.refinancingScenarios[loanId][0];
+      const pmt = state.refinancingScenarioPayment(parentLoan, scenarioLoan);
+      expect(pmt).toBeGreaterThan(0);
+
+      state.toggleRefinancingUseHighestPayment();
+      expect(state.refinancingUseHighestPayment).toBe(true);
+      const highestPmt = state.refinancingScenarioPayment(parentLoan, scenarioLoan);
+      expect(highestPmt).toBeGreaterThanOrEqual(pmt);
+
+      state.deleteRefinancingScenario(loanId, scenarioId);
+      expect(state.refinancingScenarios[loanId]?.length).toBe(0);
+    });
+
+    it('handles sorting toggles, phases, and rounding scale', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      state.loans = Loans();
+
+      state.toggleSnowballSort();
+      expect(state.snowballSort).toBe(true);
+
+      state.toggleAvalancheSort();
+      expect(state.snowballSort).toBe(false);
+
+      state.toggleReducePayments();
+      expect(state.reducePayments).toBe(false);
+
+      state.toggleRounding(50);
+      expect(state.roundingEnabled).toBe(true);
+      expect(state.roundingScale).toBe(50);
+
+      state.setRoundingScale(25);
+      expect(state.roundingScale).toBe(25);
+
+      state.setSelectedLoanId('custom-id');
+      expect(state.selectedLoanId).toBe('custom-id');
+
+      state.setPhase(constants.PHASE_REPATRIATE);
+      expect(state.viewPhase).toBe(constants.PHASE_REPATRIATE);
+
+      state.openOptionsForm();
+      expect(state.optionsFormActive).toBe(true);
+      state.exitOptionsForm();
+      expect(state.optionsFormActive).toBe(false);
+    });
+
+    it('handles persistence: saveState, loadState, clearState, and exportState', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      state.loans = Loans();
+      state.budgets = Budgets();
+      state.roundingEnabled = true;
+      state.roundingScale = 50;
+
+      const exported = state.exportState();
+      expect(exported[keys.LS_LOANS].length).toBe(3);
+      expect(exported[keys.LS_BUDGETS].length).toBe(3);
+
+      state.saveState();
+      expect(localStorage.getItem(keys.LS_LOANS)).toBeDefined();
+
+      state.clearState();
+      expect(state.loans.length).toBe(0);
+      expect(state.budgets.length).toBe(0);
+      expect(state.roundingEnabled).toBe(false);
+
+      state.loadState();
+      expect(state.loans.length).toBe(3);
+      expect(state.budgets.length).toBe(3);
+      expect(state.roundingEnabled).toBe(true);
+    });
+
+    it('builds subtitles, table titles, amortization rows, and totals', () => {
+      const state: DebtonateCoreStore = useDebtonateCoreStore();
+      state.loans = Loans();
+      state.budgets = Budgets();
+
+      const baseLoan = state.loans[0];
+      const budget = state.monthlyBudgets[0];
+
+      const sub = state.buildLoanSubtitle(baseLoan);
+      expect(sub).toContain('Payments');
+
+      const title = state.buildAmortizationTableTitle(baseLoan, budget);
+      expect(title).toContain('Amortization Table');
+
+      const tableSub = state.buildAmortizationTableSubtitle(baseLoan, budget);
+      expect(tableSub).toContain('/month');
+
+      const schedule = state.getPaymentSchedule(baseLoan.id, budget.id);
+      const rows = state.amortizationTableRows(schedule);
+      expect(rows.length).toBe(schedule.amortizationSchedule.length);
+
+      const totals = state.amortizationTableTotals(schedule);
+      expect(totals[constants.TK_PERIOD]).toBe('Totals');
+
+      const numPayments = state.getNumPayments(baseLoan.id, budget.id);
+      expect(numPayments).toBe(schedule.amortizationSchedule.length);
+
+      const lifetimeInterest = state.getLifetimeInterest(baseLoan.id, budget.id);
+      expect(lifetimeInterest).toBeGreaterThan(0);
+
+      const partialInterest = state.getInterestUpToPeriod(baseLoan.id, budget.id, 5);
+      expect(partialInterest).toBeGreaterThan(0);
+
+      const loanComp = state.getLoanComparativeAnalysis(baseLoan.id);
+      expect(loanComp).toBeDefined();
+
+      const budgetComp = state.getBudgetComparativeAnalysis(budget.id);
+      expect(budgetComp).toBeDefined();
+    });
+  });
 });

@@ -31,14 +31,46 @@ describe('InstrumentsPanel Component (Appreciate)', () => {
     }
   };
 
-  it('renders ListPanel with instruments and title', async () => {
+  it('renders ListPanel with instruments and handles pivot selection and creation in career phase', async () => {
     const store = useAppreciateCoreStore();
-    (store as any).instrumentsWithTotals = [];
-    (store as any).monthlyBudgets = [];
-    (store as any).monthlyWithdrawalBudgets = [];
+    (store as any).instrumentsWithTotals = [{ id: 'inst-1', name: 'IRA' }];
+    (store as any).monthlyBudgets = [{ id: 'b-1', absolute: 500 }];
+    (store as any).getBudgetName = vi.fn().mockReturnValue('Career Budget 1');
     store.viewPhase = constants.PHASE_CAREER as any;
 
     const wrapper = mount(InstrumentsPanel, { global: globalConfig });
     expect(wrapper.text()).toContain(constants.INSTRUMENTS);
+
+    // Verify InstrumentCard stub rendered
+    expect(wrapper.findComponent({ name: 'InstrumentCard' }).exists()).toBe(true);
+
+    const listPanel = wrapper.findComponent(ListPanel);
+    const pivotMenu = listPanel.props('pivotMenu');
+    expect(pivotMenu.buttons.length).toBe(1);
+    expect(pivotMenu.buttons[0].text).toBe('Career Budget 1');
+    pivotMenu.buttons[0].onClick();
+
+    listPanel.props('createItem')();
+    expect(store.openInstrumentForm).toHaveBeenCalled();
+  });
+
+  it('switches to withdrawal budgets in retirement phase and resets viewedItemId on phase change', async () => {
+    const store = useAppreciateCoreStore();
+    (store as any).instrumentsWithTotals = [{ id: 'inst-1', name: 'IRA' }];
+    (store as any).monthlyWithdrawalBudgets = [{ id: 'w-1', absolute: 3000 }];
+    (store as any).getWithdrawalBudgetName = vi.fn().mockReturnValue('Withdrawal 1');
+    store.viewPhase = constants.PHASE_RETIREMENT as any;
+
+    const wrapper = mount(InstrumentsPanel, { global: globalConfig });
+
+    const listPanel = wrapper.findComponent(ListPanel);
+    const pivotMenu = listPanel.props('pivotMenu');
+    expect(pivotMenu.buttons.length).toBe(1);
+    expect(pivotMenu.buttons[0].text).toBe('Withdrawal 1');
+    pivotMenu.buttons[0].onClick();
+
+    // Trigger watcher by changing viewPhase
+    store.viewPhase = constants.PHASE_CAREER as any;
+    await wrapper.vm.$nextTick();
   });
 });

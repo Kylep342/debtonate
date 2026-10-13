@@ -895,4 +895,187 @@ describe('Appreciate Core Store', () => {
     state.clearState();
     expect(state.selectedInstrumentId).toBe(constants.TOTALS);
   });
+
+  describe('Appreciate Store Actions', () => {
+    it('handles instrument CRUD, selection, and viewing', () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      const instId = state.createInstrument(50000, 0.08, 'Roth IRA', 7000);
+
+      expect(state.instruments.length).toBe(1);
+      expect(state.getInstrument(instId)?.name).toBe('Roth IRA');
+      expect(state.getInstrumentName(instId)).toBe('Roth IRA');
+      expect(state.getInstrumentIndex(instId)).toBeGreaterThanOrEqual(0);
+
+      state.viewInstrument(instId);
+      expect(state.instrumentDetailsPanelActive).toBe(true);
+      expect(state.currentInstrumentId).toBe(instId);
+
+      state.unviewInstrument();
+      expect(state.instrumentDetailsPanelActive).toBe(false);
+      expect(state.currentInstrumentId).toBeNull();
+
+      state.openInstrumentForm();
+      expect(state.instrumentFormActive).toBe(true);
+      state.exitInstrumentForm();
+      expect(state.instrumentFormActive).toBe(false);
+
+      state.editInstrument(instId);
+      expect(state.currentInstrumentId).toBe(instId);
+      expect(state.instrumentFormActive).toBe(true);
+
+      state.deleteInstrument(instId);
+      expect(state.instruments.length).toBe(0);
+    });
+
+    it('handles withdrawal budget CRUD and naming', () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      const wBudgetId = state.createWithdrawalBudget(4500);
+
+      expect(state.withdrawalBudgets.length).toBe(1);
+      expect(state.getWithdrawalBudget(wBudgetId)?.relative).toBe(4500);
+      expect(state.getWithdrawalBudgetName(wBudgetId)).toBe('Withdrawal 1');
+      expect(state.getWithdrawalBudgetName(constants.DEFAULT)).toBe('Target Income');
+
+      state.editWithdrawalBudget(wBudgetId);
+      expect(state.currentBudgetId).toBe(wBudgetId);
+      expect(state.budgetFormActive).toBe(true);
+
+      state.deleteWithdrawalBudget(wBudgetId);
+      expect(state.withdrawalBudgets.length).toBe(0);
+    });
+
+    it('handles settings, phase toggles, and deflation', () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+
+      state.setPhase(constants.PHASE_RETIREMENT);
+      expect(state.viewPhase).toBe(constants.PHASE_RETIREMENT);
+
+      state.togglePhase();
+      expect(state.viewPhase).toBe(constants.PHASE_CAREER);
+
+      state.setDesiredNetIncome(5000);
+      expect(state.desiredNetIncome).toBe(5000);
+
+      state.setRetirementTaxRate(15);
+      expect(state.retirementTaxRate).toBe(15);
+
+      state.setInflationFactor(3.5);
+      expect(state.inflationFactor).toBe(3.5);
+
+      state.setYearsToContribute(25);
+      expect(state.yearsToContribute).toBe(25);
+
+      state.setYearsToSpend(35);
+      expect(state.yearsToSpend).toBe(35);
+
+      state.setSelectedCareerBudgetId('b-test');
+      expect(state.selectedCareerBudgetId).toBe('b-test');
+
+      state.toggleAccrueBeforeContribution();
+      expect(state.accrueBeforeContribution).toBe(true);
+
+      state.toggleDeflateAllMoney(2.5);
+      expect(state.deflateAllMoney).toBe(true);
+      expect(state.inflationFactor).toBe(2.5);
+
+      const deflated = state.deflate(1000, 12);
+      expect(deflated).toBeLessThan(1000);
+
+      state.openOptionsForm();
+      expect(state.optionsFormActive).toBe(true);
+      state.exitOptionsForm();
+      expect(state.optionsFormActive).toBe(false);
+    });
+
+    it('handles persistence: saveState, loadState, clearState, and exportState', () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.instruments = Instruments();
+      state.budgets = Budgets();
+      state.withdrawalBudgets = [{ id: 'w1', relative: 4000 }];
+      state.desiredNetIncome = 4500;
+      state.retirementTaxRate = 12;
+
+      const exported = state.exportState();
+      expect(exported[keys.LS_INSTRUMENTS].length).toBe(3);
+      expect(exported[keys.LS_BUDGETS].length).toBe(3);
+      expect(exported[keys.LS_WITHDRAWAL_BUDGETS].length).toBe(1);
+
+      state.saveState();
+      expect(localStorage.getItem(keys.LS_INSTRUMENTS)).toBeDefined();
+
+      state.clearState();
+      expect(state.instruments.length).toBe(0);
+      expect(state.budgets.length).toBe(0);
+      expect(state.withdrawalBudgets.length).toBe(0);
+
+      state.loadState();
+      expect(state.instruments.length).toBe(3);
+      expect(state.budgets.length).toBe(3);
+      expect(state.withdrawalBudgets.length).toBe(1);
+      expect(state.desiredNetIncome).toBe(4500);
+      expect(state.retirementTaxRate).toBe(12);
+    });
+
+    it('builds subtitles, table titles, rows, and totals for career and retirement', () => {
+      const state: AppreciateCoreStore = useAppreciateCoreStore();
+      state.instruments = Instruments();
+      state.budgets = Budgets();
+      state.withdrawalBudgets = [{ id: 'w1', relative: 3500 }];
+
+      const inst = state.instruments[0];
+      const budget = state.monthlyBudgets[0];
+
+      // Career phase subtitles and tables
+      state.setPhase(constants.PHASE_CAREER);
+      const instSub = state.buildInstrumentSubtitle(inst);
+      expect(instSub).toContain('%');
+
+      const title = state.buildAmortizationTableTitle(inst, budget);
+      expect(title).toContain('Amortization Table');
+
+      const subtitle = state.buildAmortizationTableSubtitle(inst, budget);
+      expect(subtitle).toContain('Contributions');
+
+      const sched = state.getContributionSchedule(inst.id, budget.id);
+      const rows = state.amortizationTableRows(sched);
+      expect(rows.length).toBe(sched.amortizationSchedule.length);
+
+      const totals = state.amortizationTableTotals(sched);
+      expect(totals[constants.TK_PERIOD]).toBe('Totals');
+
+      const numContribs = state.getNumContributions(inst.id, budget.id);
+      expect(numContribs).toBe(sched.amortizationSchedule.length);
+
+      const maxBal = state.getMaxMoney(inst.id);
+      expect(maxBal).toBeGreaterThan(0);
+
+      const instComp = state.getInstrumentComparativeAnalysis(inst.id);
+      expect(instComp).toBeDefined();
+
+      const budgetComp = state.getBudgetComparativeAnalysis(budget.id);
+      expect(budgetComp).toBeDefined();
+
+      // Retirement phase subtitles and tables
+      state.setPhase(constants.PHASE_RETIREMENT);
+      const wBudget = state.monthlyWithdrawalBudgets[0];
+      const retTitle = state.buildAmortizationTableTitle(inst, wBudget);
+      expect(retTitle).toContain('Amortization Table');
+
+      const retSub = state.buildAmortizationTableSubtitle(inst, wBudget);
+      expect(retSub).toContain('Withdrawals');
+
+      const wSched = state.getWithdrawalSchedule(inst.id, wBudget.id);
+      const wRows = state.amortizationTableRows(wSched);
+      expect(wRows.length).toBe(wSched.amortizationSchedule.length);
+
+      const wTotals = state.amortizationTableTotals(wSched);
+      expect(wTotals[constants.TK_PERIOD]).toBe('Totals');
+
+      const numWithdrawals = state.getNumWithdrawals(inst.id, wBudget.id);
+      expect(numWithdrawals).toBe(wSched.amortizationSchedule.length);
+
+      const steady = state.getSteadyStateMonthlyWithdrawal(inst.id, wBudget.id);
+      expect(steady).toBeGreaterThanOrEqual(0);
+    });
+  });
 });

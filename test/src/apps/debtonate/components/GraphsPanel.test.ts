@@ -59,4 +59,33 @@ describe('GraphsPanel Component (Debtonate)', () => {
     const graphsFrame = wrapper.findComponent({ name: 'GraphsFrame' });
     expect(graphsFrame.props('initialItemId')).toBe(constants.TOTALS);
   });
+
+  it('forwards extraPivot and dynamic extraView slots to GraphsFrame', () => {
+    const wrapper = mount(GraphsPanel, {
+      props: {
+        extraViewIds: ['custom-tab'],
+      },
+      slots: {
+        extraPivot: '<div data-testid="extra-pivot-content">Pivot Slot</div>',
+        'view-custom-tab': '<template #default="{ viewedItemId }"><div data-testid="custom-view-content">{{ viewedItemId }}</div></template>',
+      },
+      global: {
+        stubs: {
+          GraphsFrame: {
+            name: 'GraphsFrame',
+            template: `
+              <div class="graphs-frame">
+                <slot name="extraPivot" />
+                <slot name="view-custom-tab" :viewed-item-id="'test-item-id'" />
+              </div>
+            `,
+            props: ['extraViewIds'],
+          },
+        },
+      },
+    });
+
+    expect(wrapper.find('[data-testid="extra-pivot-content"]').text()).toBe('Pivot Slot');
+    expect(wrapper.find('[data-testid="custom-view-content"]').text()).toBe('test-item-id');
+  });
 });

@@ -31,12 +31,26 @@ describe('LoansPanel Component (Debtonate)', () => {
     }
   };
 
-  it('renders ListPanel with loans and title', async () => {
+  it('renders ListPanel with loans and title, and handles pivot selection and creation', async () => {
     const store = useDebtonateCoreStore();
-    (store as any).loansWithTotals = [];
-    (store as any).monthlyBudgets = [];
+    (store as any).loansWithTotals = [{ id: 'loan-1', name: 'Loan 1' }];
+    (store as any).monthlyBudgets = [{ id: 'b-1', absolute: 500 }];
+    (store as any).getBudgetName = vi.fn().mockReturnValue('Budget 1');
 
     const wrapper = mount(LoansPanel, { global: globalConfig });
     expect(wrapper.text()).toContain(constants.LOANS);
+
+    // Verify LoanCard stub rendered for the loan item
+    expect(wrapper.findComponent({ name: 'LoanCard' }).exists()).toBe(true);
+
+    // Call pivot button onClick
+    const listPanel = wrapper.findComponent(ListPanel);
+    const pivotMenu = listPanel.props('pivotMenu');
+    expect(pivotMenu.buttons.length).toBe(1);
+    pivotMenu.buttons[0].onClick();
+
+    // Verify createItem calls openLoanForm
+    listPanel.props('createItem')();
+    expect(store.openLoanForm).toHaveBeenCalled();
   });
 });
