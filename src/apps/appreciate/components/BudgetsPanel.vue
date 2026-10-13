@@ -49,7 +49,7 @@ const orderedBudgets: ComputedRef<MonthlyBudget[]> = computed(() => [
 ]);
 
 const panelTitle = computed(() => isCareerPhase.value ? constants.BUDGETS : constants.WITHDRAWALS);
-const createBudgetAction = () => isCareerPhase.value ? state.openBudgetForm() : state.openBudgetForm(); // TODO: withdrawal form
+const createBudgetAction = () => state.openBudgetForm();
 </script>
 
 <template>

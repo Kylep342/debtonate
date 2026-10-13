@@ -16,7 +16,7 @@ const fields: FormField[] = [
     placeholder: 'e.g., Pension, Stock, Property',
   },
   { key: 'currentBalance', label: 'Current Balance', type: 'number', step: '0.01', required: true },
-  { key: 'interestRate', label: 'Interest Rate', type: 'number', step: '0.01', required: true },
+  { key: 'interestRate', label: 'Expected Return', type: 'number', step: '0.01', required: true },
   { key: 'annualLimit', label: 'Annual Limit (Optional)', type: 'number', step: '0.01', required: false },
 ];
 

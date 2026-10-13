@@ -54,6 +54,7 @@ export interface AppreciateCoreState {
   minimumBudget: Budget;
   optionsFormActive: Ref<boolean>;
   selectedCareerBudgetId: Ref<string | null>;
+  selectedInstrumentId: Ref<string | null>;
   viewPhase: Ref<string>;
   withdrawalBudgets: Ref<Budget[]>;
   yearsToContribute: Ref<number>;
@@ -199,6 +200,7 @@ export interface AppreciateCoreActions {
   openOptionsForm: () => void;
   saveState: () => void;
   setSelectedCareerBudgetId: (id: string) => void;
+  setSelectedInstrumentId: (id: string | null) => void;
   setDesiredNetIncome: (newIncome: number) => void;
   setRetirementTaxRate: (newRate: number) => void;
   setInflationFactor: (newFactor: number) => void;
@@ -299,6 +301,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const minimumBudget: Budget = { id: constants.DEFAULT, relative: 0 };
   const optionsFormActive: Ref<boolean> = ref(false);
   const selectedCareerBudgetId: Ref<string | null> = ref(constants.DEFAULT);
+  const selectedInstrumentId: Ref<string | null> = ref(constants.TOTALS);
   const viewPhase: Ref<string> = ref(constants.PHASE_CAREER);
   const withdrawalBudgets: Ref<Budget[]> = ref([]);
   const yearsToContribute: Ref<number> = ref(
@@ -538,12 +541,12 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     const metrics = [
       'Principal',
       'Interest',
-      'Interest/principal ratio',
-      'Share of balance at retirement as principal',
-      'Effective avg saved/yr of work',
-      'Growth factor from present',
-      'Crossover point',
-      'Age of > $1M saved',
+      'Interest/Principal Ratio',
+      'Share of Balance at Retirement as Principal',
+      'Effective Avg Saved/Yr of Work',
+      'Growth Factor from Present',
+      'Crossover Point',
+      'Age of > $1M Saved',
     ];
 
     metrics.forEach(metric => {
@@ -560,14 +563,14 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
 
       analysis['Principal'][budget.id] = globalOptions.Money(principal);
       analysis['Interest'][budget.id] = globalOptions.Money(interest);
-      analysis['Interest/principal ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '-';
-      analysis['Share of balance at retirement as principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
-      analysis['Effective avg saved/yr of work'][budget.id] = globalOptions.Money(contributedPrincipal / yearsToContribute.value);
-      analysis['Growth factor from present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '-';
-      analysis['Crossover point'][budget.id] = getCrossoverPoint(constants.TOTALS, budget.id).formatted;
+      analysis['Interest/Principal Ratio'][budget.id] = principal > 0 ? (interest / principal).toFixed(4) : '-';
+      analysis['Share of Balance at Retirement as Principal'][budget.id] = total > 0 ? globalOptions.Percent((principal / total) * 100) : '0.00%';
+      analysis['Effective Avg Saved/Yr of Work'][budget.id] = globalOptions.Money(contributedPrincipal / yearsToContribute.value);
+      analysis['Growth Factor from Present'][budget.id] = principal > 0 ? (total / principal).toFixed(4) : '-';
+      analysis['Crossover Point'][budget.id] = getCrossoverPoint(constants.TOTALS, budget.id).formatted;
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => Number(r.currentBalance) >= 1000000)?.period;
-      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
+      analysis['Age of > $1M Saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 26 : '-'; // Assuming age 26 start
     });
 
     return analysis;
@@ -576,14 +579,14 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const retirementTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
     const analysis: Record<string, Record<string, any>> = {};
     const metrics = [
-      'Initial balance',
+      'Initial Balance',
       'Growth',
-      'Growth/initial ratio',
-      'Share of value retirement end as growth',
-      'Effective avg saved/yr',
-      'Growth factor from retirement start',
-      'Safe withdrawal rate',
-      'Age of > $1M saved',
+      'Growth/Initial Ratio',
+      'Share of Value Retirement End as Growth',
+      'Effective Avg Saved/Yr',
+      'Growth Factor from Retirement Start',
+      'Safe Withdrawal Rate',
+      'Age of > $1M Saved',
     ];
 
     metrics.forEach(metric => {
@@ -596,16 +599,16 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
       const growth = Number(schedule.lifetimeGrowth);
       const finalBalance = Number(schedule.amortizationSchedule.slice(-1)[0]?.currentBalance || 0);
 
-      analysis['Initial balance'][budget.id] = globalOptions.Money(initialBalance);
+      analysis['Initial Balance'][budget.id] = globalOptions.Money(initialBalance);
       analysis['Growth'][budget.id] = globalOptions.Money(growth);
-      analysis['Growth/initial ratio'][budget.id] = initialBalance > 0 ? (growth / initialBalance).toFixed(4) : '0.0000';
-      analysis['Share of value retirement end as growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
-      analysis['Effective avg saved/yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
-      analysis['Growth factor from retirement start'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
-      analysis['Safe withdrawal rate'][budget.id] = getSafeWithdrawalRate(constants.TOTALS, budget.id).formatted;
+      analysis['Growth/Initial Ratio'][budget.id] = initialBalance > 0 ? (growth / initialBalance).toFixed(4) : '0.0000';
+      analysis['Share of Value Retirement End as Growth'][budget.id] = finalBalance > 0 ? globalOptions.Percent((growth / finalBalance) * 100) : '0.00%';
+      analysis['Effective Avg Saved/Yr'][budget.id] = globalOptions.Money(growth / yearsToSpend.value);
+      analysis['Growth Factor from Retirement Start'][budget.id] = initialBalance > 0 ? (finalBalance / initialBalance).toFixed(4) : '0.0000';
+      analysis['Safe Withdrawal Rate'][budget.id] = getSafeWithdrawalRate(constants.TOTALS, budget.id).formatted;
 
       const milestonePeriod = schedule.amortizationSchedule.find(r => Number(r.currentBalance) >= 1000000)?.period;
-      analysis['Age of > $1M saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming retirement start retirement
+      analysis['Age of > $1M Saved'][budget.id] = milestonePeriod ? Math.floor(milestonePeriod / 12) + 65 : '-'; // Assuming retirement start retirement
     });
 
     return analysis;
@@ -627,8 +630,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Principal Contributed',
         'Interest Growth',
         'Final Balance',
-        'Interest/principal ratio',
-        'Growth factor from present',
+        'Interest/Principal Ratio',
+        'Growth Factor from Present',
         'Crossover Point',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
@@ -648,8 +651,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Principal Contributed'][budget.id] = globalOptions.Money(contributed);
         analysis['Interest Growth'][budget.id] = globalOptions.Money(growth);
         analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
-        analysis['Interest/principal ratio'][budget.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
-        analysis['Growth factor from present'][budget.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
+        analysis['Interest/Principal Ratio'][budget.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
+        analysis['Growth Factor from Present'][budget.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
         analysis['Crossover Point'][budget.id] = getCrossoverPoint(instrumentId, budget.id).formatted;
       });
     } else {
@@ -658,8 +661,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Expected Return',
         'Growth in Retirement',
         'Final Balance',
-        'Growth/initial ratio',
-        'Growth factor from retirement start',
+        'Growth/Initial Ratio',
+        'Growth Factor from Retirement Start',
         'Safe Withdrawal Rate',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
@@ -676,8 +679,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Expected Return'][budget.id] = rateStr;
         analysis['Growth in Retirement'][budget.id] = globalOptions.Money(growth);
         analysis['Final Balance'][budget.id] = globalOptions.Money(finalBal);
-        analysis['Growth/initial ratio'][budget.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
-        analysis['Growth factor from retirement start'][budget.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth/Initial Ratio'][budget.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth Factor from Retirement Start'][budget.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
         analysis['Safe Withdrawal Rate'][budget.id] = getSafeWithdrawalRate(instrumentId, budget.id).formatted;
       });
     }
@@ -701,8 +704,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Principal Contributed',
         'Interest Growth',
         'Final Balance',
-        'Interest/principal ratio',
-        'Growth factor from present',
+        'Interest/Principal Ratio',
+        'Growth Factor from Present',
         'Crossover Point',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
@@ -722,8 +725,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Principal Contributed'][instItem.id] = globalOptions.Money(contributed);
         analysis['Interest Growth'][instItem.id] = globalOptions.Money(growth);
         analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
-        analysis['Interest/principal ratio'][instItem.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
-        analysis['Growth factor from present'][instItem.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
+        analysis['Interest/Principal Ratio'][instItem.id] = totalPrincipal > 0 ? (growth / totalPrincipal).toFixed(4) : '-';
+        analysis['Growth Factor from Present'][instItem.id] = totalPrincipal > 0 ? (finalBal / totalPrincipal).toFixed(4) : '-';
         analysis['Crossover Point'][instItem.id] = getCrossoverPoint(instItem.id, budgetId).formatted;
       });
     } else {
@@ -735,8 +738,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         'Expected Return',
         'Growth in Retirement',
         'Final Balance',
-        'Growth/initial ratio',
-        'Growth factor from retirement start',
+        'Growth/Initial Ratio',
+        'Growth Factor from Retirement Start',
         'Safe Withdrawal Rate',
       ];
       metrics.forEach(m => { analysis[m] = {}; });
@@ -753,8 +756,8 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         analysis['Expected Return'][instItem.id] = rateStr;
         analysis['Growth in Retirement'][instItem.id] = globalOptions.Money(growth);
         analysis['Final Balance'][instItem.id] = globalOptions.Money(finalBal);
-        analysis['Growth/initial ratio'][instItem.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
-        analysis['Growth factor from retirement start'][instItem.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth/Initial Ratio'][instItem.id] = initialBal > 0 ? (growth / initialBal).toFixed(4) : '0.0000';
+        analysis['Growth Factor from Retirement Start'][instItem.id] = initialBal > 0 ? (finalBal / initialBal).toFixed(4) : '0.0000';
         analysis['Safe Withdrawal Rate'][instItem.id] = getSafeWithdrawalRate(instItem.id, budgetId).formatted;
       });
     }
@@ -819,6 +822,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           `Balances over Time by Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
+        valueLabel: () => 'Balance',
         subheader: () =>
           'Project nominal portfolio wealth accumulation across contribution plans over time',
         x: globalOptions.Period,
@@ -954,6 +958,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           )}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
+        valueLabel: () => 'Purchasing Power',
         subheader: () =>
           'Forecast true future purchasing power by adjusting projected portfolio growth for inflation',
         x: globalOptions.Period,
@@ -1018,6 +1023,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           `Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getWithdrawalBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
+        valueLabel: () => 'Balance',
         subheader: () =>
           'Monitor retirement depletion horizons and capital longevity across spending strategies',
         x: globalOptions.Period,
@@ -1089,6 +1095,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           `Purchasing Power Drawdown over Time by Withdrawal Budget - ${getInstrumentName(instrumentId)}`,
         lineName: getWithdrawalBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
+        valueLabel: () => 'Purchasing Power',
         subheader: () =>
           'Evaluate the real inflation-adjusted purchasing power of your remaining retirement reserves',
         x: globalOptions.Period,
@@ -1165,6 +1172,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         return id.endsWith('_growth') ? `${name} (Growth)` : `${name} (Principal)`;
       },
       seriesLabel: () => 'Budget / Component',
+      valueLabel: () => 'Cumulative Amount',
       subheader: () =>
         'Measure wealth engine efficiency by tracking physical deposits against exponential compound returns',
       x: globalOptions.Period,
@@ -1234,6 +1242,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         return id.endsWith('_growth') ? `${name} (Monthly Return)` : `${name} (Monthly Deposit)`;
       },
       seriesLabel: () => 'Budget / Stream',
+      valueLabel: () => 'Monthly Amount',
       subheader: () =>
         'Pinpoint the crossover milestone where monthly compound returns overtake monthly savings deposits',
       x: globalOptions.Period,
@@ -1307,6 +1316,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
           ? `Target Income (${globalOptions.Money(desiredNetIncome.value)}/mo)`
           : getBudgetAbsoluteRate(id),
       seriesLabel: () => 'Budget / Goal',
+      valueLabel: () => 'Monthly Income',
       subheader: () =>
         'Track Financial Independence by measuring sustainable monthly passive income (4% SWR) against your target goal',
       x: globalOptions.Period,
@@ -1427,6 +1437,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         return id;
       },
       seriesLabel: () => 'Market Scenario',
+      valueLabel: () => 'Balance',
       subheader: () =>
         'Stress-test portfolio survival across Bull (+2%), Base (Expected), and Bear (-2%) market returns',
       x: globalOptions.Period,
@@ -1503,6 +1514,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
         return id.endsWith('_yield') ? `${name} (Yield)` : `${name} (Withdrawal)`;
       },
       seriesLabel: () => 'Cash Flow Stream',
+      valueLabel: () => 'Cash Flow',
       subheader: () =>
         'Determine retirement sustainability by comparing monthly investment yield against cash withdrawn',
       x: globalOptions.Period,
@@ -1556,6 +1568,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     instruments.value = [];
     optionsFormActive.value = false;
     selectedCareerBudgetId.value = constants.DEFAULT;
+    selectedInstrumentId.value = constants.TOTALS;
     viewPhase.value = constants.PHASE_CAREER;
     withdrawalBudgets.value = [];
     yearsToContribute.value = constants.DEFAULT_YEARS_TO_CONTRIBUTE;
@@ -1773,6 +1786,10 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
   const setSelectedCareerBudgetId = (id: string): void => {
     selectedCareerBudgetId.value = id;
     saveState();
+  };
+
+  const setSelectedInstrumentId = (id: string | null): void => {
+    selectedInstrumentId.value = id;
   };
 
   const setYearsToContribute = (newYears: number): void => {
@@ -2421,6 +2438,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     minimumBudget,
     optionsFormActive,
     selectedCareerBudgetId,
+    selectedInstrumentId,
     viewPhase,
     withdrawalBudgets,
     yearsToContribute,
@@ -2513,6 +2531,7 @@ export const useAppreciateCoreStore = defineStore('appreciateCore', () => {
     openOptionsForm,
     saveState,
     setSelectedCareerBudgetId,
+    setSelectedInstrumentId,
     setDesiredNetIncome,
     setRetirementTaxRate,
     setInflationFactor,

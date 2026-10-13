@@ -139,7 +139,7 @@ const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === co
             </tr>
             <tr>
               <td class="truncate max-w-[110px]">
-                Interest Rate
+                Expected Return
               </td>
               <td :class="['text-right', 'whitespace-nowrap']">
                 <b>{{ instrumentInterestRate }}</b>

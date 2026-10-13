@@ -610,6 +610,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
           `Balances over Time by Budget - ${getLoanName(loanId)}`,
         lineName: getBudgetAbsoluteRate,
         seriesLabel: () => 'Budget',
+        valueLabel: () => 'Balance',
         subheader: () =>
           'Compare accelerated debt elimination timelines and debt-free milestones across payment plans',
         x: globalOptions.Period,
@@ -838,6 +839,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         return getBudgetAbsoluteRate(id);
       },
       seriesLabel: () => 'Budget / Metric',
+      valueLabel: () => 'Interest Paid',
       subheader: () =>
         'Quantify total lifetime borrowing costs and track how extra payments prevent interest from exceeding principal',
       x: globalOptions.Period,
@@ -996,6 +998,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         header: (loanId: string) => `Balance Comparison - ${getLoanName(loanId)}`,
         lineName: getScenarioNameLocal,
         seriesLabel: () => 'Scenario',
+        valueLabel: () => 'Balance',
         subheader: () =>
           'Compare payoff trajectory and debt elimination speed between current terms and refinancing offers',
         x: globalOptions.Period,
@@ -1107,6 +1110,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         `Interest Paid Comparison - ${getLoanName(loanId)}`,
       lineName: getScenarioNameLocal,
       seriesLabel: () => 'Scenario',
+      valueLabel: () => 'Interest Paid',
       subheader: () =>
         'Compare total lifetime interest expense between your current loan and new refinancing proposals',
       x: globalOptions.Period,

@@ -69,5 +69,6 @@ describe('InstrumentCard Component (Appreciate)', () => {
 
     expect(wrapper.find('h2').text()).toBe('Index Fund');
     expect(wrapper.findComponent(DonutGraph).exists()).toBe(true);
+    expect(wrapper.text()).toContain('Expected Return');
   });
 });

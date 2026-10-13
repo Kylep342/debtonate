@@ -63,8 +63,8 @@ const planStats = computed(() => {
       entityCount: debtonateStore.loans.length,
       entityLabel: 'Debts',
       budgetCount: debtonateStore.budgets.length,
-      totalMoney: globalOptions.Money(debtonateStore.totalPrincipal),
-      totalMoneyLabel: 'Total Principal',
+      totalMoney: globalOptions.Money(debtonateStore.totalCurrentBalance || debtonateStore.totalPrincipal),
+      totalMoneyLabel: 'Total Debt',
       monthlyPayment: globalOptions.Money(debtonateStore.totalMinPayment),
       monthlyPaymentLabel: 'Total Min Payment',
     };

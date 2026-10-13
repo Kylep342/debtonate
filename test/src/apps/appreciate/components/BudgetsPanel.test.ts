@@ -46,4 +46,20 @@ describe('BudgetsPanel Component (Appreciate)', () => {
     const wrapper = mount(BudgetsPanel, { global: globalConfig });
     expect(wrapper.text()).toContain(constants.BUDGETS);
   });
+
+  it('renders correctly with withdrawal budgets in retirement phase', async () => {
+    const store = useAppreciateCoreStore();
+    (store as any).instrumentsWithTotals = [];
+    (store as any).monthlyBudgets = [
+      { id: constants.DEFAULT, relative: 500, absolute: 500 },
+    ];
+    (store as any).monthlyWithdrawalBudgets = [
+      { id: constants.DEFAULT, relative: 2000, absolute: 2000 },
+      { id: 'w1', relative: 3000, absolute: 3000 }
+    ];
+    store.viewPhase = constants.PHASE_RETIREMENT as any;
+
+    const wrapper = mount(BudgetsPanel, { global: globalConfig });
+    expect(wrapper.text()).toContain(constants.WITHDRAWALS);
+  });
 });

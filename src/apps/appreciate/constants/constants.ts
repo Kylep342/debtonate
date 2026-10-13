@@ -6,7 +6,7 @@ import sharedConstants from '@/apps/shared/constants/constants';
 
 const BTN_CAREER = 'Career';
 const BTN_RETIREMENT = 'Retirement';
-const BUDGET_DETAILS_ID = 'appreciateBudgetDetails';
+const BUDGET_DETAILS_ID = 'budgetDetails';
 const DEFAULT_INFLATION_FACTOR = 3;
 const DEFAULT_YEARS_TO_CONTRIBUTE = 25;
 const DEFAULT_YEARS_TO_SPEND = 40;
@@ -28,7 +28,7 @@ const INSTRUMENTS = 'Instruments';
 const MAX_DELTA_FACTOR = 30; // used for both growth and inflation
 const MAX_DURATION_YEARS = constants.MAX_DURATION_YEARS;
 const NAME_TOTALS_AS_AN_INSTRUMENT = 'All Instruments';
-const OPTIONS_FORM_ID = 'appreciateOptionsForm';
+const OPTIONS_FORM_ID = 'optionsForm';
 const PHASE_CAREER = 'Career';
 const PHASE_RETIREMENT = 'Retirement';
 const WITHDRAWAL_FORM_ID = 'withdrawalForm';

@@ -186,6 +186,29 @@ const appreciationDelta = computed(() => {
   };
 });
 
+const cardHeaderBadge = computed(() => {
+  if (isCareerPhase.value) {
+    if (!appreciationDelta.value) return null;
+    return {
+      text: appreciationDelta.value.extraTotalText,
+      badgeClass: 'badge-success',
+    };
+  } else {
+    if (
+      !safeWithdrawalResult.value ||
+      safeWithdrawalResult.value.tier === 'na' ||
+      !safeWithdrawalResult.value.label ||
+      safeWithdrawalResult.value.label === 'N/A'
+    ) {
+      return null;
+    }
+    return {
+      text: `${safeWithdrawalResult.value.label} (${safeWithdrawalResult.value.formatted})`,
+      badgeClass: safeWithdrawalResult.value.badgeClass || 'badge-primary',
+    };
+  }
+});
+
 const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
@@ -205,7 +228,7 @@ const editButtons: ComputedRef<Button[]> = computed(() => ([
   },
 ]));
 
-const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT && isCareerPhase.value ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
@@ -221,10 +244,10 @@ const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === consta
               {{ budgetName }}
             </h2>
             <span
-              v-if="appreciationDelta"
-              class="badge badge-success badge-xs sm:badge-sm font-semibold text-[11px] shrink-0"
+              v-if="cardHeaderBadge"
+              :class="['badge badge-xs sm:badge-sm font-semibold text-[11px] shrink-0', cardHeaderBadge.badgeClass]"
             >
-              {{ appreciationDelta.extraTotalText }}
+              {{ cardHeaderBadge.text }}
             </span>
           </div>
           <base-menu

@@ -42,6 +42,30 @@ const totalInvestedFormatted = computed<string>(() => {
 });
 
 const isRetirementPhase = computed<boolean>(() => state.viewPhase === constants.PHASE_RETIREMENT);
+const budgetsTabLabel = computed(() => isRetirementPhase.value ? 'Withdrawals' : 'Budgets');
+
+const portfolioSummary = computed<{ badge: string; metric: string; detail: string } | null>(() => {
+  if (!state.instruments.length) return null;
+  if (isRetirementPhase.value) {
+    const schedule = state.getWithdrawalSchedule(constants.TOTALS, constants.DEFAULT);
+    const finalRecord = schedule?.amortizationSchedule?.slice(-1)[0];
+    const finalBalance = Number(finalRecord?.currentBalance || 0);
+    return {
+      badge: 'Horizon',
+      metric: `${state.yearsToSpend} yrs (${globalOptions.Money(finalBalance)})`,
+      detail: `${globalOptions.Money(state.desiredNetIncome)}/mo`,
+    };
+  } else {
+    const schedule = state.getContributionSchedule(constants.TOTALS, constants.DEFAULT);
+    const finalRecord = schedule?.amortizationSchedule?.slice(-1)[0];
+    const nestEgg = Number(finalRecord?.currentBalance || 0);
+    return {
+      badge: 'Nest Egg',
+      metric: globalOptions.Money(nestEgg),
+      detail: totalInvestedFormatted.value,
+    };
+  }
+});
 
 useModal(computed<boolean>(() => state.budgetDetailsPanelActive), constants.BUDGET_DETAILS_ID);
 useModal(computed<boolean>(() => state.budgetFormActive), constants.BUDGET_FORM_ID);
@@ -98,7 +122,7 @@ const tabClass = (tab: string) => [
       <a
         :class="tabClass('budgets')"
         @click="activeTab = 'budgets'"
-      >Budgets</a>
+      >{{ budgetsTabLabel }}</a>
       <a
         :class="tabClass('analysis')"
         @click="activeTab = 'analysis'"
@@ -154,7 +178,7 @@ const tabClass = (tab: string) => [
 
     <!-- Floating Mobile Summary Pill -->
     <div
-      v-if="!isDesktop && activeTab !== 'analysis' && state.instruments.length"
+      v-if="!isDesktop && activeTab !== 'analysis' && state.instruments.length && portfolioSummary"
       class="fixed bottom-9 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none"
     >
       <button
@@ -163,11 +187,11 @@ const tabClass = (tab: string) => [
         @click="activeTab = 'analysis'"
       >
         <div class="flex items-center gap-1.5 truncate">
-          <span class="badge badge-primary badge-xs py-2 px-2 font-semibold">Invested</span>
-          <span class="font-medium truncate">{{ totalInvestedFormatted }}</span>
+          <span class="badge badge-primary badge-xs py-2 px-2 font-semibold">{{ portfolioSummary.badge }}</span>
+          <span class="font-medium truncate">{{ portfolioSummary.metric }}</span>
         </div>
-        <div class="flex items-center gap-1.5 text-base-content/70 text-[11px] shrink-0">
-          <span>View Analysis</span>
+        <div class="flex items-center gap-1.5 text-base-content/70 font-mono text-[11px] shrink-0">
+          <span>{{ portfolioSummary.detail }}</span>
           <span class="text-primary font-bold text-xs">&rarr;</span>
         </div>
       </button>

@@ -122,5 +122,13 @@ describe('BudgetDetailsPanel Component (Debtonate)', () => {
     expect(wrapper.text()).toContain('All Loans - Budget Comparison');
     expect(wrapper.text()).toContain('Budget 1');
     expect(wrapper.text()).toContain('$2,000');
+
+    // Selecting a new baseline updates currentBudget and store.currentBudgetId
+    const tabular = wrapper.findComponent(TabularAnalysis);
+    const mockBudget2 = { id: 'b2', relative: 200, absolute: 600 };
+    vi.mocked(store.getBudget).mockReturnValue(mockBudget2 as any);
+    tabular.vm.$emit('selectBaseline', 'b2');
+    await nextTick();
+    expect(store.currentBudgetId).toBe('b2');
   });
 });

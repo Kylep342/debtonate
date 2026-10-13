@@ -102,6 +102,14 @@ watch(
   },
   { immediate: true },
 );
+
+const onSelectBaseline = (id: string) => {
+  const budget = state.getBudget(id);
+  if (budget) {
+    currentBudget.value = budget;
+    state.currentBudgetId = id;
+  }
+};
 </script>
 
 <template>
@@ -221,6 +229,7 @@ watch(
             :baseline-id="currentBudget.id"
             :state-hash="state.stateHash"
             class="flex-1 min-h-0 flex flex-col"
+            @select-baseline="onSelectBaseline"
           />
         </div>
       </div>

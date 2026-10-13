@@ -33,6 +33,8 @@ describe('InstrumentForm Component (Appreciate)', () => {
     const fields = form.props('fields');
     const nameField = fields.find((f: any) => f.key === 'name');
     expect(nameField?.placeholder).toBe('e.g., Pension, Stock, Property');
+    const rateField = fields.find((f: any) => f.key === 'interestRate');
+    expect(rateField?.label).toBe('Expected Return');
   });
 
   it('submits instrument form with converted interest rate', async () => {

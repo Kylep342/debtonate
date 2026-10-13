@@ -132,4 +132,22 @@ describe('ShareExportModal Component', () => {
     await doneBtn.trigger('click');
     expect(globalOptions.isShareExportActive).toBe(false);
   });
+
+  it('renders correct plan stats for Debtonate and Appreciate', () => {
+    const debtonateWrapper = mount(ShareExportModal, {
+      props: { appType: 'debtonate' },
+      global: globalConfig,
+    });
+    expect(debtonateWrapper.text()).toContain('Debts');
+    expect(debtonateWrapper.text()).toContain('Total Debt');
+    expect(debtonateWrapper.text()).toContain('Total Min Payment');
+
+    const appreciateWrapper = mount(ShareExportModal, {
+      props: { appType: 'appreciate' },
+      global: globalConfig,
+    });
+    expect(appreciateWrapper.text()).toContain('Accounts');
+    expect(appreciateWrapper.text()).toContain('Total Balance');
+    expect(appreciateWrapper.text()).toContain('Total Monthly Limit');
+  });
 });

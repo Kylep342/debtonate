@@ -289,5 +289,80 @@ describe('BudgetCard Component (Appreciate)', () => {
     expect(wrapper.text()).toContain('4% Rule');
     const badge = wrapper.find('.badge-info');
     expect(badge.exists()).toBe(true);
+    expect(wrapper.find('.cardHeaderTitle + .badge').text()).toBe('4% Rule (3.80%)');
+  });
+
+  it('protects default baseline budget with Details-only button in both phases', async () => {
+    const store = useAppreciateCoreStore();
+    const defaultBudget = { id: constants.DEFAULT, relative: 0, absolute: 0 };
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    store.instruments = [{ id: mockInstrumentId, currentBalance: 10000, annualRate: 0.07, periodsPerYear: 12 }] as any;
+
+    (store as any).cardGraphs = {
+      [mockInstrumentId]: {
+        [defaultBudget.id]: [
+          { label: 'Growth', value: 0, color: 'green' },
+          { label: 'Contribution', value: 0, color: 'blue' }
+        ]
+      }
+    };
+
+    (store as any).withdrawalSchedules = {
+      [mockInstrumentId]: {
+        [defaultBudget.id]: {
+          lifetimeGrowth: 0,
+          lifetimeWithdrawal: 0,
+        }
+      }
+    };
+
+    // Career phase default budget
+    store.viewPhase = constants.PHASE_CAREER;
+    vi.mocked(store.getBudgetName).mockReturnValue('Baseline');
+    vi.mocked(store.getContributionSchedule).mockReturnValue({
+      lifetimeContribution: 0,
+      lifetimeGrowth: 0,
+      amortizationSchedule: []
+    } as any);
+
+    const careerWrapper = mount(BudgetCard, {
+      props: {
+        budget: defaultBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    const careerMenu = careerWrapper.findComponent(BaseMenu);
+    expect(careerMenu.props('buttons').length).toBe(1);
+    expect(careerMenu.props('buttons')[0].text).toBe(constants.BTN_DETAILS);
+
+    // Retirement phase default budget
+    store.viewPhase = constants.PHASE_RETIREMENT;
+    vi.mocked(store.getWithdrawalBudgetName).mockReturnValue('Target Income');
+    vi.mocked(store.getWithdrawalSchedule).mockReturnValue({
+      lifetimeGrowth: 0,
+      lifetimeWithdrawal: 0,
+      amortizationSchedule: []
+    } as any);
+    vi.mocked(store.getSafeWithdrawalRate).mockReturnValue({
+      rate: 4.0,
+      formatted: '4.00%',
+      tier: 'benchmark',
+      label: '4% Rule',
+      badgeClass: 'badge-info'
+    });
+
+    const retirementWrapper = mount(BudgetCard, {
+      props: {
+        budget: defaultBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    const retirementMenu = retirementWrapper.findComponent(BaseMenu);
+    expect(retirementMenu.props('buttons').length).toBe(1);
+    expect(retirementMenu.props('buttons')[0].text).toBe(constants.BTN_DETAILS);
   });
 });

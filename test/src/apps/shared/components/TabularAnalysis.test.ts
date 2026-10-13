@@ -150,4 +150,39 @@ describe('TabularAnalysis Component', () => {
     expect(wrapper.emitted('selectBaseline')).toBeTruthy();
     expect(wrapper.emitted('selectBaseline')![0]).toEqual(['b1']);
   });
+
+  it('renders metric subtitles for Title Case Appreciate metrics and Earliest $1M Milestone summary card', async () => {
+    const pinia = createTestingPinia({ createSpy: vi.fn });
+    setActivePinia(pinia);
+
+    const appreciateAnalysis = {
+      'Growth/Initial Ratio': { b1: '1.4500', b2: '2.1000' },
+      'Age of > $1M Saved': { b1: '52', b2: '46' },
+      'Safe Withdrawal Rate': { b1: '4.00%', b2: '4.25%' },
+    };
+
+    const wrapper = mount(TabularAnalysis, {
+      props: {
+        analysis: appreciateAnalysis,
+        items: mockItems as any,
+        title: 'Appreciate Analysis',
+        getItemName: mockGetItemName,
+      },
+      global: {
+        plugins: [pinia],
+      },
+    });
+
+    await nextTick();
+
+    // Verify row subtitles appear from metricTooltips
+    expect(wrapper.text()).toContain('Ratio of investment returns earned during retirement to starting balance.');
+    expect(wrapper.text()).toContain('Estimated age when total investment balance surpasses $1,000,000.');
+    expect(wrapper.text()).toContain('Sustainable annual distribution rate from your nest egg.');
+
+    // Verify summary highlight cards: Earliest $1M Milestone should pick b2 (age 46, lower is better)
+    expect(wrapper.text()).toContain('Earliest $1M Milestone');
+    expect(wrapper.text()).toContain('Item Two');
+    expect(wrapper.text()).toContain('46 years old');
+  });
 });

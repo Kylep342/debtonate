@@ -792,7 +792,7 @@ describe('Appreciate Core Store', () => {
 
     // In investmentTabularAnalysis, minimumBudget (DEFAULT, relative: 0) is evaluated alongside b1
     const analysis = state.investmentTabularAnalysis;
-    const defaultRatio = analysis['Interest/principal ratio'][constants.DEFAULT];
+    const defaultRatio = analysis['Interest/Principal Ratio'][constants.DEFAULT];
     expect(defaultRatio).not.toBe('0.0000');
     expect(defaultRatio).not.toBe('-');
     expect(Number(defaultRatio)).toBeGreaterThan(0);
@@ -802,13 +802,13 @@ describe('Appreciate Core Store', () => {
 
     // getInstrumentComparativeAnalysis should also normalize starting balance as principal
     const instAnalysis = state.getInstrumentComparativeAnalysis('inst-1', true);
-    expect(instAnalysis['Interest/principal ratio'][constants.DEFAULT]).toBe(defaultRatio);
+    expect(instAnalysis['Interest/Principal Ratio'][constants.DEFAULT]).toBe(defaultRatio);
     expect(instAnalysis['Starting Balance'][constants.DEFAULT]).toBe(globalOptions.Money(10000));
     expect(instAnalysis['Principal Contributed'][constants.DEFAULT]).toBe(globalOptions.Money(0));
 
     // getBudgetComparativeAnalysis should also normalize starting balance as principal
     const budgetAnalysis = state.getBudgetComparativeAnalysis(constants.DEFAULT, true);
-    expect(budgetAnalysis['Interest/principal ratio']['inst-1']).toBe(defaultRatio);
+    expect(budgetAnalysis['Interest/Principal Ratio']['inst-1']).toBe(defaultRatio);
   });
 
   it('calculates crossover period and crossover point correctly', () => {
@@ -883,5 +883,16 @@ describe('Appreciate Core Store', () => {
     expect(swrHighRisk.rate).toBeGreaterThan(5.5);
     expect(swrHighRisk.tier).toBe('danger');
     expect(swrHighRisk.badgeClass).toBe('badge-error');
+  });
+
+  it('manages selectedInstrumentId state and reset correctly', () => {
+    const state: AppreciateCoreStore = useAppreciateCoreStore();
+    expect(state.selectedInstrumentId).toBe(constants.TOTALS);
+
+    state.setSelectedInstrumentId('inst-test-123');
+    expect(state.selectedInstrumentId).toBe('inst-test-123');
+
+    state.clearState();
+    expect(state.selectedInstrumentId).toBe(constants.TOTALS);
   });
 });

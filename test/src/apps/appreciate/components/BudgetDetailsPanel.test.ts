@@ -123,5 +123,13 @@ describe('BudgetDetailsPanel Component (Appreciate)', () => {
     expect(wrapper.text()).toContain('All Instruments - Budget Comparison');
     expect(wrapper.text()).toContain('Career Budget 1');
     expect(wrapper.text()).toContain('$300,000');
+
+    // Selecting a new baseline updates currentBudget and store.currentBudgetId
+    const tabular = wrapper.findComponent(TabularAnalysis);
+    const mockBudget2 = { id: 'b2', relative: 300, absolute: 700 };
+    vi.mocked(store.getBudget).mockReturnValue(mockBudget2 as any);
+    tabular.vm.$emit('selectBaseline', 'b2');
+    await nextTick();
+    expect(store.currentBudgetId).toBe('b2');
   });
 });
