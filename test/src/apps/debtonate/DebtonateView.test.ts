@@ -4,11 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import DebtonateView from '@/apps/debtonate/DebtonateView.vue';
 import { useDebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { getAppHistoryRef, resetAllStateHistory } from '@/apps/shared/composables/useStateHistory';
 import constants from '@/apps/debtonate/constants/constants';
 
 describe('DebtonateView Component', () => {
   beforeEach(() => {
     localStorage.clear();
+    resetAllStateHistory();
     setActivePinia(createPinia());
     HTMLDialogElement.prototype.showModal = vi.fn();
     HTMLDialogElement.prototype.close = vi.fn();
@@ -122,6 +124,9 @@ describe('DebtonateView Component', () => {
     await vi.advanceTimersByTimeAsync(500);
 
     expect(saveSpy).toHaveBeenCalled();
+    const history = getAppHistoryRef('debtonate');
+    expect(history.value.length).toBeGreaterThan(0);
+    expect(history.value[0].summary).toContain('1 loan');
     vi.useRealTimers();
   });
 });

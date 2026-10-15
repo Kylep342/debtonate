@@ -9,9 +9,11 @@ import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { getAppHistoryRef, resetAllStateHistory } from '@/apps/shared/composables/useStateHistory';
 
 describe('Debtonate OptionsForm Component', () => {
   beforeEach(() => {
+    resetAllStateHistory();
     const pinia = createTestingPinia({ createSpy: vi.fn, stubActions: false });
     setActivePinia(pinia);
   });
@@ -114,5 +116,84 @@ describe('Debtonate OptionsForm Component', () => {
 
     await toggle.trigger('change');
     expect(globalOptions.toggleAutoSaveState).toHaveBeenCalled();
+  });
+
+  it('renders disabled Undo button when history is empty, and enables it when multiple snapshots exist', async () => {
+    const history = getAppHistoryRef('debtonate');
+    history.value = [];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const undoBtn = wrapper.find('#optionsForm-undo');
+    expect(undoBtn.exists()).toBe(true);
+    expect(undoBtn.attributes('disabled')).toBeDefined();
+
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: '1 loan ($10,000)', data: { 'debtonate.loans': [] } },
+      { id: '2', timestamp: Date.now() - 60000, hash: 'hash2', summary: '2 loans ($20,000)', data: { 'debtonate.loans': [] } },
+    ];
+    await wrapper.vm.$nextTick();
+
+    expect(undoBtn.attributes('disabled')).toBeUndefined();
+
+    // Trigger undo
+    await undoBtn.trigger('click');
+    expect(history.value[0].summary).toBe('2 loans ($20,000)');
+  });
+
+  it('renders snapshot history list and allows restoring a previous snapshot', async () => {
+    const history = getAppHistoryRef('debtonate');
+    const validLoan = {
+      id: 'l1',
+      principal: 1000,
+      annualRate: 5,
+      termInYears: 1,
+      name: 'Test Loan',
+      currentBalance: 1000,
+      fees: 0,
+      extraPayment: 0,
+    };
+
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: 'Current: 0 loans', data: { 'debtonate.loans': [] } },
+      { id: '2', timestamp: Date.now() - 30000, hash: 'hash2', summary: 'Previous: 1 loan', data: { 'debtonate.loans': [validLoan] } },
+    ];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('State Memory (Last 2 of 10)');
+    expect(wrapper.text()).toContain('Current: 0 loans');
+    expect(wrapper.text()).toContain('Previous: 1 loan');
+
+    const restore0 = wrapper.find('#optionsForm-restore-0');
+    expect(restore0.attributes('disabled')).toBeDefined();
+
+    const restore1 = wrapper.find('#optionsForm-restore-1');
+    expect(restore1.attributes('disabled')).toBeUndefined();
+
+    await restore1.trigger('click');
+    expect(history.value[0].summary).toBe('Previous: 1 loan');
+  });
+
+  it('clears state history when Clear history is clicked', async () => {
+    const history = getAppHistoryRef('debtonate');
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: 'Snapshot', data: {} },
+    ];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const clearHistoryBtn = wrapper.find('#optionsForm-clear-history');
+    expect(clearHistoryBtn.exists()).toBe(true);
+
+    await clearHistoryBtn.trigger('click');
+    expect(history.value).toEqual([]);
+    expect(wrapper.find('#optionsForm-history').exists()).toBe(false);
   });
 });

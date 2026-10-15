@@ -9,6 +9,7 @@ const LS_DESIRED_NET_INCOME = 'appreciate.desiredNetIncome';
 const LS_RETIREMENT_TAX_RATE = 'appreciate.retirementTaxRate';
 const LS_INFLATION_FACTOR = 'appreciate.inflationFactor';
 const LS_INSTRUMENTS = 'appreciate.instruments';
+const LS_STATE_HISTORY = 'appreciate.stateHistory';
 const LS_YEARS_TO_CONTRIBUTE = 'appreciate.yearsToContribute';
 const LS_YEARS_TO_SPEND = 'appreciate.yearsToSpend';
 
@@ -23,6 +24,7 @@ export default Object.freeze({
   LS_RETIREMENT_TAX_RATE,
   LS_INFLATION_FACTOR,
   LS_INSTRUMENTS,
+  LS_STATE_HISTORY,
   LS_YEARS_TO_CONTRIBUTE,
   LS_YEARS_TO_SPEND,
 });

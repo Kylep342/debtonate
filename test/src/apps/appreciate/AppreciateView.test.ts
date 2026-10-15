@@ -4,11 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AppreciateView from '@/apps/appreciate/AppreciateView.vue';
 import { useAppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { getAppHistoryRef, resetAllStateHistory } from '@/apps/shared/composables/useStateHistory';
 import constants from '@/apps/appreciate/constants/constants';
 
 describe('AppreciateView Component', () => {
   beforeEach(() => {
     localStorage.clear();
+    resetAllStateHistory();
     setActivePinia(createPinia());
     HTMLDialogElement.prototype.showModal = vi.fn();
     HTMLDialogElement.prototype.close = vi.fn();
@@ -140,6 +142,9 @@ describe('AppreciateView Component', () => {
     await vi.advanceTimersByTimeAsync(500);
 
     expect(saveSpy).toHaveBeenCalled();
+    const history = getAppHistoryRef('appreciate');
+    expect(history.value.length).toBeGreaterThan(0);
+    expect(history.value[0].summary).toContain('1 instrument');
     vi.useRealTimers();
   });
 });

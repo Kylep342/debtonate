@@ -22,6 +22,8 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 import { useModal } from '@/apps/shared/composables/useModal';
 import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
 import { useAutoSave } from '@/apps/shared/composables/useAutoSave';
+import debtonateKeys from '@/apps/debtonate/constants/keys';
+import { useStateHistory } from '@/apps/shared/composables/useStateHistory';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: DebtonateCoreStore = useDebtonateCoreStore();
@@ -33,9 +35,25 @@ const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanShar
   importState: state.importState,
 });
 
+const { pushSnapshot } = useStateHistory({
+  appType: 'debtonate',
+  exportState: state.exportState,
+  importState: state.importState,
+  getSummary: (data) => {
+    const rawLoans = data[debtonateKeys.LS_LOANS] || [];
+    const count = rawLoans.length;
+    if (!count) return 'Empty portfolio';
+    const total = rawLoans.reduce((acc: number, l: any) => acc + (Number(l.principal) || 0), 0);
+    return `${count} ${count === 1 ? 'loan' : 'loans'} (${globalOptions.Money(total)})`;
+  },
+});
+
 useAutoSave({
   saveFn: state.saveState,
   isPlanLoadedFromUrl,
+  onSave: () => {
+    pushSnapshot();
+  },
   watchedSources: [
     () => state.budgets,
     () => state.loans,
@@ -54,6 +72,9 @@ useAutoSave({
 
 onMounted(() => {
   globalOptions.autoLoadIfEnabled('debtonate', state.loadState);
+  if (state.loans.length > 0) {
+    pushSnapshot();
+  }
 });
 
 const activeTab = ref('analysis');

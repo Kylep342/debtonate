@@ -66,6 +66,28 @@ describe('useAutoSave composable', () => {
     expect(isSaving.value).toBe(false);
   });
 
+  it('calls onSave callback when debounced save succeeds', async () => {
+    const globalOptions = useGlobalOptionsStore();
+    globalOptions.setAutoSaveState(true);
+
+    const saveSpy = vi.fn();
+    const onSaveSpy = vi.fn();
+    const testData = ref('initial');
+
+    useAutoSave({
+      saveFn: saveSpy,
+      onSave: onSaveSpy,
+      watchedSources: [() => testData.value],
+      debounceMs: 200,
+    });
+
+    testData.value = 'new data';
+    await vi.advanceTimersByTimeAsync(250);
+
+    expect(saveSpy).toHaveBeenCalledTimes(1);
+    expect(onSaveSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('cancels pending save when cancelPendingSave is called', async () => {
     const globalOptions = useGlobalOptionsStore();
     globalOptions.setAutoSaveState(true);

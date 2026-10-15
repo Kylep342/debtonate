@@ -13,6 +13,7 @@ export interface UseAutoSaveOptions {
   watchedSources: WatchSource<any>[];
   debounceMs?: number;
   isPlanLoadedFromUrl?: Ref<boolean>;
+  onSave?: () => void;
 }
 
 export function useAutoSave(options: UseAutoSaveOptions) {
@@ -44,6 +45,7 @@ export function useAutoSave(options: UseAutoSaveOptions) {
     timer = setTimeout(() => {
       try {
         options.saveFn();
+        options.onSave?.();
       } finally {
         isSaving.value = false;
         timer = null;
@@ -73,6 +75,7 @@ export function useAutoSave(options: UseAutoSaveOptions) {
       if (newValue && !oldValue) {
         if (canSave()) {
           options.saveFn();
+          options.onSave?.();
         }
       } else if (!newValue) {
         cancelPendingSave();
@@ -87,6 +90,7 @@ export function useAutoSave(options: UseAutoSaveOptions) {
         timer = null;
         if (canSave()) {
           options.saveFn();
+          options.onSave?.();
         }
       }
     });

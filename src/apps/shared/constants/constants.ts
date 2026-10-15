@@ -25,9 +25,11 @@ const BTN_ON = 'On';
 const BTN_OPTIONS = 'Options';
 const BTN_PIVOT = 'Pivot';
 const BTN_REFINANCE = 'Refinancing';
+const BTN_RESTORE = 'Restore';
 const BTN_SAVE = 'Save';
 const BTN_SELECT = 'Select';
 const BTN_SHARE_EXPORT = 'Share & Export';
+const BTN_UNDO = 'Undo';
 const BTN_VIEW = 'View';
 
 // Budgets
@@ -157,9 +159,11 @@ export default Object.freeze({
   BTN_OPTIONS,
   BTN_PIVOT,
   BTN_REFINANCE,
+  BTN_RESTORE,
   BTN_SAVE,
   BTN_SELECT,
   BTN_SHARE_EXPORT,
+  BTN_UNDO,
   BTN_VIEW,
   BUDGET,
   BUDGET_DETAILS,

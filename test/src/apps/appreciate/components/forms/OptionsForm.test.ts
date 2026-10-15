@@ -9,9 +9,11 @@ import BaseButton from '@/apps/shared/components/ui/BaseButton.vue';
 import BaseCard from '@/apps/shared/components/ui/BaseCard.vue';
 import BaseMenu from '@/apps/shared/components/ui/BaseMenu.vue';
 import { useGlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { getAppHistoryRef, resetAllStateHistory } from '@/apps/shared/composables/useStateHistory';
 
 describe('Appreciate OptionsForm Component', () => {
   beforeEach(() => {
+    resetAllStateHistory();
     const pinia = createTestingPinia({ createSpy: vi.fn, stubActions: false });
     setActivePinia(pinia);
   });
@@ -115,5 +117,81 @@ describe('Appreciate OptionsForm Component', () => {
 
     await toggle.trigger('change');
     expect(globalOptions.toggleAutoSaveState).toHaveBeenCalled();
+  });
+
+  it('renders disabled Undo button when history is empty, and enables it when multiple snapshots exist', async () => {
+    const history = getAppHistoryRef('appreciate');
+    history.value = [];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const undoBtn = wrapper.find('#optionsForm-undo');
+    expect(undoBtn.exists()).toBe(true);
+    expect(undoBtn.attributes('disabled')).toBeDefined();
+
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: '1 instrument ($10,000)', data: { 'appreciate.instruments': [] } },
+      { id: '2', timestamp: Date.now() - 60000, hash: 'hash2', summary: '2 instruments ($20,000)', data: { 'appreciate.instruments': [] } },
+    ];
+    await wrapper.vm.$nextTick();
+
+    expect(undoBtn.attributes('disabled')).toBeUndefined();
+
+    // Trigger undo
+    await undoBtn.trigger('click');
+    expect(history.value[0].summary).toBe('2 instruments ($20,000)');
+  });
+
+  it('renders snapshot history list and allows restoring a previous snapshot', async () => {
+    const history = getAppHistoryRef('appreciate');
+    const validInstrument = {
+      id: 'i1',
+      currentBalance: 1000,
+      annualRate: 7,
+      name: 'Test Equity',
+      annualLimit: 0,
+    };
+
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: 'Current: 0 instruments', data: { 'appreciate.instruments': [] } },
+      { id: '2', timestamp: Date.now() - 30000, hash: 'hash2', summary: 'Previous: 1 instrument', data: { 'appreciate.instruments': [validInstrument] } },
+    ];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    expect(wrapper.text()).toContain('State Memory (Last 2 of 10)');
+    expect(wrapper.text()).toContain('Current: 0 instruments');
+    expect(wrapper.text()).toContain('Previous: 1 instrument');
+
+    const restore0 = wrapper.find('#optionsForm-restore-0');
+    expect(restore0.attributes('disabled')).toBeDefined();
+
+    const restore1 = wrapper.find('#optionsForm-restore-1');
+    expect(restore1.attributes('disabled')).toBeUndefined();
+
+    await restore1.trigger('click');
+    expect(history.value[0].summary).toBe('Previous: 1 instrument');
+  });
+
+  it('clears state history when Clear history is clicked', async () => {
+    const history = getAppHistoryRef('appreciate');
+    history.value = [
+      { id: '1', timestamp: Date.now(), hash: 'hash1', summary: 'Snapshot', data: {} },
+    ];
+
+    const wrapper = mount(OptionsForm, {
+      global: globalConfig,
+    });
+
+    const clearHistoryBtn = wrapper.find('#optionsForm-clear-history');
+    expect(clearHistoryBtn.exists()).toBe(true);
+
+    await clearHistoryBtn.trigger('click');
+    expect(history.value).toEqual([]);
+    expect(wrapper.find('#optionsForm-history').exists()).toBe(false);
   });
 });

@@ -2,12 +2,40 @@
 import { computed, ref, ComputedRef } from 'vue';
 
 import constants from '@/apps/debtonate/constants/constants';
+import debtonateKeys from '@/apps/debtonate/constants/keys';
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
 import GlobalOptionsFormlet from '@/apps/shared/components/forms/GlobalOptionsFormlet.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
+import { useStateHistory } from '@/apps/shared/composables/useStateHistory';
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
+
+const {
+  canUndo,
+  clearHistory,
+  formatTime,
+  pushSnapshot,
+  restoreSnapshot,
+  snapshots,
+  undo,
+} = useStateHistory({
+  appType: 'debtonate',
+  exportState: state.exportState,
+  importState: state.importState,
+  getSummary: (data) => {
+    const rawLoans = data[debtonateKeys.LS_LOANS] || [];
+    const count = rawLoans.length;
+    if (!count) return 'Empty portfolio';
+    const total = rawLoans.reduce((acc: number, l: any) => acc + (Number(l.principal) || 0), 0);
+    return `${count} ${count === 1 ? 'loan' : 'loans'} (${globalOptions.Money(total)})`;
+  },
+});
+
+const handleSaveState = (): void => {
+  state.saveState();
+  pushSnapshot();
+};
 
 const tabs = [
   { key: 'all', label: 'All' },
@@ -323,9 +351,17 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
               </base-button>
               <base-button
                 class="btn-xs sm:btn-sm btn-primary"
-                @click="state.saveState"
+                @click="handleSaveState"
               >
                 {{ constants.BTN_SAVE }}
+              </base-button>
+              <base-button
+                :id="`${constants.OPTIONS_FORM_ID}-undo`"
+                class="btn-xs sm:btn-sm btn-secondary btn-outline"
+                :disabled="!canUndo"
+                @click="undo"
+              >
+                {{ constants.BTN_UNDO }}
               </base-button>
               <base-button
                 class="btn-xs sm:btn-sm"
@@ -340,6 +376,58 @@ const buttonText = (flag: boolean): string => (flag ? constants.BTN_ON : constan
               >
                 {{ constants.BTN_CLEAR }}
               </base-button>
+            </div>
+
+            <!-- Snapshot Memory Timeline -->
+            <div
+              v-if="snapshots.length > 0"
+              :id="`${constants.OPTIONS_FORM_ID}-history`"
+              class="mt-2 pt-3 border-t border-base-content/10 flex flex-col gap-2"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-base-content/80">
+                  State Memory (Last {{ snapshots.length }} of 10)
+                </span>
+                <button
+                  :id="`${constants.OPTIONS_FORM_ID}-clear-history`"
+                  type="button"
+                  class="text-[10px] text-error hover:underline cursor-pointer"
+                  @click="clearHistory"
+                >
+                  Clear history
+                </button>
+              </div>
+              <div class="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+                <div
+                  v-for="(snapshot, index) in snapshots"
+                  :id="`${constants.OPTIONS_FORM_ID}-snapshot-${index}`"
+                  :key="snapshot.id"
+                  class="flex items-center justify-between gap-2 p-2 rounded-lg bg-base-100 text-xs border border-base-content/5 hover:border-base-content/20 transition-colors"
+                >
+                  <div class="flex flex-col min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-medium text-base-content truncate">{{ snapshot.summary || 'Saved state' }}</span>
+                      <span
+                        v-if="index === 0"
+                        class="badge badge-xs badge-primary font-normal"
+                      >
+                        Latest
+                      </span>
+                    </div>
+                    <span class="text-[10px] text-base-content/60">
+                      {{ formatTime(snapshot.timestamp) }}
+                    </span>
+                  </div>
+                  <base-button
+                    :id="`${constants.OPTIONS_FORM_ID}-restore-${index}`"
+                    class="btn-xs btn-outline btn-primary shrink-0"
+                    :disabled="index === 0"
+                    @click="restoreSnapshot(index)"
+                  >
+                    {{ constants.BTN_RESTORE }}
+                  </base-button>
+                </div>
+              </div>
             </div>
           </div>
 

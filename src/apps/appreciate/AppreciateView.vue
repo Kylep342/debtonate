@@ -21,6 +21,8 @@ import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/
 import { useModal } from '@/apps/shared/composables/useModal';
 import { usePlanSharing } from '@/apps/shared/composables/usePlanSharing';
 import { useAutoSave } from '@/apps/shared/composables/useAutoSave';
+import appreciateKeys from '@/apps/appreciate/constants/keys';
+import { useStateHistory } from '@/apps/shared/composables/useStateHistory';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 
 const state: AppreciateCoreStore = useAppreciateCoreStore();
@@ -32,9 +34,25 @@ const { isPlanLoadedFromUrl, planLoadedMessage, dismissPlanAlert } = usePlanShar
   importState: state.importState,
 });
 
+const { pushSnapshot } = useStateHistory({
+  appType: 'appreciate',
+  exportState: state.exportState,
+  importState: state.importState,
+  getSummary: (data) => {
+    const rawInst = data[appreciateKeys.LS_INSTRUMENTS] || [];
+    const count = rawInst.length;
+    if (!count) return 'Empty portfolio';
+    const total = rawInst.reduce((acc: number, inst: any) => acc + (Number(inst.currentBalance) || 0), 0);
+    return `${count} ${count === 1 ? 'instrument' : 'instruments'} (${globalOptions.Money(total)})`;
+  },
+});
+
 useAutoSave({
   saveFn: state.saveState,
   isPlanLoadedFromUrl,
+  onSave: () => {
+    pushSnapshot();
+  },
   watchedSources: [
     () => state.accrueBeforeContribution,
     () => state.budgets,
@@ -56,6 +74,9 @@ useAutoSave({
 
 onMounted(() => {
   globalOptions.autoLoadIfEnabled('appreciate', state.loadState);
+  if (state.instruments.length > 0) {
+    pushSnapshot();
+  }
 });
 
 const activeTab = ref('analysis');
