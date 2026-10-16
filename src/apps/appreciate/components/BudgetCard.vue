@@ -4,21 +4,22 @@ import { computed, ComputedRef } from 'vue';
 
 import constants from '@/apps/appreciate/constants/constants';
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
-import ColorDot from '@/apps/shared/components/ColorDot.vue';
+import SummaryCard from '@/apps/shared/components/SummaryCard.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
-import { Button } from '@/apps/shared/types/app';
+import { Button, CardBadge, CardMetricRow } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
-  budget: MonthlyBudget,
-  viewedInstrumentId: string,
+  budget: MonthlyBudget;
+  viewedInstrumentId: string;
 }>();
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: AppreciateCoreStore = useAppreciateCoreStore();
 
 const isCareerPhase: ComputedRef<boolean> = computed(() => state.viewPhase === constants.PHASE_CAREER);
+const isDefault: ComputedRef<boolean> = computed(() => props.budget.id === constants.DEFAULT);
 
 const viewedContributionSummary: ComputedRef<contributionTypes.ContributionSchedule | null> = computed(() => {
   if (!isCareerPhase.value) return null;
@@ -43,7 +44,6 @@ const netWorth: ComputedRef<number> = computed(() => {
       )
       : finalBalance;
   } else if (viewedWithdrawalSummary.value) {
-    // In retirement, show ending balance
     const schedule = viewedWithdrawalSummary.value.amortizationSchedule;
     const finalBalance = schedule.length > 0 ? Number(schedule.slice(-1)[0].currentBalance) : 0;
     return state.deflateAllMoney
@@ -142,9 +142,8 @@ const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.h
 
 const graphContent: ComputedRef<Arc[]> = computed(() => {
   if (isCareerPhase.value) {
-    return state.cardGraphs[props.viewedInstrumentId][props.budget.id];
+    return state.cardGraphs[props.viewedInstrumentId]?.[props.budget.id] || [];
   } else {
-    // Withdrawal Donut
     const summary = viewedWithdrawalSummary.value;
     if (!summary) return [];
     return [
@@ -157,7 +156,7 @@ const graphContent: ComputedRef<Arc[]> = computed(() => {
 const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
 
 const defaultContributionSummary = computed(() => {
-  if (!isCareerPhase.value || props.budget.id === constants.DEFAULT) return null;
+  if (!isCareerPhase.value || isDefault.value) return null;
   try {
     return state.getContributionSchedule(props.viewedInstrumentId, constants.DEFAULT);
   } catch {
@@ -166,7 +165,7 @@ const defaultContributionSummary = computed(() => {
 });
 
 const appreciationDelta = computed(() => {
-  if (!isCareerPhase.value || props.budget.id === constants.DEFAULT || !defaultContributionSummary.value || !viewedContributionSummary.value) {
+  if (!isCareerPhase.value || isDefault.value || !defaultContributionSummary.value || !viewedContributionSummary.value) {
     return null;
   }
   const defaultSched = defaultContributionSummary.value.amortizationSchedule;
@@ -186,7 +185,7 @@ const appreciationDelta = computed(() => {
   };
 });
 
-const cardHeaderBadge = computed(() => {
+const cardHeaderBadge = computed<CardBadge | null>(() => {
   if (isCareerPhase.value) {
     if (!appreciationDelta.value) return null;
     return {
@@ -209,6 +208,99 @@ const cardHeaderBadge = computed(() => {
   }
 });
 
+const subtitle: ComputedRef<string> = computed(() =>
+  isDefault.value ? `Baseline · ${budgetAmount.value}` : budgetAmount.value
+);
+
+const metrics: ComputedRef<CardMetricRow[]> = computed(() => {
+  const rows: CardMetricRow[] = [
+    {
+      label: netWorthLabel.value,
+      value: budgetNetWorth.value,
+    },
+    {
+      label: 'Amount',
+      value: budgetAmount.value,
+    },
+  ];
+
+  if (isCareerPhase.value && !isDefault.value && appreciationDelta.value) {
+    rows.push({
+      label: 'Extra Net Worth',
+      value: appreciationDelta.value.extraTotalText,
+      rowClass: 'bg-success/10',
+      labelClass: 'text-success font-semibold',
+      valueClass: 'text-success',
+    });
+  }
+
+  if (!isCareerPhase.value && !isDefault.value) {
+    if (props.budget.relative > state.desiredNetIncome) {
+      rows.push({
+        label: 'vs Target',
+        value: `+${globalOptions.Money(props.budget.relative - state.desiredNetIncome)}/mo`,
+        valueClass: 'text-success font-semibold',
+      });
+    } else if (props.budget.relative < state.desiredNetIncome) {
+      rows.push({
+        label: 'vs Target',
+        value: `-${globalOptions.Money(state.desiredNetIncome - props.budget.relative)}/mo`,
+        valueClass: 'text-warning font-semibold',
+      });
+    } else {
+      rows.push({
+        label: 'vs Target',
+        value: `${globalOptions.Money(0)}/mo`,
+        valueClass: 'text-primary font-semibold',
+      });
+    }
+  } else if (isCareerPhase.value && !isDefault.value) {
+    rows.push({
+      label: 'Extra',
+      value: `+${globalOptions.Money(props.budget.relative)}/mo`,
+      valueClass: 'text-success font-semibold',
+    });
+  }
+
+  rows.push({
+    label: periodLabel.value,
+    value: budgetPeriodCount.value,
+  });
+
+  if (isCareerPhase.value && state.instruments.length) {
+    rows.push({
+      label: 'Crossover Point',
+      value: crossoverFormatted.value,
+      tooltip: 'Crossover Point (Growth >= Contribution)',
+    });
+  }
+
+  if (!isCareerPhase.value && state.instruments.length) {
+    rows.push({
+      label: 'Withdrawal Rate',
+      value: safeWithdrawalResult.value.formatted,
+      tooltip: 'Safe Withdrawal Rate (SWR)',
+      badge:
+        safeWithdrawalResult.value.tier !== 'na'
+          ? {
+              text: safeWithdrawalResult.value.label,
+              badgeClass: safeWithdrawalResult.value.badgeClass,
+            }
+          : null,
+    });
+  }
+
+  if (isCareerPhase.value && state.instruments.length) {
+    rows.push({
+      label: steadyStateLabel.value,
+      value: steadyStateWithdrawalFormatted.value,
+      tooltip: steadyStateLabel.value,
+    });
+  }
+
+  return rows;
+});
+
 const baseButtons: ComputedRef<Button[]> = computed(() => ([
   {
     text: constants.BTN_DETAILS,
@@ -228,175 +320,24 @@ const editButtons: ComputedRef<Button[]> = computed(() => ([
   },
 ]));
 
-const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => isDefault.value ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
-  <base-card
-    :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']"
-    :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']"
-  >
-    <template #cardTitle>
-      <div class="card-actions flow-root w-full min-w-0">
-        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <div class="flex items-center gap-1.5 min-w-0 truncate">
-            <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
-              {{ budgetName }}
-            </h2>
-            <span
-              v-if="cardHeaderBadge"
-              :class="['badge badge-xs sm:badge-sm font-semibold text-[11px] shrink-0', cardHeaderBadge.badgeClass]"
-            >
-              {{ cardHeaderBadge.text }}
-            </span>
-          </div>
-          <base-menu
-            :text="constants.BTN_MENU"
-            :buttons="buttons"
-            :classes="['btn-sm']"
-          />
-        </div>
-      </div>
-    </template>
-    <template #cardBody>
-      <h3
-        v-if="state.instruments.length"
-        class="text-center font-medium text-sm truncate mb-1"
-      >
-        {{ header }}
-      </h3>
-      <donut-graph
-        v-if="state.instruments.length"
-        :config="state.budgetCardGraphConfig"
-        :graph="graphContent"
-        :anchor-id="budget.id"
-      />
-      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
-        <template #body>
-          <tbody>
-            <template v-if="state.instruments.length">
-              <tr
-                v-for="(datum) in graphContent"
-                :key="datum.label"
-              >
-                <td class="truncate max-w-[110px]">
-                  <ColorDot :color="datum.color || ''" />{{ datum.label }}
-                </td>
-                <td :class="['text-right', 'whitespace-nowrap']">
-                  <b>{{ globalOptions.Money(datum.value) }}</b>
-                </td>
-              </tr>
-            </template>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                Amount
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetAmount }}</b>
-              </td>
-            </tr>
-            <tr
-              v-if="isCareerPhase && budget.id !== constants.DEFAULT && appreciationDelta"
-              class="bg-success/10"
-            >
-              <td class="truncate max-w-[110px] text-success font-semibold">
-                Extra Net Worth
-              </td>
-              <td class="text-right whitespace-nowrap text-success">
-                <b>{{ appreciationDelta.extraTotalText }}</b>
-              </td>
-            </tr>
-            <tr v-if="!isCareerPhase && budget.id !== constants.DEFAULT">
-              <td class="truncate max-w-[110px]">
-                vs Target
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b
-                  v-if="budget.relative > state.desiredNetIncome"
-                  class="text-success font-semibold"
-                >
-                  +{{ globalOptions.Money(budget.relative - state.desiredNetIncome) }}/mo
-                </b>
-                <b
-                  v-else-if="budget.relative < state.desiredNetIncome"
-                  class="text-warning font-semibold"
-                >
-                  -{{ globalOptions.Money(state.desiredNetIncome - budget.relative) }}/mo
-                </b>
-                <b
-                  v-else
-                  class="text-primary font-semibold"
-                >
-                  {{ globalOptions.Money(0) }}/mo
-                </b>
-              </td>
-            </tr>
-            <tr v-else-if="isCareerPhase && budget.id !== constants.DEFAULT">
-              <td class="truncate max-w-[110px]">
-                Extra
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b class="text-success font-semibold">+{{ globalOptions.Money(budget.relative) }}/mo</b>
-              </td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                {{ periodLabel }}
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetPeriodCount }}</b>
-              </td>
-            </tr>
-            <tr v-if="isCareerPhase && state.instruments.length">
-              <td
-                class="truncate max-w-[110px]"
-                title="Crossover Point (Growth >= Contribution)"
-              >
-                Crossover Point
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ crossoverFormatted }}</b>
-              </td>
-            </tr>
-            <tr v-if="!isCareerPhase && state.instruments.length">
-              <td
-                class="truncate max-w-[110px]"
-                title="Safe Withdrawal Rate (SWR)"
-              >
-                Withdrawal Rate
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap', 'flex', 'items-center', 'justify-end', 'gap-1']">
-                <b>{{ safeWithdrawalResult.formatted }}</b>
-                <span
-                  v-if="safeWithdrawalResult.tier !== 'na'"
-                  :class="['badge', 'badge-xs', safeWithdrawalResult.badgeClass, 'font-semibold', 'text-[10px]']"
-                >
-                  {{ safeWithdrawalResult.label }}
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                {{ netWorthLabel }}
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetNetWorth }}</b>
-              </td>
-            </tr>
-            <tr v-if="isCareerPhase && state.instruments.length">
-              <td
-                class="truncate max-w-[110px]"
-                :title="steadyStateLabel"
-              >
-                {{ steadyStateLabel }}
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ steadyStateWithdrawalFormatted }}</b>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </base-table>
-    </template>
-  </base-card>
+  <SummaryCard
+    :anchor-id="budget.id"
+    :title="budgetName"
+    :subtitle="subtitle"
+    :badge="cardHeaderBadge"
+    :is-baseline="isDefault"
+    :menu-text="constants.BTN_MENU"
+    :menu-buttons="buttons"
+    :show-graph="Boolean(state.instruments.length)"
+    :graph-header="header"
+    :graph-config="state.budgetCardGraphConfig"
+    :graph-content="graphContent"
+    :metrics="metrics"
+  />
 </template>
+
+

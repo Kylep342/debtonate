@@ -113,6 +113,63 @@ describe('BudgetCard Component (Debtonate)', () => {
     expect(wrapper.text()).toContain('1y 4m sooner');
     expect(wrapper.text()).toContain('Interest Saved');
     expect(wrapper.text()).toContain('Time Saved');
+
+    // Trigger Edit and Delete menu buttons on non-default budget
+    const menu = wrapper.findComponent(BaseMenu);
+    expect(menu.props('buttons').length).toBe(3);
+    menu.props('buttons')[0].onClick();
+    expect(store.viewBudget).toHaveBeenCalledWith('b1');
+    menu.props('buttons')[1].onClick();
+    expect(store.editBudget).toHaveBeenCalledWith('b1');
+    menu.props('buttons')[2].onClick();
+    expect(store.deleteBudget).toHaveBeenCalledWith('b1');
+  });
+
+  it('handles baseline default budget, exact-year and month-only deltas, and empty loans alert', async () => {
+    const store = useDebtonateCoreStore();
+    store.loans = [] as any;
+
+    vi.mocked(store.getBudgetName).mockReturnValue('Minimum');
+    vi.mocked(store.getPaymentSchedule).mockImplementation((loanId: string, budgetId: string) => {
+      if (budgetId === 'default') {
+        return {
+          lifetimePrincipal: 5000,
+          lifetimeInterest: 2000,
+          amortizationSchedule: new Array(24).fill({})
+        } as any;
+      }
+      return {
+        lifetimePrincipal: 5000,
+        lifetimeInterest: 1500,
+        amortizationSchedule: new Array(12).fill({})
+      } as any;
+    });
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {};
+
+    const defaultWrapper = mount(BudgetCard, {
+      props: {
+        budget: { id: 'default', relative: 0, absolute: 500 } as any,
+        viewedLoanId: mockLoanId
+      },
+      global: globalConfig
+    });
+
+    expect(defaultWrapper.find('.cardHeaderTitle + .badge').text()).toBe('Baseline');
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    defaultWrapper.findComponent(BaseMenu).props('buttons')[0].onClick();
+    expect(alertSpy).toHaveBeenCalled();
+    alertSpy.mockRestore();
+
+    // Exact 1y sooner (24 - 12 = 12 months)
+    const yearWrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedLoanId: mockLoanId
+      },
+      global: globalConfig
+    });
+    expect(yearWrapper.text()).toContain('1y sooner');
   });
 });
 

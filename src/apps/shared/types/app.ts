@@ -34,3 +34,17 @@ export type FormField = {
   hint?: string;
 };
 
+export type CardBadge = {
+  text: string;
+  badgeClass?: string;
+};
+
+export type CardMetricRow = {
+  label: string;
+  value: string | number | Date;
+  tooltip?: string;
+  rowClass?: string;
+  labelClass?: string;
+  valueClass?: string;
+  badge?: CardBadge | null;
+};

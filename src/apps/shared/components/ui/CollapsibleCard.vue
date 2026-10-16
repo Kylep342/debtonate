@@ -24,7 +24,7 @@ defineExpose({
 </script>
 
 <template>
-  <BaseCard :body-classes="bodyClasses">
+  <BaseCard :body-classes="isCollapsed ? ['hidden', ...(bodyClasses || [])] : bodyClasses">
     <template #cardTitle>
       <div class="flex items-center justify-between">
         <span>
@@ -55,3 +55,4 @@ defineExpose({
     </template>
   </BaseCard>
 </template>
+

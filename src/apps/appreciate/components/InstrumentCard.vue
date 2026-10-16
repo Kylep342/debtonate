@@ -3,16 +3,16 @@ import { computed, ComputedRef } from 'vue';
 
 import { useAppreciateCoreStore, AppreciateCoreStore } from '@/apps/appreciate/stores/core';
 import constants from '@/apps/appreciate/constants/constants';
-import ColorDot from '@/apps/shared/components/ColorDot.vue';
+import SummaryCard from '@/apps/shared/components/SummaryCard.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
-import { Button } from '@/apps/shared/types/app';
+import { Button, CardBadge, CardMetricRow } from '@/apps/shared/types/app';
 import { Arc } from '@/apps/shared/types/graph';
 import { useBreakpoint } from '@/apps/shared/functions/viewport';
 import { UIInstrument } from '@/apps/appreciate/types/core';
 
 const props = defineProps<{
-  instrument: UIInstrument,
-  viewedBudgetId: string,
+  instrument: UIInstrument;
+  viewedBudgetId: string;
 }>();
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
@@ -20,21 +20,29 @@ const state: AppreciateCoreStore = useAppreciateCoreStore();
 const { isMobile } = useBreakpoint();
 
 const isCareerPhase = computed(() => state.viewPhase === constants.PHASE_CAREER);
+const isTotals = computed(() => props.instrument.id === constants.TOTALS);
 
 const instrumentCurrentBalance: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.currentBalance)}`);
 const instrumentInterestRate: ComputedRef<string> = computed(() => `${globalOptions.Percent(props.instrument.annualRate * 100)}`);
 const instrumentAnnualLimit: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.annualLimit)}`);
 const instrumentMaxMonthlyContribution: ComputedRef<string> = computed(() => `${globalOptions.Money(props.instrument.annualLimit / constants.PERIODS_PER_YEAR)}/month`);
 
+const startingBalance: ComputedRef<string> = computed(() => {
+  const careerSchedule = state.getContributionSchedule(
+    props.instrument.id,
+    state.selectedCareerBudgetId || constants.DEFAULT
+  );
+  const lastBalance = careerSchedule?.amortizationSchedule?.slice(-1)[0]?.currentBalance || 0;
+  return `${globalOptions.Money(lastBalance)}`;
+});
+
 const instrumentName: ComputedRef<string> = computed(() => state.getInstrumentName(props.instrument.id));
 const header: ComputedRef<string> = computed(() => state.instrumentCardGraphConfig.header(props.viewedBudgetId));
 
 const graphContent: ComputedRef<Arc[]> = computed(() => {
   if (isCareerPhase.value) {
-    return state.cardGraphs[props.instrument.id][props.viewedBudgetId];
+    return state.cardGraphs[props.instrument.id]?.[props.viewedBudgetId] || [];
   } else {
-    // Withdrawal Donut for this instrument
-    // Ensure the budget exists in withdrawal schedules
     const scheduleMap = state.withdrawalSchedules[props.instrument.id];
     if (!scheduleMap || !scheduleMap[props.viewedBudgetId]) {
       return [];
@@ -45,6 +53,66 @@ const graphContent: ComputedRef<Arc[]> = computed(() => {
       { label: 'Withdrawals', value: Number(summary.lifetimeWithdrawal), color: globalOptions.colorPalette[2] },
     ];
   }
+});
+
+const subtitle: ComputedRef<string> = computed(() => {
+  if (isTotals.value) {
+    return state.instruments.length
+      ? `${state.instruments.length} ${state.instruments.length === 1 ? 'Account' : 'Accounts'} · ${instrumentInterestRate.value} APY`
+      : 'Portfolio Summary';
+  }
+  return `${instrumentInterestRate.value} Return · ${instrumentCurrentBalance.value}`;
+});
+
+const cardBadge: ComputedRef<CardBadge | null> = computed(() =>
+  isTotals.value ? { text: 'Aggregate', badgeClass: 'badge-primary badge-outline' } : null
+);
+
+const projectedBalance: ComputedRef<string> = computed(() => {
+  const sliceSum = graphContent.value.reduce((acc, item) => acc + (Number(item.value) || 0), 0);
+  const total = (Number(props.instrument.currentBalance) || 0) + sliceSum;
+  return `${globalOptions.Money(total)}`;
+});
+
+const metrics: ComputedRef<CardMetricRow[]> = computed(() => {
+  const rows: CardMetricRow[] = isCareerPhase.value
+    ? [
+        {
+          label: 'Current Balance',
+          value: instrumentCurrentBalance.value,
+        },
+        {
+          label: 'Retirement Balance',
+          value: projectedBalance.value,
+        },
+      ]
+    : [
+        {
+          label: 'Starting Balance',
+          value: startingBalance.value,
+        },
+      ];
+
+  rows.push({
+    label: 'Expected Return',
+    value: instrumentInterestRate.value,
+    valueClass: 'text-primary',
+  });
+
+  if (props.instrument.annualLimit && isCareerPhase.value) {
+    rows.push(
+      {
+        label: 'Annual Limit',
+        value: instrumentAnnualLimit.value,
+      },
+      {
+        label: isMobile.value ? 'Max Monthly' : 'Max Contribution',
+        value: instrumentMaxMonthlyContribution.value,
+      }
+    );
+  }
+
+  return rows;
 });
 
 const alertButtonIsDisabled = (): void => alert('Create an instrument to use this action');
@@ -68,102 +136,24 @@ const editButtons: ComputedRef<Button[]> = computed(() => ([
   },
 ]));
 
-const buttons: ComputedRef<Button[]> = computed(() => props.instrument.id === constants.TOTALS ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => isTotals.value ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
-  <base-card
-    :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']"
-    :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']"
-  >
-    <template #cardTitle>
-      <div :class="['card-actions', 'flow-root', 'p-0', 'w-full', 'min-w-0']">
-        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
-            {{ instrumentName }}
-          </h2>
-          <base-menu
-            :text="constants.BTN_MENU"
-            :buttons="buttons"
-            :classes="['btn-sm']"
-          />
-        </div>
-      </div>
-    </template>
-    <template #cardBody>
-      <h3
-        v-if="state.instruments.length"
-        class="text-center font-medium text-sm truncate mb-1"
-      >
-        {{ header }}
-      </h3>
-      <donut-graph
-        v-if="state.instruments.length"
-        :config="state.instrumentCardGraphConfig"
-        :graph="graphContent"
-        :anchor-id="instrument.id"
-      />
-      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
-        <template #body>
-          <tbody>
-            <template v-if="state.instruments.length">
-              <tr
-                v-for="(datum) in graphContent"
-                :key="datum.label"
-              >
-                <td class="truncate max-w-[110px]">
-                  <ColorDot :color="datum.color || ''" />{{ datum.label }}
-                </td>
-                <td :class="['text-right', 'whitespace-nowrap']">
-                  <b>{{ globalOptions.Money(datum.value) }}</b>
-                </td>
-              </tr>
-            </template>
-            <tr v-if="isCareerPhase">
-              <td class="truncate max-w-[110px]">
-                Current Balance
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ instrumentCurrentBalance }}</b>
-              </td>
-            </tr>
-            <tr v-else>
-              <td class="truncate max-w-[110px]">
-                Starting Balance
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ globalOptions.Money(
-                  state.getContributionSchedule(props.instrument.id, state.selectedCareerBudgetId || constants.DEFAULT).amortizationSchedule.slice(-1)[0]?.currentBalance || 0
-                ) }}</b>
-              </td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                Expected Return
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ instrumentInterestRate }}</b>
-              </td>
-            </tr>
-            <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td class="truncate max-w-[110px]">
-                Annual Limit
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ instrumentAnnualLimit }}</b>
-              </td>
-            </tr>
-            <tr v-if="instrument.annualLimit && isCareerPhase">
-              <td class="truncate max-w-[110px]">
-                {{ isMobile ? 'Max Monthly' : 'Max Contribution' }}
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ instrumentMaxMonthlyContribution }}</b>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </base-table>
-    </template>
-  </base-card>
+  <SummaryCard
+    :anchor-id="instrument.id"
+    :title="instrumentName"
+    :subtitle="subtitle"
+    :badge="cardBadge"
+    :is-baseline="isTotals"
+    :menu-text="constants.BTN_MENU"
+    :menu-buttons="buttons"
+    :show-graph="Boolean(state.instruments.length)"
+    :graph-header="header"
+    :graph-config="state.instrumentCardGraphConfig"
+    :graph-content="graphContent"
+    :metrics="metrics"
+  />
 </template>
+
+

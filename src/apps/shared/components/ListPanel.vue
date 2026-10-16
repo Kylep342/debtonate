@@ -31,19 +31,19 @@ const createButton: ComputedRef<Button> = computed(() => ({
         :button="createButton"
         :menu="pivotMenu"
         :title="title"
-        :class="['border-b-2', 'flex-none']"
+        :class="['border-b', 'border-base-content/15', 'flex-none']"
       />
     </template>
     <template #cardBody>
       <div
-        :class="['border-r-2', 'overflow-y-auto', 'overflow-x-hidden', 'flex-1', 'min-h-0', 'w-full', 'max-w-full']"
+        :class="['border-r', 'border-base-content/15', 'overflow-y-auto', 'overflow-x-hidden', 'flex-1', 'min-h-0', 'w-full', 'max-w-full', 'pr-1']"
         style="-webkit-overflow-scrolling: touch;"
       >
-        <ul class="w-full min-w-0">
+        <ul class="w-full min-w-0 space-y-2.5 py-1">
           <li
             v-for="item in items"
             :key="item.id"
-            class="w-full min-w-0 mb-2"
+            class="w-full min-w-0"
           >
             <slot
               name="item"
@@ -55,3 +55,4 @@ const createButton: ComputedRef<Button> = computed(() => ({
     </template>
   </base-card>
 </template>
+

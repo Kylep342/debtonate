@@ -72,5 +72,67 @@ describe('LoanCard Component (Debtonate)', () => {
 
     expect(wrapper.find('h2').text()).toBe('Car Loan');
     expect(wrapper.findComponent(DonutGraph).exists()).toBe(true);
+    expect(wrapper.text()).toContain('Total Paid');
+    expect(wrapper.text()).toContain('Original Principal');
+  });
+
+  it('renders Totals card with Aggregate badge, fees, and executes menu actions', async () => {
+    const store = useDebtonateCoreStore();
+    const totalsLoan = {
+      ...mockLoan,
+      id: 'totals',
+      currentBalance: 20000,
+      fees: 250,
+    };
+    store.loans = [mockLoan] as any;
+    vi.mocked(store.getLoanName).mockReturnValue('Totals');
+    (store as any).loanCardGraphConfig = mockGraphConfig;
+    (store as any).cardGraphs = {
+      totals: {
+        [mockBudgetId]: []
+      }
+    };
+
+    const totalsWrapper = mount(LoanCard, {
+      props: {
+        loan: totalsLoan as any,
+        viewedBudgetId: mockBudgetId
+      },
+      global: globalConfig
+    });
+
+    expect(totalsWrapper.find('.cardHeaderTitle + .badge').text()).toBe('Aggregate');
+    expect(totalsWrapper.text()).toContain('Fees');
+
+    const totalsMenu = totalsWrapper.findComponent(BaseMenu);
+    expect(totalsMenu.props('buttons').length).toBe(2);
+    totalsMenu.props('buttons')[0].onClick();
+    expect(store.viewLoan).toHaveBeenCalledWith('totals');
+    totalsMenu.props('buttons')[1].onClick();
+    expect(store.refinanceLoan).toHaveBeenCalledWith('totals');
+
+    // Individual loan menu actions (Details, Refinance, Edit, Delete)
+    const itemWrapper = mount(LoanCard, {
+      props: {
+        loan: mockLoan as any,
+        viewedBudgetId: mockBudgetId
+      },
+      global: globalConfig
+    });
+    const itemMenu = itemWrapper.findComponent(BaseMenu);
+    expect(itemMenu.props('buttons').length).toBe(4);
+    itemMenu.props('buttons')[2].onClick();
+    expect(store.editLoan).toHaveBeenCalledWith('loan1');
+    itemMenu.props('buttons')[3].onClick();
+    expect(store.deleteLoan).toHaveBeenCalledWith('loan1');
+
+    // Empty loans alert guard
+    store.loans = [] as any;
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    totalsMenu.props('buttons')[0].onClick();
+    totalsMenu.props('buttons')[1].onClick();
+    expect(alertSpy).toHaveBeenCalledTimes(2);
+    alertSpy.mockRestore();
   });
 });
+

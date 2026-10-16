@@ -74,4 +74,22 @@ describe('DonutGraph Component', () => {
 
     wrapper.unmount();
   });
+
+  it('renders centerLabel, centerValue, and non-compact size when provided', () => {
+    const wrapper = mount(DonutGraph, {
+      props: {
+        config: {},
+        graph: [{ label: 'Only Slice', value: 100, color: 'purple' }],
+        anchorId: 'test-center',
+        centerLabel: 'Total Paid',
+        centerValue: '$10,000',
+        compact: false
+      }
+    });
+
+    expect(wrapper.find('.donut-center-label').text()).toBe('Total Paid');
+    expect(wrapper.find('.donut-center-value').text()).toBe('$10,000');
+    expect(wrapper.find('svg').classes()).toContain('max-w-[180px]');
+  });
 });
+

@@ -365,4 +365,62 @@ describe('BudgetCard Component (Appreciate)', () => {
     expect(retirementMenu.props('buttons').length).toBe(1);
     expect(retirementMenu.props('buttons')[0].text).toBe(constants.BTN_DETAILS);
   });
+
+  it('executes career and retirement menu actions and renders vs Target comparisons', async () => {
+    const store = useAppreciateCoreStore();
+    (store as any).budgetCardGraphConfig = mockGraphConfig;
+    store.instruments = [{ id: mockInstrumentId }] as any;
+    store.desiredNetIncome = 1500;
+    store.deflateAllMoney = true;
+
+    // Career menu actions
+    store.viewPhase = constants.PHASE_CAREER;
+    vi.mocked(store.getContributionSchedule).mockReturnValue({
+      lifetimeContribution: 1000,
+      lifetimeGrowth: 500,
+      amortizationSchedule: [{ currentBalance: 1500 }]
+    } as any);
+    (store as any).cardGraphs = { [mockInstrumentId]: { [mockBudget.id]: [] } };
+
+    const careerWrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    const careerButtons = careerWrapper.findComponent(BaseMenu).props('buttons');
+    careerButtons[0].onClick();
+    expect(store.viewBudget).toHaveBeenCalledWith('b1');
+    careerButtons[1].onClick();
+    expect(store.editBudget).toHaveBeenCalledWith('b1');
+    careerButtons[2].onClick();
+    expect(store.deleteBudget).toHaveBeenCalledWith('b1');
+
+    // Retirement menu actions and vs Target below desiredNetIncome
+    store.viewPhase = constants.PHASE_RETIREMENT;
+    vi.mocked(store.getWithdrawalSchedule).mockReturnValue({
+      lifetimeGrowth: 100,
+      lifetimeWithdrawal: 1000,
+      amortizationSchedule: [{ currentBalance: 0, period: 18 }]
+    } as any);
+
+    const retirementWrapper = mount(BudgetCard, {
+      props: {
+        budget: mockBudget as any,
+        viewedInstrumentId: mockInstrumentId
+      },
+      global: globalConfig
+    });
+
+    expect(retirementWrapper.text()).toContain('vs Target');
+    expect(retirementWrapper.text()).toContain('Ending Balance (CYM)');
+    const retButtons = retirementWrapper.findComponent(BaseMenu).props('buttons');
+    retButtons[1].onClick();
+    expect(store.editWithdrawalBudget).toHaveBeenCalledWith('b1');
+    retButtons[2].onClick();
+    expect(store.deleteWithdrawalBudget).toHaveBeenCalledWith('b1');
+  });
 });
+

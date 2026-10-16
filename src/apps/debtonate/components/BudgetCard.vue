@@ -3,29 +3,37 @@ import { paymentTypes } from 'moneyfunx';
 import { computed, ComputedRef } from 'vue';
 
 import { useDebtonateCoreStore, DebtonateCoreStore } from '@/apps/debtonate/stores/core';
-import ColorDot from '@/apps/shared/components/ColorDot.vue';
 import constants from '@/apps/debtonate/constants/constants';
+import SummaryCard from '@/apps/shared/components/SummaryCard.vue';
 import { useGlobalOptionsStore, GlobalOptionsStore } from '@/apps/shared/stores/globalOptions';
-import { Button } from '@/apps/shared/types/app';
+import { Button, CardBadge, CardMetricRow } from '@/apps/shared/types/app';
 import { MonthlyBudget } from '@/apps/shared/types/core';
 import { Arc } from '@/apps/shared/types/graph';
 
 const props = defineProps<{
-  budget: MonthlyBudget,
-  viewedLoanId: string,
+  budget: MonthlyBudget;
+  viewedLoanId: string;
 }>();
 
 const globalOptions: GlobalOptionsStore = useGlobalOptionsStore();
 const state: DebtonateCoreStore = useDebtonateCoreStore();
 
-const viewedPaymentSchedule: ComputedRef<paymentTypes.PaymentSchedule> = computed(() => state.getPaymentSchedule(props.viewedLoanId, props.budget.id));
+const isDefault: ComputedRef<boolean> = computed(() => props.budget.id === constants.DEFAULT);
+
+const viewedPaymentSchedule: ComputedRef<paymentTypes.PaymentSchedule> = computed(() =>
+  state.getPaymentSchedule(props.viewedLoanId, props.budget.id)
+);
 
 const budgetAmount: ComputedRef<string> = computed(() => `${globalOptions.Money(props.budget.absolute)}/month`);
-const budgetPayments: ComputedRef<string | number | Date> = computed(() => globalOptions.Period(viewedPaymentSchedule.value.amortizationSchedule.length, true));
-const budgetTotalPaid: ComputedRef<string> = computed(() => `${globalOptions.Money(viewedPaymentSchedule.value.lifetimeInterest + viewedPaymentSchedule.value.lifetimePrincipal)}`);
+const budgetPayments: ComputedRef<string | number | Date> = computed(() =>
+  globalOptions.Period(viewedPaymentSchedule.value.amortizationSchedule.length, true)
+);
+const budgetTotalPaid: ComputedRef<string> = computed(() =>
+  `${globalOptions.Money(viewedPaymentSchedule.value.lifetimeInterest + viewedPaymentSchedule.value.lifetimePrincipal)}`
+);
 
 const defaultPaymentSchedule: ComputedRef<paymentTypes.PaymentSchedule | null> = computed(() => {
-  if (props.budget.id === constants.DEFAULT) return null;
+  if (isDefault.value) return null;
   try {
     return state.getPaymentSchedule(props.viewedLoanId, constants.DEFAULT);
   } catch {
@@ -34,7 +42,7 @@ const defaultPaymentSchedule: ComputedRef<paymentTypes.PaymentSchedule | null> =
 });
 
 const payoffDelta = computed(() => {
-  if (props.budget.id === constants.DEFAULT || !defaultPaymentSchedule.value || !viewedPaymentSchedule.value) {
+  if (isDefault.value || !defaultPaymentSchedule.value || !viewedPaymentSchedule.value) {
     return null;
   }
   const defaultMonths = defaultPaymentSchedule.value.amortizationSchedule?.length || 0;
@@ -68,11 +76,81 @@ const payoffDelta = computed(() => {
   };
 });
 
-const paymentsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments')
+const paymentsLabel: ComputedRef<string> = computed(() => globalOptions.periodsAsDates ? 'Debt Free' : 'Payments');
 const budgetName: ComputedRef<string> = computed(() => state.getBudgetName(props.budget.id));
 const header: ComputedRef<string> = computed(() => state.budgetCardGraphConfig.header(props.viewedLoanId));
 
-const graphContent: ComputedRef<Arc[]> = computed(() => state.cardGraphs[props.viewedLoanId][props.budget.id])
+const graphContent: ComputedRef<Arc[]> = computed(() => state.cardGraphs[props.viewedLoanId]?.[props.budget.id] || []);
+
+const subtitle: ComputedRef<string> = computed(() =>
+  isDefault.value
+    ? `Baseline · ${budgetAmount.value}`
+    : `${budgetAmount.value} (+${globalOptions.Money(props.budget.relative)}/mo)`
+);
+
+const cardBadge: ComputedRef<CardBadge | null> = computed(() => {
+  if (payoffDelta.value && (payoffDelta.value.timeText || payoffDelta.value.interestSavedText)) {
+    return {
+      text: (payoffDelta.value.timeText || payoffDelta.value.interestSavedText)!,
+      badgeClass: 'badge-success',
+    };
+  }
+  if (isDefault.value) {
+    return {
+      text: 'Baseline',
+      badgeClass: 'badge-primary badge-outline',
+    };
+  }
+  return null;
+});
+
+const metrics: ComputedRef<CardMetricRow[]> = computed(() => {
+  const rows: CardMetricRow[] = [
+    {
+      label: 'Total Paid',
+      value: budgetTotalPaid.value,
+    },
+    {
+      label: 'Amount',
+      value: budgetAmount.value,
+    },
+  ];
+
+  if (!isDefault.value) {
+    rows.push({
+      label: 'Over Minimum',
+      value: `+${globalOptions.Money(props.budget.relative)}/mo`,
+      valueClass: 'text-success font-semibold',
+    });
+  }
+
+  if (payoffDelta.value && payoffDelta.value.interestSavedText) {
+    rows.push({
+      label: 'Interest Saved',
+      value: payoffDelta.value.interestSavedText,
+      rowClass: 'bg-success/10',
+      labelClass: 'text-success font-semibold',
+      valueClass: 'text-success',
+    });
+  }
+
+  if (payoffDelta.value && payoffDelta.value.timeText) {
+    rows.push({
+      label: 'Time Saved',
+      value: payoffDelta.value.timeText,
+      rowClass: 'bg-success/10',
+      labelClass: 'text-success font-semibold',
+      valueClass: 'text-success',
+    });
+  }
+
+  rows.push({
+    label: paymentsLabel.value,
+    value: budgetPayments.value,
+  });
+
+  return rows;
+});
 
 const alertButtonIsDisabled = (): void => alert('Create a loan to use this action');
 
@@ -95,122 +173,24 @@ const editButtons: ComputedRef<Button[]> = computed(() => ([
   },
 ]));
 
-const buttons: ComputedRef<Button[]> = computed(() => props.budget.id === constants.DEFAULT ? baseButtons.value : editButtons.value);
+const buttons: ComputedRef<Button[]> = computed(() => isDefault.value ? baseButtons.value : editButtons.value);
 </script>
 
 <template>
-  <base-card
-    :class="['w-full', 'bg-base-100', 'min-w-0', 'max-w-full']"
-    :body-classes="['p-3', 'overflow-hidden', 'w-full', 'max-w-full']"
-  >
-    <template #cardTitle>
-      <div class="card-actions flow-root w-full min-w-0">
-        <div :class="['flex', 'justify-between', 'items-center', 'pr-2', 'min-w-0']">
-          <div class="flex items-center gap-1.5 min-w-0 truncate">
-            <h2 :class="['cardHeaderTitle', 'p-2', 'truncate', 'min-w-0', 'font-semibold', 'text-base']">
-              {{ budgetName }}
-            </h2>
-            <span
-              v-if="payoffDelta && (payoffDelta.timeText || payoffDelta.interestSavedText)"
-              class="badge badge-success badge-xs sm:badge-sm font-semibold text-[11px] shrink-0"
-            >
-              {{ payoffDelta.timeText || payoffDelta.interestSavedText }}
-            </span>
-          </div>
-          <base-menu
-            :text="constants.BTN_MENU"
-            :buttons="buttons"
-            :classes="['btn-sm']"
-          />
-        </div>
-      </div>
-    </template>
-    <template #cardBody>
-      <h3
-        v-if="state.loans.length"
-        class="text-center font-medium text-sm truncate mb-1"
-      >
-        {{ header }}
-      </h3>
-      <donut-graph
-        v-if="state.loans.length"
-        :config="state.budgetCardGraphConfig"
-        :graph="graphContent"
-        :anchor-id="budget.id"
-      />
-      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
-        <template #body>
-          <tbody>
-            <template v-if="state.loans.length">
-              <tr
-                v-for="(datum) in graphContent"
-                :key="datum.label"
-              >
-                <td class="truncate max-w-[110px]">
-                  <ColorDot :color="datum.color || ''" />{{ datum.label }}
-                </td>
-                <td :class="['text-right', 'whitespace-nowrap']">
-                  <b>{{ globalOptions.Money(datum.value) }}</b>
-                </td>
-              </tr>
-            </template>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                Amount
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetAmount }}</b>
-              </td>
-            </tr>
-            <tr v-if="budget.id !== constants.DEFAULT">
-              <td class="truncate max-w-[110px]">
-                Over Minimum
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b class="text-success font-semibold">+{{ globalOptions.Money(budget.relative) }}/mo</b>
-              </td>
-            </tr>
-            <tr
-              v-if="payoffDelta && payoffDelta.interestSavedText"
-              class="bg-success/10"
-            >
-              <td class="truncate max-w-[110px] text-success font-semibold">
-                Interest Saved
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap', 'text-success']">
-                <b>{{ payoffDelta.interestSavedText }}</b>
-              </td>
-            </tr>
-            <tr
-              v-if="payoffDelta && payoffDelta.timeText"
-              class="bg-success/10"
-            >
-              <td class="truncate max-w-[110px] text-success font-semibold">
-                Time Saved
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap', 'text-success']">
-                <b>{{ payoffDelta.timeText }}</b>
-              </td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                {{ paymentsLabel }}
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetPayments }}</b>
-              </td>
-            </tr>
-            <tr>
-              <td class="truncate max-w-[110px]">
-                Total Paid
-              </td>
-              <td :class="['text-right', 'whitespace-nowrap']">
-                <b>{{ budgetTotalPaid }}</b>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </base-table>
-    </template>
-  </base-card>
+  <SummaryCard
+    :anchor-id="budget.id"
+    :title="budgetName"
+    :subtitle="subtitle"
+    :badge="cardBadge"
+    :is-baseline="isDefault"
+    :menu-text="constants.BTN_MENU"
+    :menu-buttons="buttons"
+    :show-graph="Boolean(state.loans.length)"
+    :graph-header="header"
+    :graph-config="state.budgetCardGraphConfig"
+    :graph-content="graphContent"
+    :metrics="metrics"
+  />
 </template>
+
+
