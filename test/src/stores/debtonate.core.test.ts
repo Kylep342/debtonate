@@ -839,6 +839,14 @@ describe('Debtonate Core Store', () => {
       expect(state.refinancingFormActive).toBe(false);
       expect(state.currentLoanId).toBeNull();
 
+      // When loanDetailsPanelActive is true, exitRefinancingForm preserves currentLoanId
+      state.viewLoan(loanId);
+      state.refinanceLoan(loanId);
+      state.exitRefinancingForm();
+      expect(state.refinancingFormActive).toBe(false);
+      expect(state.currentLoanId).toBe(loanId);
+      state.unviewLoan();
+
       const scenarioId = state.createRefinanceScenario(loanId, 10000, 0.04, 4, 'Better Rate', 50);
       expect(state.refinancingScenarios[loanId]?.length).toBe(1);
 
@@ -951,6 +959,35 @@ describe('Debtonate Core Store', () => {
 
       const budgetComp = state.getBudgetComparativeAnalysis(budget.id);
       expect(budgetComp).toBeDefined();
+
+      // Test refinancing scenario integration with schedules, names, and comparative analysis
+      const scenId = state.createRefinanceScenario(baseLoan.id, baseLoan.currentBalance, 0.035, 3, 'Refi 3Yr', 150);
+      expect(state.loansWithScenarios.some((l) => l.id === scenId)).toBe(true);
+      expect(state.getLoanName(scenId)).toBe('Refi 3Yr');
+
+      const scenDefaultSchedule = state.getPaymentSchedule(scenId, constants.DEFAULT);
+      expect(scenDefaultSchedule.amortizationSchedule.length).toBeGreaterThan(0);
+
+      const scenExtraBudgetSchedule = state.getPaymentSchedule(scenId, budget.id);
+      expect(scenExtraBudgetSchedule.amortizationSchedule.length).toBeLessThanOrEqual(
+        scenDefaultSchedule.amortizationSchedule.length
+      );
+
+      const refiComp = state.getRefinancingComparativeAnalysis(baseLoan.id, budget.id);
+      expect(refiComp['Monthly Payment'][baseLoan.id]).toBeDefined();
+      expect(refiComp['Monthly Payment'][scenId]).toBeDefined();
+      expect(refiComp['Periods to Payoff'][scenId]).toBe(scenExtraBudgetSchedule.amortizationSchedule.length);
+
+      const scenLoanComp = state.getLoanComparativeAnalysis(scenId);
+      expect(scenLoanComp['Total Interest'][budget.id]).toBeDefined();
+
+      state.setSelectedLoanId(baseLoan.id);
+      expect(state.repatriateTabularAnalysis['Total Cost'][scenId]).toBeDefined();
+      expect(state.debtonateTabularAnalysis['Total Cost'][budget.id]).toBeDefined();
+
+      state.setPhase(constants.PHASE_REPATRIATE);
+      const repatriateBudgetComp = state.getBudgetComparativeAnalysis(budget.id);
+      expect(repatriateBudgetComp['Total Cost'][scenId]).toBeDefined();
     });
   });
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import elementIds from '@/apps/shared/constants/elementIds';
 import { exportToCsv, exportToJson, computeStateHash, CsvHeader } from '@/apps/shared/functions/export';
 
 const props = withDefaults(
@@ -11,6 +12,7 @@ const props = withDefaults(
     subtitle?: string;
     exportable?: boolean;
     baselineId?: string | null;
+    canDeleteItem?: (id: string) => boolean;
     showSummaryCards?: boolean;
     stateHash?: string;
   }>(),
@@ -18,6 +20,7 @@ const props = withDefaults(
     subtitle: '',
     exportable: true,
     baselineId: null,
+    canDeleteItem: undefined,
     showSummaryCards: true,
     stateHash: '',
   }
@@ -25,6 +28,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'selectBaseline', id: string): void;
+  (e: 'deleteItem', id: string): void;
 }>();
 
 const showDeltas = ref(Boolean(props.baselineId));
@@ -106,6 +110,7 @@ const isLowerBetter = (metric: string): boolean => {
     || m.includes('period')
     || m.includes('rate')
     || m.includes('debt')
+    || m.includes('payment')
   ) {
     return true;
   }
@@ -253,6 +258,7 @@ const metricTooltips: Record<string, string> = {
   'Growth Factor from Present': 'Multiplier of ending portfolio balance relative to total principal (current balance plus contributions).',
   'Growth factor from retirement start': 'Multiplier of final retirement balance relative to initial starting balance.',
   'Growth Factor from Retirement Start': 'Multiplier of final retirement balance relative to initial starting balance.',
+  'Monthly Payment': 'Required monthly payment for the loan or refinancing scenario.',
   'Avg Monthly Payment': 'Monthly budget amount allocated.',
   'Principal Contributed': 'Total out-of-pocket money deposited into the portfolio.',
   'Periods to Payoff': 'Total months needed to pay off debt completely.',
@@ -493,7 +499,19 @@ const handleExportJson = (): void => {
               @click="emit('selectBaseline', item.id)"
             >
               <div class="flex flex-col items-end gap-0.5">
-                <span class="truncate max-w-[140px]">{{ getItemName(item.id) }}</span>
+                <div class="flex items-center gap-1 justify-end">
+                  <span class="truncate max-w-[140px]">{{ getItemName(item.id) }}</span>
+                  <button
+                    v-if="canDeleteItem && canDeleteItem(item.id)"
+                    :id="`${elementIds.BTN_DELETE_SCENARIO_PREFIX}-${item.id}`"
+                    type="button"
+                    class="btn btn-ghost btn-xs text-error hover:bg-error/10 h-5 min-h-0 px-1 font-mono"
+                    title="Delete scenario"
+                    @click.stop="emit('deleteItem', item.id)"
+                  >
+                    x
+                  </button>
+                </div>
                 <span
                   v-if="props.baselineId && item.id === props.baselineId && displayItems.length > 1"
                   class="badge badge-xs badge-primary uppercase font-bold text-[9px] tracking-wider py-0 px-1"

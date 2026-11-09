@@ -41,20 +41,27 @@ describe('Debtonate OptionsForm Component', () => {
     expect(tabButtons[0].text()).toBe('All');
     expect(tabButtons[0].classes()).toContain('btn-primary');
 
-    // All sections are visible
-    expect(wrapper.text()).toContain('Strategy & Priority');
-    expect(wrapper.text()).toContain('Display & Regional');
-    expect(wrapper.text()).toContain('Data & Storage');
-    expect(wrapper.text()).toContain('Privacy & Data Ownership');
+    // All sections are visible, with Privacy & Data Ownership at the top
+    const bodyText = wrapper.text();
+    expect(bodyText).toContain('Privacy & Data Ownership');
+    expect(bodyText).toContain('Strategy & Priority');
+    expect(bodyText).toContain('Display & Regional');
+    expect(bodyText).toContain('Data & Storage');
+    expect(bodyText.indexOf('Privacy & Data Ownership')).toBeLessThan(bodyText.indexOf('Strategy & Priority'));
   });
 
-  it('filters to the Data tab when tab button is clicked', async () => {
+  it('hides Privacy & Data Ownership on the Strategy tab and shows it on the Data tab', async () => {
     const wrapper = mount(OptionsForm, {
       global: globalConfig,
     });
 
-    // Click on 'Data' tab button
     const tabButtons = wrapper.findAll('.bg-base-300\\/40 button');
+    const strategyTab = tabButtons.find(b => b.text() === 'Strategy');
+    expect(strategyTab).toBeDefined();
+    await strategyTab!.trigger('click');
+    expect(wrapper.text()).not.toContain('Privacy & Data Ownership');
+
+    // Click on 'Data' tab button
     const dataTab = tabButtons.find(b => b.text() === 'Data');
     expect(dataTab).toBeDefined();
     await dataTab!.trigger('click');
@@ -63,7 +70,7 @@ describe('Debtonate OptionsForm Component', () => {
     // Verify privacy disclaimer is rendered and strategy is hidden
     expect(wrapper.text()).toContain('Privacy & Data Ownership');
     expect(wrapper.text()).toContain('All data and calculation activity remain strictly within your browser');
-    expect(wrapper.text()).toContain('Saving, exporting, sharing, or deleting your plan is completely at your discretion');
+    expect(wrapper.text()).toContain('Saving, exporting, sharing, or deleting your data is at your discretion');
     expect(wrapper.text()).not.toContain('Repayment Priority Method');
   });
 

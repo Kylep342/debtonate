@@ -232,22 +232,22 @@ const resolvedCenterValue: ComputedRef<string> = computed(() => {
         </div>
       </div>
 
-      <base-table :class="['table-xs', 'w-full', 'max-w-full']">
+      <base-table :class="['table-xs', '!block', 'w-full', 'max-w-full']">
         <template #body>
-          <tbody>
+          <tbody class="block w-full">
             <template v-if="showGraph && safeGraphContent.length">
               <tr
                 v-for="datum in safeGraphContent"
                 :key="datum.label"
-                class="border-b border-base-content/5"
+                class="flex items-center justify-between gap-2 w-full border-b border-base-content/5"
               >
-                <td class="truncate max-w-[120px] text-xs text-base-content/80">
+                <td class="min-w-0 flex-1 truncate !px-1 text-xs text-base-content/80">
                   <ColorDot :color="datum.color || ''" />{{ datum.label }}
                 </td>
-                <td :class="['text-right', 'whitespace-nowrap', 'text-xs']">
+                <td :class="['shrink-0', 'text-right', 'whitespace-nowrap', '!px-1', 'text-xs']">
                   <span
                     v-if="getSliceShareText(datum.value)"
-                    class="badge badge-ghost badge-xs font-mono text-[10px] text-base-content/60 mr-1.5"
+                    class="badge badge-ghost badge-xs font-mono text-[10px] text-base-content/60 mr-1"
                   >{{ getSliceShareText(datum.value) }}</span>{{ ' ' }}<b class="font-mono text-base-content">{{ formatMoney(datum.value) }}</b>
                 </td>
               </tr>
@@ -257,20 +257,22 @@ const resolvedCenterValue: ComputedRef<string> = computed(() => {
               v-for="row in metrics"
               :key="row.label"
               :class="[
-                'border-b border-base-content/5 last:border-b-0 transition-colors hover:bg-base-200/30',
+                'flex items-center justify-between gap-2 w-full border-b border-base-content/5 last:border-b-0 transition-colors hover:bg-base-200/30',
                 row.rowClass || '',
               ]"
             >
               <td
-                :class="['truncate', 'max-w-[120px]', 'text-xs', row.labelClass || 'text-base-content/75']"
+                :class="['min-w-0', 'flex-1', 'truncate', '!px-1', 'text-xs', row.labelClass || 'text-base-content/75']"
                 :title="row.tooltip || row.label"
               >
                 {{ row.label }}
               </td>
               <td
                 :class="[
+                  'shrink-0',
                   'text-right',
                   'whitespace-nowrap',
+                  '!px-1',
                   'text-xs',
                   row.badge ? 'flex items-center justify-end gap-1' : '',
                 ]"

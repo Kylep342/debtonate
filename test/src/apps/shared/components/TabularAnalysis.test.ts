@@ -185,4 +185,36 @@ describe('TabularAnalysis Component', () => {
     expect(wrapper.text()).toContain('Item Two');
     expect(wrapper.text()).toContain('46 years old');
   });
+
+  it('renders delete button for deletable items and emits deleteItem without triggering selectBaseline', async () => {
+    const pinia = createTestingPinia({ createSpy: vi.fn });
+    setActivePinia(pinia);
+
+    const wrapper = mount(TabularAnalysis, {
+      props: {
+        analysis: {
+          'Monthly Payment': { b1: '$500.00', b2: '$420.00' },
+        },
+        items: mockItems as any,
+        title: 'Refinancing Analysis',
+        getItemName: mockGetItemName,
+        baselineId: 'b1',
+        canDeleteItem: (id: string) => id !== 'b1',
+      },
+      global: {
+        plugins: [pinia],
+      },
+    });
+
+    await nextTick();
+
+    expect(wrapper.find('#btn-delete-scenario-b1').exists()).toBe(false);
+    const deleteBtn = wrapper.find('#btn-delete-scenario-b2');
+    expect(deleteBtn.exists()).toBe(true);
+
+    await deleteBtn.trigger('click');
+    expect(wrapper.emitted('deleteItem')).toBeTruthy();
+    expect(wrapper.emitted('deleteItem')![0]).toEqual(['b2']);
+    expect(wrapper.emitted('selectBaseline')).toBeFalsy();
+  });
 });

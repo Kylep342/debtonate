@@ -20,9 +20,25 @@ const currentBudget: Ref<MonthlyBudget|null> = ref(null);
 
 const { viewedItemId, setViewedItemId } = usePivot(constants.TOTALS);
 
+const isRepatriatePhase = computed<boolean>(() => state.viewPhase === constants.PHASE_REPATRIATE);
+
+const availableVehicles = computed<UIDebtLoan[]>(() =>
+  isRepatriatePhase.value ? state.loansWithScenarios : state.loansWithTotals
+);
+
+watch(availableVehicles, (vehicles) => {
+  if (viewedItemId.value && !vehicles.some((v) => v.id === viewedItemId.value)) {
+    setViewedItemId(constants.TOTALS);
+  }
+});
+
 const currentLoan: ComputedRef<loan.ILoan | UIDebtLoan | null> = computed(() => {
   if (!viewedItemId.value) return null;
-  return state.getLoan(viewedItemId.value) || null;
+  return (
+    state.getLoan(viewedItemId.value) ||
+    state.loansWithScenarios.find((s) => s.id === viewedItemId.value) ||
+    null
+  );
 });
 
 const paymentSchedule: ComputedRef<paymentTypes.PaymentSchedule> = computed(() => {
@@ -82,7 +98,7 @@ const loanDropdownLabel = computed(() => (
 ));
 
 const loanDropdownButtons = computed<Button[]>(() =>
-  state.loansWithTotals.map((loanItem) => ({
+  availableVehicles.value.map((loanItem) => ({
     text: state.getLoanName(loanItem.id),
     onClick: () => setViewedItemId(loanItem.id),
   }))

@@ -109,6 +109,33 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
     </template>
     <template #body>
       <div class="p-3 sm:p-4 flex flex-col gap-4 min-h-[480px] sm:min-h-[520px]">
+        <!-- Privacy & Data Ownership Disclaimer -->
+        <div
+          v-if="activeTab === 'all' || activeTab === 'storage'"
+          class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-1.5"
+        >
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-primary shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            <span class="font-bold text-sm text-base-content">Privacy & Data Ownership</span>
+          </div>
+          <p class="text-xs text-base-content/70 leading-relaxed">
+            All data and calculation activity remain strictly within your browser. No financial details are ever transmitted to or stored on an external server. Saving, exporting, sharing, or deleting your data is at your discretion.
+          </p>
+        </div>
+
         <!-- Tab 1: Growth & Inflation -->
         <div
           v-if="activeTab === 'all' || activeTab === 'growth'"
@@ -311,30 +338,6 @@ const buttonText = (flag: boolean) => (flag ? constants.BTN_ON : constants.BTN_O
           >
             Data & Storage
           </div>
-          <!-- Privacy & Data Ownership Disclaimer -->
-          <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-1.5">
-            <div class="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-primary shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-              <span class="font-bold text-sm text-base-content">Privacy & Data Ownership</span>
-            </div>
-            <p class="text-xs text-base-content/70 leading-relaxed">
-              All data and calculation activity remain strictly within your browser. No financial details are ever transmitted to or stored on an external server. Saving, exporting, sharing, or deleting your plan is completely at your discretion.
-            </p>
-          </div>
-
           <div class="bg-base-200/50 rounded-xl p-4 border border-base-content/10 shadow-sm flex flex-col gap-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>

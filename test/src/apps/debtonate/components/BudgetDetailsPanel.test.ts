@@ -131,4 +131,76 @@ describe('BudgetDetailsPanel Component (Debtonate)', () => {
     await nextTick();
     expect(store.currentBudgetId).toBe('b2');
   });
+
+  it('includes refinancing scenarios in vehicle selector during Repatriate phase and resets when leaving Repatriate', async () => {
+    const mockScenario = {
+      id: 'scen-1',
+      name: 'Refi Scenario 1',
+      principal: 20000,
+      currentBalance: 20000,
+      annualRate: 0.04,
+      periodsPerYear: 12,
+      termInYears: 4,
+      minPayment: 451.58,
+      fees: 100,
+    };
+
+    const store = useDebtonateCoreStore();
+    store.viewPhase = 'Repatriate';
+    store.refinancingScenarios = {
+      'loan-1': [mockScenario as any],
+    };
+
+    vi.mocked(store.getBudget).mockReturnValue(mockBudget as any);
+    vi.mocked(store.getBudgetName).mockReturnValue('Budget 1');
+    vi.mocked(store.getLoan).mockImplementation((id: string) => {
+      if (id === 'loan-1') return mockLoan as any;
+      return undefined;
+    });
+    vi.mocked(store.getLoanName).mockImplementation((id: string) => {
+      if (id === 'loan-1') return 'Auto Loan';
+      if (id === 'scen-1') return 'Refi Scenario 1';
+      if (id === 'totals') return 'All Loans';
+      return id;
+    });
+    vi.mocked(store.getPaymentSchedule).mockReturnValue({
+      lifetimeInterest: 1600n,
+      lifetimePrincipal: 20000n,
+      amortizationSchedule: [],
+    } as any);
+    vi.mocked(store.getLoanComparativeAnalysis).mockReturnValue({
+      'Total Interest': { b1: '$1,600' },
+      'Periods to Payoff': { b1: '40' },
+    });
+
+    const wrapper = mount(BudgetDetailsPanel, {
+      props: { id: 'budgetDetailsPanel' },
+      global: globalConfig,
+    });
+
+    await nextTick();
+
+    const menu = wrapper.findComponent(BaseMenu);
+    const buttons = menu.props('buttons');
+    expect(buttons.map((b: any) => b.text)).toContain('Refi Scenario 1');
+
+    // Select the refinancing scenario
+    const scenBtn = buttons.find((b: any) => b.text === 'Refi Scenario 1');
+    expect(scenBtn).toBeDefined();
+    scenBtn!.onClick();
+    await nextTick();
+
+    expect(menu.props('text')).toBe('Refi Scenario 1');
+
+    // Switch to Comparative Analysis tab
+    const tabs = wrapper.findAll('.tabs-boxed button');
+    await tabs[1].trigger('click');
+    await nextTick();
+    expect(wrapper.text()).toContain('Refi Scenario 1 - Budget Comparison');
+
+    // Leaving Repatriate phase resets viewed vehicle to All Loans
+    store.viewPhase = 'Debtonate';
+    await nextTick();
+    expect(menu.props('text')).toBe('All Loans');
+  });
 });

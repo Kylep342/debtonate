@@ -42,4 +42,35 @@ describe('BudgetsPanel Component (Debtonate)', () => {
     const wrapper = mount(BudgetsPanel, { global: globalConfig });
     expect(wrapper.text()).toContain(constants.BUDGETS);
   });
+
+  it('includes refinancing scenarios in pivot menu during Repatriate phase and resets when phase changes', async () => {
+    const store = useDebtonateCoreStore();
+    const loanItem = { id: 'loan-1', name: 'Auto Loan' };
+    const scenItem = { id: 'scen-1', name: 'Refi 1' };
+    (store as any).loansWithTotals = [{ id: constants.TOTALS, name: 'All Loans' }, loanItem];
+    (store as any).loansWithScenarios = [{ id: constants.TOTALS, name: 'All Loans' }, loanItem, scenItem];
+    (store as any).monthlyBudgets = [
+      { id: constants.DEFAULT, relative: 0, absolute: 500 },
+    ];
+    store.viewPhase = constants.PHASE_REPATRIATE;
+    vi.mocked(store.getLoanName).mockImplementation((id: string) => {
+      if (id === 'scen-1') return 'Refi 1';
+      if (id === 'loan-1') return 'Auto Loan';
+      return 'All Loans';
+    });
+
+    const wrapper = mount(BudgetsPanel, { global: globalConfig });
+    const menu = wrapper.findComponent(BaseMenu);
+    const buttons = menu.props('buttons');
+    expect(buttons.length).toBe(3);
+
+    // Select scenario
+    buttons[2].onClick();
+    await wrapper.vm.$nextTick();
+
+    // Switch back to Debtonate phase
+    store.viewPhase = constants.PHASE_DEBTONATE;
+    await wrapper.vm.$nextTick();
+    expect(menu.props('buttons').length).toBe(2);
+  });
 });

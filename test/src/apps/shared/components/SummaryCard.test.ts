@@ -48,6 +48,9 @@ describe('SummaryCard Component', () => {
     expect(wrapper.find('.cardHeaderTitle + .badge').text()).toBe('Optimal');
     expect(wrapper.find('.cardHeaderSubtitle').text()).toBe('5.00% APR · $400/month');
     expect(wrapper.classes()).toContain('border-primary/25');
+    expect(wrapper.find('.card-body').classes()).toContain('p-3');
+    expect(wrapper.find('.card-body').classes()).not.toContain('p-4');
+    expect(wrapper.find('.card-body').classes()).not.toContain('md:px-6');
     expect(wrapper.text()).toContain('Principal');
     expect(wrapper.text()).toContain('$20,000');
     expect(wrapper.text()).toContain('4% Rule');

@@ -32,5 +32,20 @@ describe('BaseCard Component', () => {
     });
 
     expect(wrapper.find('.card-body').classes()).toContain('custom-body-class');
+    expect(wrapper.find('.card-body').classes()).toContain('p-4');
+  });
+
+  it('omits default p-4 and md:px-6 padding when custom padding classes are provided in bodyClasses', () => {
+    const wrapper = mount(BaseCard, {
+      props: {
+        bodyClasses: ['p-3', 'pt-2.5']
+      }
+    });
+
+    const classes = wrapper.find('.card-body').classes();
+    expect(classes).toContain('p-3');
+    expect(classes).toContain('pt-2.5');
+    expect(classes).not.toContain('p-4');
+    expect(classes).not.toContain('md:px-6');
   });
 });

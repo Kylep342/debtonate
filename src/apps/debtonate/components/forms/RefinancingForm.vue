@@ -50,12 +50,14 @@ const estimatedNewPayment = computed<number | null>(() => {
 });
 
 watch(
-  () => state.currentLoanId,
-  (newId) => {
-    if (newId && state.refinancingFormActive) {
+  [() => state.currentLoanId, () => state.refinancingFormActive],
+  ([newId, isActive]) => {
+    if (newId && isActive) {
       loanId.value = newId;
-      const currentLoan = state.getLoan(loanId.value)!;
-      currentBalance.value = currentLoan.currentBalance;
+      const currentLoan = state.getLoan(loanId.value);
+      if (currentLoan) {
+        currentBalance.value = currentLoan.currentBalance;
+      }
     }
   },
   { immediate: true },

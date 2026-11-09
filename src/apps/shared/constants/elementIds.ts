@@ -13,10 +13,16 @@ const BTN_GLOSSARY_CLOSE = 'btn-glossary-close';
 const BTN_GLOSSARY_DONE = 'btn-glossary-done';
 const INPUT_GLOSSARY_SEARCH = 'input-glossary-search';
 const BTN_CARD_COLLAPSE_PREFIX = 'btn-card-collapse';
+const BTN_DELETE_SCENARIO_PREFIX = 'btn-delete-scenario';
+const BAR_REFINANCE_PROMPT = 'bar-refinance-prompt';
+const BTN_DETAILS_REFINANCE = 'btn-details-refinance';
 
 export default Object.freeze({
   GLOBAL_OPTIONS_ID,
+  BAR_REFINANCE_PROMPT,
   BTN_CARD_COLLAPSE_PREFIX,
+  BTN_DELETE_SCENARIO_PREFIX,
+  BTN_DETAILS_REFINANCE,
   BTN_COPY_SHARE_LINK,
   BTN_EXPORT_SCHEDULE_CSV,
   BTN_EXPORT_SCHEDULE_JSON,

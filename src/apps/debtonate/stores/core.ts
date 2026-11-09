@@ -57,6 +57,7 @@ export interface DebtonateCoreGetters {
   interestSavedGraphs: ComputedRef<GraphConfig<LineGraphContent>>;
   loanCardGraphConfig: ComputedRef<GraphConfig<DonutGraphContent>>;
   loanFormTitle: ComputedRef<string>;
+  loansWithScenarios: ComputedRef<UIDebtLoan[]>;
   loansWithTotals: ComputedRef<UIDebtLoan[]>;
   monthlyBudgets: ComputedRef<MonthlyBudget[]>;
   paymentScenarios: ComputedRef<Record<string, PaymentScenario>>;
@@ -107,6 +108,10 @@ export interface DebtonateCoreActions {
   ) => Record<string, Record<string, any>>;
   getLoanComparativeAnalysis: (
     loanId: string
+  ) => Record<string, Record<string, any>>;
+  getRefinancingComparativeAnalysis: (
+    parentLoanId: string,
+    budgetId?: string
   ) => Record<string, Record<string, any>>;
   createBudget: (proposedBudget: number) => string;
   createLoan: (
@@ -336,6 +341,18 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     ...loans.value,
   ]);
 
+  const loansWithScenarios: ComputedRef<UIDebtLoan[]> = computed(() => {
+    const list: UIDebtLoan[] = [];
+    loansWithTotals.value.forEach((loanItem) => {
+      list.push(loanItem);
+      const scenarios = refinancingScenarios.value[loanItem.id];
+      if (scenarios && scenarios.length > 0) {
+        list.push(...scenarios);
+      }
+    });
+    return list;
+  });
+
   // Budgets
   const monthlyBudgets: ComputedRef<MonthlyBudget[]> = computed(() =>
     [...budgets.value, minimumBudget].map((budget) => ({
@@ -356,9 +373,11 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
         scenarios.forEach((scenario) => {
           const payment = refinancingScenarioPayment(parentLoan, scenario);
           const biScenario = toBigIntLoan(scenario);
+          const rawBiPayment = BigInt(Math.round(payment * 100));
+          const biPayment = rawBiPayment < biScenario.minPayment ? biScenario.minPayment : rawBiPayment;
           const paymentSchedule = payments.payLoans(
             [biScenario],
-            BigInt(Math.round(payment * 100)),
+            biPayment,
             false
           );
           schedules[parentLoanId][scenario.id] = <PaymentScenario>{
@@ -371,15 +390,22 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     return schedules;
   });
 
-  const repatriateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+  const getRefinancingComparativeAnalysis = (
+    parentLoanId: string,
+    budgetId: string = constants.DEFAULT
+  ): Record<string, Record<string, any>> => {
     const analysis: Record<string, Record<string, any>> = {};
+    const parentLoan = getLoan(parentLoanId);
+    if (!parentLoan) return analysis;
+
     const metrics = [
-      'Principal',
+      'Current Balance',
       'Interest Rate',
+      'Monthly Payment',
       'Total Interest',
-      'Total Payment',
-      'Interest/Principal Ratio',
       'Total Fees',
+      'Total Cost',
+      'Interest/Principal Ratio',
       'Periods to Payoff',
     ];
 
@@ -387,44 +413,44 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       analysis[metric] = {};
     });
 
-    const parentLoanId = selectedLoanId.value || constants.TOTALS;
-    const parentLoan = getLoan(parentLoanId);
-    if (!parentLoan) return analysis;
-
-    // Original Loan as first column
+    const budget = getBudget(budgetId);
+    const extraPayment = budget?.relative || 0;
     const scenarios = [parentLoan, ...(refinancingScenarios.value[parentLoanId] || [])];
 
     scenarios.forEach(scenario => {
-      let schedule: paymentTypes.PaymentSchedule;
-
-      if (scenario.id === parentLoanId) {
-        // Use the default budget for the original loan comparison
-        schedule = getPaymentSchedule(parentLoanId, constants.DEFAULT);
-      } else {
-        const scenarioData = refinancingSchedules.value[parentLoanId][scenario.id];
-        schedule = scenarioData.paymentSchedule[scenario.id];
-      }
-
+      const schedule = getPaymentSchedule(scenario.id, budgetId);
       const principal = scenario.currentBalance;
       const interest = Number(schedule.lifetimeInterest);
-      const total = principal + interest + (scenario.fees || 0);
+      const fees = scenario.fees || 0;
+      const total = principal + interest + fees;
+      const basePayment = scenario.id === parentLoanId
+        ? parentLoan.minPayment
+        : refinancingScenarioPayment(parentLoan, scenario);
+      const monthlyPayment = basePayment + extraPayment;
 
-      analysis['Principal'][scenario.id] = globalOptions.Money(principal);
-      analysis['Interest Rate'][scenario.id] = globalOptions.Percent(scenario.annualRate * 100);
+      analysis['Current Balance'][scenario.id] = globalOptions.Money(principal);
+      analysis['Interest Rate'][scenario.id] = globalOptions.Percent(Number(scenario.annualRate) * 100);
+      analysis['Monthly Payment'][scenario.id] = globalOptions.Money(monthlyPayment);
       analysis['Total Interest'][scenario.id] = globalOptions.Money(interest);
-      analysis['Total Payment'][scenario.id] = globalOptions.Money(total);
+      analysis['Total Fees'][scenario.id] = globalOptions.Money(fees);
+      analysis['Total Cost'][scenario.id] = globalOptions.Money(total);
       analysis['Interest/Principal Ratio'][scenario.id] = principal > 0 ? (interest / principal).toFixed(4) : '0.0000';
-      analysis['Total Fees'][scenario.id] = globalOptions.Money(scenario.fees || 0);
       analysis['Periods to Payoff'][scenario.id] = schedule.amortizationSchedule.length;
     });
 
     return analysis;
+  };
+
+  const repatriateTabularAnalysis: ComputedRef<Record<string, Record<string, any>>> = computed(() => {
+    return getRefinancingComparativeAnalysis(selectedLoanId.value || constants.TOTALS, constants.DEFAULT);
   });
 
   const getLoanComparativeAnalysis = (loanId: string): Record<string, Record<string, any>> => {
     const analysis: Record<string, Record<string, any>> = {};
     const isTotals = loanId === constants.TOTALS;
-    const loan = isTotals ? null : getLoan(loanId);
+    const loan = isTotals
+      ? null
+      : getLoan(loanId) || loansWithScenarios.value.find((s) => s.id === loanId);
     if (!isTotals && !loan) return analysis;
 
     const metrics = [
@@ -481,7 +507,11 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       analysis[metric] = {};
     });
 
-    loansWithTotals.value.forEach(loanItem => {
+    const items = viewPhase.value === constants.PHASE_REPATRIATE
+      ? loansWithScenarios.value
+      : loansWithTotals.value;
+
+    items.forEach(loanItem => {
       const schedule = getPaymentSchedule(loanItem.id, budgetId);
       const isTotals = loanItem.id === constants.TOTALS;
       const principal = isTotals ? totalCurrentBalance.value : loanItem.currentBalance;
@@ -632,7 +662,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       color: getBudgetColor,
       header: (loanId: string) => `Cost Breakdown - ${getLoanName(loanId)}`,
       lineName: getBudgetAbsoluteRate,
-      subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+      subheader: (loanId: string) => {
+        const l = getLoan(loanId) || loansWithScenarios.value.find((s) => s.id === loanId);
+        return l ? buildLoanSubtitle(l) : '';
+      },
       x: globalOptions.Period,
       xFormat: (x: number | Date) => globalOptions.Period(x, true),
       xLabel: () => globalOptions.Time,
@@ -652,7 +685,10 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
       header: (budgetId: string) =>
         `Cost Breakdown - ${getBudgetAbsoluteRate(budgetId)}`,
       lineName: getBudgetAbsoluteRate,
-      subheader: (loanId: string) => buildLoanSubtitle(getLoan(loanId)!),
+      subheader: (loanId: string) => {
+        const l = getLoan(loanId) || loansWithScenarios.value.find((s) => s.id === loanId);
+        return l ? buildLoanSubtitle(l) : '';
+      },
       x: globalOptions.Period,
       xFormat: (x: number | Date) => globalOptions.Period(x, true),
       xLabel: () => globalOptions.Time,
@@ -667,7 +703,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   const cardGraphs: ComputedRef<Record<string, Record<string, Arc[]>>> =
     computed(() => {
       const config = <Record<string, Record<string, Arc[]>>>{};
-      loansWithTotals.value.forEach((loan: UIDebtLoan) => {
+      loansWithScenarios.value.forEach((loan: UIDebtLoan) => {
         config[loan.id] = <Record<string, Arc[]>>{};
         monthlyBudgets.value.forEach((budget: MonthlyBudget) => {
           const paymentSchedule = getPaymentSchedule(loan.id, budget.id);
@@ -1428,7 +1464,15 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   };
   const getLoanIndex = (id: string): number =>
     loansWithTotals.value.findIndex((loan) => loan.id === id);
-  const getLoanName = (id: string): string => getLoan(id)!.name;
+  const getLoanName = (id: string): string => {
+    const found = getLoan(id);
+    if (found) return found.name;
+    for (const scenarios of Object.values(refinancingScenarios.value)) {
+      const scenario = scenarios.find((s) => s.id === id);
+      if (scenario) return scenario.name;
+    }
+    return id;
+  };
   const unviewLoan = () => {
     loanDetailsPanelActive.value = false;
     currentLoanId.value = null;
@@ -1500,7 +1544,9 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
   };
   const exitRefinancingForm = (): void => {
     refinancingFormActive.value = false;
-    currentLoanId.value = null;
+    if (!loanDetailsPanelActive.value) {
+      currentLoanId.value = null;
+    }
   };
 
   // Refinancing scenarios
@@ -1607,7 +1653,34 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     budgetId: string
   ): paymentTypes.PaymentSchedule => {
     const schedules = paymentSchedules.value[loanId];
-    return schedules ? schedules[budgetId] : {
+    if (schedules && schedules[budgetId]) {
+      return schedules[budgetId];
+    }
+    for (const [parentLoanId, scenarios] of Object.entries(refinancingScenarios.value)) {
+      const scenario = scenarios.find((s) => s.id === loanId);
+      if (scenario) {
+        const budget = getBudget(budgetId);
+        if (!budget || budget.relative === 0) {
+          const cached = refinancingSchedules.value[parentLoanId]?.[scenario.id]?.paymentSchedule?.[scenario.id];
+          if (cached) return cached;
+        }
+        const parentLoan = getLoan(parentLoanId);
+        if (parentLoan) {
+          const basePayment = refinancingScenarioPayment(parentLoan, scenario);
+          const totalPayment = basePayment + (budget?.relative || 0);
+          const biScenario = toBigIntLoan(scenario);
+          const rawBiPayment = BigInt(Math.round(totalPayment * 100));
+          const biPayment = rawBiPayment < biScenario.minPayment ? biScenario.minPayment : rawBiPayment;
+          const biSchedule = payments.payLoans(
+            [biScenario],
+            biPayment,
+            false
+          );
+          return toFloatSchedule(biSchedule)[scenario.id];
+        }
+      }
+    }
+    return {
       lifetimeInterest: 0,
       lifetimePrincipal: 0,
       amortizationSchedule: [],
@@ -1723,6 +1796,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     interestSavedGraphs,
     loanCardGraphConfig,
     loanFormTitle,
+    loansWithScenarios,
     loansWithTotals,
     monthlyBudgets,
     paymentScenarios,
@@ -1771,6 +1845,7 @@ export const useDebtonateCoreStore = defineStore('debtonateCore', () => {
     getBudgetIndex,
     getBudgetName,
     getLoanComparativeAnalysis,
+    getRefinancingComparativeAnalysis,
     getInterestUpToPeriod,
     getLifetimeInterest,
     getLoan,
